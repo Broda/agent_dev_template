@@ -2,6 +2,11 @@
 
 This template starts in brainstorming mode and finalizes in place into development mode.
 
+## Tooling Runtime
+
+- Python 3 is required for the repository automation scripts under `scripts/`.
+- The shell and PowerShell entrypoints are launchers; the canonical implementation lives in Python.
+
 ## Start Here
 
 - Read `AGENTS.md`

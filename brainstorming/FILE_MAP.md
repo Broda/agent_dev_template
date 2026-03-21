@@ -29,24 +29,24 @@ Lean file registry for the Project Idea Lab.
 | `brainstorming/templates/review_gate_template.md` | Optional review gate template |
 | `brainstorming/docs/adr/template.md` | Optional ADR template |
 | `brainstorming/docs/adr/ADR-0001-adopt-governance-structure-for-idea-lab.md` | Foundational ADR |
-| `scripts/validate-governance` | Cross-platform launcher for governance validation |
-| `scripts/lab-sync` | Cross-platform launcher for commit+push sync |
-| `scripts/lab-note` | Cross-platform launcher for research note capture |
-| `scripts/finalize-project` | In-place finalization launcher |
+| `scripts/validate-governance` | Cross-platform launcher for Python governance validation |
+| `scripts/lab-sync` | Cross-platform launcher for Python commit+push sync |
+| `scripts/lab-note` | Cross-platform launcher for Python research note capture |
+| `scripts/finalize-project` | Cross-platform launcher for Python in-place finalization |
 | `scripts/render-development-docs` | Development doc renderer from canonical state |
 | `scripts/validate-development` | Development-mode integrity validator |
 | `scripts/validate-brainstorming` | Brainstorming-mode integrity validator |
-| `scripts/validate-governance.ps1` | Mode-dispatch PowerShell validator |
-| `scripts/lab-sync.ps1` | Manual commit+push helper with clean-tree push safety |
-| `scripts/lab-note.ps1` | Windows research note capture helper |
+| `scripts/validate-governance.ps1` | PowerShell launcher for Python governance validation |
+| `scripts/lab-sync.ps1` | PowerShell launcher for Python commit+push sync |
+| `scripts/lab-note.ps1` | PowerShell launcher for Python research note capture |
 | `scripts/validate-brainstorming.ps1` | Windows brainstorming validator |
-| `scripts/finalize-project.sh` | Native macOS/Linux in-place finalization script |
+| `scripts/finalize-project.sh` | POSIX launcher for Python in-place finalization |
 | `scripts/render-development-docs.sh` | Native macOS/Linux development doc renderer |
 | `scripts/validate-development.sh` | Native macOS/Linux development validator |
 | `scripts/validate-brainstorming.sh` | Native macOS/Linux brainstorming validator |
-| `scripts/validate-governance.sh` | Native macOS/Linux mode-dispatch validator |
-| `scripts/lab-sync.sh` | Native macOS/Linux commit+push helper |
-| `scripts/lab-note.sh` | Native macOS/Linux research note capture helper |
+| `scripts/validate-governance.sh` | POSIX launcher for Python governance validation |
+| `scripts/lab-sync.sh` | POSIX launcher for Python commit+push sync |
+| `scripts/lab-note.sh` | POSIX launcher for Python research note capture helper |
 | `state/project-init.json` | Canonical structured handoff state |
 | `.github/workflows/governance-audit.yml` | Warn-only CI audit |
 | `.github/PULL_REQUEST_TEMPLATE.md` | PR checklist |

@@ -2,6 +2,8 @@
 
 Backend contract for conversational operations in the Project Idea Lab.
 
+Python 3 is required for the `scripts/` command implementations referenced in this document.
+
 ## Usage Style
 
 - Primary UX: conversational intent (plain language).
