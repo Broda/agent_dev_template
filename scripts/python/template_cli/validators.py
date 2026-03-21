@@ -22,6 +22,14 @@ def read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def write_text(path: Path, content: str) -> None:
+    path.write_text(content, encoding="utf-8")
+
+
+def replace_literal(content: str, old: str, new: str) -> str:
+    return content.replace(old, new)
+
+
 def read_mode(root: Path) -> str:
     mode_path = root / "MODE.md"
     if not mode_path.exists():
