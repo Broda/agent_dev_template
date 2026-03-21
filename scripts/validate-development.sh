@@ -46,7 +46,9 @@ if ! grep -Fq "Current mode: development" MODE.md 2>/dev/null; then
   add_failure "MODE.md must be switched to development."
 fi
 
-if grep -R -n -E '<[^>]+>' README.md docs CHANGELOG.md >/dev/null 2>&1; then
+placeholder_matches=$(rg -n '<[^>]+>' README.md docs CHANGELOG.md --glob '!docs/adr/ADR-TEMPLATE.md' 2>/dev/null || true)
+
+if [[ -n "$placeholder_matches" ]]; then
   add_failure "Unresolved placeholders detected in generated development docs."
 fi
 

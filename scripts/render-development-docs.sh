@@ -53,6 +53,19 @@ replace_literal() {
   ' "$file"
 }
 
+replace_readme_command_block() {
+  local file="$1"
+  local label="$2"
+  local value="$3"
+  LABEL="$label" VALUE="$value" perl -0777 -i -pe '
+    BEGIN {
+      $label = $ENV{"LABEL"} // q{};
+      $value = $ENV{"VALUE"} // q{};
+    }
+    s/\Q$label\E:\R+\s*<command>/$label . ":\n\n    " . $value/ge;
+  ' "$file"
+}
+
 validate_non_empty() {
   local label="$1"
   local value="$2"
@@ -146,14 +159,10 @@ done
 replace_literal "README.md" "Short description of the project." "$purpose"
 replace_literal "README.md" "<Prototype / MVP / Beta>" "MVP"
 replace_literal "README.md" "<Stack-specific setup steps>" "$setup_steps"
-
-awk -v b="$build_command" -v r="$run_command" -v t="$test_command" '
-  /Build:/ { print; getline; print ""; print "    " b; next }
-  /Run:/ { print; getline; print ""; print "    " r; next }
-  /Test:/ { print; getline; print ""; print "    " t; next }
-  { print }
-' "README.md" > "README.md.tmp"
-mv "README.md.tmp" "README.md"
+replace_literal "README.md" "./scripts/lab-note --topic \"<topic>\" --summary \"<bullet>\"" "./scripts/lab-note --topic \"runtime-verification\" --summary \"Captured smoke-test notes\""
+replace_readme_command_block "README.md" "Build" "$build_command"
+replace_readme_command_block "README.md" "Run" "$run_command"
+replace_readme_command_block "README.md" "Test" "$test_command"
 
 replace_literal "docs/PROJECT_CONTEXT.md" "<Describe what this project is and why it exists.>" "$purpose"
 replace_literal "docs/PROJECT_CONTEXT.md" "<What comes next>" "Deliver Milestone 0 vertical slice and verification evidence."
