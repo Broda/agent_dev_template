@@ -8,7 +8,7 @@ Python 3 is required for the `scripts/` automation commands used below.
 2. When an idea is worth keeping, say "capture this idea".
 3. When moving forward, say "make this active".
 4. Record decisions/risks only when useful.
-5. When done, say "finalize/export plan", then run `./scripts/finalize-project --idea-id <idea-id>`.
+5. When done, say "finalize/export plan", then run `./scripts/finalize-project`.
 6. Run audit:
 
 ```sh

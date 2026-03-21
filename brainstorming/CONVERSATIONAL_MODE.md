@@ -38,7 +38,7 @@ Lightweight mode for chat-first brainstorming with milestone-based recording.
 | "save a note on `<topic>`" | create research note scoped to topic | `notes/*`, `NOTES_CATALOG.md` |
 | "save that research" | create research note from prior gathered context | `notes/*`, `NOTES_CATALOG.md` |
 | "review this idea" | record review/gate | `sessions/*`, `IDEA_CATALOG.md` |
-| "finalize/export plan" | create export, persist canonical state, and switch this repo into development mode | `exports/*`, `state/project-init.json`, `MODE.md`, `docs/*`, `IDEA_CATALOG.md` |
+| "finalize/export plan" | create export for the current idea, persist canonical state, and switch this repo into development mode | `exports/*`, `state/project-init.json`, `MODE.md`, `docs/*`, `IDEA_CATALOG.md` |
 | "run audit" | validate integrity | `scripts/validate-governance` |
 
 ## Notes

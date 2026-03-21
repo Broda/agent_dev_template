@@ -28,6 +28,10 @@ This template starts in brainstorming mode and finalizes in place into developme
 Run:
 
 ```sh
+./scripts/finalize-project
+
+If needed, override the inferred current idea with:
+
 ./scripts/finalize-project --idea-id <idea-id>
 ```
 

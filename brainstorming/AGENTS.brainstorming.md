@@ -34,7 +34,8 @@ Avoid per-turn file churn for exploratory discussion.
 
 - Always create the exported project plan packet first.
 - Persist canonical answers in `state/project-init.json`.
-- Finalize in place with `./scripts/finalize-project --idea-id <idea-id>`.
+- Finalize in place with `./scripts/finalize-project`.
+- If multiple ideas are active or inference is ambiguous, pass `--idea-id <idea-id>`.
 - Do not clone another repository during finalize.
 
 ## Research Note Retrieval

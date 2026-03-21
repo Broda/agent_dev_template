@@ -34,7 +34,7 @@ Python 3 is required for the `scripts/` command implementations referenced in th
 | "save a note on <topic>" | `/lab note <topic-or-ref>` |
 | "save that research" | `/lab note <topic-or-ref>` |
 | "review this idea" | `/lab review <idea-id>` |
-| "finalize/export plan" | `/lab export <idea-id>` + `/lab finalize <idea-id>` |
+| "finalize/export plan" | `/lab export <current-idea>` + `/lab finalize [<idea-id>]` |
 | "park this" | `/lab park <idea-id>` |
 | "kill this" | `/lab kill <idea-id>` |
 | "run audit" | `/lab audit` |
@@ -89,11 +89,14 @@ Python 3 is required for the `scripts/` command implementations referenced in th
 - Create `exports/YYYY-MM-DD_PROJECT_PLAN_PACKET_<idea-id>.md` using `brainstorming/templates/project_plan_packet_template.md`.
 - Update export link in `IDEA_CATALOG.md`.
 
-### `/lab finalize <idea-id>`
+### `/lab finalize [<idea-id>]`
 - Mark idea status `exported`.
 - Ensure export path is present in `IDEA_CATALOG.md`.
 - Capture canonical decisions in `state/project-init.json`.
-- Finalize in place with `./scripts/finalize-project --idea-id <idea-id>`.
+- Finalize in place with `./scripts/finalize-project`.
+- Default target is the current idea from canonical state or the single active idea.
+- If multiple ideas are active or inference is ambiguous, prompt with a numbered choice list.
+- `--idea-id <idea-id>` remains available as an explicit override.
 - Switch `MODE.md` to development after successful rendering and validation.
 
 ### `/lab park <idea-id>`

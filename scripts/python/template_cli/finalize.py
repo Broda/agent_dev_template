@@ -155,6 +155,27 @@ def choose_from_list(prompt: str, current: str, options: list[str]) -> str:
                 return options[idx - 1]
 
 
+def choose_idea_to_finalize(candidates: list[tuple[str, str, str]]) -> str:
+    eprint("Multiple ideas are available to finalize:")
+    for idx, (idea_id, title, status) in enumerate(candidates, start=1):
+        display_title = title or idea_id
+        eprint(f"{idx}) {display_title} [{idea_id}] ({status})")
+
+    while True:
+        try:
+            response = input(f"Select idea to finalize [1-{len(candidates)}]: ")
+        except EOFError:
+            raise SystemExit(
+                "Cannot infer which idea to finalize non-interactively.\n"
+                "Rerun with stdin/TTY answers or pass --idea-id explicitly."
+            )
+        response = trim(response)
+        if response.isdigit():
+            idx = int(response)
+            if 1 <= idx <= len(candidates):
+                return candidates[idx - 1][0]
+
+
 def extract_label_value(path: Path, label: str) -> str:
     prefix = f"- {label}:"
     if not path.exists():
@@ -293,10 +314,57 @@ def _write_mode_development(root: Path) -> None:
     )
 
 
-def run_finalize_project(root: Path, idea_id: str) -> int:
+def resolve_finalize_idea_id(root: Path, explicit_idea_id: str = "") -> str:
     catalog_path = root / "IDEA_CATALOG.md"
     if not catalog_path.exists():
         raise SystemExit("IDEA_CATALOG.md not found.")
+
+    explicit_idea_id = trim(explicit_idea_id)
+    if explicit_idea_id:
+        return explicit_idea_id
+
+    state_idea_id = trim(existing_state_value(root, "ideaId"))
+    if state_idea_id:
+        return state_idea_id
+
+    active_rows: list[tuple[str, str, str]] = []
+    exported_rows: list[tuple[str, str, str]] = []
+    all_rows: list[tuple[str, str, str]] = []
+    for cells in parse_markdown_table_rows(catalog_path, IDEA_ROW_RE):
+        if not cells:
+            continue
+        idea_id = trim(cells[0] if len(cells) > 0 else "")
+        title = trim(cells[1] if len(cells) > 1 else "") or idea_id
+        status = trim(cells[2] if len(cells) > 2 else "")
+        if not idea_id:
+            continue
+        row = (idea_id, title, status or "unknown")
+        all_rows.append(row)
+        if status == "active":
+            active_rows.append(row)
+        elif status == "exported":
+            exported_rows.append(row)
+
+    if len(active_rows) == 1:
+        return active_rows[0][0]
+    if len(active_rows) > 1:
+        return choose_idea_to_finalize(active_rows)
+    if len(all_rows) == 1:
+        return all_rows[0][0]
+    if len(exported_rows) == 1:
+        return exported_rows[0][0]
+    if len(all_rows) > 1:
+        return choose_idea_to_finalize(all_rows)
+
+    raise SystemExit(
+        "Could not infer which idea to finalize.\n"
+        "Set state/project-init.json ideaId, keep at least one idea in IDEA_CATALOG.md, or pass --idea-id explicitly."
+    )
+
+
+def run_finalize_project(root: Path, idea_id: str) -> int:
+    idea_id = resolve_finalize_idea_id(root, idea_id)
+    catalog_path = root / "IDEA_CATALOG.md"
 
     catalog_cells = None
     for cells in parse_markdown_table_rows(catalog_path, IDEA_ROW_RE):
