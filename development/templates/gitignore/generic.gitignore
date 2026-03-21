@@ -1,0 +1,44 @@
+# ----------------------------
+# Generic Project Ignore
+# ----------------------------
+
+# Build outputs
+build/
+dist/
+out/
+coverage/
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.*
+*.local
+
+# Runtime data
+*.db
+*.sqlite
+*.sqlite3
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Temporary
+tmp/
+temp/
+
+# Packaged artifacts
+release/
+artifacts/
+*.exe
+*.dmg
+*.pkg
+*.zip
+*.tar.gz

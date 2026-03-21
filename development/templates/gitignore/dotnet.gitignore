@@ -1,0 +1,48 @@
+# ----------------------------
+# .NET / C#
+# ----------------------------
+
+# Build artifacts
+bin/
+obj/
+out/
+
+# User-specific files
+*.user
+*.suo
+*.userprefs
+
+# Logs
+*.log
+
+# Runtime databases (local-first apps)
+*.db
+*.sqlite
+*.sqlite3
+
+# Test results
+TestResults/
+coverage/
+
+# Visual Studio
+.vs/
+
+# Rider
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.*
+
+# Packaged artifacts
+release/
+artifacts/
+*.exe
+*.dmg
+*.pkg
+*.zip
+*.tar.gz

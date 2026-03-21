@@ -1,0 +1,23 @@
+{
+  "status": "draft",
+  "ideaId": "",
+  "projectName": "",
+  "purpose": "",
+  "projectType": "",
+  "techStack": {
+    "language": "",
+    "runtime": "",
+    "framework": "",
+    "packageTool": ""
+  },
+  "persistence": "",
+  "authentication": "",
+  "determinism": "",
+  "packaging": "",
+  "constraints": "",
+  "commands": {
+    "build": "",
+    "run": "",
+    "test": ""
+  }
+}

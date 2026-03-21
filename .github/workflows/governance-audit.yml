@@ -1,0 +1,25 @@
+﻿name: Governance Audit (Warn Only)
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run governance audit (warn-only)
+        shell: bash
+        run: |
+          echo "Running governance audit in warn-only mode..."
+          if ! ./scripts/validate-governance; then
+            echo "::warning::Governance audit reported failures. Warn-only mode: this does not block merge."
+          else
+            echo "Governance audit passed."
+          fi
+          exit 0
