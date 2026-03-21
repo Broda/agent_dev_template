@@ -663,7 +663,7 @@ replace_line_prefix "$export_path" "- Technical dependencies:" "$(summarize_depe
 replace_line_prefix "$export_path" "- External dependencies:" "${notes_col:-None recorded}"
 replace_line_prefix "$export_path" "- Team/process dependencies:" "Owner: $owner"
 replace_line_prefix "$export_path" "- Latest review session:" "${latest_review_session:-None recorded}"
-replace_line_prefix "$export_path" "- Quality gate result: pass | conditional-pass | fail" "${latest_review_outcome:-conditional-pass}"
+replace_line_prefix "$export_path" "- Quality gate result:" "${latest_review_outcome:-conditional-pass}"
 replace_line_prefix "$export_path" "- Required artifacts:" "\`$STATE_FILE\`, development governance docs, verification evidence, and implementation source."
 replace_line_prefix "$export_path" "- Implementation recommendations:" "Start with Milestone 0 and keep changes aligned to $project_type boundaries."
 replace_line_prefix "$export_path" "- Sequencing notes:" "Build first, then run, then test, then capture verification evidence."
