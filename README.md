@@ -21,7 +21,7 @@ This template starts in brainstorming mode and finalizes in place into developme
 - Idea state files: `ideas/`
 - Sessions: `sessions/`
 - Notes: `notes/`
-- Exports: `exports/`
+- Optional summaries: `exports/`
 
 ## Finalize In Place
 
@@ -29,18 +29,27 @@ Run:
 
 ```sh
 ./scripts/finalize-project
+```
 
 If needed, override the inferred current idea with:
 
+```sh
 ./scripts/finalize-project --idea-id <idea-id>
+```
+
+If you also want an archival summary snapshot:
+
+```sh
+./scripts/finalize-project --write-export
 ```
 
 This will:
 
-1. Create or refresh the exported project plan packet.
-2. Capture canonical project decisions in `state/project-init.json`.
-3. Render the development governance docs into `docs/`, `README.md`, `CHANGELOG.md`, and `.gitignore`.
-4. Switch `MODE.md` to `development`.
+1. Capture canonical project decisions in `state/project-init.json`.
+2. Append a finalization session entry under `sessions/`.
+3. Optionally generate a summary snapshot under `exports/`.
+4. Render the development governance docs into `docs/`, `README.md`, `CHANGELOG.md`, and `.gitignore`.
+5. Switch `MODE.md` to `development`.
 
 ## Development Phase
 

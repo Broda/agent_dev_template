@@ -181,7 +181,9 @@ def run_validate_brainstorming(root: Path) -> int:
         "ideas/_active.md",
         "ideas/_parked.md",
         "ideas/_killed.md",
+        "sessions/",
         "notes/",
+        "exports/",
         "brainstorming/templates/idea_template.md",
         "brainstorming/templates/decision_template.md",
         "brainstorming/templates/note_template.md",
@@ -243,6 +245,7 @@ def run_validate_brainstorming(root: Path) -> int:
                 "parked": "ideas/_parked.md",
                 "killed": "ideas/_killed.md",
                 "exported": "ideas/_active.md",
+                "finalized": "ideas/_active.md",
             }
             state_file = state_file_by_status.get(status)
             if state_file is None:
@@ -255,15 +258,10 @@ def run_validate_brainstorming(root: Path) -> int:
             if status == "active" and is_noneish(sessions):
                 result.add_warning(f"Active idea '{idea_id}' has no session link yet.")
 
-            if status == "exported":
-                if not export_path or is_noneish(export_path):
-                    result.add_failure(f"Exported idea '{idea_id}' must include export file path.")
-                else:
-                    clean_export_path = clean_backticks(export_path)
-                    if not path_exists(root, clean_export_path):
-                        result.add_failure(
-                            f"Catalog export path missing for '{idea_id}': {clean_export_path}"
-                        )
+            if status in {"exported", "finalized"} and export_path and not is_noneish(export_path):
+                clean_export_path = clean_backticks(export_path)
+                if not path_exists(root, clean_export_path):
+                    result.add_failure(f"Catalog export path missing for '{idea_id}': {clean_export_path}")
 
     validate_notes_catalog(root, result)
 
@@ -292,7 +290,9 @@ def run_validate_development(root: Path) -> int:
         "CHANGELOG.md",
         ".gitignore",
         "NOTES_CATALOG.md",
+        "sessions/",
         "notes/",
+        "exports/",
         "scripts/lab-note",
         "scripts/lab-note.sh",
         "scripts/lab-note.ps1",
@@ -346,6 +346,22 @@ def run_validate_development(root: Path) -> int:
             result.add_failure("state/project-init.json must include a non-empty ideaId.")
         if not str(state.get("projectType", "")).strip():
             result.add_failure("state/project-init.json must include a non-empty projectType.")
+        schema_version = state.get("schemaVersion")
+        if schema_version:
+            if schema_version != 2:
+                result.add_failure("state/project-init.json schemaVersion must be 2.")
+            product = state.get("product", {})
+            governance = state.get("governance", {})
+            artifacts = state.get("artifacts", {})
+            if not str(product.get("problemStatement", "")).strip():
+                result.add_failure("state/project-init.json must include product.problemStatement.")
+            if not str(product.get("solutionSummary", "")).strip():
+                result.add_failure("state/project-init.json must include product.solutionSummary.")
+            if not str(governance.get("topRisks", "")).strip():
+                result.add_failure("state/project-init.json must include governance.topRisks.")
+            session_files = artifacts.get("sessionFiles", [])
+            if not isinstance(session_files, list) or not session_files:
+                result.add_failure("state/project-init.json must include artifacts.sessionFiles.")
 
     validate_notes_catalog(root, result)
     return print_development_summary(result)

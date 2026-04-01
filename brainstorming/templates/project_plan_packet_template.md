@@ -1,4 +1,4 @@
-﻿# Project Plan Packet Template (Governance Export)
+﻿# Project Summary Snapshot Template (Optional Archive)
 
 ## 1. Executive Summary
 
@@ -54,11 +54,11 @@
 - Latest review session:
 - Quality gate result: pass | conditional-pass | fail
 - If conditional-pass: conditions, owners, due dates
-- Policy compliance check:
-  - `DECISION_POLICY.md`
-  - `REVIEW_WORKFLOW.md`
-  - `QUALITY_BAR.md`
-  - `SECURITY_POLICY.md`
+- Development docs generated:
+  - `docs/PROJECT_CONTEXT.md`
+  - `docs/ROADMAP.md`
+  - `docs/ARCHITECTURE.md`
+  - `docs/SECURITY_POLICY.md`
 
 ## 9. Quality Checklist
 

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import argparse
 import json
 import re
 import shutil
@@ -8,7 +7,6 @@ import subprocess
 import sys
 import tempfile
 from contextlib import AbstractContextManager
-from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
 
@@ -25,6 +23,7 @@ from template_cli.validators import (
 
 
 STATE_FILE = "state/project-init.json"
+STATE_SCHEMA_VERSION = 2
 
 
 def eprint(message: str) -> None:
@@ -37,6 +36,10 @@ def trim(value: str | None) -> str:
 
 def join_by(sep: str, values: list[str]) -> str:
     return sep.join(v for v in values if trim(v))
+
+
+def join_lines(values: list[str]) -> str:
+    return "\n".join(v for v in values if trim(v))
 
 
 def replace_line_prefix(path: Path, prefix: str, value: str) -> None:
@@ -203,6 +206,25 @@ def latest_session_path(session_paths: list[str]) -> str:
     return max(session_paths) if session_paths else ""
 
 
+def unique_values(values: list[str]) -> list[str]:
+    seen: set[str] = set()
+    unique: list[str] = []
+    for value in values:
+        cleaned = trim(value)
+        if not cleaned or cleaned in seen:
+            continue
+        seen.add(cleaned)
+        unique.append(cleaned)
+    return unique
+
+
+def split_linkish_values(value: str, prefixes: tuple[str, ...]) -> list[str]:
+    matches: list[str] = []
+    for prefix in prefixes:
+        matches.extend(re.findall(rf"{re.escape(prefix)}/[^`,\s]+\.md", value))
+    return unique_values(matches)
+
+
 def summarize_decisions(project_type: str, persistence: str, authentication: str, determinism: str, packaging: str) -> str:
     parts = []
     if project_type:
@@ -292,6 +314,10 @@ class BackupManager(AbstractContextManager["BackupManager"]):
 
 
 def _update_catalog_export(root: Path, idea_id: str, export_path: str) -> None:
+    _update_catalog_transition(root, idea_id, session_path="", export_path=export_path)
+
+
+def _update_catalog_transition(root: Path, idea_id: str, session_path: str, export_path: str) -> None:
     catalog_path = root / "IDEA_CATALOG.md"
     lines = read_text(catalog_path).splitlines()
     updated: list[str] = []
@@ -301,8 +327,14 @@ def _update_catalog_export(root: Path, idea_id: str, export_path: str) -> None:
             if cells and cells[0] == idea_id:
                 while len(cells) < 7:
                     cells.append("")
-                _, title, _, owner, sessions, _, notes = cells[:7]
-                line = f"| {idea_id} | {title} | exported | {owner} | {sessions} | `{export_path}` | {notes} |"
+                _, title, _, owner, sessions, existing_export, notes = cells[:7]
+                session_links = unique_values(
+                    split_linkish_values(sessions, ("sessions",)) + ([session_path] if session_path else [])
+                )
+                summary_export = export_path or clean_backticks(existing_export)
+                session_cell = ", ".join(f"`{value}`" for value in session_links) or "_none_"
+                export_cell = f"`{summary_export}`" if trim(summary_export) else "_n/a_"
+                line = f"| {idea_id} | {title} | finalized | {owner} | {session_cell} | {export_cell} | {notes} |"
         updated.append(line)
     write_text(catalog_path, "\n".join(updated) + "\n")
 
@@ -328,7 +360,7 @@ def resolve_finalize_idea_id(root: Path, explicit_idea_id: str = "") -> str:
         return state_idea_id
 
     active_rows: list[tuple[str, str, str]] = []
-    exported_rows: list[tuple[str, str, str]] = []
+    finalized_rows: list[tuple[str, str, str]] = []
     all_rows: list[tuple[str, str, str]] = []
     for cells in parse_markdown_table_rows(catalog_path, IDEA_ROW_RE):
         if not cells:
@@ -342,8 +374,8 @@ def resolve_finalize_idea_id(root: Path, explicit_idea_id: str = "") -> str:
         all_rows.append(row)
         if status == "active":
             active_rows.append(row)
-        elif status == "exported":
-            exported_rows.append(row)
+        elif status in {"exported", "finalized"}:
+            finalized_rows.append(row)
 
     if len(active_rows) == 1:
         return active_rows[0][0]
@@ -351,8 +383,8 @@ def resolve_finalize_idea_id(root: Path, explicit_idea_id: str = "") -> str:
         return choose_idea_to_finalize(active_rows)
     if len(all_rows) == 1:
         return all_rows[0][0]
-    if len(exported_rows) == 1:
-        return exported_rows[0][0]
+    if len(finalized_rows) == 1:
+        return finalized_rows[0][0]
     if len(all_rows) > 1:
         return choose_idea_to_finalize(all_rows)
 
@@ -362,7 +394,168 @@ def resolve_finalize_idea_id(root: Path, explicit_idea_id: str = "") -> str:
     )
 
 
-def run_finalize_project(root: Path, idea_id: str) -> int:
+def _write_summary_export(root: Path, export_path: str, state: dict) -> None:
+    product = state.get("product", {})
+    governance = state.get("governance", {})
+    artifacts = state.get("artifacts", {})
+
+    shutil.copyfile(root / "brainstorming/templates/project_plan_packet_template.md", root / export_path)
+    export_file = root / export_path
+    replace_line_prefix(export_file, "- Project name:", str(state.get("projectName", "")))
+    replace_line_prefix(export_file, "- Idea ID:", str(state.get("ideaId", "")))
+    replace_line_prefix(export_file, "- Owner:", str(state.get("owner", "unassigned")))
+    replace_line_prefix(export_file, "- Date:", str(state.get("finalizedAt", "")))
+    replace_line_prefix(export_file, "- One-sentence objective:", str(state.get("purpose", "")))
+    replace_line_prefix(
+        export_file,
+        "- Problem statement:",
+        str(product.get("problemStatement", "")) or str(state.get("purpose", "")),
+    )
+    replace_line_prefix(export_file, "- Target users:", str(product.get("targetUsers", "")) or "See related sessions")
+    replace_line_prefix(export_file, "- Why now:", str(product.get("whyNow", "")) or "See related sessions")
+    replace_line_prefix(
+        export_file,
+        "- Expected value:",
+        str(product.get("expectedValue", "")) or str(state.get("purpose", "")),
+    )
+    replace_line_prefix(
+        export_file,
+        "- Solution summary:",
+        str(product.get("solutionSummary", ""))
+        or f"Deliver the first milestone vertical slice for {state.get('projectName', '')}.",
+    )
+    replace_line_prefix(
+        export_file,
+        "- MVP scope:",
+        str(product.get("mvpScope", ""))
+        or "Milestone 0 vertical slice with working build, run, and test commands.",
+    )
+    replace_line_prefix(
+        export_file,
+        "- Out of scope:",
+        str(product.get("outOfScope", "")) or "See roadmap and follow-up sessions.",
+    )
+    replace_line_prefix(
+        export_file,
+        "- Assumptions and constraints:",
+        join_by("; ", [str(product.get("assumptions", "")), str(state.get("constraints", ""))]),
+    )
+    replace_line_prefix(
+        export_file,
+        "- Key decisions:",
+        str(governance.get("keyDecisions", "")) or "See canonical state and related sessions.",
+    )
+    replace_line_prefix(
+        export_file,
+        "- ADR references:",
+        join_by(", ", [f"`{value}`" for value in list(artifacts.get("adrReferences", []))]),
+    )
+    replace_line_prefix(
+        export_file,
+        "- Top risks:",
+        str(governance.get("topRisks", "")) or "Capture implementation risks during Milestone 0 execution.",
+    )
+    replace_line_prefix(
+        export_file,
+        "- Mitigation plans:",
+        str(governance.get("mitigationPlans", ""))
+        or "Keep scope narrow, validate early, and update governance on change.",
+    )
+    replace_line_prefix(
+        export_file,
+        "- Contingencies:",
+        str(governance.get("contingencies", "")) or "Reduce scope and re-baseline roadmap if assumptions fail.",
+    )
+    replace_line_prefix(
+        export_file,
+        "- Remaining accepted risks:",
+        str(governance.get("remainingAcceptedRisks", "")) or "None recorded at finalization time.",
+    )
+    replace_line_prefix(export_file, "- Milestone 1:", "Milestone 0 vertical slice implemented and verified.")
+    replace_line_prefix(
+        export_file,
+        "- Milestone 2:",
+        "Stabilize architecture, tests, and documentation after first delivery.",
+    )
+    replace_line_prefix(
+        export_file,
+        "- Milestone 3:",
+        "Expand scope only after baseline verification remains green.",
+    )
+    replace_line_prefix(
+        export_file,
+        "- Exit criteria per milestone:",
+        f"{state['commands']['build']} (success), {state['commands']['test']} (pass), {state['commands']['run']} (smoke verified).",
+    )
+    replace_line_prefix(
+        export_file,
+        "- Technical dependencies:",
+        summarize_dependencies(
+            str(state["techStack"]["language"]),
+            str(state["techStack"]["runtime"]),
+            str(state["techStack"]["framework"]),
+            str(state["techStack"]["packageTool"]),
+        ),
+    )
+    replace_line_prefix(
+        export_file,
+        "- External dependencies:",
+        str(artifacts.get("noteReferences", "")) or "None recorded",
+    )
+    replace_line_prefix(export_file, "- Team/process dependencies:", f"Owner: {state.get('owner', 'unassigned')}")
+    replace_line_prefix(
+        export_file,
+        "- Latest review session:",
+        str(governance.get("latestReviewSession", "")) or "None recorded",
+    )
+    replace_line_prefix(
+        export_file,
+        "- Quality gate result:",
+        str(governance.get("latestReviewOutcome", "")) or "conditional-pass",
+    )
+    replace_line_prefix(
+        export_file,
+        "- Required artifacts:",
+        f"`{STATE_FILE}`, development governance docs, verification evidence, and implementation source.",
+    )
+    replace_line_prefix(
+        export_file,
+        "- Implementation recommendations:",
+        f"Start with Milestone 0 and keep changes aligned to {state.get('projectType', '')} boundaries.",
+    )
+    replace_line_prefix(
+        export_file,
+        "- Sequencing notes:",
+        "Build first, then run, then test, then capture verification evidence.",
+    )
+    replace_line_prefix(
+        export_file,
+        "- Explicit non-goals:",
+        str(product.get("nonGoals", "")) or "Avoid scope expansion before baseline verification is complete.",
+    )
+    replace_line_prefix(
+        export_file,
+        "- Idea source link:",
+        join_by(", ", [f"`{value}`" for value in list(artifacts.get("ideaFiles", []))]),
+    )
+    replace_line_prefix(
+        export_file,
+        "- Session links:",
+        join_by(", ", [f"`{value}`" for value in list(artifacts.get("sessionFiles", []))]),
+    )
+    replace_line_prefix(
+        export_file,
+        "- ADR links:",
+        join_by(", ", [f"`{value}`" for value in list(artifacts.get("adrReferences", []))]),
+    )
+    replace_line_prefix(
+        export_file,
+        "- Risk references:",
+        str(governance.get("latestReviewSession", "")) or "See related sessions",
+    )
+
+
+def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False) -> int:
     idea_id = resolve_finalize_idea_id(root, idea_id)
     catalog_path = root / "IDEA_CATALOG.md"
 
@@ -398,7 +591,7 @@ def run_finalize_project(root: Path, idea_id: str) -> int:
         )
 
     session_paths: list[str] = []
-    for match in re.findall(r"sessions/[^`,\s]+\.md", sessions_col):
+    for match in split_linkish_values(sessions_col, ("sessions",)):
         if path_exists(root, match) and match not in session_paths:
             session_paths.append(match)
     for match in files_containing(root, "sessions", idea_id):
@@ -425,6 +618,22 @@ def run_finalize_project(root: Path, idea_id: str) -> int:
     existing_build_command = existing_state_value(root, "commands.build")
     existing_run_command = existing_state_value(root, "commands.run")
     existing_test_command = existing_state_value(root, "commands.test")
+    existing_problem_statement = existing_state_value(root, "product.problemStatement")
+    existing_target_users = existing_state_value(root, "product.targetUsers")
+    existing_why_now = existing_state_value(root, "product.whyNow")
+    existing_expected_value = existing_state_value(root, "product.expectedValue")
+    existing_solution_summary = existing_state_value(root, "product.solutionSummary")
+    existing_mvp_scope = existing_state_value(root, "product.mvpScope")
+    existing_out_of_scope = existing_state_value(root, "product.outOfScope")
+    existing_assumptions = existing_state_value(root, "product.assumptions")
+    existing_non_goals = existing_state_value(root, "product.nonGoals")
+    existing_key_decisions = existing_state_value(root, "governance.keyDecisions")
+    existing_top_risks = existing_state_value(root, "governance.topRisks")
+    existing_mitigation_plans = existing_state_value(root, "governance.mitigationPlans")
+    existing_contingencies = existing_state_value(root, "governance.contingencies")
+    existing_remaining_risks = existing_state_value(root, "governance.remainingAcceptedRisks")
+    existing_latest_review_outcome = existing_state_value(root, "governance.latestReviewOutcome")
+    existing_latest_review_session = existing_state_value(root, "governance.latestReviewSession")
 
     if existing_project_name:
         project_name = existing_project_name
@@ -447,31 +656,31 @@ def run_finalize_project(root: Path, idea_id: str) -> int:
                 break
     objective = ask_non_empty("One-sentence objective", objective)
 
-    problem_statement = first_value_for_label(hydrate_files, "Problem statement")
-    target_users = first_value_for_label(hydrate_files, "Affected users/personas") or first_value_for_label(
+    problem_statement = existing_problem_statement or first_value_for_label(hydrate_files, "Problem statement")
+    target_users = existing_target_users or first_value_for_label(hydrate_files, "Affected users/personas") or first_value_for_label(
         hydrate_files, "Target users"
     )
-    why_now = first_value_for_label(hydrate_files, "Why now")
-    expected_value = first_value_for_label(hydrate_files, "Expected value") or first_value_for_label(
+    why_now = existing_why_now or first_value_for_label(hydrate_files, "Why now")
+    expected_value = existing_expected_value or first_value_for_label(hydrate_files, "Expected value") or first_value_for_label(
         hydrate_files, "Value hypothesis"
     )
-    solution_summary = first_value_for_label(hydrate_files, "Solution summary")
-    mvp_scope = first_value_for_label(hydrate_files, "MVP scope")
-    out_of_scope = first_value_for_label(hydrate_files, "Out of scope")
-    assumptions = first_value_for_label(hydrate_files, "Assumptions")
-    non_goals = first_value_for_label(hydrate_files, "Non-goals")
-    top_risks = first_value_for_label(hydrate_files, "Top risks") or first_value_for_label(
+    solution_summary = existing_solution_summary or first_value_for_label(hydrate_files, "Solution summary")
+    mvp_scope = existing_mvp_scope or first_value_for_label(hydrate_files, "MVP scope")
+    out_of_scope = existing_out_of_scope or first_value_for_label(hydrate_files, "Out of scope")
+    assumptions = existing_assumptions or first_value_for_label(hydrate_files, "Assumptions")
+    non_goals = existing_non_goals or first_value_for_label(hydrate_files, "Non-goals")
+    top_risks = existing_top_risks or first_value_for_label(hydrate_files, "Top risks") or first_value_for_label(
         hydrate_files, "Top risks (link to risk entries)"
     )
-    mitigation_plans = first_value_for_label(hydrate_files, "Mitigation plans") or first_value_for_label(
+    mitigation_plans = existing_mitigation_plans or first_value_for_label(hydrate_files, "Mitigation plans") or first_value_for_label(
         hydrate_files, "Preventive mitigation"
     )
-    contingencies = first_value_for_label(hydrate_files, "Contingency plan")
-    remaining_risks = first_value_for_label(hydrate_files, "Remaining accepted risks")
-    latest_review_outcome = first_value_for_label(hydrate_files, "Latest review outcome") or first_value_for_label(
+    contingencies = existing_contingencies or first_value_for_label(hydrate_files, "Contingency plan")
+    remaining_risks = existing_remaining_risks or first_value_for_label(hydrate_files, "Remaining accepted risks")
+    latest_review_outcome = existing_latest_review_outcome or first_value_for_label(hydrate_files, "Latest review outcome") or first_value_for_label(
         hydrate_files, "Result"
     )
-    latest_review_session = latest_session_path(session_paths)
+    latest_review_session = existing_latest_review_session or latest_session_path(session_paths)
 
     constraints_source = existing_constraints if not is_placeholder_value(existing_constraints) else ""
     if not constraints_source:
@@ -506,19 +715,23 @@ def run_finalize_project(root: Path, idea_id: str) -> int:
     build_command = ask_non_empty("Build command", existing_build_command)
     run_command = ask_non_empty("Run command", existing_run_command)
     test_command = ask_non_empty("Test command", existing_test_command)
+    key_decisions = existing_key_decisions or summarize_decisions(
+        project_type, persistence, authentication, determinism, packaging
+    )
 
     date_stamp = date.today().isoformat()
-    export_path = f"exports/{date_stamp}_PROJECT_PLAN_PACKET_{idea_id}.md"
-    session_path = f"exports/{date_stamp}_FINALIZATION_SESSION_{idea_id}.md"
+    export_path = f"exports/{date_stamp}_PROJECT_SUMMARY_{idea_id}.md"
+    session_path = f"sessions/{date_stamp}_FINALIZATION_SESSION_{idea_id}.md"
 
-    (root / "exports").mkdir(parents=True, exist_ok=True)
+    (root / "sessions").mkdir(parents=True, exist_ok=True)
+    if write_export:
+        (root / "exports").mkdir(parents=True, exist_ok=True)
     (root / "state").mkdir(parents=True, exist_ok=True)
     (root / "docs/adr").mkdir(parents=True, exist_ok=True)
 
     with BackupManager(root) as backups:
         for relative_path in [
             STATE_FILE,
-            export_path,
             "README.md",
             "CHANGELOG.md",
             ".gitignore",
@@ -538,11 +751,16 @@ def run_finalize_project(root: Path, idea_id: str) -> int:
             session_path,
         ]:
             backups.backup_path(relative_path)
+        if write_export:
+            backups.backup_path(export_path)
 
         state = {
+            "schemaVersion": STATE_SCHEMA_VERSION,
             "status": "finalized",
+            "finalizedAt": date_stamp,
             "ideaId": idea_id,
             "projectName": project_name,
+            "owner": owner,
             "purpose": objective,
             "projectType": project_type,
             "techStack": {
@@ -561,129 +779,61 @@ def run_finalize_project(root: Path, idea_id: str) -> int:
                 "run": run_command,
                 "test": test_command,
             },
+            "product": {
+                "problemStatement": problem_statement or objective,
+                "targetUsers": target_users or "See related sessions",
+                "whyNow": why_now or "See related sessions",
+                "expectedValue": expected_value or objective,
+                "solutionSummary": solution_summary or f"Deliver the first milestone vertical slice for {project_name}.",
+                "mvpScope": mvp_scope or "Milestone 0 vertical slice with working build, run, and test commands.",
+                "outOfScope": out_of_scope or "See roadmap and follow-up sessions.",
+                "assumptions": assumptions,
+                "nonGoals": non_goals,
+            },
+            "governance": {
+                "keyDecisions": key_decisions
+                or summarize_decisions(project_type, persistence, authentication, determinism, packaging),
+                "topRisks": top_risks or "Capture implementation risks during Milestone 0 execution.",
+                "mitigationPlans": mitigation_plans
+                or "Keep scope narrow, validate early, and update governance on change.",
+                "contingencies": contingencies or "Reduce scope and re-baseline roadmap if assumptions fail.",
+                "remainingAcceptedRisks": remaining_risks or "None recorded at finalization time.",
+                "latestReviewOutcome": latest_review_outcome or "conditional-pass",
+                "latestReviewSession": latest_review_session,
+            },
+            "artifacts": {
+                "ideaFiles": unique_values(idea_files),
+                "sessionFiles": unique_values(session_paths + [session_path]),
+                "noteReferences": notes_col or "None recorded",
+                "summaryExport": export_path if write_export else "",
+                "finalizationSession": session_path,
+                "adrReferences": ["docs/adr/ADR-0001-record-architecture-decisions.md"],
+            },
         }
         write_text(root / STATE_FILE, json.dumps(state, indent=2) + "\n")
-
-        shutil.copyfile(
-            root / "brainstorming/templates/project_plan_packet_template.md", root / export_path
-        )
-        export_file = root / export_path
-        replace_line_prefix(export_file, "- Project name:", project_name)
-        replace_line_prefix(export_file, "- Idea ID:", idea_id)
-        replace_line_prefix(export_file, "- Owner:", owner)
-        replace_line_prefix(export_file, "- Date:", date_stamp)
-        replace_line_prefix(export_file, "- One-sentence objective:", objective)
-        replace_line_prefix(export_file, "- Problem statement:", problem_statement or objective)
-        replace_line_prefix(export_file, "- Target users:", target_users or "See related sessions")
-        replace_line_prefix(export_file, "- Why now:", why_now or "See related sessions")
-        replace_line_prefix(export_file, "- Expected value:", expected_value or objective)
-        replace_line_prefix(
-            export_file,
-            "- Solution summary:",
-            solution_summary or f"Deliver the first milestone vertical slice for {project_name}.",
-        )
-        replace_line_prefix(
-            export_file,
-            "- MVP scope:",
-            mvp_scope or "Milestone 0 vertical slice with working build, run, and test commands.",
-        )
-        replace_line_prefix(export_file, "- Out of scope:", out_of_scope or "See roadmap and follow-up sessions.")
-        replace_line_prefix(
-            export_file, "- Assumptions and constraints:", join_by("; ", [assumptions, constraints])
-        )
-        replace_line_prefix(
-            export_file,
-            "- Key decisions:",
-            summarize_decisions(project_type, persistence, authentication, determinism, packaging),
-        )
-        replace_line_prefix(
-            export_file, "- ADR references:", "`docs/adr/ADR-0001-record-architecture-decisions.md`"
-        )
-        replace_line_prefix(
-            export_file, "- Top risks:", top_risks or "Capture implementation risks during Milestone 0 execution."
-        )
-        replace_line_prefix(
-            export_file,
-            "- Mitigation plans:",
-            mitigation_plans or "Keep scope narrow, validate early, and update governance on change.",
-        )
-        replace_line_prefix(
-            export_file,
-            "- Contingencies:",
-            contingencies or "Reduce scope and re-baseline roadmap if assumptions fail.",
-        )
-        replace_line_prefix(
-            export_file, "- Remaining accepted risks:", remaining_risks or "None recorded at finalization time."
-        )
-        replace_line_prefix(export_file, "- Milestone 1:", "Milestone 0 vertical slice implemented and verified.")
-        replace_line_prefix(
-            export_file,
-            "- Milestone 2:",
-            "Stabilize architecture, tests, and documentation after first delivery.",
-        )
-        replace_line_prefix(
-            export_file,
-            "- Milestone 3:",
-            "Expand scope only after baseline verification remains green.",
-        )
-        replace_line_prefix(
-            export_file,
-            "- Exit criteria per milestone:",
-            f"{build_command} (success), {test_command} (pass), {run_command} (smoke verified).",
-        )
-        replace_line_prefix(
-            export_file,
-            "- Technical dependencies:",
-            summarize_dependencies(language, runtime, framework, package_tool),
-        )
-        replace_line_prefix(export_file, "- External dependencies:", notes_col or "None recorded")
-        replace_line_prefix(export_file, "- Team/process dependencies:", f"Owner: {owner}")
-        replace_line_prefix(
-            export_file, "- Latest review session:", latest_review_session or "None recorded"
-        )
-        replace_line_prefix(
-            export_file, "- Quality gate result:", latest_review_outcome or "conditional-pass"
-        )
-        replace_line_prefix(
-            export_file,
-            "- Required artifacts:",
-            f"`{STATE_FILE}`, development governance docs, verification evidence, and implementation source.",
-        )
-        replace_line_prefix(
-            export_file,
-            "- Implementation recommendations:",
-            f"Start with Milestone 0 and keep changes aligned to {project_type} boundaries.",
-        )
-        replace_line_prefix(
-            export_file,
-            "- Sequencing notes:",
-            "Build first, then run, then test, then capture verification evidence.",
-        )
-        replace_line_prefix(
-            export_file,
-            "- Explicit non-goals:",
-            non_goals or "Avoid scope expansion before baseline verification is complete.",
-        )
-        replace_line_prefix(export_file, "- Idea source link:", join_by(", ", idea_files))
-        replace_line_prefix(export_file, "- Session links:", join_by(", ", session_paths))
-        replace_line_prefix(export_file, "- ADR links:", "`docs/adr/ADR-0001-record-architecture-decisions.md`")
-        replace_line_prefix(export_file, "- Risk references:", latest_review_session or "See related sessions")
+        if write_export:
+            _write_summary_export(root, export_path, state)
 
         render_code = run_render_development_docs(root)
         if render_code != 0:
             raise SystemExit(render_code)
 
-        _update_catalog_export(root, idea_id, export_path)
+        _update_catalog_transition(root, idea_id, session_path, export_path if write_export else "")
         _write_mode_development(root)
 
-        session_content = (
-            "# Finalization Session\n\n"
-            f"- Date: {date_stamp}\n"
-            f"- Owner: {owner}\n"
-            f"- Idea ID: {idea_id}\n"
-            f"- Session: {session_path}\n"
-            f"- Export: `{export_path}`\n"
-            f"- Canonical state: `{STATE_FILE}`\n"
+        session_lines = [
+            "# Finalization Session",
+            "",
+            f"- Date: {date_stamp}",
+            f"- Owner: {owner}",
+            f"- Idea ID: {idea_id}",
+            f"- Session: {session_path}",
+            f"- Canonical state: `{STATE_FILE}`",
+        ]
+        if write_export:
+            session_lines.append(f"- Summary export: `{export_path}`")
+        session_content = join_lines(session_lines) + "\n\n"
+        session_content += (
             "- Result: in-place mode switch completed\n\n"
             "The repository has been successfully finalized into development mode.\n"
         )
@@ -695,8 +845,9 @@ def run_finalize_project(root: Path, idea_id: str) -> int:
 
         backups.commit()
 
-    print(f"Project plan created: {export_path}")
     print(f"Canonical state saved: {STATE_FILE}")
     print(f"Finalization session log: {session_path}")
+    if write_export:
+        print(f"Optional project summary written: {export_path}")
     print("The repository has been successfully finalized into development mode.")
     return 0

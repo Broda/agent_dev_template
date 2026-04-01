@@ -8,8 +8,9 @@ Python 3 is required for the `scripts/` automation commands used below.
 2. When an idea is worth keeping, say "capture this idea".
 3. When moving forward, say "make this active".
 4. Record decisions/risks only when useful.
-5. When done, say "finalize/export plan", then run `./scripts/finalize-project`.
-6. Run audit:
+5. When done, say "finalize this repo", then run `./scripts/finalize-project`.
+6. If you also want an archival summary snapshot, rerun with `./scripts/finalize-project --write-export`.
+7. Run audit:
 
 ```sh
 ./scripts/validate-governance
@@ -19,7 +20,7 @@ Python 3 is required for the `scripts/` automation commands used below.
 
 - [ ] Idea exists in `IDEA_CATALOG.md`
 - [ ] At least one session exists in `sessions/`
-- [ ] Export exists in `exports/`
+- [ ] Canonical state is ready to be captured in `state/project-init.json`
 
 ## Optional Add-ons
 

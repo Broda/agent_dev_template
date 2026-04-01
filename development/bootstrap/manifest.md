@@ -1,4 +1,4 @@
-# project_init_templates/manifest.md — Structured Mode Bootstrap
+# development/bootstrap/manifest.md — Structured Mode Bootstrap
 
 This folder is a one-time bootstrap installer.
 
@@ -6,7 +6,7 @@ Goal:
 - Ask a small set of initialization questions
 - Generate only the governance/docs needed for THIS project
 - Populate placeholders using user answers
-- Delete `project_init_templates/` after successful initialization
+- Render governance docs from `development/templates/` after successful initialization
 
 After initialization:
 - `docs/` is the single source of truth
@@ -74,7 +74,7 @@ Always generate the following (from templates):
 - CHANGELOG.md
 - .gitignore (stack-aligned)
 
-Note: CHANGELOG.md must be generated from a template file (add `project_init_templates/docs/CHANGELOG.base.md`).
+Note: CHANGELOG.md must be generated from `development/templates/docs/CHANGELOG.base.md`.
 
 ---
 
@@ -121,7 +121,7 @@ Must include:
 - “Docs” section linking governance files
 
 ### .gitignore
-Select the best baseline from `project_init_templates/gitignore/`:
+Select the best baseline from `development/templates/gitignore/`:
 
 - node.gitignore
 - dotnet.gitignore
@@ -163,7 +163,8 @@ Initialization is complete only when:
 
 Then:
 
-- Delete `project_init_templates/` folder entirely.
+- Treat generated docs as the live governance source.
+- Keep template assets under `development/templates/` and `development/bootstrap/` for template maintenance only.
 
 Record in CHANGELOG under [Unreleased]:
 - “Initialized Structured Mode governance baseline.”

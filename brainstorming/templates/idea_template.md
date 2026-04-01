@@ -7,7 +7,7 @@
 - Title:
 - Date:
 - Owner:
-- Status: inbox | active | parked | killed | exported
+- Status: inbox | active | parked | killed | finalized
 - Sensitivity: Public | Internal | Restricted
 
 ## Problem Definition
@@ -58,7 +58,7 @@
 
 - Latest review outcome: pass | conditional-pass | fail
 - Conditions to finalize:
-- Planned export path:
+- Optional summary export path:
 
 ## Traceability
 

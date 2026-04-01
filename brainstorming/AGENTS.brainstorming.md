@@ -36,9 +36,10 @@ Avoid per-turn file churn for exploratory discussion.
 
 ## Finalization Rule
 
-- Always create the exported project plan packet first.
-- Persist canonical answers in `state/project-init.json`.
+- Persist canonical answers in `state/project-init.json` first.
+- Treat `state/project-init.json` and `sessions/` as the source of truth for transition into development mode.
 - Finalize in place with `./scripts/finalize-project`.
+- Use `./scripts/finalize-project --write-export` only when you also want an archival summary snapshot in `exports/`.
 - If multiple ideas are active or inference is ambiguous, pass `--idea-id <idea-id>`.
 - Do not clone another repository during finalize.
 
@@ -84,8 +85,8 @@ Session boundary checkpoint:
 
 - Idea record in `ideas/_*.md` and `IDEA_CATALOG.md`
 - At least one session file in `sessions/`
-- Export file in `exports/`
 - Canonical handoff state in `state/project-init.json` after finalization
+- Optional archival summary in `exports/`
 
 ## References
 

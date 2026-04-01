@@ -41,6 +41,37 @@ def _extract_value(state: dict, path: str) -> str:
     return str(cur)
 
 
+def _state_value(state: dict, path: str, default: str = "") -> str:
+    cur = state
+    for part in path.split("."):
+        if not isinstance(cur, dict) or part not in cur:
+            return default
+        cur = cur[part]
+    if cur is None:
+        return default
+    value = str(cur).strip()
+    return value or default
+
+
+def _state_list(state: dict, path: str) -> list[str]:
+    cur = state
+    for part in path.split("."):
+        if not isinstance(cur, dict) or part not in cur:
+            return []
+        cur = cur[part]
+    if not isinstance(cur, list):
+        return []
+    values: list[str] = []
+    seen: set[str] = set()
+    for item in cur:
+        value = str(item).strip()
+        if not value or value in seen:
+            continue
+        seen.add(value)
+        values.append(value)
+    return values
+
+
 def _copy_base(root: Path, src: str, dst: str) -> None:
     src_path = root / src
     dst_path = root / dst
@@ -79,6 +110,20 @@ def _related_hydration_files(root: Path, idea_id: str) -> list[Path]:
         for path in sorted(base.rglob(f"*{idea_id}*.md"), reverse=True):
             if path.is_file():
                 files.append(path)
+    return files
+
+
+def _related_hydration_files_from_state(root: Path, state: dict, idea_id: str) -> list[Path]:
+    files = _related_hydration_files(root, idea_id)
+    for relative_path in _state_list(state, "artifacts.ideaFiles") + _state_list(state, "artifacts.sessionFiles"):
+        path = root / relative_path
+        if path.is_file() and path not in files:
+            files.append(path)
+    summary_export = _state_value(state, "artifacts.summaryExport")
+    if summary_export:
+        export_path = root / summary_export
+        if export_path.is_file() and export_path not in files:
+            files.append(export_path)
     return files
 
 
@@ -642,15 +687,23 @@ def run_render_development_docs(root: Path) -> int:
     build_command = _extract_value(state, "commands.build")
     run_command = _extract_value(state, "commands.run")
     test_command = _extract_value(state, "commands.test")
-    hydration_files = _related_hydration_files(root, idea_id)
-    problem_statement = _first_value_for_label(hydration_files, ["Problem statement"]) or purpose
-    target_users = _first_value_for_label(
+    hydration_files = _related_hydration_files_from_state(root, state, idea_id)
+    problem_statement = _state_value(state, "product.problemStatement") or _first_value_for_label(
+        hydration_files, ["Problem statement"]
+    ) or purpose
+    target_users = _state_value(state, "product.targetUsers") or _first_value_for_label(
         hydration_files, ["Target users", "Affected users/personas"]
     ) or "Users validated during brainstorming"
-    solution_summary = _first_value_for_label(hydration_files, ["Solution summary"]) or purpose
-    mvp_scope = _first_value_for_label(hydration_files, ["MVP scope"]) or "Capture milestone scope in ROADMAP.md."
-    out_of_scope = _first_value_for_label(hydration_files, ["Out of scope"]) or "Track non-goals explicitly."
-    top_risks = _first_value_for_label(
+    solution_summary = _state_value(state, "product.solutionSummary") or _first_value_for_label(
+        hydration_files, ["Solution summary"]
+    ) or purpose
+    mvp_scope = _state_value(state, "product.mvpScope") or _first_value_for_label(
+        hydration_files, ["MVP scope"]
+    ) or "Capture milestone scope in ROADMAP.md."
+    out_of_scope = _state_value(state, "product.outOfScope") or _first_value_for_label(
+        hydration_files, ["Out of scope"]
+    ) or "Track non-goals explicitly."
+    top_risks = _state_value(state, "governance.topRisks") or _first_value_for_label(
         hydration_files, ["Top risks", "Top risks (link to risk entries)"]
     ) or "Capture implementation risks during the first milestone."
     domain_concepts = _infer_domain_concepts(

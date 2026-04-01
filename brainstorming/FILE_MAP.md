@@ -18,9 +18,9 @@ Lean file registry for the Project Idea Lab.
 | `ideas/_active.md` | Active ideas |
 | `ideas/_parked.md` | Parked ideas |
 | `ideas/_killed.md` | Killed ideas |
-| `sessions/` | Session records |
+| `sessions/` | Session records and finalization continuity logs |
 | `notes/` | Saved research/context notes |
-| `exports/` | Final plan exports |
+| `exports/` | Optional archival project summaries |
 | `brainstorming/templates/idea_template.md` | Idea capture template |
 | `brainstorming/templates/decision_template.md` | Decision template |
 | `brainstorming/templates/note_template.md` | Research note template |

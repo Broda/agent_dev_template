@@ -9,12 +9,12 @@ Follow this procedure exactly.
 # 1) Read Manifest
 
 Read:
-- project_init_templates/manifest.md
+- development/bootstrap/manifest.md
 
 Review:
-- project_init_templates/docs/*.base.md
-- project_init_templates/docs/adr/*
-- project_init_templates/gitignore/*.gitignore
+- development/templates/docs/*.base.md
+- development/templates/docs/adr/*
+- development/templates/gitignore/*.gitignore
 
 Do not generate anything yet.
 
@@ -121,7 +121,7 @@ Ensure ADR numbering starts at 0001.
 
 ---
 
-# 7) Final Validation Before Cleanup
+# 7) Final Validation
 
 Confirm ALL of the following:
 
@@ -159,14 +159,13 @@ If ANY validation fails:
 
 ---
 
-# 8) Cleanup
+# 8) Post-Initialization Behavior
 
-Delete the entire `project_init_templates/` folder.
+After initialization:
 
-After deletion:
-
-- Do NOT reference templates again.
-- Do NOT regenerate governance files.
+- Treat generated files under `docs/`, `README.md`, `CHANGELOG.md`, and `.gitignore` as the live source of truth.
+- Keep `development/templates/` and `development/bootstrap/` as maintenance assets for the template itself, not as day-to-day governance.
+- Do NOT rely on template files during normal development work.
 - Switch to permanent governance rules in AGENTS.md.
 
 ---

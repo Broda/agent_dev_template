@@ -1,7 +1,10 @@
 {
+  "schemaVersion": 2,
   "status": "draft",
+  "finalizedAt": "",
   "ideaId": "",
   "projectName": "",
+  "owner": "",
   "purpose": "",
   "projectType": "",
   "techStack": {
@@ -19,5 +22,33 @@
     "build": "",
     "run": "",
     "test": ""
+  },
+  "product": {
+    "problemStatement": "",
+    "targetUsers": "",
+    "whyNow": "",
+    "expectedValue": "",
+    "solutionSummary": "",
+    "mvpScope": "",
+    "outOfScope": "",
+    "assumptions": "",
+    "nonGoals": ""
+  },
+  "governance": {
+    "keyDecisions": "",
+    "topRisks": "",
+    "mitigationPlans": "",
+    "contingencies": "",
+    "remainingAcceptedRisks": "",
+    "latestReviewOutcome": "",
+    "latestReviewSession": ""
+  },
+  "artifacts": {
+    "ideaFiles": [],
+    "sessionFiles": [],
+    "noteReferences": "",
+    "summaryExport": "",
+    "finalizationSession": "",
+    "adrReferences": []
   }
 }

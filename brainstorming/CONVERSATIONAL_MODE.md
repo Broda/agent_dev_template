@@ -38,7 +38,8 @@ Lightweight mode for chat-first brainstorming with milestone-based recording.
 | "save a note on `<topic>`" | create research note scoped to topic | `notes/*`, `NOTES_CATALOG.md` |
 | "save that research" | create research note from prior gathered context | `notes/*`, `NOTES_CATALOG.md` |
 | "review this idea" | record review/gate | `sessions/*`, `IDEA_CATALOG.md` |
-| "finalize/export plan" | create export for the current idea, persist canonical state, and switch this repo into development mode | `exports/*`, `state/project-init.json`, `MODE.md`, `docs/*`, `IDEA_CATALOG.md` |
+| "finalize this repo" | persist canonical state, append finalization history, and switch this repo into development mode | `sessions/*`, `state/project-init.json`, `MODE.md`, `docs/*`, `IDEA_CATALOG.md` |
+| "save a summary snapshot" | generate an optional archival project summary | `exports/*` |
 | "run audit" | validate integrity | `scripts/validate-governance` |
 
 ## Notes
@@ -48,6 +49,6 @@ Lightweight mode for chat-first brainstorming with milestone-based recording.
 - If a likely topic shift is detected, prompt once (respecting 10-minute cooldown): "Before we switch, save the previous thread?"
 - Topic-shift quick actions: `capture idea`, `record decision`, `log risk`, `save path note`, `skip`.
 - Note recall rule: for "save that info" requests, resolve from recent relevant research; if ambiguous, ask one clarifier.
-- For small ideas, keep artifacts minimal: idea + session + export.
+- For small ideas, keep artifacts minimal: idea + session + canonical state.
 - No extra push phrase is required; milestone commits are auto-pushed by default.
 - If push fails, local commits are preserved for manual retry without interrupting flow.

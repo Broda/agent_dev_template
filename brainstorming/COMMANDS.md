@@ -34,7 +34,8 @@ Python 3 is required for the `scripts/` command implementations referenced in th
 | "save a note on <topic>" | `/lab note <topic-or-ref>` |
 | "save that research" | `/lab note <topic-or-ref>` |
 | "review this idea" | `/lab review <idea-id>` |
-| "finalize/export plan" | `/lab export <current-idea>` + `/lab finalize [<idea-id>]` |
+| "save a summary snapshot" | `/lab export <idea-id>` |
+| "finalize this repo" | `/lab finalize [<idea-id>]` |
 | "park this" | `/lab park <idea-id>` |
 | "kill this" | `/lab kill <idea-id>` |
 | "run audit" | `/lab audit` |
@@ -86,14 +87,14 @@ Python 3 is required for the `scripts/` command implementations referenced in th
 - Update `IDEA_CATALOG.md`.
 
 ### `/lab export <idea-id>`
-- Create `exports/YYYY-MM-DD_PROJECT_PLAN_PACKET_<idea-id>.md` using `brainstorming/templates/project_plan_packet_template.md`.
-- Update export link in `IDEA_CATALOG.md`.
+- Optionally create `exports/YYYY-MM-DD_PROJECT_SUMMARY_<idea-id>.md` using `brainstorming/templates/project_plan_packet_template.md`.
+- Update summary export link in `IDEA_CATALOG.md` when a snapshot exists.
 
 ### `/lab finalize [<idea-id>]`
-- Mark idea status `exported`.
-- Ensure export path is present in `IDEA_CATALOG.md`.
 - Capture canonical decisions in `state/project-init.json`.
+- Append a finalization session entry under `sessions/`.
 - Finalize in place with `./scripts/finalize-project`.
+- Use `--write-export` only when an archival summary snapshot is desired.
 - Default target is the current idea from canonical state or the single active idea.
 - If multiple ideas are active or inference is ambiguous, prompt with a numbered choice list.
 - `--idea-id <idea-id>` remains available as an explicit override.
@@ -147,7 +148,8 @@ Python 3 is required for the `scripts/` command implementations referenced in th
 
 - Idea record (`ideas/_*.md` + `IDEA_CATALOG.md`)
 - At least one related session (`sessions/*`)
-- Final export packet (`exports/*`)
+- Canonical state (`state/project-init.json`)
+- Optional archival summary (`exports/*`)
 
 ## Auto-Commit Message Strategy
 

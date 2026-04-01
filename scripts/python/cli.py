@@ -31,6 +31,7 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser("render-development-docs")
     finalize_parser = subparsers.add_parser("finalize-project")
     finalize_parser.add_argument("--idea-id", default="")
+    finalize_parser.add_argument("--write-export", action="store_true")
     note_parser = subparsers.add_parser("lab-note")
     note_parser.add_argument("--topic", required=True)
     note_parser.add_argument("--source", default="recent assistant research context")
@@ -56,7 +57,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "render-development-docs":
         return run_render_development_docs(Path.cwd())
     if args.command == "finalize-project":
-        return run_finalize_project(Path.cwd(), args.idea_id or "")
+        return run_finalize_project(Path.cwd(), args.idea_id or "", write_export=args.write_export)
     if args.command == "lab-note":
         return run_lab_note(
             Path.cwd(),
