@@ -24,6 +24,9 @@ Python 3 is required for the `scripts/` command implementations referenced in th
 
 ## Conversational Intent Mapping
 
+This table is generated from `brainstorming/intent_registry.json` via `./scripts/render-intent-docs`.
+
+<!-- BEGIN GENERATED CONVERSATIONAL INTENT MAPPING -->
 | Conversational phrase family | Backend intent |
 |---|---|
 | "capture this idea", "save this idea", "log this idea" | `/lab capture <idea-id>` |
@@ -40,7 +43,10 @@ Python 3 is required for the `scripts/` command implementations referenced in th
 | "what's the current state?", "show me status", "where are we now?" | `/lab status` |
 | "why is finalize blocked?", "what exactly is missing before finalize?", "show me where finalize is getting values from" | `/lab doctor [<idea-id>]` |
 | "run audit", "validate the repo", "check governance" | `/lab audit` |
-| "commit this milestone", "push these changes", "sync the repo" | `/lab commit`, `/lab push`, `/lab sync` |
+| "commit this milestone", "make a commit", "commit these changes" | `/lab commit [message]` |
+| "push these changes", "push this branch", "publish the branch" | `/lab push` |
+| "sync the repo", "commit and push this", "sync these changes" | `/lab sync [message]` |
+<!-- END GENERATED CONVERSATIONAL INTENT MAPPING -->
 
 ## Commands (Backend Contract)
 

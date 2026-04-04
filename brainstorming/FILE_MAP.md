@@ -10,6 +10,7 @@ Lean file registry for the Project Idea Lab.
 | `brainstorming/AGENTS.brainstorming.md` | Brainstorming-mode contract |
 | `brainstorming/CONVERSATIONAL_MODE.md` | Plain-language interaction and milestone capture |
 | `brainstorming/COMMANDS.md` | Optional backend command mapping |
+| `brainstorming/intent_registry.json` | Canonical brainstorming intent registry for generated NL mapping tables |
 | `brainstorming/QUICKSTART.md` | Fast start workflow |
 | `brainstorming/EXAMPLE_LIFECYCLE.md` | End-to-end example from capture through finalize |
 | `brainstorming/FILE_MAP.md` | Registry of retained files |
@@ -38,6 +39,7 @@ Lean file registry for the Project Idea Lab.
 | `scripts/lab` | Cross-platform launcher for brainstorming lifecycle commands |
 | `scripts/lab-sync` | Cross-platform launcher for Python commit+push sync |
 | `scripts/lab-note` | Cross-platform launcher for Python research note capture |
+| `scripts/render-intent-docs` | Cross-platform launcher for generated intent table rendering |
 | `scripts/finalize-project` | Cross-platform launcher for Python in-place finalization |
 | `scripts/render-development-docs` | Development doc renderer from canonical state |
 | `scripts/validate-development` | Development-mode integrity validator |
@@ -46,8 +48,10 @@ Lean file registry for the Project Idea Lab.
 | `scripts/lab.ps1` | PowerShell launcher for brainstorming lifecycle commands |
 | `scripts/lab-sync.ps1` | PowerShell launcher for Python commit+push sync |
 | `scripts/lab-note.ps1` | PowerShell launcher for Python research note capture |
+| `scripts/render-intent-docs.ps1` | PowerShell launcher for generated intent table rendering |
 | `scripts/validate-brainstorming.ps1` | Windows brainstorming validator |
 | `scripts/finalize-project.sh` | POSIX launcher for Python in-place finalization |
+| `scripts/render-intent-docs.sh` | POSIX launcher for generated intent table rendering |
 | `scripts/render-development-docs.sh` | Native macOS/Linux development doc renderer |
 | `scripts/validate-development.sh` | Native macOS/Linux development validator |
 | `scripts/validate-brainstorming.sh` | Native macOS/Linux brainstorming validator |

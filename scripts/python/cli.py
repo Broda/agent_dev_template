@@ -17,6 +17,7 @@ from template_cli.validators import (  # noqa: E402
 )
 from template_cli.notes import run_lab_note  # noqa: E402
 from template_cli.render import run_render_development_docs  # noqa: E402
+from template_cli.intents import run_render_intent_docs  # noqa: E402
 from template_cli.finalize import run_finalize_project  # noqa: E402
 from template_cli.sync import run_lab_sync_from_argv  # noqa: E402
 from template_cli.workflow import (  # noqa: E402
@@ -46,6 +47,7 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser("validate-development")
     subparsers.add_parser("validate-governance")
     subparsers.add_parser("render-development-docs")
+    subparsers.add_parser("render-intent-docs")
     finalize_parser = subparsers.add_parser("finalize-project")
     finalize_parser.add_argument("--idea-id", default="")
     finalize_parser.add_argument("--write-export", action="store_true")
@@ -158,6 +160,8 @@ def main(argv: list[str] | None = None) -> int:
         return run_validate_governance(Path.cwd())
     if args.command == "render-development-docs":
         return run_render_development_docs(Path.cwd())
+    if args.command == "render-intent-docs":
+        return run_render_intent_docs(Path.cwd())
     if args.command == "finalize-project":
         return run_finalize_project(Path.cwd(), args.idea_id or "", write_export=args.write_export)
     if args.command == "lab-note":

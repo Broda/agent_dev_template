@@ -26,15 +26,17 @@ Lightweight mode for chat-first brainstorming with milestone-based recording.
 
 ## Intent Map
 
+This table is generated from `brainstorming/intent_registry.json` via `./scripts/render-intent-docs`.
+
+<!-- BEGIN GENERATED INTENT MAP -->
 | Natural phrase family | Action | Files touched |
 |---|---|---|
-| "let's brainstorm `<idea-id>`", "continue that idea", "pick up the previous thread" | open/continue context | `sessions/*` (as needed) |
 | "capture this idea", "save this idea", "log this idea" | add idea intake | `ideas/_inbox.md`, `IDEA_CATALOG.md` |
 | "make this active", "promote this idea", "work on this now" | move to active | `ideas/_active.md`, `sessions/*`, `IDEA_CATALOG.md` |
 | "decision: ... because ...", "we should do X", "record this decision" | record decision | `sessions/*` and optionally `brainstorming/docs/adr/*` |
 | "risk: ...", "log this risk", "what could go wrong here?" | record risk | `sessions/*` |
 | "save path note", "record this branch", "note why we deferred that" | append exploration note to current session file | `sessions/*` |
-| "save that info in notes", "save a note on `<topic>`", "save that research" | create research note from prior gathered context or explicit topic | `notes/*`, `NOTES_CATALOG.md` |
+| "save that info in notes", "save a note on <topic>", "save that research" | create research note from prior gathered context or explicit topic | `notes/*`, `NOTES_CATALOG.md` |
 | "review this idea", "gate this idea", "is this ready?" | record review/gate | `sessions/*`, `IDEA_CATALOG.md` |
 | "save a summary snapshot", "export a summary", "make a handoff summary" | generate an optional archival project summary | `exports/*` |
 | "finalize this repo", "switch to development mode", "finalize this idea" | persist canonical state, append finalization history, and switch this repo into development mode | `sessions/*`, `state/project-init.json`, `MODE.md`, `docs/*`, `IDEA_CATALOG.md` |
@@ -43,11 +45,15 @@ Lightweight mode for chat-first brainstorming with milestone-based recording.
 | "what's the current state?", "show me status", "where are we now?" | report current mode, active idea context, and finalize readiness | no write |
 | "why is finalize blocked?", "what exactly is missing before finalize?", "show me where finalize is getting values from" | explain finalize-readiness and source evidence | no write |
 | "run audit", "validate the repo", "check governance" | validate integrity | `scripts/validate-governance` |
-| "commit this milestone", "push these changes", "sync the repo" | perform explicit git sync operations when requested | git metadata and working tree |
+| "commit this milestone", "make a commit", "commit these changes" | create an explicit git commit | git metadata and working tree |
+| "push these changes", "push this branch", "publish the branch" | push the current branch to origin | git metadata and working tree |
+| "sync the repo", "commit and push this", "sync these changes" | perform explicit commit plus push sync | git metadata and working tree |
+<!-- END GENERATED INTENT MAP -->
 
 ## Notes
 
 - Freeform conversation is valid; no write occurs until milestones happen.
+- Open/continue-context cues such as "let's brainstorm `<idea-id>`" remain valid, but they are not command-backed registry intents.
 - These phrases are intent families, not literal parser triggers. The agent/operator layer maps nearby wording onto the same backend action.
 - Background recording/sync runs quietly by default to protect brainstorming flow.
 - If a likely topic shift is detected, prompt once (respecting 10-minute cooldown): "Before we switch, save the previous thread?"

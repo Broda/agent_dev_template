@@ -1,0 +1,210 @@
+{
+  "schemaVersion": 1,
+  "mode": "brainstorming",
+  "intents": [
+    {
+      "command": "capture",
+      "backendIntent": "/lab capture <idea-id>",
+      "phrases": [
+        "capture this idea",
+        "save this idea",
+        "log this idea"
+      ],
+      "description": "add idea intake",
+      "filesTouched": "`ideas/_inbox.md`, `IDEA_CATALOG.md`",
+      "writeBehavior": "write"
+    },
+    {
+      "command": "activate",
+      "backendIntent": "/lab activate <idea-id>",
+      "phrases": [
+        "make this active",
+        "promote this idea",
+        "work on this now"
+      ],
+      "description": "move to active",
+      "filesTouched": "`ideas/_active.md`, `sessions/*`, `IDEA_CATALOG.md`",
+      "writeBehavior": "write"
+    },
+    {
+      "command": "decide",
+      "backendIntent": "/lab decide <decision-slug>",
+      "phrases": [
+        "decision: ... because ...",
+        "we should do X",
+        "record this decision"
+      ],
+      "description": "record decision",
+      "filesTouched": "`sessions/*` and optionally `brainstorming/docs/adr/*`",
+      "writeBehavior": "write"
+    },
+    {
+      "command": "risk",
+      "backendIntent": "/lab risk <idea-id>",
+      "phrases": [
+        "risk: ...",
+        "log this risk",
+        "what could go wrong here?"
+      ],
+      "description": "record risk",
+      "filesTouched": "`sessions/*`",
+      "writeBehavior": "write"
+    },
+    {
+      "command": "path-note",
+      "backendIntent": "/lab path-note <idea-id>",
+      "phrases": [
+        "save path note",
+        "record this branch",
+        "note why we deferred that"
+      ],
+      "description": "append exploration note to current session file",
+      "filesTouched": "`sessions/*`",
+      "writeBehavior": "write"
+    },
+    {
+      "command": "note",
+      "backendIntent": "/lab note <topic-or-ref>",
+      "phrases": [
+        "save that info in notes",
+        "save a note on <topic>",
+        "save that research"
+      ],
+      "description": "create research note from prior gathered context or explicit topic",
+      "filesTouched": "`notes/*`, `NOTES_CATALOG.md`",
+      "writeBehavior": "write"
+    },
+    {
+      "command": "review",
+      "backendIntent": "/lab review <idea-id>",
+      "phrases": [
+        "review this idea",
+        "gate this idea",
+        "is this ready?"
+      ],
+      "description": "record review/gate",
+      "filesTouched": "`sessions/*`, `IDEA_CATALOG.md`",
+      "writeBehavior": "write"
+    },
+    {
+      "command": "export",
+      "backendIntent": "/lab export <idea-id>",
+      "phrases": [
+        "save a summary snapshot",
+        "export a summary",
+        "make a handoff summary"
+      ],
+      "description": "generate an optional archival project summary",
+      "filesTouched": "`exports/*`",
+      "writeBehavior": "write"
+    },
+    {
+      "command": "finalize",
+      "backendIntent": "/lab finalize [<idea-id>]",
+      "phrases": [
+        "finalize this repo",
+        "switch to development mode",
+        "finalize this idea"
+      ],
+      "description": "persist canonical state, append finalization history, and switch this repo into development mode",
+      "filesTouched": "`sessions/*`, `state/project-init.json`, `MODE.md`, `docs/*`, `IDEA_CATALOG.md`",
+      "writeBehavior": "write"
+    },
+    {
+      "command": "park",
+      "backendIntent": "/lab park <idea-id>",
+      "phrases": [
+        "park this",
+        "pause this idea",
+        "put this on hold"
+      ],
+      "description": "move idea to parked state",
+      "filesTouched": "`ideas/_parked.md`, `IDEA_CATALOG.md`",
+      "writeBehavior": "write"
+    },
+    {
+      "command": "kill",
+      "backendIntent": "/lab kill <idea-id>",
+      "phrases": [
+        "kill this",
+        "drop this idea",
+        "archive this as dead"
+      ],
+      "description": "move idea to killed state",
+      "filesTouched": "`ideas/_killed.md`, `IDEA_CATALOG.md`",
+      "writeBehavior": "write"
+    },
+    {
+      "command": "status",
+      "backendIntent": "/lab status",
+      "phrases": [
+        "what's the current state?",
+        "show me status",
+        "where are we now?"
+      ],
+      "description": "report current mode, active idea context, and finalize readiness",
+      "filesTouched": "no write",
+      "writeBehavior": "no-write"
+    },
+    {
+      "command": "doctor",
+      "backendIntent": "/lab doctor [<idea-id>]",
+      "phrases": [
+        "why is finalize blocked?",
+        "what exactly is missing before finalize?",
+        "show me where finalize is getting values from"
+      ],
+      "description": "explain finalize-readiness and source evidence",
+      "filesTouched": "no write",
+      "writeBehavior": "no-write"
+    },
+    {
+      "command": "audit",
+      "backendIntent": "/lab audit",
+      "phrases": [
+        "run audit",
+        "validate the repo",
+        "check governance"
+      ],
+      "description": "validate integrity",
+      "filesTouched": "`scripts/validate-governance`",
+      "writeBehavior": "no-write"
+    },
+    {
+      "command": "commit",
+      "backendIntent": "/lab commit [message]",
+      "phrases": [
+        "commit this milestone",
+        "make a commit",
+        "commit these changes"
+      ],
+      "description": "create an explicit git commit",
+      "filesTouched": "git metadata and working tree",
+      "writeBehavior": "git"
+    },
+    {
+      "command": "push",
+      "backendIntent": "/lab push",
+      "phrases": [
+        "push these changes",
+        "push this branch",
+        "publish the branch"
+      ],
+      "description": "push the current branch to origin",
+      "filesTouched": "git metadata and working tree",
+      "writeBehavior": "git"
+    },
+    {
+      "command": "sync",
+      "backendIntent": "/lab sync [message]",
+      "phrases": [
+        "sync the repo",
+        "commit and push this",
+        "sync these changes"
+      ],
+      "description": "perform explicit commit plus push sync",
+      "filesTouched": "git metadata and working tree",
+      "writeBehavior": "git"
+    }
+  ]
+}

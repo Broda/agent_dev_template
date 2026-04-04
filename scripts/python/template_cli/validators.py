@@ -7,6 +7,14 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from template_cli.intents import (
+    COMMANDS_DOC,
+    CONVERSATIONAL_DOC,
+    IntentRegistryError,
+    INTENT_REGISTRY_FILE,
+    registry_commands,
+    render_intent_docs_to_memory,
+)
 
 NOTE_ID_RE = re.compile(r"^note-\d{4}$")
 NOTE_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -202,6 +210,36 @@ def validate_lab_command_parity(root: Path, result: ValidationResult) -> None:
         result.add_failure(f"Documented lab command is not registered in CLI: {command}")
 
 
+def validate_intent_registry(root: Path, result: ValidationResult) -> None:
+    try:
+        registry_command_names = registry_commands(root)
+        rendered_docs = render_intent_docs_to_memory(root)
+    except IntentRegistryError as exc:
+        result.add_failure(str(exc))
+        return
+
+    documented = documented_lab_commands(root)
+    registered = registered_lab_commands(root)
+
+    missing_doc_sections = sorted(registry_command_names - documented)
+    for command in missing_doc_sections:
+        result.add_failure(f"Intent registry command is missing a command section in COMMANDS.md: {command}")
+
+    unknown_registry_commands = sorted(registry_command_names - registered)
+    for command in unknown_registry_commands:
+        result.add_failure(f"Intent registry command is not registered in CLI: {command}")
+
+    for relative_path, expected_content in rendered_docs.items():
+        path = root / relative_path
+        if not path.exists():
+            result.add_failure(f"Missing generated intent doc target: {relative_path}")
+            continue
+        if read_text(path) != expected_content:
+            result.add_failure(
+                f"Generated intent section is stale in {relative_path}. Run ./scripts/render-intent-docs."
+            )
+
+
 def run_validate_brainstorming(root: Path) -> int:
     result = ValidationResult()
 
@@ -212,6 +250,7 @@ def run_validate_brainstorming(root: Path) -> int:
         "brainstorming/AGENTS.brainstorming.md",
         "brainstorming/CONVERSATIONAL_MODE.md",
         "brainstorming/COMMANDS.md",
+        "brainstorming/intent_registry.json",
         "brainstorming/QUICKSTART.md",
         "brainstorming/EXAMPLE_LIFECYCLE.md",
         "brainstorming/FILE_MAP.md",
@@ -247,6 +286,9 @@ def run_validate_brainstorming(root: Path) -> int:
         "scripts/lab-sync.sh",
         "scripts/lab-note.sh",
         "scripts/finalize-project",
+        "scripts/render-intent-docs",
+        "scripts/render-intent-docs.sh",
+        "scripts/render-intent-docs.ps1",
         "scripts/render-development-docs",
         "scripts/validate-development",
         "scripts/validate-brainstorming",
@@ -312,6 +354,7 @@ def run_validate_brainstorming(root: Path) -> int:
 
     validate_notes_catalog(root, result)
     validate_lab_command_parity(root, result)
+    validate_intent_registry(root, result)
 
     if read_mode(root) != "brainstorming":
         result.add_failure(
