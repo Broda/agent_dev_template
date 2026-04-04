@@ -86,6 +86,20 @@ def _replace_file_literals(path: Path, replacements: list[tuple[str, str]]) -> N
     write_text(path, content)
 
 
+def _append_unique_lines(path: Path, lines_to_add: list[str]) -> None:
+    content = read_text(path)
+    existing_lines = content.splitlines()
+    additions = [line for line in lines_to_add if line not in existing_lines]
+    if not additions:
+        return
+    if content and not content.endswith("\n"):
+        content += "\n"
+    if content and not content.endswith("\n\n"):
+        content += "\n"
+    content += "\n".join(additions) + "\n"
+    write_text(path, content)
+
+
 def _replace_readme_command_block(content: str, label: str, value: str) -> str:
     pattern = re.compile(rf"{re.escape(label)}:\r?\n\r?\n\s*<command>")
     return pattern.sub(f"{label}:\n\n    {value}", content)
@@ -752,8 +766,7 @@ def run_render_development_docs(root: Path) -> int:
         shutil.copyfile(root / "development/templates/gitignore/generic.gitignore", root / ".gitignore")
 
     if persistence and persistence != "None":
-        with (root / ".gitignore").open("a", encoding="utf-8") as handle:
-            handle.write("\n*.db\n*.sqlite\n*.sqlite3\n")
+        _append_unique_lines(root / ".gitignore", ["*.db", "*.sqlite", "*.sqlite3"])
 
     setup_steps = (
         f"Language: {language}\n"

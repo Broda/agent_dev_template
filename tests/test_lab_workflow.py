@@ -54,18 +54,22 @@ class LabWorkflowTests(unittest.TestCase):
         run_cmd(["git", "add", "-A"], cwd=self.repo)
         run_cmd(["git", "commit", "-m", "baseline"], cwd=self.repo)
 
-    def write_render_fixture(self) -> None:
+    def write_render_fixture(self, state_fixture: str = "finalized_state_v2.json") -> None:
         fixture_dir = REPO_ROOT / "tests/fixtures"
+        fixture_state = json.loads((fixture_dir / state_fixture).read_text(encoding="utf-8"))
+        idea_id = fixture_state["ideaId"]
+        project_name = fixture_state["projectName"]
         (self.repo / "sessions").mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(
-            fixture_dir / "finalized_session.md",
-            self.repo / "sessions/2026-04-03_idea-render-fixture.md",
+        session_template = (fixture_dir / "finalized_session.md").read_text(encoding="utf-8")
+        session_text = (
+            session_template.replace("idea-render-fixture", idea_id)
+            .replace("Render Fixture", project_name)
         )
-        shutil.copyfile(
-            fixture_dir / "finalized_session.md",
-            self.repo / "sessions/2026-04-03_FINALIZATION_SESSION_idea-render-fixture.md",
+        (self.repo / f"sessions/2026-04-03_{idea_id}.md").write_text(session_text, encoding="utf-8")
+        (self.repo / f"sessions/2026-04-03_FINALIZATION_SESSION_{idea_id}.md").write_text(
+            session_text,
+            encoding="utf-8",
         )
-        fixture_state = json.loads((fixture_dir / "finalized_state_v2.json").read_text(encoding="utf-8"))
         (self.repo / "state/project-init.json").write_text(
             json.dumps(fixture_state, indent=2) + "\n",
             encoding="utf-8",
@@ -295,6 +299,19 @@ class LabWorkflowTests(unittest.TestCase):
         self.assertIn("Development-mode rendering needs a stable, reusable finalized-state fixture.", project_context)
         self.assertIn("Rendered docs drift from the state schema or validation contract.", project_context)
         self.assertIn("./scripts/validate-development", roadmap)
+
+    def test_render_and_validate_development_with_persistence_fixture(self) -> None:
+        self.write_render_fixture("finalized_state_with_persistence_v2.json")
+        run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
+        run_cmd(["./scripts/validate-development"], cwd=self.repo)
+        migration_policy = self.repo / "docs/MIGRATION_POLICY.md"
+        gitignore_lines = (self.repo / ".gitignore").read_text(encoding="utf-8").splitlines()
+        project_context = (self.repo / "docs/PROJECT_CONTEXT.md").read_text(encoding="utf-8")
+        self.assertTrue(migration_policy.exists())
+        self.assertIn("SQLite", project_context)
+        self.assertEqual(gitignore_lines.count("*.db"), 1)
+        self.assertEqual(gitignore_lines.count("*.sqlite"), 1)
+        self.assertEqual(gitignore_lines.count("*.sqlite3"), 1)
 
     def test_lab_wrapper_capture_activate_export_flow(self) -> None:
         run_cmd(
