@@ -8,6 +8,7 @@ Python 3 is required for the `scripts/` command implementations referenced in th
 
 - Primary UX: conversational intent (plain language).
 - `/lab` command syntax remains optional and supported.
+- The backend contract is executable through `./scripts/lab <command> ...`.
 - Milestone writes implicitly run commit + push synchronization.
 - Default brainstorming runtime uses Focus Mode (quiet background ops).
 - Autosync push is best-effort; push failures are silent by default while local commits are retained.

@@ -18,6 +18,7 @@ This template starts in brainstorming mode and finalizes in place into developme
 - Conversational rules: `brainstorming/CONVERSATIONAL_MODE.md`
 - Backend contract: `brainstorming/COMMANDS.md`
 - Quickstart: `brainstorming/QUICKSTART.md`
+- Shell runtime: `./scripts/lab <command> ...`
 - Idea state files: `ideas/`
 - Sessions: `sessions/`
 - Notes: `notes/`

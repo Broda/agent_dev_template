@@ -30,6 +30,7 @@ Lean file registry for the Project Idea Lab.
 | `brainstorming/docs/adr/template.md` | Optional ADR template |
 | `brainstorming/docs/adr/ADR-0001-adopt-governance-structure-for-idea-lab.md` | Foundational ADR |
 | `scripts/validate-governance` | Cross-platform launcher for Python governance validation |
+| `scripts/lab` | Cross-platform launcher for brainstorming lifecycle commands |
 | `scripts/lab-sync` | Cross-platform launcher for Python commit+push sync |
 | `scripts/lab-note` | Cross-platform launcher for Python research note capture |
 | `scripts/finalize-project` | Cross-platform launcher for Python in-place finalization |
@@ -37,6 +38,7 @@ Lean file registry for the Project Idea Lab.
 | `scripts/validate-development` | Development-mode integrity validator |
 | `scripts/validate-brainstorming` | Brainstorming-mode integrity validator |
 | `scripts/validate-governance.ps1` | PowerShell launcher for Python governance validation |
+| `scripts/lab.ps1` | PowerShell launcher for brainstorming lifecycle commands |
 | `scripts/lab-sync.ps1` | PowerShell launcher for Python commit+push sync |
 | `scripts/lab-note.ps1` | PowerShell launcher for Python research note capture |
 | `scripts/validate-brainstorming.ps1` | Windows brainstorming validator |
@@ -45,6 +47,7 @@ Lean file registry for the Project Idea Lab.
 | `scripts/validate-development.sh` | Native macOS/Linux development validator |
 | `scripts/validate-brainstorming.sh` | Native macOS/Linux brainstorming validator |
 | `scripts/validate-governance.sh` | POSIX launcher for Python governance validation |
+| `scripts/lab.sh` | POSIX launcher for brainstorming lifecycle commands |
 | `scripts/lab-sync.sh` | POSIX launcher for Python commit+push sync |
 | `scripts/lab-note.sh` | POSIX launcher for Python research note capture helper |
 | `state/project-init.json` | Canonical structured handoff state |
