@@ -24,6 +24,8 @@ Lean file registry for the Project Idea Lab.
 | `notes/` | Saved research/context notes |
 | `exports/` | Optional archival project summaries |
 | `tests/` | Regression tests for CLI and workflow runtime |
+| `tests/test_lab_workflow.py` | Black-box workflow and finalize/render regression suite |
+| `tests/test_intent_registry_contract.py` | Intent-registry render, parity, and CI-contract regression suite |
 | `tests/fixtures/finalized_state_v2.json` | Canonical finalized-state fixture for development render/validate regression |
 | `tests/fixtures/finalized_state_with_persistence_v2.json` | Persistence-enabled finalized-state fixture for migration-policy render regression |
 | `tests/fixtures/finalized_session.md` | Matching finalized session fixture for development render/validate regression |

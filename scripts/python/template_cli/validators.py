@@ -317,6 +317,8 @@ def run_validate_brainstorming(root: Path) -> int:
         "scripts/validate-governance",
         "scripts/lab-sync",
         "scripts/lab-note",
+        "tests/test_lab_workflow.py",
+        "tests/test_intent_registry_contract.py",
         "tests/fixtures/finalized_state_v2.json",
         "tests/fixtures/finalized_state_with_persistence_v2.json",
         "tests/fixtures/finalized_session.md",
