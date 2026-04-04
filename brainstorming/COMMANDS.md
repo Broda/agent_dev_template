@@ -24,24 +24,23 @@ Python 3 is required for the `scripts/` command implementations referenced in th
 
 ## Conversational Intent Mapping
 
-| Conversational phrase | Backend intent |
+| Conversational phrase family | Backend intent |
 |---|---|
-| "capture this idea" | `/lab capture <idea-id>` |
-| "make this active" | `/lab activate <idea-id>` |
-| "decision: ... because ..." | `/lab decide <decision-slug>` |
-| "risk: ..." | `/lab risk <idea-id>` |
-| "save path note" | `/lab path-note <idea-id>` |
-| "save that info in notes" | `/lab note <topic-or-ref>` |
-| "save a note on <topic>" | `/lab note <topic-or-ref>` |
-| "save that research" | `/lab note <topic-or-ref>` |
-| "review this idea" | `/lab review <idea-id>` |
-| "save a summary snapshot" | `/lab export <idea-id>` |
-| "finalize this repo" | `/lab finalize [<idea-id>]` |
-| "park this" | `/lab park <idea-id>` |
-| "kill this" | `/lab kill <idea-id>` |
-| "what's the current state?" | `/lab status` |
-| "why is finalize blocked?" | `/lab doctor [<idea-id>]` |
-| "run audit" | `/lab audit` |
+| "capture this idea", "save this idea", "log this idea" | `/lab capture <idea-id>` |
+| "make this active", "promote this idea", "work on this now" | `/lab activate <idea-id>` |
+| "decision: ... because ...", "we should do X", "record this decision" | `/lab decide <decision-slug>` |
+| "risk: ...", "log this risk", "what could go wrong here?" | `/lab risk <idea-id>` |
+| "save path note", "record this branch", "note why we deferred that" | `/lab path-note <idea-id>` |
+| "save that info in notes", "save a note on <topic>", "save that research" | `/lab note <topic-or-ref>` |
+| "review this idea", "gate this idea", "is this ready?" | `/lab review <idea-id>` |
+| "save a summary snapshot", "export a summary", "make a handoff summary" | `/lab export <idea-id>` |
+| "finalize this repo", "switch to development mode", "finalize this idea" | `/lab finalize [<idea-id>]` |
+| "park this", "pause this idea", "put this on hold" | `/lab park <idea-id>` |
+| "kill this", "drop this idea", "archive this as dead" | `/lab kill <idea-id>` |
+| "what's the current state?", "show me status", "where are we now?" | `/lab status` |
+| "why is finalize blocked?", "what exactly is missing before finalize?", "show me where finalize is getting values from" | `/lab doctor [<idea-id>]` |
+| "run audit", "validate the repo", "check governance" | `/lab audit` |
+| "commit this milestone", "push these changes", "sync the repo" | `/lab commit`, `/lab push`, `/lab sync` |
 
 ## Commands (Backend Contract)
 

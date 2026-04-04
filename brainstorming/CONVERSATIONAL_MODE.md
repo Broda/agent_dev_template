@@ -26,25 +26,29 @@ Lightweight mode for chat-first brainstorming with milestone-based recording.
 
 ## Intent Map
 
-| Natural phrase | Action | Files touched |
+| Natural phrase family | Action | Files touched |
 |---|---|---|
-| "let's brainstorm `<idea-id>`" | open/continue context | `sessions/*` (as needed) |
-| "capture this idea" | add idea intake | `ideas/_inbox.md`, `IDEA_CATALOG.md` |
-| "make this active" | move to active | `ideas/_active.md`, `sessions/*`, `IDEA_CATALOG.md` |
-| "decision: ... because ..." | record decision | `sessions/*` and optionally `brainstorming/docs/adr/*` |
-| "risk: ..." | record risk | `sessions/*` |
-| "save path note" | append exploration note to current session file | `sessions/*` |
-| "save that info in notes" | create research note from prior gathered context | `notes/*`, `NOTES_CATALOG.md` |
-| "save a note on `<topic>`" | create research note scoped to topic | `notes/*`, `NOTES_CATALOG.md` |
-| "save that research" | create research note from prior gathered context | `notes/*`, `NOTES_CATALOG.md` |
-| "review this idea" | record review/gate | `sessions/*`, `IDEA_CATALOG.md` |
-| "finalize this repo" | persist canonical state, append finalization history, and switch this repo into development mode | `sessions/*`, `state/project-init.json`, `MODE.md`, `docs/*`, `IDEA_CATALOG.md` |
-| "save a summary snapshot" | generate an optional archival project summary | `exports/*` |
-| "run audit" | validate integrity | `scripts/validate-governance` |
+| "let's brainstorm `<idea-id>`", "continue that idea", "pick up the previous thread" | open/continue context | `sessions/*` (as needed) |
+| "capture this idea", "save this idea", "log this idea" | add idea intake | `ideas/_inbox.md`, `IDEA_CATALOG.md` |
+| "make this active", "promote this idea", "work on this now" | move to active | `ideas/_active.md`, `sessions/*`, `IDEA_CATALOG.md` |
+| "decision: ... because ...", "we should do X", "record this decision" | record decision | `sessions/*` and optionally `brainstorming/docs/adr/*` |
+| "risk: ...", "log this risk", "what could go wrong here?" | record risk | `sessions/*` |
+| "save path note", "record this branch", "note why we deferred that" | append exploration note to current session file | `sessions/*` |
+| "save that info in notes", "save a note on `<topic>`", "save that research" | create research note from prior gathered context or explicit topic | `notes/*`, `NOTES_CATALOG.md` |
+| "review this idea", "gate this idea", "is this ready?" | record review/gate | `sessions/*`, `IDEA_CATALOG.md` |
+| "save a summary snapshot", "export a summary", "make a handoff summary" | generate an optional archival project summary | `exports/*` |
+| "finalize this repo", "switch to development mode", "finalize this idea" | persist canonical state, append finalization history, and switch this repo into development mode | `sessions/*`, `state/project-init.json`, `MODE.md`, `docs/*`, `IDEA_CATALOG.md` |
+| "park this", "pause this idea", "put this on hold" | move idea to parked state | `ideas/_parked.md`, `IDEA_CATALOG.md` |
+| "kill this", "drop this idea", "archive this as dead" | move idea to killed state | `ideas/_killed.md`, `IDEA_CATALOG.md` |
+| "what's the current state?", "show me status", "where are we now?" | report current mode, active idea context, and finalize readiness | no write |
+| "why is finalize blocked?", "what exactly is missing before finalize?", "show me where finalize is getting values from" | explain finalize-readiness and source evidence | no write |
+| "run audit", "validate the repo", "check governance" | validate integrity | `scripts/validate-governance` |
+| "commit this milestone", "push these changes", "sync the repo" | perform explicit git sync operations when requested | git metadata and working tree |
 
 ## Notes
 
 - Freeform conversation is valid; no write occurs until milestones happen.
+- These phrases are intent families, not literal parser triggers. The agent/operator layer maps nearby wording onto the same backend action.
 - Background recording/sync runs quietly by default to protect brainstorming flow.
 - If a likely topic shift is detected, prompt once (respecting 10-minute cooldown): "Before we switch, save the previous thread?"
 - Topic-shift quick actions: `capture idea`, `record decision`, `log risk`, `save path note`, `skip`.
