@@ -334,6 +334,171 @@ class LabWorkflowTests(unittest.TestCase):
         )
         self.assertTrue(remote_head.stdout.strip())
 
+    def test_lab_decide_appends_to_last_matching_session_section(self) -> None:
+        self.write_finalize_fixture("idea-duplicate-decisions")
+        session_path = self.repo / "sessions/2026-04-03_idea-duplicate-decisions.md"
+        session_path.write_text(
+            textwrap.dedent(
+                """\
+                # Brainstorming Session
+
+                ## Metadata
+
+                - Date: 2026-04-03
+                - Idea ID: `idea-duplicate-decisions`
+                - Title: Finalize Smoke
+                - Owner: Test User
+                - Status: active
+
+                ## Risks
+
+                - Existing risk note.
+
+                ## Decisions
+
+                - Historical decision placeholder.
+
+                ## Exploration Path Notes
+
+                - Explored a first approach.
+
+                ## Decisions
+
+                - Current decision log lives here.
+
+                ## Review Gates
+                """
+            ),
+            encoding="utf-8",
+        )
+
+        run_cmd(
+            [
+                "./scripts/lab",
+                "decide",
+                "--idea-id",
+                "idea-duplicate-decisions",
+                "--chosen-option",
+                "Append to the latest canonical decision section",
+                "--rationale",
+                "Keep hand-edited session ordering intact",
+                "--no-sync",
+            ],
+            cwd=self.repo,
+        )
+
+        content = session_path.read_text(encoding="utf-8")
+        decision_sections = content.split("## Decisions")
+        self.assertEqual(len(decision_sections), 3)
+        self.assertNotIn("Decision ID: decision-001", decision_sections[1])
+        self.assertIn("Decision ID: decision-001", decision_sections[2])
+        self.assertIn("## Review Gates", decision_sections[2])
+
+    def test_lab_review_preserves_noncanonical_idea_bullets(self) -> None:
+        self.write_finalize_fixture("idea-weird-bullets")
+        (self.repo / "ideas/_active.md").write_text(
+            textwrap.dedent(
+                """\
+                # Active Ideas
+
+                ---
+
+                ## Idea: Weird Bullets
+
+                ## Metadata
+
+                  - Idea ID: `idea-weird-bullets`
+                  * Codename (kebab case): weird-bullets
+                  - Title: Weird Bullets
+                  - Date: 2026-04-03
+                  - Owner: Test User
+                  - Status: active
+                  - Sensitivity: Internal
+
+                ## Problem Definition
+
+                  * Problem statement: Preserve important values during rewrites.
+                  - Affected users/personas: Template maintainers
+                  - Why now: Hand-edited markdown should stay durable.
+                  - Current alternatives: Manually fix dropped fields
+
+                ## Hypotheses
+
+                  - Value hypothesis: More resilient markdown mutation reduces maintenance churn.
+                  - Adoption hypothesis:
+                  - Feasibility hypothesis:
+
+                ## Proposed Scope
+
+                  - MVP scope: Tolerate mild formatting drift.
+                  - Out of scope: Arbitrary markdown parsing.
+                  * Assumptions: Core headings still exist.
+                  - Constraints: Preserve markdown readability.
+
+                ## Governance Rationale
+
+                  - Why this idea should be pursued: Avoid silent data loss.
+                  - Strategic alignment: Improve template reliability.
+                  * Non-goals: Enforce one exact bullet style.
+
+                ## Risks and Unknowns
+
+                  - Top risks (link to risk entries): Regex-only rewrites can drop fields.
+                  - Open questions:
+                  - Dependency concerns:
+
+                ## Decisions and ADR Links
+
+                  - Related decisions:
+                  - Related ADRs (`docs/adr/ADR-XXXX-*.md`):
+
+                ## Validation Plan
+
+                  - Evidence needed: Regression coverage for hand-edited markdown.
+                  - Test plan: Add session and idea rewrite tests.
+                  - Success criteria: Key fields survive rewrites.
+                  - Failure criteria: Rewrites blank existing fields.
+
+                ## Review and Export Readiness
+
+                  - Latest review outcome: conditional-pass
+                  - Conditions to finalize:
+                  - Optional summary export path:
+
+                ## Traceability
+
+                  - Session links: `sessions/2026-04-03_idea-weird-bullets.md`
+                  - Catalog reference: `IDEA_CATALOG.md`
+                """
+            ),
+            encoding="utf-8",
+        )
+
+        run_cmd(
+            [
+                "./scripts/lab",
+                "review",
+                "--idea-id",
+                "idea-weird-bullets",
+                "--result",
+                "pass",
+                "--summary",
+                "Core fields survived the rewrite path",
+                "--outcome",
+                "revise",
+                "--next-action",
+                "Finalize after test coverage lands",
+                "--no-sync",
+            ],
+            cwd=self.repo,
+        )
+
+        updated_idea = (self.repo / "ideas/_active.md").read_text(encoding="utf-8")
+        self.assertIn("- Problem statement: Preserve important values during rewrites.", updated_idea)
+        self.assertIn("- Constraints: Preserve markdown readability.", updated_idea)
+        self.assertIn("- Non-goals: Enforce one exact bullet style.", updated_idea)
+        self.assertIn("- Latest review outcome: pass", updated_idea)
+
 
 if __name__ == "__main__":
     unittest.main()

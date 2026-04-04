@@ -35,6 +35,7 @@ BUCKET_FILES = {
     "finalized": "ideas/_active.md",
 }
 IDEA_BLOCK_RE = re.compile(r"(?ms)^## Idea:.*?(?=^## Idea:|\Z)")
+SECTION_HEADING_RE = re.compile(r"^##\s+(.+?)\s*$")
 
 
 def _trim(value: str | None) -> str:
@@ -78,12 +79,25 @@ def _default_adr_references(root: Path) -> list[str]:
     return [candidate for candidate in candidates if path_exists(root, candidate)]
 
 
+def _strip_wrapping_backticks(value: str) -> str:
+    stripped = _trim(value)
+    if stripped.startswith("`") and stripped.endswith("`") and stripped.count("`") == 2:
+        return stripped[1:-1]
+    return stripped
+
+
 def _extract_label_from_text(block: str, label: str) -> str:
-    prefix = f"- {label}:"
+    pattern = re.compile(rf"^\s*[-*]\s+{re.escape(label)}:\s*(.*?)\s*$")
+    value = ""
     for line in block.splitlines():
-        if line.startswith(prefix):
-            return _trim(line[len(prefix) :]).strip("`")
-    return ""
+        match = pattern.match(line)
+        if match:
+            value = _strip_wrapping_backticks(match.group(1))
+    return value
+
+
+def _block_matches_idea_id(block: str, idea_id: str) -> bool:
+    return _extract_label_from_text(block, "Idea ID") == idea_id
 
 
 def _extract_catalog_row(root: Path, idea_id: str) -> dict[str, str]:
@@ -186,7 +200,7 @@ def _find_idea_block(root: Path, idea_id: str) -> tuple[str, str] | None:
             continue
         _, blocks = _read_idea_blocks(path)
         for block in blocks:
-            if f"- Idea ID: `{idea_id}`" in block:
+            if _block_matches_idea_id(block, idea_id):
                 return relpath, block
     return None
 
@@ -199,7 +213,7 @@ def _remove_idea_from_buckets(root: Path, idea_id: str) -> None:
         if not path.exists():
             continue
         header, blocks = _read_idea_blocks(path)
-        kept = [block for block in blocks if f"- Idea ID: `{idea_id}`" not in block]
+        kept = [block for block in blocks if not _block_matches_idea_id(block, idea_id)]
         if len(kept) != len(blocks):
             _write_idea_blocks(path, header, kept)
 
@@ -406,20 +420,48 @@ def _ensure_session_file(root: Path, idea_id: str, title: str, owner: str, expli
 
 
 def _append_under_section(path: Path, section_title: str, block: str) -> None:
-    content = read_text(path)
-    header = f"## {section_title}"
-    if header not in content:
-        content = content.rstrip() + f"\n\n{header}\n"
-    pattern = re.compile(rf"(?ms)(^## {re.escape(section_title)}\n)(.*?)(?=^## |\Z)")
-    match = pattern.search(content)
-    if not match:
-        content = content.rstrip() + "\n\n" + block.strip() + "\n"
-        write_text(path, content)
+    lines = read_text(path).splitlines()
+    block_lines = block.strip().splitlines()
+    normalized_title = re.sub(r"\s+", " ", section_title.strip())
+    section_start = -1
+    section_end = len(lines)
+
+    for index, line in enumerate(lines):
+        match = SECTION_HEADING_RE.match(line)
+        if not match:
+            continue
+        heading_title = re.sub(r"\s+", " ", match.group(1).strip())
+        if heading_title == normalized_title:
+            section_start = index
+
+    if section_start >= 0:
+        for index in range(section_start + 1, len(lines)):
+            if SECTION_HEADING_RE.match(lines[index]):
+                section_end = index
+                break
+
+        body = list(lines[section_start + 1 : section_end])
+        while body and not body[-1].strip():
+            body.pop()
+        if not body:
+            body = [""]
+        elif body[-1].strip():
+            body.append("")
+        body.extend(block_lines)
+        body.append("")
+        updated_lines = lines[: section_start + 1] + body + lines[section_end:]
+        write_text(path, "\n".join(updated_lines).rstrip() + "\n")
         return
-    current_body = match.group(2).rstrip()
-    new_body = current_body + ("\n\n" if current_body else "\n") + block.strip() + "\n"
-    updated = content[: match.start(2)] + new_body + content[match.end(2) :]
-    write_text(path, updated)
+
+    while lines and not lines[-1].strip():
+        lines.pop()
+    if lines:
+        lines.append("")
+    lines.append(f"## {section_title}")
+    lines.append("")
+    lines.extend(block_lines)
+    lines.append("")
+    write_text(path, "\n".join(lines).rstrip() + "\n")
 
 
 def _sync(root: Path, *, message: str, files: list[str], no_sync: bool) -> int:
