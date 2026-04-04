@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import shutil
 import subprocess
 import tempfile
@@ -52,6 +53,40 @@ class LabWorkflowTests(unittest.TestCase):
         run_cmd(["git", "config", "user.email", "test@example.com"], cwd=self.repo)
         run_cmd(["git", "add", "-A"], cwd=self.repo)
         run_cmd(["git", "commit", "-m", "baseline"], cwd=self.repo)
+
+    def write_render_fixture(self) -> None:
+        fixture_dir = REPO_ROOT / "tests/fixtures"
+        (self.repo / "sessions").mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(
+            fixture_dir / "finalized_session.md",
+            self.repo / "sessions/2026-04-03_idea-render-fixture.md",
+        )
+        shutil.copyfile(
+            fixture_dir / "finalized_session.md",
+            self.repo / "sessions/2026-04-03_FINALIZATION_SESSION_idea-render-fixture.md",
+        )
+        fixture_state = json.loads((fixture_dir / "finalized_state_v2.json").read_text(encoding="utf-8"))
+        (self.repo / "state/project-init.json").write_text(
+            json.dumps(fixture_state, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        (self.repo / "MODE.md").write_text(
+            textwrap.dedent(
+                """\
+                # Repository Mode
+
+                Current mode: development
+
+                Allowed values:
+
+                - brainstorming
+                - development
+
+                Switch modes with `./scripts/finalize-project`.
+                """
+            ),
+            encoding="utf-8",
+        )
 
     def write_finalize_fixture(self, idea_id: str = "idea-finalize-smoke") -> None:
         (self.repo / "sessions").mkdir(parents=True, exist_ok=True)
@@ -247,6 +282,19 @@ class LabWorkflowTests(unittest.TestCase):
 
     def test_validate_brainstorming_clean_template(self) -> None:
         run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo)
+
+    def test_render_and_validate_development_from_checked_in_fixture(self) -> None:
+        self.write_render_fixture()
+        run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
+        run_cmd(["./scripts/validate-development"], cwd=self.repo)
+        readme = (self.repo / "README.md").read_text(encoding="utf-8")
+        project_context = (self.repo / "docs/PROJECT_CONTEXT.md").read_text(encoding="utf-8")
+        roadmap = (self.repo / "docs/ROADMAP.md").read_text(encoding="utf-8")
+        self.assertIn("# Render Fixture", readme)
+        self.assertIn("Render development docs from a finalized canonical state fixture.", readme)
+        self.assertIn("Development-mode rendering needs a stable, reusable finalized-state fixture.", project_context)
+        self.assertIn("Rendered docs drift from the state schema or validation contract.", project_context)
+        self.assertIn("./scripts/validate-development", roadmap)
 
     def test_lab_wrapper_capture_activate_export_flow(self) -> None:
         run_cmd(

@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 2,
+  "status": "finalized",
+  "finalizedAt": "2026-04-03",
+  "ideaId": "idea-render-fixture",
+  "projectName": "Render Fixture",
+  "owner": "Test User",
+  "purpose": "Render development docs from a finalized canonical state fixture.",
+  "projectType": "CLI",
+  "techStack": {
+    "language": "Python",
+    "runtime": "Python 3.12",
+    "framework": "None",
+    "packageTool": "None"
+  },
+  "persistence": "None",
+  "authentication": "None",
+  "determinism": "High",
+  "packaging": "None",
+  "constraints": "Keep generated docs deterministic and easy to audit.",
+  "commands": {
+    "build": "python3 -m py_compile scripts/python/cli.py scripts/python/template_cli/*.py",
+    "run": "./scripts/render-development-docs",
+    "test": "./scripts/validate-development"
+  },
+  "product": {
+    "problemStatement": "Development-mode rendering needs a stable, reusable finalized-state fixture.",
+    "targetUsers": "Template maintainers",
+    "whyNow": "Regression coverage should not depend only on inline test scaffolding.",
+    "expectedValue": "Reliable render and validation tests for the development-mode contract.",
+    "solutionSummary": "Use a checked-in finalized-state fixture to drive render and validation regressions.",
+    "mvpScope": "Exercise render-development-docs and validate-development from canonical state.",
+    "outOfScope": "Shipping demo application code.",
+    "assumptions": "Development docs are generated from canonical state and templates.",
+    "nonGoals": "Replace conversational brainstorming examples."
+  },
+  "governance": {
+    "keyDecisions": "Treat finalized canonical state as the render source of truth.",
+    "topRisks": "Rendered docs drift from the state schema or validation contract.",
+    "mitigationPlans": "Keep a stable fixture and assert render-plus-validate in CI.",
+    "contingencies": "Refresh the fixture when the state schema evolves intentionally.",
+    "remainingAcceptedRisks": "Fixtures may need periodic wording updates as templates change.",
+    "latestReviewOutcome": "pass",
+    "latestReviewSession": "sessions/2026-04-03_idea-render-fixture.md"
+  },
+  "artifacts": {
+    "ideaFiles": [],
+    "sessionFiles": [
+      "sessions/2026-04-03_idea-render-fixture.md"
+    ],
+    "noteReferences": "None recorded",
+    "summaryExport": "",
+    "finalizationSession": "sessions/2026-04-03_FINALIZATION_SESSION_idea-render-fixture.md",
+    "adrReferences": [
+      "docs/adr/ADR-0001-record-architecture-decisions.md"
+    ]
+  }
+}

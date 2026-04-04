@@ -23,6 +23,8 @@ Lean file registry for the Project Idea Lab.
 | `notes/` | Saved research/context notes |
 | `exports/` | Optional archival project summaries |
 | `tests/` | Regression tests for CLI and workflow runtime |
+| `tests/fixtures/finalized_state_v2.json` | Canonical finalized-state fixture for development render/validate regression |
+| `tests/fixtures/finalized_session.md` | Matching finalized session fixture for development render/validate regression |
 | `brainstorming/templates/idea_template.md` | Idea capture template |
 | `brainstorming/templates/decision_template.md` | Decision template |
 | `brainstorming/templates/note_template.md` | Research note template |
