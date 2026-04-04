@@ -29,6 +29,35 @@ This template starts in brainstorming mode and finalizes in place into developme
 - Notes: `notes/`
 - Optional summaries: `exports/`
 
+## Common Flows
+
+Check current context and inferred finalize target:
+
+```sh
+./scripts/lab status
+```
+
+Capture and activate an idea:
+
+```sh
+./scripts/lab capture --idea-id idea-template-hardening --title "Template Hardening"
+./scripts/lab activate --idea-id idea-template-hardening
+```
+
+Record a decision, risk, and review:
+
+```sh
+./scripts/lab decide --idea-id idea-template-hardening --chosen-option "State-first finalize" --rationale "Preserve continuity"
+./scripts/lab risk --idea-id idea-template-hardening --statement "Docs/runtime drift" --mitigation "Validate and test the full path"
+./scripts/lab review --idea-id idea-template-hardening --result conditional-pass --summary "Ready after parity checks"
+```
+
+Create an optional summary snapshot before finalizing:
+
+```sh
+./scripts/lab export --idea-id idea-template-hardening
+```
+
 ## Finalize In Place
 
 Check the inferred target and readiness first if needed:

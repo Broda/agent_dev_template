@@ -23,6 +23,25 @@ Python 3 is required for the `scripts/` automation commands used below.
 - [ ] At least one session exists in `sessions/`
 - [ ] Canonical state is ready to be captured in `state/project-init.json`
 
+## Shell Cookbook
+
+Core flow:
+
+```sh
+./scripts/lab capture --idea-id idea-template-hardening --title "Template Hardening"
+./scripts/lab activate --idea-id idea-template-hardening
+./scripts/lab status
+./scripts/lab review --idea-id idea-template-hardening --result conditional-pass --summary "Ready after parity checks"
+./scripts/finalize-project --idea-id idea-template-hardening
+```
+
+Optional summary snapshot:
+
+```sh
+./scripts/lab export --idea-id idea-template-hardening
+./scripts/finalize-project --idea-id idea-template-hardening --write-export
+```
+
 ## Optional Add-ons
 
 - ADR for strategic decisions (`brainstorming/docs/adr/template.md`)
