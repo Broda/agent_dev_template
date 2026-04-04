@@ -313,6 +313,27 @@ class LabWorkflowTests(unittest.TestCase):
         self.assertEqual(gitignore_lines.count("*.sqlite"), 1)
         self.assertEqual(gitignore_lines.count("*.sqlite3"), 1)
 
+    def test_render_development_docs_is_idempotent_with_persistence_fixture(self) -> None:
+        self.write_render_fixture("finalized_state_with_persistence_v2.json")
+        run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
+        first_snapshot = {
+            "README.md": (self.repo / "README.md").read_text(encoding="utf-8"),
+            ".gitignore": (self.repo / ".gitignore").read_text(encoding="utf-8"),
+            "docs/PROJECT_CONTEXT.md": (self.repo / "docs/PROJECT_CONTEXT.md").read_text(encoding="utf-8"),
+            "docs/ROADMAP.md": (self.repo / "docs/ROADMAP.md").read_text(encoding="utf-8"),
+            "docs/MIGRATION_POLICY.md": (self.repo / "docs/MIGRATION_POLICY.md").read_text(encoding="utf-8"),
+        }
+        run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
+        second_snapshot = {
+            "README.md": (self.repo / "README.md").read_text(encoding="utf-8"),
+            ".gitignore": (self.repo / ".gitignore").read_text(encoding="utf-8"),
+            "docs/PROJECT_CONTEXT.md": (self.repo / "docs/PROJECT_CONTEXT.md").read_text(encoding="utf-8"),
+            "docs/ROADMAP.md": (self.repo / "docs/ROADMAP.md").read_text(encoding="utf-8"),
+            "docs/MIGRATION_POLICY.md": (self.repo / "docs/MIGRATION_POLICY.md").read_text(encoding="utf-8"),
+        }
+        self.assertEqual(first_snapshot, second_snapshot)
+        run_cmd(["./scripts/validate-development"], cwd=self.repo)
+
     def test_lab_wrapper_capture_activate_export_flow(self) -> None:
         run_cmd(
             [
