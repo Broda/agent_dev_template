@@ -253,6 +253,7 @@ def run_validate_brainstorming(root: Path) -> int:
         "scripts/lab-sync",
         "scripts/lab-note",
         "state/project-init.json",
+        ".github/workflows/ci.yml",
         ".github/workflows/governance-audit.yml",
         ".github/PULL_REQUEST_TEMPLATE.md",
     ]

@@ -52,6 +52,7 @@ Lean file registry for the Project Idea Lab.
 | `scripts/lab-sync.sh` | POSIX launcher for Python commit+push sync |
 | `scripts/lab-note.sh` | POSIX launcher for Python research note capture helper |
 | `state/project-init.json` | Canonical structured handoff state |
+| `.github/workflows/ci.yml` | Blocking CI for tests and governance validation |
 | `.github/workflows/governance-audit.yml` | Warn-only CI audit |
 | `.github/PULL_REQUEST_TEMPLATE.md` | PR checklist |
 | `.gitignore` | Local/derived file exclusions |

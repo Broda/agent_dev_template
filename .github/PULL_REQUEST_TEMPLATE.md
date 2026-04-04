@@ -14,5 +14,6 @@
 
 - [ ] Preserved non-destructive history
 - [ ] Updated `IDEA_CATALOG.md` when idea state changed
+- [ ] Ran `python3 -m unittest discover -s tests -v`
 - [ ] Ran `scripts/validate-governance`
 - [ ] Updated docs if conversational contract changed
