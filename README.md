@@ -13,11 +13,19 @@ This template starts in brainstorming mode and finalizes in place into developme
 - Confirm `MODE.md` is `brainstorming`
 - Use the brainstorming workflow in `brainstorming/`
 
+## Mode Guide
+
+| Mode | Read First | Main Runtime | Main Goal |
+|---|---|---|---|
+| `brainstorming` | `brainstorming/AGENTS.brainstorming.md` | `./scripts/lab <command> ...` | Capture ideas, decisions, risks, and canonical project intent |
+| `development` | `development/AGENTS.development.md` | development governance docs under `docs/` | Execute delivery work against the finalized project definition |
+
 ## Brainstorming Phase
 
 - Conversational rules: `brainstorming/CONVERSATIONAL_MODE.md`
 - Backend contract: `brainstorming/COMMANDS.md`
 - Quickstart: `brainstorming/QUICKSTART.md`
+- Example walkthrough: `brainstorming/EXAMPLE_LIFECYCLE.md`
 - Shell runtime: `./scripts/lab <command> ...`
 - Examples:
   - `./scripts/lab status`

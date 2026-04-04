@@ -11,6 +11,7 @@ Lean file registry for the Project Idea Lab.
 | `brainstorming/CONVERSATIONAL_MODE.md` | Plain-language interaction and milestone capture |
 | `brainstorming/COMMANDS.md` | Optional backend command mapping |
 | `brainstorming/QUICKSTART.md` | Fast start workflow |
+| `brainstorming/EXAMPLE_LIFECYCLE.md` | End-to-end example from capture through finalize |
 | `brainstorming/FILE_MAP.md` | Registry of retained files |
 | `IDEA_CATALOG.md` | Central idea index |
 | `NOTES_CATALOG.md` | Central research note index |

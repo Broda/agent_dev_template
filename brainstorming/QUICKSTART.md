@@ -2,6 +2,8 @@
 
 Python 3 is required for the `scripts/` automation commands used below.
 
+For a concrete start-to-finish example, see `brainstorming/EXAMPLE_LIFECYCLE.md`.
+
 ## 5-Minute Start
 
 1. Start brainstorming naturally in chat.

@@ -213,6 +213,7 @@ def run_validate_brainstorming(root: Path) -> int:
         "brainstorming/CONVERSATIONAL_MODE.md",
         "brainstorming/COMMANDS.md",
         "brainstorming/QUICKSTART.md",
+        "brainstorming/EXAMPLE_LIFECYCLE.md",
         "brainstorming/FILE_MAP.md",
         "IDEA_CATALOG.md",
         "NOTES_CATALOG.md",
