@@ -240,6 +240,28 @@ def validate_intent_registry(root: Path, result: ValidationResult) -> None:
             )
 
 
+def validate_intent_sync_ci(root: Path, result: ValidationResult) -> None:
+    ci_path = root / ".github/workflows/ci.yml"
+    if not ci_path.exists():
+        return
+
+    ci_text = read_text(ci_path)
+    required_checks = [
+        ("render step", "\n          ./scripts/render-intent-docs\n"),
+        (
+            "drift warning",
+            "Generated intent docs are out of sync. Run ./scripts/render-intent-docs and commit the result.",
+        ),
+        (
+            "focused generated-doc diff",
+            "git diff -- brainstorming/CONVERSATIONAL_MODE.md brainstorming/COMMANDS.md",
+        ),
+    ]
+    for label, snippet in required_checks:
+        if snippet not in ci_text:
+            result.add_failure(f"CI workflow is missing the generated intent sync contract: {label}")
+
+
 def run_validate_brainstorming(root: Path) -> int:
     result = ValidationResult()
 
@@ -355,6 +377,7 @@ def run_validate_brainstorming(root: Path) -> int:
     validate_notes_catalog(root, result)
     validate_lab_command_parity(root, result)
     validate_intent_registry(root, result)
+    validate_intent_sync_ci(root, result)
 
     if read_mode(root) != "brainstorming":
         result.add_failure(
