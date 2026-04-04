@@ -464,6 +464,105 @@ def _append_under_section(path: Path, section_title: str, block: str) -> None:
     write_text(path, "\n".join(lines).rstrip() + "\n")
 
 
+def _status_counts(rows: list[list[str]]) -> dict[str, int]:
+    counts = {name: 0 for name in ["inbox", "active", "parked", "killed", "finalized"]}
+    for cells in rows:
+        if len(cells) > 2:
+            status = cells[2].strip()
+            if status in counts:
+                counts[status] += 1
+    return counts
+
+
+def _resolved_finalize_target(root: Path, active_rows: list[list[str]]) -> tuple[dict[str, str] | None, str]:
+    state_idea_id = existing_state_value(root, "ideaId")
+    if state_idea_id:
+        row = _extract_catalog_row(root, state_idea_id)
+        if row.get("idea_id"):
+            return row, "canonical state"
+
+    if len(active_rows) == 1:
+        idea_id = active_rows[0][0].strip()
+        row = _extract_catalog_row(root, idea_id)
+        if row.get("idea_id"):
+            return row, "single active idea"
+
+    if len(active_rows) > 1:
+        return None, "ambiguous"
+    return None, "none"
+
+
+def _status_signal(
+    root: Path,
+    *,
+    state_keys: list[str],
+    idea_block: str,
+    hydration_files: list[Path],
+    label: str = "",
+) -> str:
+    for state_key in state_keys:
+        value = existing_state_value(root, state_key)
+        if value:
+            return value
+    if label:
+        direct_value = _extract_label_from_text(idea_block, label)
+        if direct_value:
+            return direct_value
+        hydrated_value = first_value_for_label(hydration_files, label)
+        if hydrated_value:
+            return hydrated_value
+    return ""
+
+
+def _status_readiness(root: Path, row: dict[str, str]) -> tuple[str, list[str], list[str], list[str]]:
+    idea_id = row["idea_id"]
+    idea_lookup = _find_idea_block(root, idea_id)
+    idea_block = idea_lookup[1] if idea_lookup else ""
+    session_files = _collect_session_links(root, idea_id, row)
+    hydration_files = [
+        root / rel
+        for rel in files_containing(root, "ideas", idea_id) + session_files
+        if path_exists(root, rel)
+    ]
+
+    required_missing: list[str] = []
+    advisory_missing: list[str] = []
+
+    if not session_files:
+        required_missing.append("session history")
+
+    field_checks = [
+        ("problem statement", ["product.problemStatement", "purpose"], "Problem statement"),
+        ("MVP scope", ["product.mvpScope"], "MVP scope"),
+        ("build command", ["commands.build"], ""),
+        ("run command", ["commands.run"], ""),
+        ("test command", ["commands.test"], ""),
+    ]
+    for display_name, state_keys, label in field_checks:
+        if not _status_signal(root, state_keys=state_keys, idea_block=idea_block, hydration_files=hydration_files, label=label):
+            required_missing.append(display_name)
+
+    advisory_checks = [
+        ("latest review outcome", ["governance.latestReviewOutcome"], "Latest review outcome"),
+        ("top risks", ["governance.topRisks"], "Top risks (link to risk entries)"),
+    ]
+    for display_name, state_keys, label in advisory_checks:
+        if not _status_signal(root, state_keys=state_keys, idea_block=idea_block, hydration_files=hydration_files, label=label):
+            advisory_missing.append(display_name)
+
+    summary_export = clean_backticks(row.get("summary_export", ""))
+    if summary_export and summary_export != "_n/a_":
+        advisory_present = [f"summary snapshot: {summary_export}"]
+    else:
+        advisory_present = []
+
+    if required_missing:
+        return "needs-input", required_missing, advisory_missing, advisory_present
+    if advisory_missing:
+        return "ready-with-advisories", required_missing, advisory_missing, advisory_present
+    return "ready", required_missing, advisory_missing, advisory_present
+
+
 def _sync(root: Path, *, message: str, files: list[str], no_sync: bool) -> int:
     if no_sync:
         return 0
@@ -481,31 +580,63 @@ def run_lab_status(root: Path) -> int:
     mode = read_mode(root) or "unknown"
     rows = parse_markdown_table_rows(root / "IDEA_CATALOG.md", IDEA_ROW_RE)
     active = [cells for cells in rows if len(cells) > 2 and cells[2].strip() == "active"]
-    finalized = [cells for cells in rows if len(cells) > 2 and cells[2].strip() == "finalized"]
+    counts = _status_counts(rows)
     state_idea_id = existing_state_value(root, "ideaId")
+    state_status = existing_state_value(root, "status")
+
     print(f"Mode: {mode}")
-    print(f"Ideas tracked: {len(rows)}")
-    print(f"Active ideas: {len(active)}")
-    print(f"Finalized ideas: {len(finalized)}")
+    print(
+        "Ideas tracked: "
+        f"{len(rows)} "
+        f"(inbox {counts['inbox']}, active {counts['active']}, parked {counts['parked']}, "
+        f"killed {counts['killed']}, finalized {counts['finalized']})"
+    )
     if state_idea_id:
-        print(f"Canonical state ideaId: {state_idea_id}")
-    if len(active) == 1:
-        idea_id = active[0][0].strip()
-        row = _extract_catalog_row(root, idea_id)
-        sessions = _collect_session_links(root, idea_id, row)
-        print(f"Current active idea: {idea_id}")
-        print(f"Related sessions: {len(sessions)}")
-        missing: list[str] = []
-        if not sessions:
-            missing.append("session history")
-        if not existing_state_value(root, "purpose"):
-            missing.append("canonical purpose")
-        if not existing_state_value(root, "commands.build"):
-            missing.append("build command")
-        if missing:
-            print("Finalize readiness gaps: " + ", ".join(missing))
+        if state_status:
+            print(f"Canonical state: {state_status} for {state_idea_id}")
         else:
-            print("Finalize readiness: baseline fields present")
+            print(f"Canonical state: {state_idea_id}")
+    else:
+        print("Canonical state: no bound idea yet")
+
+    if active:
+        print("Active ideas:")
+        for cells in active:
+            while len(cells) < 2:
+                cells.append("")
+            print(f"- {cells[0].strip()} ({cells[1].strip() or 'untitled'})")
+
+    target_row, target_source = _resolved_finalize_target(root, active)
+    if target_row is None:
+        if target_source == "ambiguous":
+            print("Finalize target: ambiguous")
+            print("Finalize readiness: blocked")
+            print("Missing before finalize: explicit --idea-id or a single active idea")
+        else:
+            print("Finalize target: none")
+            print("Finalize readiness: blocked")
+            print("Missing before finalize: capture and activate an idea")
+        return 0
+
+    sessions = _collect_session_links(root, target_row["idea_id"], target_row)
+    print(f"Finalize target: {target_row['idea_id']} (from {target_source})")
+    print(f"Target title: {target_row.get('title') or _title_from_idea_id(target_row['idea_id'])}")
+    print(f"Target owner: {target_row.get('owner') or _default_owner(root)}")
+    print(f"Related sessions: {len(sessions)}")
+    summary_export = clean_backticks(target_row.get("summary_export", ""))
+    if summary_export and summary_export != "_n/a_":
+        print(f"Summary snapshot: {summary_export}")
+    else:
+        print("Summary snapshot: none")
+
+    readiness, required_missing, advisory_missing, advisory_present = _status_readiness(root, target_row)
+    print(f"Finalize readiness: {readiness}")
+    if required_missing:
+        print("Missing before low-friction finalize: " + ", ".join(required_missing))
+    if advisory_missing:
+        print("Advisories: capture " + ", ".join(advisory_missing))
+    for note in advisory_present:
+        print(f"Signals: {note}")
     return 0
 
 

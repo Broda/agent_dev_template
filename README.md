@@ -20,6 +20,7 @@ This template starts in brainstorming mode and finalizes in place into developme
 - Quickstart: `brainstorming/QUICKSTART.md`
 - Shell runtime: `./scripts/lab <command> ...`
 - Examples:
+  - `./scripts/lab status`
   - `./scripts/lab capture --idea-id idea-template-hardening --title "Template Hardening"`
   - `./scripts/lab activate --idea-id idea-template-hardening`
   - `./scripts/lab finalize --idea-id idea-template-hardening --write-export`
@@ -30,7 +31,13 @@ This template starts in brainstorming mode and finalizes in place into developme
 
 ## Finalize In Place
 
-Run:
+Check the inferred target and readiness first if needed:
+
+```sh
+./scripts/lab status
+```
+
+Then run:
 
 ```sh
 ./scripts/finalize-project

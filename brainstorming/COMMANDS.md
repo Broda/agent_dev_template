@@ -128,7 +128,9 @@ Python 3 is required for the `scripts/` command implementations referenced in th
 - Run `scripts/validate-governance`.
 
 ### `/lab status`
-- Report current mode, idea counts, active idea context, and finalize-readiness gaps.
+- Report current mode, per-status idea counts, active idea context, inferred finalize target, and finalize-readiness gaps.
+- If finalize target selection is ambiguous, list active candidates and call that out explicitly.
+- If a single target is inferable, report related session count, summary snapshot presence, and missing fields for a low-friction finalize.
 - Example:
   - `./scripts/lab status`
 

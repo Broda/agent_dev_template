@@ -316,6 +316,40 @@ class LabWorkflowTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("select idea to finalize", result.stderr.lower() + result.stdout.lower())
 
+    def test_lab_status_reports_ready_target_context(self) -> None:
+        self.write_finalize_fixture("idea-status-ready")
+        result = run_cmd(["./scripts/lab", "status"], cwd=self.repo)
+        self.assertIn("Mode: brainstorming", result.stdout)
+        self.assertIn("Ideas tracked: 1 (inbox 0, active 1, parked 0, killed 0, finalized 0)", result.stdout)
+        self.assertIn("Canonical state: draft for idea-status-ready", result.stdout)
+        self.assertIn("Finalize target: idea-status-ready (from canonical state)", result.stdout)
+        self.assertIn("Target title: Finalize Smoke", result.stdout)
+        self.assertIn("Related sessions: 1", result.stdout)
+        self.assertIn("Finalize readiness: ready", result.stdout)
+
+    def test_lab_status_reports_ambiguous_multiple_active_ideas(self) -> None:
+        self.write_finalize_fixture("idea-status-first")
+        state_path = self.repo / "state/project-init.json"
+        state_text = state_path.read_text(encoding="utf-8").replace('"ideaId": "idea-status-first"', '"ideaId": ""')
+        state_path.write_text(state_text, encoding="utf-8")
+        catalog_path = self.repo / "IDEA_CATALOG.md"
+        catalog_path.write_text(
+            catalog_path.read_text(encoding="utf-8")
+            + "| idea-status-second | Second Idea | active | Test User | `sessions/2026-04-03_idea-status-second.md` | _n/a_ | _none_ |\n",
+            encoding="utf-8",
+        )
+        (self.repo / "sessions/2026-04-03_idea-status-second.md").write_text(
+            "# Brainstorming Session\n\n- Idea ID: `idea-status-second`\n",
+            encoding="utf-8",
+        )
+        result = run_cmd(["./scripts/lab", "status"], cwd=self.repo)
+        self.assertIn("Active ideas:", result.stdout)
+        self.assertIn("- idea-status-first (Finalize Smoke)", result.stdout)
+        self.assertIn("- idea-status-second (Second Idea)", result.stdout)
+        self.assertIn("Finalize target: ambiguous", result.stdout)
+        self.assertIn("Finalize readiness: blocked", result.stdout)
+        self.assertIn("Missing before finalize: explicit --idea-id or a single active idea", result.stdout)
+
     def test_lab_commit_and_push_wrappers(self) -> None:
         self.init_git_repo()
         remote_path = self.tmpdir / "remote.git"

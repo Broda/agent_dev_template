@@ -7,10 +7,11 @@ Python 3 is required for the `scripts/` automation commands used below.
 1. Start brainstorming naturally in chat.
 2. When an idea is worth keeping, say "capture this idea".
 3. When moving forward, say "make this active".
-4. Record decisions/risks only when useful.
-5. When done, say "finalize this repo", then run `./scripts/finalize-project`.
-6. If you also want an archival summary snapshot, rerun with `./scripts/finalize-project --write-export`.
-7. Run audit:
+4. Check current context and finalize readiness with `./scripts/lab status`.
+5. Record decisions/risks only when useful.
+6. When done, say "finalize this repo", then run `./scripts/finalize-project`.
+7. If you also want an archival summary snapshot, rerun with `./scripts/finalize-project --write-export`.
+8. Run audit:
 
 ```sh
 ./scripts/validate-governance
