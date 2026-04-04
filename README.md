@@ -68,6 +68,24 @@ Create an optional summary snapshot before finalizing:
 ./scripts/lab export --idea-id idea-template-hardening
 ```
 
+## Maintaining Intent Docs
+
+If you change brainstorming NL mappings:
+
+```sh
+./scripts/render-intent-docs
+./scripts/validate-governance
+```
+
+Source of truth:
+- `brainstorming/intent_registry.json`
+
+Generated sections:
+- `brainstorming/CONVERSATIONAL_MODE.md`
+- `brainstorming/COMMANDS.md`
+
+Do not hand-edit the generated intent tables directly. Edit the registry, rerender, then validate.
+
 ## Finalize In Place
 
 Check the inferred target and readiness first if needed:

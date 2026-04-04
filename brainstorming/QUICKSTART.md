@@ -51,3 +51,14 @@ Optional summary snapshot:
 - Research notes for gathered info (`notes/`, `NOTES_CATALOG.md`, `./scripts/lab-note`)
 - Risk tracking (`brainstorming/templates/risk_template.md`)
 - Review gate (`brainstorming/templates/review_gate_template.md`)
+
+## Maintaining Intent Docs
+
+When changing brainstorming NL intent mappings:
+
+```sh
+./scripts/render-intent-docs
+./scripts/validate-governance
+```
+
+Edit `brainstorming/intent_registry.json` first. The intent tables in `brainstorming/CONVERSATIONAL_MODE.md` and `brainstorming/COMMANDS.md` are generated.
