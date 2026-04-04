@@ -29,6 +29,7 @@ This template starts in brainstorming mode and finalizes in place into developme
 - Shell runtime: `./scripts/lab <command> ...`
 - Examples:
   - `./scripts/lab status`
+  - `./scripts/lab doctor`
   - `./scripts/lab capture --idea-id idea-template-hardening --title "Template Hardening"`
   - `./scripts/lab activate --idea-id idea-template-hardening`
   - `./scripts/lab finalize --idea-id idea-template-hardening --write-export`
@@ -43,6 +44,7 @@ Check current context and inferred finalize target:
 
 ```sh
 ./scripts/lab status
+./scripts/lab doctor
 ```
 
 Capture and activate an idea:

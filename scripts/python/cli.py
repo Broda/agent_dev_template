@@ -25,6 +25,7 @@ from template_cli.workflow import (  # noqa: E402
     run_lab_capture,
     run_lab_commit_command,
     run_lab_decide,
+    run_lab_doctor,
     run_lab_export,
     run_lab_finalize,
     run_lab_kill,
@@ -57,6 +58,8 @@ def build_parser() -> argparse.ArgumentParser:
     note_parser.add_argument("--no-sync", action="store_true")
     subparsers.add_parser("lab-sync")
     subparsers.add_parser("lab-status")
+    doctor_parser = subparsers.add_parser("lab-doctor")
+    doctor_parser.add_argument("--idea-id", default="")
     subparsers.add_parser("lab-audit")
     push_parser = subparsers.add_parser("lab-push")
     commit_parser = subparsers.add_parser("lab-commit")
@@ -171,6 +174,8 @@ def main(argv: list[str] | None = None) -> int:
         return run_lab_sync_from_argv(Path.cwd(), remaining)
     if args.command == "lab-status":
         return run_lab_status(Path.cwd())
+    if args.command == "lab-doctor":
+        return run_lab_doctor(Path.cwd(), idea_id=args.idea_id)
     if args.command == "lab-audit":
         return run_lab_audit(Path.cwd())
     if args.command == "lab-commit":

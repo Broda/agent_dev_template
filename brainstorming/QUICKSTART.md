@@ -9,7 +9,7 @@ For a concrete start-to-finish example, see `brainstorming/EXAMPLE_LIFECYCLE.md`
 1. Start brainstorming naturally in chat.
 2. When an idea is worth keeping, say "capture this idea".
 3. When moving forward, say "make this active".
-4. Check current context and finalize readiness with `./scripts/lab status`.
+4. Check current context and finalize readiness with `./scripts/lab status` or `./scripts/lab doctor`.
 5. Record decisions/risks only when useful.
 6. When done, say "finalize this repo", then run `./scripts/finalize-project`.
 7. If you also want an archival summary snapshot, rerun with `./scripts/finalize-project --write-export`.
@@ -33,6 +33,7 @@ Core flow:
 ./scripts/lab capture --idea-id idea-template-hardening --title "Template Hardening"
 ./scripts/lab activate --idea-id idea-template-hardening
 ./scripts/lab status
+./scripts/lab doctor
 ./scripts/lab review --idea-id idea-template-hardening --result conditional-pass --summary "Ready after parity checks"
 ./scripts/finalize-project --idea-id idea-template-hardening
 ```

@@ -436,6 +436,41 @@ class LabWorkflowTests(unittest.TestCase):
         self.assertIn("Finalize readiness: blocked", result.stdout)
         self.assertIn("Missing before finalize: explicit --idea-id or a single active idea", result.stdout)
 
+    def test_lab_doctor_reports_missing_finalize_fields(self) -> None:
+        run_cmd(
+            [
+                "./scripts/lab",
+                "capture",
+                "--idea-id",
+                "idea-doctor-blocked",
+                "--title",
+                "Doctor Blocked",
+                "--no-sync",
+            ],
+            cwd=self.repo,
+        )
+        run_cmd(["./scripts/lab", "activate", "--idea-id", "idea-doctor-blocked", "--no-sync"], cwd=self.repo)
+        result = run_cmd(["./scripts/lab", "doctor"], cwd=self.repo)
+        self.assertIn("Finalize doctor", result.stdout)
+        self.assertIn("Finalize target: idea-doctor-blocked (from single active idea)", result.stdout)
+        self.assertIn("Finalize readiness: needs-input", result.stdout)
+        self.assertIn("- session history: OK via sessions/", result.stdout)
+        self.assertIn("- problem statement: MISSING", result.stdout)
+        self.assertIn("- MVP scope: MISSING", result.stdout)
+        self.assertIn("- build command: MISSING", result.stdout)
+        self.assertIn("Blocked on:", result.stdout)
+        self.assertIn("update the active idea/session or prefill state/project-init.json", result.stdout)
+
+    def test_lab_doctor_reports_sources_for_ready_target(self) -> None:
+        self.write_finalize_fixture("idea-doctor-ready")
+        result = run_cmd(["./scripts/lab", "doctor"], cwd=self.repo)
+        self.assertIn("Finalize target: idea-doctor-ready (from canonical state)", result.stdout)
+        self.assertIn("Finalize readiness: ready", result.stdout)
+        self.assertIn("- problem statement: OK via state.product.problemStatement", result.stdout)
+        self.assertIn("- build command: OK via state.commands.build", result.stdout)
+        self.assertIn("- top risks: OK via state.governance.topRisks", result.stdout)
+        self.assertIn("Next step: finalize can run now with ./scripts/finalize-project --idea-id idea-doctor-ready", result.stdout)
+
     def test_lab_commit_and_push_wrappers(self) -> None:
         self.init_git_repo()
         remote_path = self.tmpdir / "remote.git"

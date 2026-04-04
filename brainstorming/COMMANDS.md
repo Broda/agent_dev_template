@@ -40,6 +40,7 @@ Python 3 is required for the `scripts/` command implementations referenced in th
 | "park this" | `/lab park <idea-id>` |
 | "kill this" | `/lab kill <idea-id>` |
 | "what's the current state?" | `/lab status` |
+| "why is finalize blocked?" | `/lab doctor [<idea-id>]` |
 | "run audit" | `/lab audit` |
 
 ## Commands (Backend Contract)
@@ -133,6 +134,14 @@ Python 3 is required for the `scripts/` command implementations referenced in th
 - If a single target is inferable, report related session count, summary snapshot presence, and missing fields for a low-friction finalize.
 - Example:
   - `./scripts/lab status`
+
+### `/lab doctor [<idea-id>]`
+- Explain finalize-readiness in detail for the inferred target or an explicit `--idea-id`.
+- Report which idea was selected, why it was selected, and which artifacts or state keys supplied required finalize fields.
+- If finalize is blocked, list the exact missing inputs and suggest the next action.
+- Example:
+  - `./scripts/lab doctor`
+  - `./scripts/lab doctor --idea-id idea-template-hardening`
 
 ### `/lab commit [message]`
 - Commit staged changes manually.
