@@ -23,11 +23,14 @@ from template_cli.workflow import (  # noqa: E402
     run_lab_activate,
     run_lab_audit,
     run_lab_capture,
+    run_lab_commit_command,
     run_lab_decide,
     run_lab_export,
+    run_lab_finalize,
     run_lab_kill,
     run_lab_park,
     run_lab_path_note,
+    run_lab_push_command,
     run_lab_review,
     run_lab_risk,
     run_lab_status,
@@ -55,6 +58,12 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser("lab-sync")
     subparsers.add_parser("lab-status")
     subparsers.add_parser("lab-audit")
+    push_parser = subparsers.add_parser("lab-push")
+    commit_parser = subparsers.add_parser("lab-commit")
+    commit_parser.add_argument("--message", default="brainstorm: milestone update")
+    lab_finalize_parser = subparsers.add_parser("lab-finalize")
+    lab_finalize_parser.add_argument("--idea-id", default="")
+    lab_finalize_parser.add_argument("--write-export", action="store_true")
 
     capture_parser = subparsers.add_parser("lab-capture")
     capture_parser.add_argument("--idea-id", required=True)
@@ -164,6 +173,12 @@ def main(argv: list[str] | None = None) -> int:
         return run_lab_status(Path.cwd())
     if args.command == "lab-audit":
         return run_lab_audit(Path.cwd())
+    if args.command == "lab-commit":
+        return run_lab_commit_command(Path.cwd(), message=args.message)
+    if args.command == "lab-push":
+        return run_lab_push_command(Path.cwd())
+    if args.command == "lab-finalize":
+        return run_lab_finalize(Path.cwd(), idea_id=args.idea_id, write_export=args.write_export)
     if args.command == "lab-capture":
         return run_lab_capture(
             Path.cwd(),

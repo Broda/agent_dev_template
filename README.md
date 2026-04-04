@@ -19,6 +19,10 @@ This template starts in brainstorming mode and finalizes in place into developme
 - Backend contract: `brainstorming/COMMANDS.md`
 - Quickstart: `brainstorming/QUICKSTART.md`
 - Shell runtime: `./scripts/lab <command> ...`
+- Examples:
+  - `./scripts/lab capture --idea-id idea-template-hardening --title "Template Hardening"`
+  - `./scripts/lab activate --idea-id idea-template-hardening`
+  - `./scripts/lab finalize --idea-id idea-template-hardening --write-export`
 - Idea state files: `ideas/`
 - Sessions: `sessions/`
 - Notes: `notes/`

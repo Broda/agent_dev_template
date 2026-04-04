@@ -21,6 +21,7 @@ Lean file registry for the Project Idea Lab.
 | `sessions/` | Session records and finalization continuity logs |
 | `notes/` | Saved research/context notes |
 | `exports/` | Optional archival project summaries |
+| `tests/` | Regression tests for CLI and workflow runtime |
 | `brainstorming/templates/idea_template.md` | Idea capture template |
 | `brainstorming/templates/decision_template.md` | Decision template |
 | `brainstorming/templates/note_template.md` | Research note template |

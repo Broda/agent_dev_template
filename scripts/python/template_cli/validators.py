@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -163,6 +164,44 @@ def validate_notes_catalog(root: Path, result: ValidationResult) -> None:
             result.add_failure(f"Missing note file for '{note_id}': {clean_note_path}")
 
 
+def documented_lab_commands(root: Path) -> set[str]:
+    commands_path = root / "brainstorming/COMMANDS.md"
+    if not commands_path.exists():
+        return set()
+    commands: set[str] = set()
+    for match in re.findall(r"### `/lab ([a-z-]+)", read_text(commands_path)):
+        commands.add(match.strip())
+    return commands
+
+
+def registered_lab_commands(root: Path) -> set[str]:
+    cli_path = root / "scripts/python/cli.py"
+    if not cli_path.exists():
+        return set()
+    result = subprocess.run(
+        [sys.executable, str(cli_path), "-h"],
+        cwd=root,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    output = (result.stdout or "") + "\n" + (result.stderr or "")
+    commands: set[str] = set()
+    for match in re.findall(r"\blab-([a-z-]+)\b", output):
+        commands.add(match.strip())
+    return commands
+
+
+def validate_lab_command_parity(root: Path, result: ValidationResult) -> None:
+    documented = documented_lab_commands(root)
+    registered = registered_lab_commands(root)
+    if not documented or not registered:
+        return
+    missing = sorted(documented - registered)
+    for command in missing:
+        result.add_failure(f"Documented lab command is not registered in CLI: {command}")
+
+
 def run_validate_brainstorming(root: Path) -> int:
     result = ValidationResult()
 
@@ -192,6 +231,9 @@ def run_validate_brainstorming(root: Path) -> int:
         "brainstorming/templates/review_gate_template.md",
         "brainstorming/docs/adr/template.md",
         "brainstorming/docs/adr/ADR-0001-adopt-governance-structure-for-idea-lab.md",
+        "scripts/lab",
+        "scripts/lab.sh",
+        "scripts/lab.ps1",
         "scripts/validate-brainstorming.ps1",
         "scripts/validate-governance.ps1",
         "scripts/lab-sync.ps1",
@@ -264,6 +306,7 @@ def run_validate_brainstorming(root: Path) -> int:
                     result.add_failure(f"Catalog export path missing for '{idea_id}': {clean_export_path}")
 
     validate_notes_catalog(root, result)
+    validate_lab_command_parity(root, result)
 
     if read_mode(root) != "brainstorming":
         result.add_failure(
@@ -293,6 +336,9 @@ def run_validate_development(root: Path) -> int:
         "sessions/",
         "notes/",
         "exports/",
+        "scripts/lab",
+        "scripts/lab.sh",
+        "scripts/lab.ps1",
         "scripts/lab-note",
         "scripts/lab-note.sh",
         "scripts/lab-note.ps1",

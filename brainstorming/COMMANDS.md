@@ -39,6 +39,7 @@ Python 3 is required for the `scripts/` command implementations referenced in th
 | "finalize this repo" | `/lab finalize [<idea-id>]` |
 | "park this" | `/lab park <idea-id>` |
 | "kill this" | `/lab kill <idea-id>` |
+| "what's the current state?" | `/lab status` |
 | "run audit" | `/lab audit` |
 
 ## Commands (Backend Contract)
@@ -47,19 +48,27 @@ Python 3 is required for the `scripts/` command implementations referenced in th
 - Add/update idea in `ideas/_inbox.md` using `brainstorming/templates/idea_template.md`.
 - Add/update row in `IDEA_CATALOG.md`.
 - Update `brainstorming/FILE_MAP.md` when file inventory changes.
+- Example:
+  - `./scripts/lab capture --idea-id idea-template-hardening --title "Template Hardening"`
 
 ### `/lab activate <idea-id>`
 - Move/update idea in `ideas/_active.md`.
 - Create/update session file in `sessions/`.
 - Update `IDEA_CATALOG.md`.
+- Example:
+  - `./scripts/lab activate --idea-id idea-template-hardening`
 
 ### `/lab decide <decision-slug>`
 - Record decision in session using `brainstorming/templates/decision_template.md`.
 - For major strategic changes, create ADR from `brainstorming/docs/adr/template.md`.
 - Update `IDEA_CATALOG.md` references.
+- Example:
+  - `./scripts/lab decide --idea-id idea-template-hardening --chosen-option "State-first finalize" --rationale "Preserve continuity"`
 
 ### `/lab risk <idea-id>`
 - Record risk in session using `brainstorming/templates/risk_template.md`.
+- Example:
+  - `./scripts/lab risk --idea-id idea-template-hardening --statement "Docs/runtime drift"`
 
 ### `/lab path-note <idea-id>`
 - Append note to the current session file under `## Exploration Path Notes`.
@@ -86,10 +95,14 @@ Python 3 is required for the `scripts/` command implementations referenced in th
 ### `/lab review <idea-id>`
 - Record review notes and optional gate using `brainstorming/templates/review_gate_template.md`.
 - Update `IDEA_CATALOG.md`.
+- Example:
+  - `./scripts/lab review --idea-id idea-template-hardening --result conditional-pass --summary "Ready after validator parity"`
 
 ### `/lab export <idea-id>`
 - Optionally create `exports/YYYY-MM-DD_PROJECT_SUMMARY_<idea-id>.md` using `brainstorming/templates/project_plan_packet_template.md`.
 - Update summary export link in `IDEA_CATALOG.md` when a snapshot exists.
+- Example:
+  - `./scripts/lab export --idea-id idea-template-hardening`
 
 ### `/lab finalize [<idea-id>]`
 - Capture canonical decisions in `state/project-init.json`.
@@ -100,6 +113,8 @@ Python 3 is required for the `scripts/` command implementations referenced in th
 - If multiple ideas are active or inference is ambiguous, prompt with a numbered choice list.
 - `--idea-id <idea-id>` remains available as an explicit override.
 - Switch `MODE.md` to development after successful rendering and validation.
+- Example:
+  - `./scripts/lab finalize --idea-id idea-template-hardening --write-export`
 
 ### `/lab park <idea-id>`
 - Move/update idea in `ideas/_parked.md`.
@@ -112,13 +127,22 @@ Python 3 is required for the `scripts/` command implementations referenced in th
 ### `/lab audit`
 - Run `scripts/validate-governance`.
 
+### `/lab status`
+- Report current mode, idea counts, active idea context, and finalize-readiness gaps.
+- Example:
+  - `./scripts/lab status`
+
 ### `/lab commit [message]`
 - Commit staged changes manually.
 - Message format preferred: `brainstorm: <milestone-type> <idea-id-or-context>`.
+- Example:
+  - `./scripts/lab commit --message "brainstorm: capture idea-template-hardening"`
 
 ### `/lab push`
 - Push current branch to `origin/<current-branch>`.
 - Requires clean working tree.
+- Example:
+  - `./scripts/lab push`
 
 ### `/lab sync [message]`
 - Manual commit+push wrapper using `scripts/lab-sync`.

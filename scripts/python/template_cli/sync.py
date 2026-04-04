@@ -137,3 +137,56 @@ def run_lab_sync_from_argv(root: Path, argv: list[str]) -> int:
         no_warn_push_failure=no_warn_push_failure,
         files=files,
     )
+
+
+def run_lab_commit(root: Path, *, message: str = "brainstorm: milestone update") -> int:
+    add_result = _run_git(root, ["add", "-A"], check=False)
+    if add_result.returncode != 0:
+        if add_result.stderr:
+            _warn(add_result.stderr.strip())
+        return add_result.returncode
+
+    staged_result = _run_git(root, ["diff", "--cached", "--name-only"], check=False)
+    if not staged_result.stdout.strip():
+        print("No staged changes to commit.")
+        return 0
+
+    commit_result = _run_git(root, ["commit", "-m", message], check=False)
+    if commit_result.returncode != 0:
+        if commit_result.stderr:
+            _warn(commit_result.stderr.strip())
+        return commit_result.returncode
+
+    sha_result = _run_git(root, ["rev-parse", "--short", "HEAD"], check=False)
+    print(f"Committed: {sha_result.stdout.strip()}")
+    return 0
+
+
+def run_lab_push(root: Path) -> int:
+    branch_result = _run_git(root, ["symbolic-ref", "--quiet", "--short", "HEAD"], check=False)
+    branch = branch_result.stdout.strip()
+    if not branch:
+        _warn("Warning: Detached HEAD detected. Push skipped.")
+        return 2
+
+    remote_result = _run_git(root, ["remote"], check=False)
+    remotes = {line.strip() for line in remote_result.stdout.splitlines()}
+    if "origin" not in remotes:
+        _warn("Warning: Remote 'origin' not configured. Push skipped.")
+        return 2
+
+    dirty_result = _run_git(root, ["status", "--porcelain"], check=False)
+    if dirty_result.stdout.strip():
+        _warn("Warning: Working tree is not clean. Push skipped by policy.")
+        return 2
+
+    push_result = _run_git(root, ["push", "origin", branch], check=False)
+    if push_result.returncode != 0:
+        _warn(f"Warning: Push failed for origin/{branch}.")
+        if push_result.stderr:
+            _warn(push_result.stderr.strip())
+        return push_result.returncode
+
+    sha_result = _run_git(root, ["rev-parse", "--short", "HEAD"], check=False)
+    print(f"Pushed: origin/{branch} @ {sha_result.stdout.strip()}")
+    return 0
