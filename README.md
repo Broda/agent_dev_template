@@ -1,4 +1,4 @@
-# Master Codex Template
+# Master Agent Template
 
 This template starts in brainstorming mode and finalizes in place into development mode.
 
