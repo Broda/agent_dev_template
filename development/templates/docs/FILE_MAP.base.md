@@ -58,3 +58,15 @@ Examples:
 - "No public contract changes."
 
 Layer targeting prevents architectural drift.
+
+---
+
+# Agent Operating Rules
+
+Before editing any file:
+
+1. Identify the correct layer from the map above.
+2. Confirm the change is isolated to that layer (or that cross-layer changes are explicitly in scope).
+3. If the change touches a public contract (interface layer, API surface, CLI commands, config formats), an ADR is required before proceeding — see `docs/ARCHITECTURE.md`.
+
+Do not introduce logic from one layer into another. If the scope is unclear, ask before editing.

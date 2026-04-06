@@ -227,18 +227,32 @@ Before release:
 
 ---
 
-# 6. AI Compliance Rule
+# 6. AI Guardrails
+
+## Agent Pre-Work Sequence
+
+Before making any meaningful change in this repository:
+
+1. Read this file (`docs/GOVERNANCE_INDEX.md`) to identify which governance docs apply.
+2. Read all governance documents listed in the index above.
+3. Read the most recent ADRs in `docs/adr/`.
+4. Read `CHANGELOG.md`.
+5. Identify the active milestone in `docs/ROADMAP.md` and confirm the change is in scope.
+6. Classify the change (feature, bug fix, refactor, migration, security fix, docs-only).
+
+If persistence exists in this project, also read `docs/MIGRATION_POLICY.md` before any data-layer change.
+
+## Constraints
 
 AI agents must:
 
-- Read all governance files before modifying structure.
 - Not introduce breaking changes silently.
 - Not weaken security posture.
 - Not modify migrations improperly.
 - Not change public contracts without ADR + version bump.
 - Not bypass Definition of Done.
 
-If uncertain, ask for clarification.
+When uncertain about scope, architecture, or policy: surface the question to the user before proceeding. Do not guess.
 
 ---
 

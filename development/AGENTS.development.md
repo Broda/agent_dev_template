@@ -36,6 +36,19 @@ Evidence format example:
 
 - Evidence: `<test command>` (pass), `<build command>` (success), `<run command>` (smoke verified)
 
+## Validation Commands
+
+Build, run, and test commands for this project are recorded in `docs/PROJECT_CONTEXT.md` under the "Commands" section and in `state/project-init.json` under `commands`.
+
+After completing a task:
+
+- Run the test command to verify correctness.
+- Run the build command to confirm no build breakage.
+- Run `./scripts/validate-governance` to confirm governance integrity.
+- Run `./scripts/validate-development` to confirm development doc integrity.
+
+Record each command and its result as evidence under the completed task in `docs/ROADMAP.md`.
+
 ## Public Contract Discipline
 
 Do not change public contracts without an ADR and version alignment.
