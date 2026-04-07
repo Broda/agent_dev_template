@@ -289,7 +289,7 @@ AI must:
 - Not change types without migration.
 - Not introduce schema/format drift.
 
-If uncertain, ask before generating migration.
+When uncertain, surface the question to the user before proceeding. Do not guess migration strategy.
 
 ---
 

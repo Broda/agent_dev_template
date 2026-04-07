@@ -220,7 +220,7 @@ AI must:
 - Not expose secrets in logs.
 - Not weaken cryptographic configuration.
 
-If uncertain about security implications, ask before implementing.
+When uncertain about security implications, surface the question to the user before proceeding. Do not guess.
 
 ---
 

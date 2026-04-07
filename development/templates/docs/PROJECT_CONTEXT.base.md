@@ -293,7 +293,7 @@ AI-assisted development must:
 - Avoid adding major dependencies casually.
 - Align changes with the active milestone.
 
-If unsure, ask for clarification rather than guessing architecture.
+When unsure, surface the question to the user before proceeding. Do not guess architecture.
 
 ---
 

@@ -18,7 +18,10 @@ Do not mix the two rule sets in one task.
 ## Agent-specific guidance
 
 - **Claude Code**: Also read `CLAUDE.md` before acting. It covers tool usage, auto-sync behavior, topic-shift nudging, and the finalize flow.
-- **Other agents**: The mode contracts above are self-contained. Start with the contract for the current mode.
+- **Other agents**: The mode contracts above are self-contained. Key facts that apply to all agents:
+  - `./scripts/lab` is the canonical CLI interface. All commands handle git commit and push automatically.
+  - Topic-shift nudging (in the brainstorming contract) is advisory and applies to agents with multi-turn conversational sessions. Skip it if your agent operates command-by-command.
+  - For finalization, pre-populate `state/project-init.json` with known values, then run `./scripts/finalize-project --idea-id <id>`.
 
 ## Key scripts (Python 3 required)
 

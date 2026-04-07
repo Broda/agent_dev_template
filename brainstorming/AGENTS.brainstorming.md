@@ -11,6 +11,7 @@ Keep brainstorming natural while recording milestone artifacts for later finaliz
 
 ## Git Sync Behavior
 
+- `./scripts/lab` commands handle commit and push automatically. Do not run separate git commands for milestone writes unless recovery is needed.
 - Auto-commit on each milestone write.
 - Auto-push after each auto-commit.
 - Push target: current branch to `origin/<current-branch>`.
@@ -44,6 +45,8 @@ Avoid per-turn file churn for exploratory discussion.
 - Do not clone another repository during finalize.
 
 ## Topic-Shift Continuity Nudges
+
+The following applies to agents with persistent, multi-turn conversational sessions. Agents that operate command-by-command may skip this section.
 
 To reduce idea loss during exploratory branching:
 
