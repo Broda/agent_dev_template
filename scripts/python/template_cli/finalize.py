@@ -422,13 +422,13 @@ def _write_summary_export(root: Path, export_path: str, state: dict) -> None:
         export_file,
         "- Solution summary:",
         str(product.get("solutionSummary", ""))
-        or f"Deliver the first milestone vertical slice for {state.get('projectName', '')}.",
+        or f"Deliver the first implementation slice for {state.get('projectName', '')}.",
     )
     replace_line_prefix(
         export_file,
         "- MVP scope:",
         str(product.get("mvpScope", ""))
-        or "Milestone 0 vertical slice with working build, run, and test commands.",
+        or "Milestone 0 implementation slice with working build, run, and test commands.",
     )
     replace_line_prefix(
         export_file,
@@ -471,7 +471,7 @@ def _write_summary_export(root: Path, export_path: str, state: dict) -> None:
         "- Remaining accepted risks:",
         str(governance.get("remainingAcceptedRisks", "")) or "None recorded at finalization time.",
     )
-    replace_line_prefix(export_file, "- Milestone 1:", "Milestone 0 vertical slice implemented and verified.")
+    replace_line_prefix(export_file, "- Milestone 1:", "Milestone 0 implementation slice implemented and verified.")
     replace_line_prefix(
         export_file,
         "- Milestone 2:",
@@ -729,6 +729,14 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
     (root / "state").mkdir(parents=True, exist_ok=True)
     (root / "docs/adr").mkdir(parents=True, exist_ok=True)
 
+    existing_state: dict = {}
+    state_path = root / STATE_FILE
+    if state_path.exists():
+        try:
+            existing_state = json.loads(read_text(state_path))
+        except json.JSONDecodeError:
+            existing_state = {}
+
     with BackupManager(root) as backups:
         for relative_path in [
             STATE_FILE,
@@ -753,6 +761,26 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
             backups.backup_path(relative_path)
         if write_export:
             backups.backup_path(export_path)
+
+        existing_artifacts = existing_state.get("artifacts", {}) if isinstance(existing_state, dict) else {}
+        preserved_note_references = str(existing_artifacts.get("noteReferences", "") or "").strip()
+        preserved_summary_export = str(existing_artifacts.get("summaryExport", "") or "").strip()
+        preserved_adr_references = existing_artifacts.get("adrReferences", [])
+        if not isinstance(preserved_adr_references, list):
+            preserved_adr_references = []
+
+        adr_references = unique_values(
+            list(preserved_adr_references) + ["docs/adr/ADR-0001-record-architecture-decisions.md"]
+        )
+
+        effective_note_references = notes_col
+        if is_placeholder_value(effective_note_references) or effective_note_references.lower() in {
+            "none recorded",
+            "_none_",
+            "_n/a_",
+            "_none yet_",
+        }:
+            effective_note_references = preserved_note_references
 
         state = {
             "schemaVersion": STATE_SCHEMA_VERSION,
@@ -784,8 +812,8 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
                 "targetUsers": target_users or "See related sessions",
                 "whyNow": why_now or "See related sessions",
                 "expectedValue": expected_value or objective,
-                "solutionSummary": solution_summary or f"Deliver the first milestone vertical slice for {project_name}.",
-                "mvpScope": mvp_scope or "Milestone 0 vertical slice with working build, run, and test commands.",
+                "solutionSummary": solution_summary or f"Deliver the first implementation slice for {project_name}.",
+                "mvpScope": mvp_scope or "Milestone 0 implementation slice with working build, run, and test commands.",
                 "outOfScope": out_of_scope or "See roadmap and follow-up sessions.",
                 "assumptions": assumptions,
                 "nonGoals": non_goals,
@@ -804,10 +832,10 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
             "artifacts": {
                 "ideaFiles": unique_values(idea_files),
                 "sessionFiles": unique_values(session_paths + [session_path]),
-                "noteReferences": notes_col or "None recorded",
-                "summaryExport": export_path if write_export else "",
+                "noteReferences": effective_note_references or "None recorded",
+                "summaryExport": export_path if write_export else preserved_summary_export,
                 "finalizationSession": session_path,
-                "adrReferences": ["docs/adr/ADR-0001-record-architecture-decisions.md"],
+                "adrReferences": adr_references,
             },
         }
         write_text(root / STATE_FILE, json.dumps(state, indent=2) + "\n")

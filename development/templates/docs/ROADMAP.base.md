@@ -33,7 +33,7 @@ Each milestone must include:
 
 ## Goal
 
-Establish stable architecture baseline and vertical slice.
+Establish a stable architecture baseline and first implementation slice.
 
 ## Architecture Impact
 

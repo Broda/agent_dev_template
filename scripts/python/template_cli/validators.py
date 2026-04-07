@@ -21,6 +21,22 @@ NOTE_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 IDEA_ROW_RE = re.compile(r"^\|\s*idea-[a-z0-9-]+")
 ADR_LINK_RE = re.compile(r"docs/adr/ADR-[0-9]{4}-[a-z0-9-]+\.md")
 PLACEHOLDER_RE = re.compile(r"<[^>]+>")
+FORBIDDEN_DEVELOPMENT_TEMPLATE_TERMS = [
+    "gameplay",
+    "player",
+    "battle",
+    "economy",
+    "market",
+    "playable loop",
+    "starter progression",
+    "onboarding",
+]
+DEVELOPMENT_SEMANTIC_DOCS = [
+    "README.md",
+    "docs/PROJECT_CONTEXT.md",
+    "docs/ROADMAP.md",
+    "docs/ARCHITECTURE.md",
+]
 
 
 def path_exists(root: Path, relative_path: str) -> bool:
@@ -320,6 +336,7 @@ def run_validate_brainstorming(root: Path) -> int:
         "tests/test_lab_workflow.py",
         "tests/test_intent_registry_contract.py",
         "tests/fixtures/finalized_state_v2.json",
+        "tests/fixtures/finalized_state_web_app_v2.json",
         "tests/fixtures/finalized_state_with_persistence_v2.json",
         "tests/fixtures/finalized_session.md",
         "state/project-init.json",
@@ -481,6 +498,37 @@ def run_validate_development(root: Path) -> int:
             session_files = artifacts.get("sessionFiles", [])
             if not isinstance(session_files, list) or not session_files:
                 result.add_failure("state/project-init.json must include artifacts.sessionFiles.")
+            adr_references = artifacts.get("adrReferences", [])
+            if not isinstance(adr_references, list) or not adr_references:
+                result.add_failure("state/project-init.json must include artifacts.adrReferences.")
+            else:
+                for adr_reference in adr_references:
+                    if not isinstance(adr_reference, str) or not adr_reference.strip():
+                        result.add_failure(
+                            "state/project-init.json contains an empty artifacts.adrReferences entry."
+                        )
+                        continue
+                    if not path_exists(root, adr_reference):
+                        result.add_failure(
+                            f"state/project-init.json references a missing ADR file: {adr_reference}"
+                        )
+            summary_export = str(artifacts.get("summaryExport", "")).strip()
+            if summary_export and not path_exists(root, summary_export):
+                result.add_failure(
+                    f"state/project-init.json references a missing summary export: {summary_export}"
+                )
+
+    for relative_path in DEVELOPMENT_SEMANTIC_DOCS:
+        path = root / relative_path
+        if not path.exists():
+            continue
+        text = read_text(path).lower()
+        for term in FORBIDDEN_DEVELOPMENT_TEMPLATE_TERMS:
+            if term in text:
+                result.add_failure(
+                    f"Generated development docs contain template-specific language '{term}' in {relative_path}."
+                )
+                break
 
     validate_notes_catalog(root, result)
     return print_development_summary(result)

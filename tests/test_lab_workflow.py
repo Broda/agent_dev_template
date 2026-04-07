@@ -70,6 +70,14 @@ class LabWorkflowTests(unittest.TestCase):
             session_text,
             encoding="utf-8",
         )
+        summary_export = fixture_state.get("artifacts", {}).get("summaryExport", "")
+        if summary_export:
+            summary_export_path = self.repo / summary_export
+            summary_export_path.parent.mkdir(parents=True, exist_ok=True)
+            summary_export_path.write_text(
+                f"# Summary Export\n\n- Idea ID: `{idea_id}`\n- Title: {project_name}\n",
+                encoding="utf-8",
+            )
         (self.repo / "state/project-init.json").write_text(
             json.dumps(fixture_state, indent=2) + "\n",
             encoding="utf-8",
@@ -300,6 +308,33 @@ class LabWorkflowTests(unittest.TestCase):
         self.assertIn("Rendered docs drift from the state schema or validation contract.", project_context)
         self.assertIn("./scripts/validate-development", roadmap)
 
+    def test_render_and_validate_development_with_non_game_web_app_fixture(self) -> None:
+        self.write_render_fixture("finalized_state_web_app_v2.json")
+        run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
+        run_cmd(["./scripts/validate-development"], cwd=self.repo)
+        readme = (self.repo / "README.md").read_text(encoding="utf-8").lower()
+        project_context = (self.repo / "docs/PROJECT_CONTEXT.md").read_text(encoding="utf-8").lower()
+        architecture = (self.repo / "docs/ARCHITECTURE.md").read_text(encoding="utf-8").lower()
+        roadmap = (self.repo / "docs/ROADMAP.md").read_text(encoding="utf-8").lower()
+        for banned_term in [
+            "gameplay",
+            "player",
+            "battle",
+            "economy",
+            "market",
+            "playable loop",
+            "starter progression",
+            "onboarding",
+        ]:
+            self.assertNotIn(banned_term, readme)
+            self.assertNotIn(banned_term, project_context)
+            self.assertNotIn(banned_term, architecture)
+            self.assertNotIn(banned_term, roadmap)
+        self.assertIn("operations teams need one internal system for location and contact data", project_context)
+        self.assertIn("editor-first internal web platform", readme)
+        self.assertIn("shared postgresql", architecture)
+        self.assertIn("pnpm build", roadmap)
+
     def test_render_and_validate_development_with_persistence_fixture(self) -> None:
         self.write_render_fixture("finalized_state_with_persistence_v2.json")
         run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
@@ -381,6 +416,47 @@ class LabWorkflowTests(unittest.TestCase):
         self.assertTrue(sessions)
         exports = sorted((self.repo / "exports").glob("*PROJECT_SUMMARY*.md"))
         self.assertTrue(exports)
+        run_cmd(["./scripts/validate-development"], cwd=self.repo)
+
+    def test_lab_finalize_preserves_curated_artifact_references(self) -> None:
+        self.write_finalize_fixture("idea-finalize-preserve")
+        custom_adr = self.repo / "docs/adr/ADR-0099-custom-preserved-reference.md"
+        custom_adr.parent.mkdir(parents=True, exist_ok=True)
+        custom_adr.write_text("# ADR 0099\n\nPreserved custom ADR reference.\n", encoding="utf-8")
+        preserved_export = self.repo / "exports/2026-04-03_PROJECT_SUMMARY_idea-finalize-preserve.md"
+        preserved_export.parent.mkdir(parents=True, exist_ok=True)
+        preserved_export.write_text("# Summary Export\n\nPreserved export.\n", encoding="utf-8")
+        state_path = self.repo / "state/project-init.json"
+        state = json.loads(state_path.read_text(encoding="utf-8"))
+        state["artifacts"]["noteReferences"] = "notes/2026-04-03_note-0001-preserved-reference.md"
+        state["artifacts"]["summaryExport"] = "exports/2026-04-03_PROJECT_SUMMARY_idea-finalize-preserve.md"
+        state["artifacts"]["adrReferences"] = [
+            "docs/adr/ADR-0099-custom-preserved-reference.md",
+        ]
+        state_path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+
+        result = run_cmd(
+            ["./scripts/lab", "finalize", "--idea-id", "idea-finalize-preserve"],
+            cwd=self.repo,
+            input_text="\n" * 12,
+        )
+
+        self.assertIn("successfully finalized", result.stdout.lower())
+        finalized_state = json.loads(state_path.read_text(encoding="utf-8"))
+        artifacts = finalized_state["artifacts"]
+        self.assertEqual(
+            artifacts["noteReferences"],
+            "notes/2026-04-03_note-0001-preserved-reference.md",
+        )
+        self.assertEqual(
+            artifacts["summaryExport"],
+            "exports/2026-04-03_PROJECT_SUMMARY_idea-finalize-preserve.md",
+        )
+        self.assertIn("docs/adr/ADR-0099-custom-preserved-reference.md", artifacts["adrReferences"])
+        self.assertIn(
+            "docs/adr/ADR-0001-record-architecture-decisions.md",
+            artifacts["adrReferences"],
+        )
         run_cmd(["./scripts/validate-development"], cwd=self.repo)
 
     def test_lab_finalize_requires_explicit_choice_when_multiple_ideas_active(self) -> None:

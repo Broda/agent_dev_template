@@ -8,7 +8,7 @@ from pathlib import Path
 from template_cli.validators import read_text, replace_literal, write_text
 
 
-MILESTONE_NAME = "Milestone 0 — Foundation / Spine"
+MILESTONE_NAME = "Milestone 0 — Foundation"
 STATE_FILE = "state/project-init.json"
 
 
@@ -151,24 +151,18 @@ def _first_value_for_label(files: list[Path], labels: list[str]) -> str:
 
 
 def _infer_domain_concepts(text: str) -> list[str]:
-    lowered = text.lower()
     concepts: list[str] = []
-    keyword_map = [
-        ("profile", "Accounts and moderated player profiles"),
-        ("egg", "Eggs, hatching, and species roll logic"),
-        ("monster", "Monsters, stats, and progression"),
-        ("rangler", "Ranglers, archetypes, and training specialization"),
-        ("battle", "Turn-based battle flow and combat resolution"),
-        ("energy", "Player and monster energy pacing"),
-        ("crate", "Crates, items, and content rewards"),
-        ("deploy", "Deployment-based passive earnings"),
-        ("market", "Marketplace listings, trades, and ownership changes"),
-        ("admin", "Admin-authored content and publish controls"),
-        ("subscriber", "Subscriber status and bonus handling"),
-    ]
-    for token, label in keyword_map:
-        if token in lowered:
-            concepts.append(label)
+    for chunk in re.split(r"[.;]\s*", text):
+        value = _trim(chunk)
+        if not value:
+            continue
+        if len(value) > 90:
+            continue
+        if value.lower() in {concept.lower() for concept in concepts}:
+            continue
+        concepts.append(value[:1].upper() + value[1:])
+        if len(concepts) >= 4:
+            break
     return concepts or ["Core domain entities and rules derived from the finalized product plan"]
 
 
@@ -210,7 +204,7 @@ Tooling: {package_tool}
 
 ---
 
-# Core Loop
+# Product Shape
 
 {core_loop}
 
@@ -288,6 +282,9 @@ def _render_project_context(
     out_of_scope: str,
     constraints: str,
     top_risks: str,
+    build_command: str,
+    run_command: str,
+    test_command: str,
 ) -> str:
     return f"""# PROJECT_CONTEXT.md — Structured Mode v2
 
@@ -371,6 +368,9 @@ If unsure, prefer placing logic deeper (Domain/App) rather than higher (Interfac
 - Tests required for core logic.
 - No CI/CD required at this stage.
 - Milestone-driven execution.
+- Build command: `{build_command}`
+- Run command: `{run_command}`
+- Test command: `{test_command}`
 
 Refactors must be intentional and milestone-scoped.
 
@@ -379,9 +379,9 @@ Refactors must be intentional and milestone-scoped.
 # 6. Product Risks To Respect
 
 - {top_risks}
-- Preserve server authority around gameplay and progression.
-- Keep content expansion data-driven where possible.
-- Avoid scope expansion before the first playable loop is stable.
+- Preserve authority around validation, persistence, and security-sensitive behavior.
+- Keep scope aligned to the active milestone and roadmap.
+- Avoid reshaping the product model casually once development mode is active.
 
 ---
 
@@ -451,11 +451,11 @@ This document defines structure and boundaries.
 
 # 1. Design Goals
 
-- Deliver the core {project_name} gameplay loop with clear boundaries.
+- Deliver the first {project_name} implementation slice with clear boundaries.
 - Keep infrastructure replaceable without rewriting domain logic.
-- Preserve deterministic and testable gameplay calculations.
+- Preserve deterministic and testable business rules.
 - Maintain stable public contracts.
-- Support long-term maintainability and content extensibility.
+- Support long-term maintainability and controlled expansion.
 
 ---
 
@@ -473,9 +473,9 @@ This document defines structure and boundaries.
 
 # 3. Major Surfaces
 
-- Public player surface for gameplay, progression, and market interactions.
-- Private admin surface for content authoring, balance controls, and release/publish actions.
-- Backend application services that keep game rules authoritative.
+- User-facing or operator-facing interfaces for the current milestone.
+- Administrative or editor workflows for controlled mutation paths.
+- Backend application services that keep business rules authoritative.
 - Persistence and infrastructure services that support runtime state, history, and deployment needs.
 
 Constraints to preserve:
@@ -508,14 +508,14 @@ Interface
 - Basic input validation and presentation logic
 
 Must NOT:
-- Contain gameplay rules
+- Contain business rules
 - Access storage directly
 
 ---
 
 ## Application Layer
 
-- Orchestrates onboarding, progression, battle, and admin use cases
+- Orchestrates use cases, workflows, and transaction boundaries
 - Coordinates domain services and repositories
 - Defines transaction boundaries and workflow sequencing
 
@@ -523,9 +523,9 @@ Must NOT:
 
 ## Domain Layer
 
-- Pure gameplay and business logic
+- Pure business logic
 - Deterministic calculations where possible
-- Framework-agnostic rules for progression, economy, and ownership
+- Framework-agnostic rules derived from the finalized product plan
 - Unit-testable behavior with no I/O
 
 ---
@@ -550,7 +550,7 @@ Public contracts include:
 
 - API endpoints
 - DTO structures
-- Admin/public surface boundaries
+- Surface boundaries
 - CLI commands
 - Library exports
 
@@ -563,7 +563,7 @@ Changes require ADR.
 Refactors must:
 
 - Preserve public contracts
-- Preserve gameplay behavior
+- Preserve agreed behavior
 - Maintain test coverage
 - Avoid cross-layer leaks
 """
@@ -578,8 +578,8 @@ def _render_roadmap(
     top_risks: str,
     domain_concepts: list[str],
 ) -> str:
-    domain_focus = "; ".join(domain_concepts[:4]) or "Core entities and game rules"
-    extra_domain = "\n".join(f"- [ ] Define rules for {concept.lower()}" for concept in domain_concepts[:5])
+    domain_focus = "; ".join(domain_concepts[:4]) or "Core domain entities and rules"
+    extra_domain = "\n".join(f"- [ ] Define rules for {concept.lower()}" for concept in domain_concepts[:4])
     return f"""# ROADMAP.md — Structured Mode v2
 
 This roadmap defines execution.
@@ -599,13 +599,13 @@ Rules:
 
 ## Goal
 
-Establish the first playable {project_name} vertical slice and validate the project baseline.
+Establish the first implementation slice for {project_name} and validate the project baseline.
 
 ## Architecture Impact
 
 - Lock the initial service and UI boundaries around the product shape.
-- Keep gameplay logic authoritative and testable.
-- Preserve room for content expansion without rewriting the spine.
+- Keep core business logic authoritative and testable.
+- Preserve room for later milestones without rewriting the spine.
 
 Product focus:
 
@@ -619,10 +619,9 @@ Primary risk pressure:
 
 ## Domain/Core
 
-- [ ] Model the core game entities and relationships
-- [ ] Define rules for onboarding, progression, and ownership state
+- [ ] Model the core domain entities and relationships
 {extra_domain}
-- [ ] Add deterministic unit tests for the core gameplay calculations
+- [ ] Add deterministic unit tests for the core domain logic
 
 Focus areas:
 
@@ -632,24 +631,24 @@ Focus areas:
 
 ## Application
 
-- [ ] Create use-case orchestration for player onboarding and profile setup
-- [ ] Create orchestration for starter progression, training, and battle flows
-- [ ] Separate public-player and private-admin workflows
+- [ ] Create the first use-case orchestration needed for the milestone
+- [ ] Separate lower-risk and higher-risk application workflows where the product shape requires it
+- [ ] Define transaction boundaries and error handling for the first slice
 
 ---
 
 ## Persistence
 
-- [ ] Define repository interfaces for player state, content, and runtime history
+- [ ] Define repository interfaces for milestone data and runtime state
 - [ ] Design the initial persistence schema and migration strategy
-- [ ] Ensure progression and economy state can be reconstructed and verified
+- [ ] Ensure persisted state can be reconstructed and verified
 
 ---
 
 ## Interface
 
-- [ ] Build the first player-facing flow needed for the playable loop
-- [ ] Build the first admin flow needed to manage core content
+- [ ] Build the first user-facing or operator-facing flow needed for the milestone
+- [ ] Build the first privileged or editor-facing flow needed to manage core data
 - [ ] Provide clear validation and failure feedback at the boundaries
 
 ---
@@ -666,7 +665,7 @@ Focus areas:
 
 - [ ] Build succeeds
 - [ ] Tests pass
-- [ ] Manual smoke test completes for the first playable loop
+- [ ] Manual smoke test completes for the first milestone flow
 
 Evidence target:
 
@@ -676,9 +675,9 @@ Evidence target:
 
 ## Completion Criteria
 
-- The first playable loop works end to end.
+- The first milestone flow works end to end.
 - Core domain behavior is covered by tests.
-- Public/admin boundaries are defined and respected.
+- Surface boundaries are defined and respected.
 - The architecture can grow without invalidating the spine.
 """
 
@@ -834,6 +833,9 @@ def run_render_development_docs(root: Path) -> int:
             out_of_scope,
             constraints or "None recorded",
             top_risks,
+            build_command,
+            run_command,
+            test_command,
         ),
     )
     write_text(

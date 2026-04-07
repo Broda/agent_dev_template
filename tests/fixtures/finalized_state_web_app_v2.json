@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 2,
+  "status": "finalized",
+  "finalizedAt": "2026-04-07",
+  "ideaId": "idea-ops-platform-fixture",
+  "projectName": "Operations Platform Fixture",
+  "owner": "Test User",
+  "purpose": "Render development docs for a non-game internal web platform without template drift.",
+  "projectType": "Web App",
+  "techStack": {
+    "language": "TypeScript and Rust",
+    "runtime": "Node 24 and Rust stable",
+    "framework": "React, Vite, axum, sqlx",
+    "packageTool": "pnpm and Cargo"
+  },
+  "persistence": "PostgreSQL",
+  "authentication": "Server-managed cookie sessions with MFA",
+  "determinism": "High",
+  "packaging": "Docker Compose for infrastructure, local app processes for development",
+  "constraints": "Keep development docs product-neutral and aligned to finalized state.",
+  "commands": {
+    "build": "pnpm build",
+    "run": "pnpm dev",
+    "test": "pnpm test"
+  },
+  "product": {
+    "problemStatement": "Operations teams need one internal system for location and contact data instead of inconsistent spreadsheets.",
+    "targetUsers": "Internal editors and read-only operational users",
+    "whyNow": "The initial spreadsheet seed is messy and the development handoff must preserve the product model cleanly.",
+    "expectedValue": "Development docs stay aligned to the finalized web-platform decisions without inheriting game-template language.",
+    "solutionSummary": "Build an editor-first internal web platform with separate read and editor surfaces backed by shared PostgreSQL.",
+    "mvpScope": "Monorepo foundation, auth, editor API, and location CRUD before import review and read surfaces.",
+    "outOfScope": "General-purpose public commerce features or self-service account creation.",
+    "assumptions": "Finalized state is the source of truth for generated development docs.",
+    "nonGoals": "Reintroducing template-specific vertical-slice wording that does not match the product."
+  },
+  "governance": {
+    "keyDecisions": "Use one monorepo, server-managed cookie sessions, editor API first, and a product-neutral render path.",
+    "topRisks": "Development docs may drift away from finalized state or reintroduce template-specific language.",
+    "mitigationPlans": "Validate generated docs against banned terms and preserve curated artifact references across finalize.",
+    "contingencies": "Regenerate from finalized state and review semantic drift before switching to development mode.",
+    "remainingAcceptedRisks": "Some wording may still evolve as the generic template improves.",
+    "latestReviewOutcome": "pass",
+    "latestReviewSession": "sessions/2026-04-07_idea-ops-platform-fixture.md"
+  },
+  "artifacts": {
+    "ideaFiles": [],
+    "sessionFiles": [
+      "sessions/2026-04-07_idea-ops-platform-fixture.md"
+    ],
+    "noteReferences": "notes/2026-04-07_note-0001-renderer-gap-analysis.md",
+    "summaryExport": "exports/2026-04-07_PROJECT_SUMMARY_idea-ops-platform-fixture.md",
+    "finalizationSession": "sessions/2026-04-07_FINALIZATION_SESSION_idea-ops-platform-fixture.md",
+    "adrReferences": [
+      "docs/adr/ADR-0001-record-architecture-decisions.md"
+    ]
+  }
+}
