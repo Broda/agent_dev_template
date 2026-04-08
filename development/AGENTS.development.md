@@ -49,6 +49,12 @@ After completing a task:
 
 Record each command and its result as evidence under the completed task in `docs/ROADMAP.md`.
 
+## Code Structure
+
+- Keep every code file at or under **500 lines**. If a file exceeds this limit, refactor it into multiple files or modules before the task is considered done.
+- Prefer splitting by responsibility: one module per cohesive concern. Do not split arbitrarily to hit the line target.
+- When splitting, update `docs/FILE_MAP.md` and `docs/ARCHITECTURE.md` to reflect the new module boundaries.
+
 ## Public Contract Discipline
 
 Do not change public contracts without an ADR and version alignment.

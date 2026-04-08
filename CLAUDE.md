@@ -23,6 +23,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Build/test/validate**: Use the Bash tool to run the `build`, `run`, and `test` commands defined in `docs/PROJECT_CONTEXT.md`. Record evidence under the completed task in `docs/ROADMAP.md`.
 - **Research notes**: Run `./scripts/lab-note` via Bash. Never load `notes/` content into context unless the user asks. Check `NOTES_CATALOG.md` first when notes are needed.
 - **Governance validation**: Run `./scripts/validate-governance` via Bash after any structural change.
+- **File size limit**: Keep every code file at or under 500 lines. Refactor into multiple files/modules when this limit is reached, splitting by responsibility. Update `docs/FILE_MAP.md` and `docs/ARCHITECTURE.md` to reflect new module boundaries.
 
 ---
 
