@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from template_cli.finalize import (
+from template_cli.finalize import run_finalize_project
+from template_cli.finalize_helpers import (
     existing_state_value,
     files_containing,
     first_value_for_label,
-    run_finalize_project,
 )
 from template_cli.sync import run_lab_commit, run_lab_push
 from template_cli.io_helpers import (

@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from template_cli.finalize import (
+from template_cli.finalize_helpers import (
     existing_state_value,
     files_containing,
     first_value_for_label,
     infer_project_type,
-    _write_summary_export,
 )
+from template_cli.finalize_state import _write_summary_export
 from template_cli.workflow_data import (
     BUCKET_FILES,
     _append_idea_to_bucket,

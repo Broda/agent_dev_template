@@ -5,7 +5,7 @@ import subprocess
 from datetime import datetime
 from pathlib import Path
 
-from template_cli.finalize import (
+from template_cli.finalize_helpers import (
     existing_state_value,
     files_containing,
     first_value_for_label,
