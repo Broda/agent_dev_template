@@ -82,6 +82,7 @@ BRAINSTORMING_CORE_ARTIFACTS = [
     ".github/workflows/ci.yml",
     ".github/workflows/governance-audit.yml",
     ".github/PULL_REQUEST_TEMPLATE.md",
+    "scripts/python/template_cli/render_governance_templates.py",
     "scripts/python/template_cli/workflow_render.py",
 ]
 

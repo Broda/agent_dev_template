@@ -101,7 +101,8 @@ Lean file registry for the Project Harness Template.
 | `scripts/python/template_cli/validator_skills.py` | Repo-scoped skill and skill metadata validation helpers |
 | `scripts/python/template_cli/plugin_sync.py` | Plugin skill mirror sync command implementation |
 | `scripts/python/template_cli/render_helpers.py` | State-extraction, file-manipulation, and hydration helpers for development doc rendering |
-| `scripts/python/template_cli/render_templates.py` | Pure template functions for README and PROJECT_CONTEXT document generation |
+| `scripts/python/template_cli/render_governance_templates.py` | Pure templates for rendered architecture and roadmap governance docs |
+| `scripts/python/template_cli/render_templates.py` | Pure template functions for development document generation |
 | `scripts/python/template_cli/finalize_helpers.py` | Utility functions, interactive prompts, markdown extraction, and state helpers for finalization |
 | `scripts/python/template_cli/finalize_state.py` | BackupManager, catalog transition functions, and summary export writer for finalization |
 | `scripts/python/template_cli/workflow_data.py` | Idea-block I/O, catalog helpers, session helpers, and data primitives for lab workflow commands |
