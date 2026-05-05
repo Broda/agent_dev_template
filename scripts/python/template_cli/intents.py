@@ -116,6 +116,18 @@ def registry_commands(root: Path) -> set[str]:
     return {str(intent["command"]).strip() for intent in data["intents"]}
 
 
+def registry_command_modes(root: Path) -> dict[str, set[str]]:
+    data = load_intent_registry(root)
+    return {
+        _trim(str(intent["command"])): {_trim(str(mode)) for mode in intent["modes"]}
+        for intent in data["intents"]
+    }
+
+
+def modes_for_command(root: Path, command: str) -> set[str]:
+    return registry_command_modes(root).get(_trim(command), set())
+
+
 def _render_phrase_family(phrases: list[str]) -> str:
     return ", ".join(f'"{_trim(str(phrase))}"' for phrase in phrases)
 

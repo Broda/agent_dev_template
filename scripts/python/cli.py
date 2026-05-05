@@ -16,10 +16,11 @@ from template_cli.validators import (  # noqa: E402
     run_validate_governance,
 )
 from template_cli.bootstrap import run_project_harness_new  # noqa: E402
+from template_cli.io_helpers import read_mode  # noqa: E402
 from template_cli.notes import run_lab_note  # noqa: E402
 from template_cli.plugin_sync import run_sync_plugin_skills  # noqa: E402
 from template_cli.render import run_render_development_docs  # noqa: E402
-from template_cli.intents import run_render_intent_docs  # noqa: E402
+from template_cli.intents import IntentRegistryError, modes_for_command, run_render_intent_docs  # noqa: E402
 from template_cli.finalize import run_finalize_project  # noqa: E402
 from template_cli.sync import run_lab_sync_from_argv  # noqa: E402
 from template_cli.workflow import (  # noqa: E402
@@ -157,9 +158,47 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _lab_command_name(command: str) -> str:
+    return command.removeprefix("lab-")
+
+
+def _enforce_lab_mode(root: Path, command: str) -> int:
+    if not command.startswith("lab-"):
+        return 0
+
+    lab_command = _lab_command_name(command)
+    try:
+        allowed_modes = modes_for_command(root, lab_command)
+    except IntentRegistryError as exc:
+        print(f"Cannot load harness command registry: {exc}", file=sys.stderr)
+        return 2
+
+    mode = read_mode(root) or "unknown"
+    if mode in allowed_modes:
+        return 0
+
+    if allowed_modes:
+        allowed_display = ", ".join(sorted(allowed_modes))
+    else:
+        allowed_display = "no registered modes"
+    print(
+        f"/lab {lab_command} is not available in {mode} mode "
+        f"(allowed: {allowed_display}).",
+        file=sys.stderr,
+    )
+    print(
+        "Check MODE.md and harness_commands/intent_registry.json before dispatching this command.",
+        file=sys.stderr,
+    )
+    return 2
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args, remaining = parser.parse_known_args(argv)
+    mode_error = _enforce_lab_mode(Path.cwd(), args.command)
+    if mode_error:
+        return mode_error
 
     if args.command == "validate-brainstorming":
         return run_validate_brainstorming(Path.cwd())

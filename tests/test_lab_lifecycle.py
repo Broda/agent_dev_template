@@ -162,6 +162,32 @@ class LabLifecycleTests(LabWorkflowTestCase):
         self.assertIn("multiple active ideas found", result.stderr.lower() + result.stdout.lower())
         self.assertIn("pass --idea-id explicitly", result.stderr.lower() + result.stdout.lower())
 
+    def test_lab_blocks_brainstorming_only_commands_in_development_mode(self) -> None:
+        self.write_render_fixture()
+        result = run_cmd(
+            [
+                "./scripts/lab",
+                "capture",
+                "--idea-id",
+                "idea-dev-blocked",
+                "--title",
+                "Should Not Write",
+            ],
+            cwd=self.repo,
+            check=False,
+        )
+        combined = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("/lab capture is not available in development mode", combined)
+        self.assertIn("allowed: brainstorming", combined)
+        self.assertNotIn("idea-dev-blocked", (self.repo / "IDEA_CATALOG.md").read_text(encoding="utf-8"))
+
+    def test_lab_allows_shared_commands_in_development_mode(self) -> None:
+        self.write_render_fixture()
+        result = run_cmd(["./scripts/lab", "status"], cwd=self.repo)
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("Mode: development", result.stdout)
+
     def test_lab_status_reports_ready_target_context(self) -> None:
         self.write_finalize_fixture("idea-status-ready")
         result = run_cmd(["./scripts/lab", "status"], cwd=self.repo)
