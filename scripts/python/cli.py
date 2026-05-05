@@ -54,7 +54,7 @@ def build_parser() -> argparse.ArgumentParser:
     harness_new_parser = subparsers.add_parser("project-harness-new")
     harness_new_parser.add_argument("target")
     harness_new_parser.add_argument("--origin", default="")
-    harness_new_parser.add_argument("--initial-commit", action="store_true")
+    harness_new_parser.add_argument("--no-git", action="store_true")
     finalize_parser = subparsers.add_parser("finalize-project")
     finalize_parser.add_argument("--idea-id", default="")
     finalize_parser.add_argument("--write-export", action="store_true")
@@ -176,7 +176,7 @@ def main(argv: list[str] | None = None) -> int:
             Path.cwd(),
             args.target,
             origin=args.origin,
-            initial_commit=args.initial_commit,
+            no_git=args.no_git,
         )
     if args.command == "finalize-project":
         return run_finalize_project(Path.cwd(), args.idea_id or "", write_export=args.write_export)

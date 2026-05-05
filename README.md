@@ -48,6 +48,8 @@ To create a fresh harness copy from a local checkout:
 ./scripts/project-harness new ../my-project
 ```
 
+This creates an independent Git repository with a baseline commit and no remote. Pass `--origin <url>` only when you want to connect the new project to its own remote.
+
 ## Start Here
 
 - Read `AGENTS.md`

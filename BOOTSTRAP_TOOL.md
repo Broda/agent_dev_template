@@ -21,7 +21,7 @@ Create a new project repository from this harness template.
 Expected behavior:
 
 1. Copy or clone the harness into `<project-name>`.
-2. Reset Git history only when the user explicitly asks for a fresh initial commit.
+2. Initialize a fresh independent Git repository by default.
 3. Point `origin` at the user-provided project remote when one is supplied.
 4. Leave `MODE.md` as `brainstorming`.
 5. Run `./scripts/validate-governance`.
@@ -31,7 +31,7 @@ The command should not collect project product requirements. Those belong in bra
 Current local interface:
 
 ```sh
-./scripts/project-harness new <path> [--origin <url>] [--initial-commit]
+./scripts/project-harness new <path> [--origin <url>] [--no-git]
 ```
 
 Behavior:
@@ -39,8 +39,10 @@ Behavior:
 - Copies the harness working tree to a new path.
 - Refuses to overwrite an existing target.
 - Excludes local Git history and common cache/dependency directories.
-- Initializes Git only when `--origin` or `--initial-commit` is supplied.
-- Creates an initial commit only when `--initial-commit` is supplied.
+- Initializes a fresh Git repository with no remote by default.
+- Creates an initial commit by default.
+- Adds `origin` only when `--origin` is supplied.
+- Skips Git initialization only when `--no-git` is supplied.
 
 ## `update`
 

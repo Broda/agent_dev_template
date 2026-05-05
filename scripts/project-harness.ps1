@@ -15,7 +15,7 @@ if (-not $Command -or $Command -eq '-h' -or $Command -eq '--help') {
 Usage: ./scripts/project-harness <command> [args]
 
 Commands:
-  new <path> [--origin <url>] [--initial-commit]
+  new <path> [--origin <url>] [--no-git]
 '@
     exit 0
 }
