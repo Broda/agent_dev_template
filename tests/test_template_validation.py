@@ -159,6 +159,25 @@ class TemplateValidationTests(LabWorkflowTestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("FILE_MAP.md missing registry row for plugin artifact: .agents/plugins/marketplace.json", result.stdout)
 
+    def test_validate_brainstorming_checks_template_cli_file_map_rows(self) -> None:
+        file_map_path = self.repo / "brainstorming/FILE_MAP.md"
+        file_map_path.write_text(
+            file_map_path.read_text(encoding="utf-8").replace(
+                "| `scripts/python/template_cli/workflow_render.py` | Pure markdown renderers for lab workflow artifacts |\n",
+                "",
+                1,
+            ),
+            encoding="utf-8",
+        )
+
+        result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(
+            "FILE_MAP.md missing registry row for template CLI module: scripts/python/template_cli/workflow_render.py",
+            result.stdout,
+        )
+
     def test_validate_brainstorming_checks_python_file_size(self) -> None:
         oversized_path = self.repo / "tests/oversized_fixture.py"
         oversized_path.write_text("\n".join("x = 1" for _ in range(501)) + "\n", encoding="utf-8")

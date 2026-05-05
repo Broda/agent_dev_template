@@ -93,6 +93,7 @@ Lean file registry for the Project Harness Template.
 | `.github/PULL_REQUEST_TEMPLATE.md` | PR checklist |
 | `.gitignore` | Local/derived file exclusions |
 | `scripts/python/template_cli/io_helpers.py` | I/O primitives, regex constants, ValidationResult, and summary printers shared across the CLI |
+| `scripts/python/template_cli/finalize.py` | In-place finalization orchestration |
 | `scripts/python/template_cli/validator_artifacts.py` | Retained artifact lists for brainstorming and development validation |
 | `scripts/python/template_cli/validator_code_size.py` | Python file-size validation for template tooling and tests |
 | `scripts/python/template_cli/validator_launchers.py` | Launcher consistency checks for shell and PowerShell entrypoints |
@@ -100,11 +101,17 @@ Lean file registry for the Project Harness Template.
 | `scripts/python/template_cli/validator_plugins.py` | Local plugin manifest and marketplace validation helpers |
 | `scripts/python/template_cli/validator_skills.py` | Repo-scoped skill and skill metadata validation helpers |
 | `scripts/python/template_cli/plugin_sync.py` | Plugin skill mirror sync command implementation |
+| `scripts/python/template_cli/intents.py` | Intent registry rendering and generated intent-doc sync helpers |
+| `scripts/python/template_cli/notes.py` | Durable research note capture command implementation |
+| `scripts/python/template_cli/render.py` | Development document render orchestration |
 | `scripts/python/template_cli/render_helpers.py` | State-extraction, file-manipulation, and hydration helpers for development doc rendering |
 | `scripts/python/template_cli/render_governance_templates.py` | Pure templates for rendered architecture and roadmap governance docs |
 | `scripts/python/template_cli/render_templates.py` | Pure template functions for development document generation |
+| `scripts/python/template_cli/sync.py` | Git sync helpers for milestone commit and push flows |
+| `scripts/python/template_cli/validators.py` | Brainstorming and development validation orchestration |
 | `scripts/python/template_cli/finalize_helpers.py` | Utility functions, interactive prompts, markdown extraction, and state helpers for finalization |
 | `scripts/python/template_cli/finalize_state.py` | BackupManager, catalog transition functions, and summary export writer for finalization |
 | `scripts/python/template_cli/workflow_data.py` | Idea-block I/O, catalog helpers, session helpers, and data primitives for lab workflow commands |
 | `scripts/python/template_cli/workflow_commands.py` | Lab lifecycle mutation commands (capture, activate, park, kill, decide, risk, review, export) |
 | `scripts/python/template_cli/workflow_render.py` | Pure markdown renderers for lab workflow artifacts |
+| `scripts/python/template_cli/workflow.py` | Lab status, doctor, audit, and finalize command orchestration |

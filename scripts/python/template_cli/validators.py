@@ -158,6 +158,21 @@ def validate_intent_sync_ci(root: Path, result: ValidationResult) -> None:
             result.add_failure(f"CI workflow is missing the generated intent sync contract: {label}")
 
 
+def validate_template_cli_file_map(root: Path, result: ValidationResult) -> None:
+    file_map_path = root / "brainstorming/FILE_MAP.md"
+    module_root = root / "scripts/python/template_cli"
+    if not file_map_path.exists() or not module_root.exists():
+        return
+
+    file_map_contents = read_text(file_map_path)
+    for path in sorted(module_root.glob("*.py")):
+        if path.name == "__init__.py":
+            continue
+        relative_path = path.relative_to(root).as_posix()
+        if f"`{relative_path}`" not in file_map_contents:
+            result.add_failure(f"FILE_MAP.md missing registry row for template CLI module: {relative_path}")
+
+
 def run_validate_brainstorming(root: Path) -> int:
     result = ValidationResult()
 
@@ -213,6 +228,7 @@ def run_validate_brainstorming(root: Path) -> int:
     validate_lab_command_parity(root, result)
     validate_intent_registry(root, result)
     validate_intent_sync_ci(root, result)
+    validate_template_cli_file_map(root, result)
     validate_module_boundaries(root, result)
     validate_python_file_sizes(root, result)
     validate_python_launchers(root, result)
