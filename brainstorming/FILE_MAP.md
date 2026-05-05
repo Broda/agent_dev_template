@@ -95,6 +95,7 @@ Lean file registry for the Project Harness Template.
 | `scripts/python/template_cli/io_helpers.py` | I/O primitives, regex constants, ValidationResult, and summary printers shared across the CLI |
 | `scripts/python/template_cli/validator_code_size.py` | Python file-size validation for template tooling and tests |
 | `scripts/python/template_cli/validator_launchers.py` | Launcher consistency checks for shell and PowerShell entrypoints |
+| `scripts/python/template_cli/validator_module_boundaries.py` | Import-boundary checks for template CLI modules |
 | `scripts/python/template_cli/validator_plugins.py` | Local plugin manifest and marketplace validation helpers |
 | `scripts/python/template_cli/validator_skills.py` | Repo-scoped skill and skill metadata validation helpers |
 | `scripts/python/template_cli/plugin_sync.py` | Plugin skill mirror sync command implementation |

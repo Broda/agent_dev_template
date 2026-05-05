@@ -13,6 +13,7 @@ from template_cli.intents import (
 )
 from template_cli.validator_code_size import validate_python_file_sizes
 from template_cli.validator_launchers import validate_python_launchers
+from template_cli.validator_module_boundaries import validate_module_boundaries
 from template_cli.validator_plugins import (
     PLUGIN_MANIFEST,
     PLUGIN_MARKETPLACE,
@@ -298,6 +299,7 @@ def run_validate_brainstorming(root: Path) -> int:
     validate_lab_command_parity(root, result)
     validate_intent_registry(root, result)
     validate_intent_sync_ci(root, result)
+    validate_module_boundaries(root, result)
     validate_python_file_sizes(root, result)
     validate_python_launchers(root, result)
     validate_repo_plugins(root, result)
@@ -438,6 +440,7 @@ def run_validate_development(root: Path) -> int:
                 break
 
     validate_notes_catalog(root, result)
+    validate_module_boundaries(root, result)
     validate_python_file_sizes(root, result)
     validate_python_launchers(root, result)
     validate_repo_plugins(root, result)
