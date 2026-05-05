@@ -349,6 +349,10 @@ def run_validate_development(root: Path) -> int:
         "README.md",
         "CHANGELOG.md",
         ".gitignore",
+        ".agents/skills/brainstorming-lab/SKILL.md",
+        ".agents/skills/project-finalizer/SKILL.md",
+        ".agents/skills/development-governance/SKILL.md",
+        ".agents/skills/template-maintenance/SKILL.md",
         "NOTES_CATALOG.md",
         "sessions/",
         "notes/",
@@ -458,6 +462,7 @@ def run_validate_development(root: Path) -> int:
                 break
 
     validate_notes_catalog(root, result)
+    validate_repo_skills(root, result)
     return print_development_summary(result)
 
 

@@ -336,6 +336,17 @@ class LabWorkflowTests(unittest.TestCase):
         self.assertIn("Rendered docs drift from the state schema or validation contract.", project_context)
         self.assertIn("./scripts/validate-development", roadmap)
 
+    def test_validate_development_requires_repo_skills(self) -> None:
+        self.write_render_fixture()
+        run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
+        (self.repo / ".agents/skills/development-governance/SKILL.md").unlink()
+
+        result = run_cmd(["./scripts/validate-development"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Missing required artifact: .agents/skills/development-governance/SKILL.md", result.stdout)
+        self.assertIn("Missing required repo skill: .agents/skills/development-governance/SKILL.md", result.stdout)
+
     def test_render_and_validate_development_with_non_game_web_app_fixture(self) -> None:
         self.write_render_fixture("finalized_state_web_app_v2.json")
         run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
