@@ -17,8 +17,8 @@ This template starts in brainstorming mode and finalizes in place into developme
 
 | Mode | Read First | Main Runtime | Main Goal |
 |---|---|---|---|
-| `brainstorming` | `brainstorming/AGENTS.brainstorming.md` | `./scripts/lab <command> ...` | Capture ideas, decisions, risks, and canonical project intent |
-| `development` | `development/AGENTS.development.md` | development governance docs under `docs/` | Execute delivery work against the finalized project definition |
+| `brainstorming` | `.agents/skills/brainstorming-lab/SKILL.md` or `brainstorming/AGENTS.brainstorming.md` | `./scripts/lab <command> ...` | Capture ideas, decisions, risks, and canonical project intent |
+| `development` | `.agents/skills/development-governance/SKILL.md` or `development/AGENTS.development.md` | governance docs under `docs/` | Execute delivery work against the finalized project definition |
 
 ## Brainstorming Phase
 
@@ -69,24 +69,6 @@ Create an optional summary snapshot before finalizing:
 ./scripts/lab export --idea-id idea-template-hardening
 ```
 
-## Maintaining Intent Docs
-
-If you change brainstorming NL mappings:
-
-```sh
-./scripts/render-intent-docs
-./scripts/validate-governance
-```
-
-Source of truth:
-- `brainstorming/intent_registry.json`
-
-Generated sections:
-- `brainstorming/CONVERSATIONAL_MODE.md`
-- `brainstorming/COMMANDS.md`
-
-Do not hand-edit the generated intent tables directly. Edit the registry, rerender, then validate.
-
 ## Finalize In Place
 
 Repo-scoped skill: `.agents/skills/project-finalizer/SKILL.md`
@@ -132,6 +114,8 @@ After finalization, the active runtime rules come from `development/AGENTS.devel
 ## Template Maintenance
 
 Repo-scoped skill: `.agents/skills/template-maintenance/SKILL.md`
+
+Use this skill when changing the template runtime, generated intent mappings, validators, wrappers, development templates, repo-scoped skills, or future plugin packaging.
 
 ## Notes Policy
 

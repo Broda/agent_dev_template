@@ -19,7 +19,8 @@ Use this skill when maintaining the template rather than brainstorming a user pr
 - Keep command names and entrypoint paths stable unless the user explicitly asks for a breaking change.
 - Update `brainstorming/FILE_MAP.md` when the retained template inventory changes.
 - Update tests or fixtures when behavior changes.
-- Do not hand-edit generated intent tables; edit the registry and run `./scripts/render-intent-docs`.
+- Do not hand-edit generated intent tables in `brainstorming/CONVERSATIONAL_MODE.md` or `brainstorming/COMMANDS.md`.
+- To change natural-language mappings, edit `brainstorming/intent_registry.json`, run `./scripts/render-intent-docs`, then validate.
 
 ## Verification
 
