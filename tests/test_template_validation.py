@@ -137,7 +137,7 @@ class TemplateValidationTests(LabWorkflowTestCase):
         file_map_path = self.repo / "brainstorming/FILE_MAP.md"
         file_map_path.write_text(
             file_map_path.read_text(encoding="utf-8").replace(
-                "| `.agents/plugins/marketplace.json` | Local plugin marketplace entry for future reusable distribution |\n",
+                "| `.agents/plugins/marketplace.json` | Local plugin marketplace entry for agent-behavior distribution |\n",
                 "",
                 1,
             ),

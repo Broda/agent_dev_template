@@ -1,6 +1,6 @@
 ﻿# File Map
 
-Lean file registry for the Project Idea Lab.
+Lean file registry for the Project Harness Template.
 
 | Path | Purpose |
 |---|---|
@@ -13,9 +13,9 @@ Lean file registry for the Project Idea Lab.
 | `.agents/skills/project-finalizer/agents/openai.yaml` | UI metadata for the project finalization skill |
 | `.agents/skills/development-governance/SKILL.md` | Repo-scoped skill for development-mode governance |
 | `.agents/skills/development-governance/agents/openai.yaml` | UI metadata for the development governance skill |
-| `.agents/skills/template-maintenance/SKILL.md` | Repo-scoped skill for maintaining this template itself |
+| `.agents/skills/template-maintenance/SKILL.md` | Repo-scoped skill for maintaining this harness template |
 | `.agents/skills/template-maintenance/agents/openai.yaml` | UI metadata for the template maintenance skill |
-| `.agents/plugins/marketplace.json` | Local plugin marketplace entry for future reusable distribution |
+| `.agents/plugins/marketplace.json` | Local plugin marketplace entry for agent-behavior distribution |
 | `plugins/project-lifecycle-lab/.codex-plugin/plugin.json` | Local plugin manifest for the lifecycle agent-behavior package |
 | `plugins/project-lifecycle-lab/skills/brainstorming-lab/SKILL.md` | Plugin mirror of the brainstorming lifecycle skill |
 | `plugins/project-lifecycle-lab/skills/brainstorming-lab/agents/openai.yaml` | Plugin mirror of brainstorming skill UI metadata |

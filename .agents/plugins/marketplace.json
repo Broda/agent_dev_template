@@ -1,7 +1,7 @@
 {
-  "name": "agent-dev-template",
+  "name": "project-harness-template",
   "interface": {
-    "displayName": "Agent Dev Template"
+    "displayName": "Project Harness Template"
   },
   "plugins": [
     {
