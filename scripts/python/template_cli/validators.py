@@ -175,6 +175,7 @@ def run_validate_brainstorming(root: Path) -> int:
 
     core_artifacts = [
         "README.md",
+        "BOOTSTRAP_TOOL.md",
         "AGENTS.md",
         "MODE.md",
         *REPO_SKILL_ARTIFACTS,

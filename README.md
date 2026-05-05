@@ -24,7 +24,7 @@ The harness remains self-contained. Project state, deterministic scripts, valida
 | Deterministic tooling | Repeatable local behavior that should remain inspectable in each project | `./scripts/lab`, `./scripts/finalize-project`, `./scripts/validate-governance`, `scripts/python/template_cli/` |
 | Repo-scoped skills | Canonical agent instructions for operating this harness in the current repo | `.agents/skills/` |
 | Plugin package | Optional portable distribution of reusable agent behavior | `plugins/project-lifecycle-lab/` |
-| Future bootstrap helper | Optional convenience for creating/updating harness instances | not required for current use |
+| Future bootstrap helper | Optional convenience for creating/updating harness instances | `BOOTSTRAP_TOOL.md` |
 
 ## Using This Public Harness
 
