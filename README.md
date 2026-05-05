@@ -42,6 +42,12 @@ After creating a project repo:
 
 The public template should stay generic. Project-specific product decisions belong in idea records, sessions, notes, and finalized development docs, not in the reusable harness scripts or template-maintenance skills.
 
+To create a fresh harness copy from a local checkout:
+
+```sh
+./scripts/project-harness new ../my-project
+```
+
 ## Start Here
 
 - Read `AGENTS.md`

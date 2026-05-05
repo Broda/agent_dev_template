@@ -15,6 +15,7 @@ from template_cli.validators import (  # noqa: E402
     run_validate_development,
     run_validate_governance,
 )
+from template_cli.bootstrap import run_project_harness_new  # noqa: E402
 from template_cli.notes import run_lab_note  # noqa: E402
 from template_cli.plugin_sync import run_sync_plugin_skills  # noqa: E402
 from template_cli.render import run_render_development_docs  # noqa: E402
@@ -50,6 +51,10 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser("render-development-docs")
     subparsers.add_parser("render-intent-docs")
     subparsers.add_parser("sync-plugin-skills")
+    harness_new_parser = subparsers.add_parser("project-harness-new")
+    harness_new_parser.add_argument("target")
+    harness_new_parser.add_argument("--origin", default="")
+    harness_new_parser.add_argument("--initial-commit", action="store_true")
     finalize_parser = subparsers.add_parser("finalize-project")
     finalize_parser.add_argument("--idea-id", default="")
     finalize_parser.add_argument("--write-export", action="store_true")
@@ -166,6 +171,13 @@ def main(argv: list[str] | None = None) -> int:
         return run_render_intent_docs(Path.cwd())
     if args.command == "sync-plugin-skills":
         return run_sync_plugin_skills(Path.cwd())
+    if args.command == "project-harness-new":
+        return run_project_harness_new(
+            Path.cwd(),
+            args.target,
+            origin=args.origin,
+            initial_commit=args.initial_commit,
+        )
     if args.command == "finalize-project":
         return run_finalize_project(Path.cwd(), args.idea_id or "", write_export=args.write_export)
     if args.command == "lab-note":

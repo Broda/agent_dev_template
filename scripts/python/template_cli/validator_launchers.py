@@ -9,6 +9,7 @@ PYTHON_COMMAND_LAUNCHERS = {
     "finalize-project": "finalize-project",
     "lab-note": "lab-note",
     "lab-sync": "lab-sync",
+    "project-harness": "project-harness-new",
     "render-development-docs": "render-development-docs",
     "render-intent-docs": "render-intent-docs",
     "sync-plugin-skills": "sync-plugin-skills",

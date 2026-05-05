@@ -49,6 +49,7 @@ Lean file registry for the Project Harness Template.
 | `tests/test_intent_registry_contract.py` | Intent-registry render, parity, and CI-contract regression suite |
 | `tests/test_lab_lifecycle.py` | Lab command, finalize, status, doctor, and review regression tests |
 | `tests/test_template_validation.py` | Template governance, skill, plugin, and launcher validation tests |
+| `tests/test_project_harness_bootstrap.py` | Project harness bootstrap command regression tests |
 | `tests/fixtures/finalized_state_v2.json` | Canonical finalized-state fixture for development render/validate regression |
 | `tests/fixtures/finalized_state_web_app_v2.json` | Non-game finalized-state fixture for product-neutral development rendering regression |
 | `tests/fixtures/finalized_state_with_persistence_v2.json` | Persistence-enabled finalized-state fixture for migration-policy render regression |
@@ -65,6 +66,7 @@ Lean file registry for the Project Harness Template.
 | `scripts/lab` | Cross-platform launcher for brainstorming lifecycle commands |
 | `scripts/lab-sync` | Cross-platform launcher for Python commit+push sync |
 | `scripts/lab-note` | Cross-platform launcher for Python research note capture |
+| `scripts/project-harness` | Cross-platform launcher for harness bootstrap helpers |
 | `scripts/render-intent-docs` | Cross-platform launcher for generated intent table rendering |
 | `scripts/sync-plugin-skills` | Cross-platform launcher for syncing canonical repo skills into the plugin package |
 | `scripts/finalize-project` | Cross-platform launcher for Python in-place finalization |
@@ -75,6 +77,7 @@ Lean file registry for the Project Harness Template.
 | `scripts/lab.ps1` | PowerShell launcher for brainstorming lifecycle commands |
 | `scripts/lab-sync.ps1` | PowerShell launcher for Python commit+push sync |
 | `scripts/lab-note.ps1` | PowerShell launcher for Python research note capture |
+| `scripts/project-harness.ps1` | PowerShell launcher for harness bootstrap helpers |
 | `scripts/render-intent-docs.ps1` | PowerShell launcher for generated intent table rendering |
 | `scripts/sync-plugin-skills.ps1` | PowerShell launcher for plugin skill mirror syncing |
 | `scripts/validate-brainstorming.ps1` | Windows brainstorming validator |
@@ -88,12 +91,14 @@ Lean file registry for the Project Harness Template.
 | `scripts/lab.sh` | POSIX launcher for brainstorming lifecycle commands |
 | `scripts/lab-sync.sh` | POSIX launcher for Python commit+push sync |
 | `scripts/lab-note.sh` | POSIX launcher for Python research note capture helper |
+| `scripts/project-harness.sh` | POSIX launcher for harness bootstrap helpers |
 | `state/project-init.json` | Canonical structured handoff state |
 | `.github/workflows/ci.yml` | Blocking CI for tests and governance validation |
 | `.github/workflows/governance-audit.yml` | Warn-only CI audit |
 | `.github/PULL_REQUEST_TEMPLATE.md` | PR checklist |
 | `.gitignore` | Local/derived file exclusions |
 | `scripts/python/template_cli/io_helpers.py` | I/O primitives, regex constants, ValidationResult, and summary printers shared across the CLI |
+| `scripts/python/template_cli/bootstrap.py` | Project harness bootstrap command implementation |
 | `scripts/python/template_cli/finalize.py` | In-place finalization orchestration |
 | `scripts/python/template_cli/validator_artifacts.py` | Retained artifact lists for brainstorming and development validation |
 | `scripts/python/template_cli/validator_code_size.py` | Python file-size validation for template tooling and tests |

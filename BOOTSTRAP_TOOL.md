@@ -7,10 +7,12 @@ The public template remains the canonical, inspectable harness. A bootstrap help
 ## Proposed Commands
 
 ```sh
-project-harness new <project-name>
+./scripts/project-harness new <project-name>
 project-harness update
 project-harness validate
 ```
+
+The first local command is implemented as `./scripts/project-harness new <path>`.
 
 ## `new`
 
@@ -25,6 +27,20 @@ Expected behavior:
 5. Run `./scripts/validate-governance`.
 
 The command should not collect project product requirements. Those belong in brainstorming records after the harness exists.
+
+Current local interface:
+
+```sh
+./scripts/project-harness new <path> [--origin <url>] [--initial-commit]
+```
+
+Behavior:
+
+- Copies the harness working tree to a new path.
+- Refuses to overwrite an existing target.
+- Excludes local Git history and common cache/dependency directories.
+- Initializes Git only when `--origin` or `--initial-commit` is supplied.
+- Creates an initial commit only when `--initial-commit` is supplied.
 
 ## `update`
 
