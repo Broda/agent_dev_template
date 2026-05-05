@@ -11,16 +11,12 @@ from template_cli.intents import (
     registry_commands,
     render_intent_docs_to_memory,
 )
+from template_cli.validator_artifacts import BRAINSTORMING_CORE_ARTIFACTS, DEVELOPMENT_REQUIRED_ARTIFACTS
 from template_cli.validator_code_size import validate_python_file_sizes
 from template_cli.validator_launchers import validate_python_launchers
 from template_cli.validator_module_boundaries import validate_module_boundaries
-from template_cli.validator_plugins import (
-    PLUGIN_MANIFEST,
-    PLUGIN_MARKETPLACE,
-    PLUGIN_SKILL_ARTIFACTS,
-    validate_repo_plugins,
-)
-from template_cli.validator_skills import REPO_SKILLS, REPO_SKILL_METADATA, validate_repo_skills
+from template_cli.validator_plugins import validate_repo_plugins
+from template_cli.validator_skills import validate_repo_skills
 from template_cli.io_helpers import (
     ADR_LINK_RE,
     DEVELOPMENT_SEMANTIC_DOCS,
@@ -40,15 +36,6 @@ from template_cli.io_helpers import (
     read_mode,
     read_text,
 )
-
-
-REPO_SKILL_ARTIFACTS = [
-    artifact
-    for skill_path, metadata_path in zip(REPO_SKILLS.values(), REPO_SKILL_METADATA.values())
-    for artifact in (skill_path, metadata_path)
-]
-REPO_PLUGIN_ARTIFACTS = [PLUGIN_MARKETPLACE, PLUGIN_MANIFEST, *PLUGIN_SKILL_ARTIFACTS]
-
 
 def validate_notes_catalog(root: Path, result: ValidationResult) -> None:
     notes_catalog_path = root / "NOTES_CATALOG.md"
@@ -174,80 +161,7 @@ def validate_intent_sync_ci(root: Path, result: ValidationResult) -> None:
 def run_validate_brainstorming(root: Path) -> int:
     result = ValidationResult()
 
-    core_artifacts = [
-        "README.md",
-        "BOOTSTRAP_TOOL.md",
-        "AGENTS.md",
-        "MODE.md",
-        *REPO_SKILL_ARTIFACTS,
-        *REPO_PLUGIN_ARTIFACTS,
-        "brainstorming/AGENTS.brainstorming.md",
-        "brainstorming/CONVERSATIONAL_MODE.md",
-        "brainstorming/COMMANDS.md",
-        "brainstorming/intent_registry.json",
-        "brainstorming/QUICKSTART.md",
-        "brainstorming/EXAMPLE_LIFECYCLE.md",
-        "brainstorming/FILE_MAP.md",
-        "IDEA_CATALOG.md",
-        "NOTES_CATALOG.md",
-        "ideas/_inbox.md",
-        "ideas/_active.md",
-        "ideas/_parked.md",
-        "ideas/_killed.md",
-        "sessions/",
-        "notes/",
-        "exports/",
-        "brainstorming/templates/idea_template.md",
-        "brainstorming/templates/decision_template.md",
-        "brainstorming/templates/note_template.md",
-        "brainstorming/templates/project_plan_packet_template.md",
-        "brainstorming/templates/risk_template.md",
-        "brainstorming/templates/review_gate_template.md",
-        "brainstorming/docs/adr/template.md",
-        "brainstorming/docs/adr/ADR-0001-adopt-governance-structure-for-idea-lab.md",
-        "scripts/lab",
-        "scripts/lab.sh",
-        "scripts/lab.ps1",
-        "scripts/validate-brainstorming.ps1",
-        "scripts/validate-governance.ps1",
-        "scripts/lab-sync.ps1",
-        "scripts/lab-note.ps1",
-        "scripts/sync-plugin-skills.ps1",
-        "scripts/finalize-project.sh",
-        "scripts/render-development-docs.sh",
-        "scripts/sync-plugin-skills.sh",
-        "scripts/validate-development.sh",
-        "scripts/validate-brainstorming.sh",
-        "scripts/validate-governance.sh",
-        "scripts/lab-sync.sh",
-        "scripts/lab-note.sh",
-        "scripts/finalize-project",
-        "scripts/render-intent-docs",
-        "scripts/render-intent-docs.sh",
-        "scripts/render-intent-docs.ps1",
-        "scripts/sync-plugin-skills",
-        "scripts/render-development-docs",
-        "scripts/validate-development",
-        "scripts/validate-brainstorming",
-        "scripts/validate-governance",
-        "scripts/lab-sync",
-        "scripts/lab-note",
-        "tests/workflow_test_helpers.py",
-        "tests/test_development_rendering.py",
-        "tests/test_lab_lifecycle.py",
-        "tests/test_intent_registry_contract.py",
-        "tests/test_template_validation.py",
-        "tests/fixtures/finalized_state_v2.json",
-        "tests/fixtures/finalized_state_web_app_v2.json",
-        "tests/fixtures/finalized_state_with_persistence_v2.json",
-        "tests/fixtures/finalized_session.md",
-        "state/project-init.json",
-        ".github/workflows/ci.yml",
-        ".github/workflows/governance-audit.yml",
-        ".github/PULL_REQUEST_TEMPLATE.md",
-    ]
-
-    for artifact in core_artifacts:
+    for artifact in BRAINSTORMING_CORE_ARTIFACTS:
         if not path_exists(root, artifact):
             result.add_failure(f"Missing required artifact: {artifact}")
 
@@ -313,7 +227,7 @@ def run_validate_brainstorming(root: Path) -> int:
     file_map_path = root / "brainstorming/FILE_MAP.md"
     if file_map_path.exists():
         file_map_contents = read_text(file_map_path)
-        for artifact in core_artifacts:
+        for artifact in BRAINSTORMING_CORE_ARTIFACTS:
             if f"`{artifact}`" not in file_map_contents:
                 result.add_warning(f"FILE_MAP.md missing registry row for: {artifact}")
 
@@ -323,38 +237,7 @@ def run_validate_brainstorming(root: Path) -> int:
 def run_validate_development(root: Path) -> int:
     result = ValidationResult()
 
-    required = [
-        "AGENTS.md",
-        "MODE.md",
-        "README.md",
-        "CHANGELOG.md",
-        ".gitignore",
-        *REPO_SKILL_ARTIFACTS,
-        *REPO_PLUGIN_ARTIFACTS,
-        "NOTES_CATALOG.md",
-        "sessions/",
-        "notes/",
-        "exports/",
-        "scripts/lab",
-        "scripts/lab.sh",
-        "scripts/lab.ps1",
-        "scripts/lab-note",
-        "scripts/lab-note.sh",
-        "scripts/lab-note.ps1",
-        "docs/PROJECT_CONTEXT.md",
-        "docs/ROADMAP.md",
-        "docs/ARCHITECTURE.md",
-        "docs/FILE_MAP.md",
-        "docs/GOVERNANCE_INDEX.md",
-        "docs/VERSIONING_AND_RELEASE_POLICY.md",
-        "docs/SECURITY_POLICY.md",
-        "docs/RUNTIME_VERIFICATION_REPORT.md",
-        "docs/adr/ADR-0001-record-architecture-decisions.md",
-        "docs/adr/ADR-TEMPLATE.md",
-        "state/project-init.json",
-    ]
-
-    for artifact in required:
+    for artifact in DEVELOPMENT_REQUIRED_ARTIFACTS:
         if not path_exists(root, artifact):
             result.add_failure(f"Missing required artifact: {artifact}")
 

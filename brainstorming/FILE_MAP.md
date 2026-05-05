@@ -93,6 +93,7 @@ Lean file registry for the Project Harness Template.
 | `.github/PULL_REQUEST_TEMPLATE.md` | PR checklist |
 | `.gitignore` | Local/derived file exclusions |
 | `scripts/python/template_cli/io_helpers.py` | I/O primitives, regex constants, ValidationResult, and summary printers shared across the CLI |
+| `scripts/python/template_cli/validator_artifacts.py` | Retained artifact lists for brainstorming and development validation |
 | `scripts/python/template_cli/validator_code_size.py` | Python file-size validation for template tooling and tests |
 | `scripts/python/template_cli/validator_launchers.py` | Launcher consistency checks for shell and PowerShell entrypoints |
 | `scripts/python/template_cli/validator_module_boundaries.py` | Import-boundary checks for template CLI modules |
