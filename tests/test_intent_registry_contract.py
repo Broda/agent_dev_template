@@ -79,6 +79,29 @@ class IntentRegistryContractTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("Intent registry command is not registered in CLI: unknown-command", result.stdout + result.stderr)
 
+    def test_validate_governance_fails_on_backend_intent_command_drift(self) -> None:
+        registry_path = self.repo / "brainstorming/intent_registry.json"
+        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+        registry["intents"][0]["backendIntent"] = "/lab missing <idea-id>"
+        registry_path.write_text(json.dumps(registry, indent=2) + "\n", encoding="utf-8")
+        result = run_cmd(["./scripts/validate-governance"], cwd=self.repo, check=False)
+        self.assertNotEqual(result.returncode, 0)
+        output = result.stdout + result.stderr
+        self.assertIn("Intent 'capture' backendIntent command mismatch", output)
+        self.assertIn("Intent 'capture' backendIntent maps to unsupported lab command: missing", output)
+
+    def test_validate_governance_fails_on_non_lab_backend_intent(self) -> None:
+        registry_path = self.repo / "brainstorming/intent_registry.json"
+        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+        registry["intents"][0]["backendIntent"] = "/scripts/custom-capture <idea-id>"
+        registry_path.write_text(json.dumps(registry, indent=2) + "\n", encoding="utf-8")
+        result = run_cmd(["./scripts/validate-governance"], cwd=self.repo, check=False)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(
+            "Intent 'capture' backendIntent must start with /lab for agent-dispatched workflow commands",
+            result.stdout + result.stderr,
+        )
+
     def test_validate_governance_fails_when_ci_sync_step_is_removed(self) -> None:
         ci_path = self.repo / ".github/workflows/ci.yml"
         ci_text = ci_path.read_text(encoding="utf-8").replace("          ./scripts/render-intent-docs\n", "", 1)

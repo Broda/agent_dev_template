@@ -10,10 +10,11 @@ Use this skill when finalizing an idea into development mode or diagnosing why f
 ## Readiness Flow
 
 1. Confirm `MODE.md` says `brainstorming`.
-2. Run `./scripts/lab status` for the inferred target and readiness summary.
-3. Run `./scripts/lab doctor [--idea-id <id>]` when fields, sessions, or source artifacts are unclear.
-4. If multiple ideas are active, require an explicit `--idea-id`.
-5. Treat non-interactive finalization as the default; use `--interactive` only when the user explicitly wants prompt-fill mode.
+2. Treat phrases like "finalize this repo" and "switch to development mode" as first-class agent intents that map to `./scripts/lab finalize`.
+3. Run `./scripts/lab status` for the inferred target and readiness summary.
+4. Run `./scripts/lab doctor [--idea-id <id>]` when fields, sessions, or source artifacts are unclear.
+5. If multiple ideas are active, require an explicit `--idea-id`.
+6. Treat non-interactive finalization as the default; use `--interactive` only when the user explicitly wants prompt-fill mode.
 
 ## Required Sources
 

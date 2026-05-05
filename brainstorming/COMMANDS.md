@@ -25,6 +25,7 @@ Python 3 is required for the `scripts/` command implementations referenced in th
 ## Conversational Intent Mapping
 
 This table is generated from `brainstorming/intent_registry.json` via `./scripts/render-intent-docs`.
+It is for agent dispatch: humans can speak the phrase family naturally, and agents translate it to the backend intent before running deterministic harness commands.
 
 <!-- BEGIN GENERATED CONVERSATIONAL INTENT MAPPING -->
 | Conversational phrase family | Backend intent |

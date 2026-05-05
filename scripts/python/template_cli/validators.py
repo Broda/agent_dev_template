@@ -8,6 +8,7 @@ from pathlib import Path
 
 from template_cli.intents import (
     IntentRegistryError,
+    load_intent_registry,
     registry_commands,
     render_intent_docs_to_memory,
 )
@@ -108,6 +109,7 @@ def validate_lab_command_parity(root: Path, result: ValidationResult) -> None:
 
 def validate_intent_registry(root: Path, result: ValidationResult) -> None:
     try:
+        registry = load_intent_registry(root)
         registry_command_names = registry_commands(root)
         rendered_docs = render_intent_docs_to_memory(root)
     except IntentRegistryError as exc:
@@ -124,6 +126,28 @@ def validate_intent_registry(root: Path, result: ValidationResult) -> None:
     unknown_registry_commands = sorted(registry_command_names - registered)
     for command in unknown_registry_commands:
         result.add_failure(f"Intent registry command is not registered in CLI: {command}")
+
+    for intent in registry["intents"]:
+        command = str(intent["command"]).strip()
+        backend_intent = str(intent["backendIntent"]).strip()
+        parts = backend_intent.split()
+        if not parts or parts[0] != "/lab":
+            result.add_failure(
+                f"Intent '{command}' backendIntent must start with /lab for agent-dispatched workflow commands: {backend_intent}"
+            )
+            continue
+        if len(parts) < 2:
+            result.add_failure(f"Intent '{command}' backendIntent is missing a lab command: {backend_intent}")
+            continue
+        backend_command = parts[1].strip("[]")
+        if backend_command != command:
+            result.add_failure(
+                f"Intent '{command}' backendIntent command mismatch: expected /lab {command}, found {backend_intent}"
+            )
+        if backend_command not in registered:
+            result.add_failure(
+                f"Intent '{command}' backendIntent maps to unsupported lab command: {backend_command}"
+            )
 
     for relative_path, expected_content in rendered_docs.items():
         path = root / relative_path

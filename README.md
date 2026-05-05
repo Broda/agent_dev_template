@@ -11,6 +11,18 @@ The intended flow stays simple:
 
 The harness remains self-contained. Project state, deterministic scripts, validation, and generated development docs live in the repository. Plugins and skills provide agent operating knowledge around that harness; they do not replace the harness runtime.
 
+## Agent Operation Model
+
+This harness is optimized for human-agent development, not for humans memorizing commands. The primary interface is conversational intent; the scripts are the auditable implementation layer underneath.
+
+1. The human describes what should happen in normal language.
+2. The agent reads `MODE.md` and follows the active repo-scoped skill.
+3. In brainstorming mode, the agent maps natural-language requests through `brainstorming/intent_registry.json` and the generated intent docs.
+4. The agent runs deterministic `./scripts/lab ...` or validation commands to persist state and evidence.
+5. The agent reports the outcome, validation evidence, and the next decision point.
+
+Examples: "capture this idea", "what's missing before finalize?", "finalize this repo", and "commit this milestone" are agent-facing intents. Terminal commands remain documented so the workflow is inspectable and recoverable.
+
 ## Tooling Runtime
 
 - Python 3 is required for the repository automation scripts under `scripts/`.

@@ -27,6 +27,7 @@ Lightweight mode for chat-first brainstorming with milestone-based recording.
 ## Intent Map
 
 This table is generated from `brainstorming/intent_registry.json` via `./scripts/render-intent-docs`.
+It is the agent-facing interface for brainstorming mode: the user can speak naturally, and the agent maps intent into deterministic harness actions.
 
 <!-- BEGIN GENERATED INTENT MAP -->
 | Natural phrase family | Action | Files touched |
