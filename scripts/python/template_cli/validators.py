@@ -230,7 +230,6 @@ def run_validate_brainstorming(root: Path) -> int:
         "tests/workflow_test_helpers.py",
         "tests/test_development_rendering.py",
         "tests/test_lab_lifecycle.py",
-        "tests/test_lab_workflow.py",
         "tests/test_intent_registry_contract.py",
         "tests/test_template_validation.py",
         "tests/fixtures/finalized_state_v2.json",

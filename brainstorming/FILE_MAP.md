@@ -38,7 +38,6 @@ Lean file registry for the Project Idea Lab.
 | `tests/test_development_rendering.py` | Development doc render and validation regression tests |
 | `tests/test_intent_registry_contract.py` | Intent-registry render, parity, and CI-contract regression suite |
 | `tests/test_lab_lifecycle.py` | Lab command, finalize, status, doctor, and review regression tests |
-| `tests/test_lab_workflow.py` | Compatibility pointer for moved workflow regression tests |
 | `tests/test_template_validation.py` | Template governance, skill, plugin, and launcher validation tests |
 | `tests/fixtures/finalized_state_v2.json` | Canonical finalized-state fixture for development render/validate regression |
 | `tests/fixtures/finalized_state_web_app_v2.json` | Non-game finalized-state fixture for product-neutral development rendering regression |
