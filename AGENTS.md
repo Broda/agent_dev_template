@@ -1,6 +1,6 @@
 # Agent Dispatcher
 
-This repository is a two-phase project template. It starts in **brainstorming mode** and finalizes in place into **development mode**.
+This repository is a two-phase project harness template. It starts in **brainstorming mode** and finalizes in place into **development mode**.
 
 ## Start Here
 
@@ -13,7 +13,7 @@ This repository is a two-phase project template. It starts in **brainstorming mo
 | `MODE.md` says `brainstorming` | `$brainstorming-lab` | `brainstorming/AGENTS.brainstorming.md` |
 | Preparing or running finalization | `$project-finalizer` | `brainstorming/AGENTS.brainstorming.md` |
 | `MODE.md` says `development` | `$development-governance` | `development/AGENTS.development.md` |
-| Maintaining this template repo itself | `$template-maintenance` | this file plus current mode contract |
+| Maintaining this harness template itself | `$template-maintenance` | this file plus current mode contract |
 
 The legacy contracts remain available for agents that do not support skills.
 

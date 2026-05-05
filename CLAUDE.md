@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Guidance for Claude Code when working in this repository.
+Guidance for Claude Code when working in this project harness template.
 
 ## Start Here
 
@@ -53,7 +53,7 @@ python3 -m unittest discover -s tests -v
 
 ## Template Maintenance
 
-For changes to this template itself:
+For changes to this harness template itself:
 
 - Keep command paths stable.
 - Edit `brainstorming/intent_registry.json` before regenerating generated intent docs.

@@ -1,11 +1,30 @@
-# Master Agent Template
+# Project Harness Template
 
-This template starts in brainstorming mode and finalizes in place into development mode.
+This public template is a project harness: a cloneable, repo-local operating environment for taking an idea from conversation into governed development.
+
+The intended flow stays simple:
+
+1. Clone this template into a new project repository.
+2. Brainstorm the project in `brainstorming` mode.
+3. Finalize in place into `development` mode.
+4. Develop against the rendered governance docs.
+
+The harness remains self-contained. Project state, deterministic scripts, validation, and generated development docs live in the repository. Plugins and skills provide agent operating knowledge around that harness; they do not replace the harness runtime.
 
 ## Tooling Runtime
 
 - Python 3 is required for the repository automation scripts under `scripts/`.
 - The shell and PowerShell entrypoints are launchers; the canonical implementation lives in Python.
+
+## Harness Architecture
+
+| Layer | Purpose | Examples |
+|---|---|---|
+| Project substrate | Durable project lifecycle state and retained docs | `MODE.md`, `ideas/`, `sessions/`, `state/`, `brainstorming/`, `development/` |
+| Deterministic tooling | Repeatable local behavior that should remain inspectable in each project | `./scripts/lab`, `./scripts/finalize-project`, `./scripts/validate-governance`, `scripts/python/template_cli/` |
+| Repo-scoped skills | Canonical agent instructions for operating this harness in the current repo | `.agents/skills/` |
+| Plugin package | Optional portable distribution of reusable agent behavior | `plugins/project-lifecycle-lab/` |
+| Future bootstrap helper | Optional convenience for creating/updating harness instances | not required for current use |
 
 ## Start Here
 

@@ -1,6 +1,6 @@
 ---
 name: development-governance
-description: Use in this template repo when MODE.md says development, or when implementing, reviewing, validating, or documenting work after project finalization.
+description: Use in this project harness template when MODE.md says development, or when implementing, reviewing, validating, or documenting work after project finalization.
 ---
 
 # Development Governance

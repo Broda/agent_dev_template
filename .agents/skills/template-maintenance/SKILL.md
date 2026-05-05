@@ -1,11 +1,11 @@
 ---
 name: template-maintenance
-description: Use when editing this project template itself, including scripts/python/template_cli, generated intent docs, validators, wrappers, development templates, repo-scoped skills, or plugin packaging.
+description: Use when editing this project harness template itself, including scripts/python/template_cli, generated intent docs, validators, wrappers, development templates, repo-scoped skills, or plugin packaging.
 ---
 
 # Template Maintenance
 
-Use this skill when maintaining the template rather than brainstorming a user project or developing a finalized generated project.
+Use this skill when maintaining the harness template rather than brainstorming a user project or developing a finalized generated project.
 
 ## Source Of Truth
 
@@ -17,7 +17,7 @@ Use this skill when maintaining the template rather than brainstorming a user pr
 ## Editing Rules
 
 - Keep command names and entrypoint paths stable unless the user explicitly asks for a breaking change.
-- Update `brainstorming/FILE_MAP.md` when the retained template inventory changes.
+- Update `brainstorming/FILE_MAP.md` when the retained harness template inventory changes.
 - Update tests or fixtures when behavior changes.
 - Do not hand-edit generated intent tables in `brainstorming/CONVERSATIONAL_MODE.md` or `brainstorming/COMMANDS.md`.
 - To change natural-language mappings, edit `brainstorming/intent_registry.json`, run `./scripts/render-intent-docs`, then validate.

@@ -1,6 +1,6 @@
 ---
 name: brainstorming-lab
-description: Use in this template repo when MODE.md says brainstorming, or when the user wants to capture, activate, park, kill, review, export, finalize, or discuss project ideas with milestone persistence.
+description: Use in this project harness template when MODE.md says brainstorming, or when the user wants to capture, activate, park, kill, review, export, finalize, or discuss project ideas with milestone persistence.
 ---
 
 # Brainstorming Lab

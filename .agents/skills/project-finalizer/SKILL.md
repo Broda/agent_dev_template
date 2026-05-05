@@ -1,6 +1,6 @@
 ---
 name: project-finalizer
-description: Use in this template repo when preparing or running brainstorming-to-development finalization, checking finalize readiness, hydrating state/project-init.json, rendering development docs, or diagnosing blocked finalization.
+description: Use in this project harness template when preparing or running brainstorming-to-development finalization, checking finalize readiness, hydrating state/project-init.json, rendering development docs, or diagnosing blocked finalization.
 ---
 
 # Project Finalizer

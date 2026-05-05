@@ -1,7 +1,7 @@
 {
   "name": "project-lifecycle-lab",
   "version": "0.1.0",
-  "description": "Reusable project brainstorming, finalization, governance, and template-maintenance workflows.",
+  "description": "Reusable agent workflows for operating project harness templates.",
   "author": {
     "name": "David Green",
     "email": "drgreen@gmail.com",
@@ -14,7 +14,7 @@
   "interface": {
     "displayName": "Project Lifecycle Lab",
     "shortDescription": "Reusable project lifecycle workflows",
-    "longDescription": "Project Lifecycle Lab packages the brainstorming, finalization, development-governance, and template-maintenance workflows being refined in this template. The active repo-scoped skills remain under .agents/skills until plugin distribution is ready.",
+    "longDescription": "Project Lifecycle Lab packages reusable Codex operating knowledge for project harness templates. The harness runtime stays in the repo: project state, scripts, validators, and generated governance docs remain inspectable and local. Repo-scoped skills under .agents/skills stay canonical until plugin distribution is ready.",
     "developerName": "David Green",
     "category": "Productivity",
     "capabilities": ["Read", "Write"],
