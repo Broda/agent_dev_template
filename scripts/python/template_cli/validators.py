@@ -13,7 +13,12 @@ from template_cli.intents import (
 )
 from template_cli.validator_code_size import validate_python_file_sizes
 from template_cli.validator_launchers import validate_python_launchers
-from template_cli.validator_plugins import PLUGIN_MANIFEST, PLUGIN_MARKETPLACE, validate_repo_plugins
+from template_cli.validator_plugins import (
+    PLUGIN_MANIFEST,
+    PLUGIN_MARKETPLACE,
+    PLUGIN_SKILL_ARTIFACTS,
+    validate_repo_plugins,
+)
 from template_cli.validator_skills import REPO_SKILLS, REPO_SKILL_METADATA, validate_repo_skills
 from template_cli.io_helpers import (
     ADR_LINK_RE,
@@ -41,7 +46,7 @@ REPO_SKILL_ARTIFACTS = [
     for skill_path, metadata_path in zip(REPO_SKILLS.values(), REPO_SKILL_METADATA.values())
     for artifact in (skill_path, metadata_path)
 ]
-REPO_PLUGIN_ARTIFACTS = [PLUGIN_MARKETPLACE, PLUGIN_MANIFEST]
+REPO_PLUGIN_ARTIFACTS = [PLUGIN_MARKETPLACE, PLUGIN_MANIFEST, *PLUGIN_SKILL_ARTIFACTS]
 
 
 def validate_notes_catalog(root: Path, result: ValidationResult) -> None:

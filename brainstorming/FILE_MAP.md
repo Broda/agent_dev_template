@@ -16,7 +16,15 @@ Lean file registry for the Project Idea Lab.
 | `.agents/skills/template-maintenance/SKILL.md` | Repo-scoped skill for maintaining this template itself |
 | `.agents/skills/template-maintenance/agents/openai.yaml` | UI metadata for the template maintenance skill |
 | `.agents/plugins/marketplace.json` | Local plugin marketplace entry for future reusable distribution |
-| `plugins/project-lifecycle-lab/.codex-plugin/plugin.json` | Local plugin manifest scaffold for the lifecycle skill package |
+| `plugins/project-lifecycle-lab/.codex-plugin/plugin.json` | Local plugin manifest for the lifecycle agent-behavior package |
+| `plugins/project-lifecycle-lab/skills/brainstorming-lab/SKILL.md` | Plugin mirror of the brainstorming lifecycle skill |
+| `plugins/project-lifecycle-lab/skills/brainstorming-lab/agents/openai.yaml` | Plugin mirror of brainstorming skill UI metadata |
+| `plugins/project-lifecycle-lab/skills/project-finalizer/SKILL.md` | Plugin mirror of the project finalization skill |
+| `plugins/project-lifecycle-lab/skills/project-finalizer/agents/openai.yaml` | Plugin mirror of finalizer skill UI metadata |
+| `plugins/project-lifecycle-lab/skills/development-governance/SKILL.md` | Plugin mirror of the development governance skill |
+| `plugins/project-lifecycle-lab/skills/development-governance/agents/openai.yaml` | Plugin mirror of development skill UI metadata |
+| `plugins/project-lifecycle-lab/skills/template-maintenance/SKILL.md` | Plugin mirror of the harness template maintenance skill |
+| `plugins/project-lifecycle-lab/skills/template-maintenance/agents/openai.yaml` | Plugin mirror of maintenance skill UI metadata |
 | `brainstorming/AGENTS.brainstorming.md` | Brainstorming-mode contract |
 | `brainstorming/CONVERSATIONAL_MODE.md` | Plain-language interaction and milestone capture |
 | `brainstorming/COMMANDS.md` | Optional backend command mapping |

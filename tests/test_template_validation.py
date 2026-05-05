@@ -105,6 +105,34 @@ class TemplateValidationTests(LabWorkflowTestCase):
             result.stdout,
         )
 
+    def test_validate_brainstorming_checks_plugin_skills_path(self) -> None:
+        manifest_path = self.repo / "plugins/project-lifecycle-lab/.codex-plugin/plugin.json"
+        manifest_path.write_text(
+            manifest_path.read_text(encoding="utf-8").replace('"skills": "./skills/"', '"skills": "./wrong-skills/"', 1),
+            encoding="utf-8",
+        )
+
+        result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Plugin manifest skills path must be ./skills/", result.stdout)
+
+    def test_validate_brainstorming_checks_plugin_skill_mirror_drift(self) -> None:
+        plugin_skill_path = self.repo / "plugins/project-lifecycle-lab/skills/brainstorming-lab/SKILL.md"
+        plugin_skill_path.write_text(
+            plugin_skill_path.read_text(encoding="utf-8").replace("Keep conversation natural", "Keep conversation scripted", 1),
+            encoding="utf-8",
+        )
+
+        result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(
+            "Plugin skill mirror drifted from canonical repo skill: "
+            "plugins/project-lifecycle-lab/skills/brainstorming-lab/SKILL.md",
+            result.stdout,
+        )
+
     def test_validate_brainstorming_checks_plugin_file_map_rows(self) -> None:
         file_map_path = self.repo / "brainstorming/FILE_MAP.md"
         file_map_path.write_text(

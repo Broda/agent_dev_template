@@ -11,6 +11,7 @@
   "repository": "https://github.com/Broda/agent_dev_template",
   "license": "MIT",
   "keywords": ["codex", "skills", "project-lifecycle", "template"],
+  "skills": "./skills/",
   "interface": {
     "displayName": "Project Lifecycle Lab",
     "shortDescription": "Reusable project lifecycle workflows",

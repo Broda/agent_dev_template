@@ -4,11 +4,27 @@ import json
 from pathlib import Path
 
 from template_cli.io_helpers import ValidationResult, read_text
+from template_cli.validator_skills import REPO_SKILLS, REPO_SKILL_METADATA
 
 
 PLUGIN_NAME = "project-lifecycle-lab"
 PLUGIN_MANIFEST = "plugins/project-lifecycle-lab/.codex-plugin/plugin.json"
 PLUGIN_MARKETPLACE = ".agents/plugins/marketplace.json"
+PLUGIN_SKILLS_DIR = "plugins/project-lifecycle-lab/skills"
+PLUGIN_SKILLS = {
+    skill_name: f"{PLUGIN_SKILLS_DIR}/{skill_name}/SKILL.md"
+    for skill_name in REPO_SKILLS
+}
+PLUGIN_SKILL_METADATA = {
+    skill_name: f"{PLUGIN_SKILLS_DIR}/{skill_name}/agents/openai.yaml"
+    for skill_name in REPO_SKILLS
+}
+PLUGIN_SKILL_ARTIFACTS = [
+    artifact
+    for skill_path, metadata_path in zip(PLUGIN_SKILLS.values(), PLUGIN_SKILL_METADATA.values())
+    for artifact in (skill_path, metadata_path)
+]
+PLUGIN_ARTIFACTS = [PLUGIN_MARKETPLACE, PLUGIN_MANIFEST, *PLUGIN_SKILL_ARTIFACTS]
 
 
 def validate_repo_plugins(root: Path, result: ValidationResult) -> None:
@@ -20,9 +36,12 @@ def validate_repo_plugins(root: Path, result: ValidationResult) -> None:
 
     if manifest.get("name") != PLUGIN_NAME:
         result.add_failure(f"Plugin manifest name must be {PLUGIN_NAME}: {PLUGIN_MANIFEST}")
+    if manifest.get("skills") != "./skills/":
+        result.add_failure(f"Plugin manifest skills path must be ./skills/: {PLUGIN_MANIFEST}")
     if not manifest.get("interface", {}).get("displayName"):
         result.add_failure(f"Plugin manifest must include interface.displayName: {PLUGIN_MANIFEST}")
     _validate_plugin_boundary(manifest, result)
+    _validate_plugin_skill_mirrors(root, result)
 
     entries = marketplace.get("plugins", [])
     matching_entries = [entry for entry in entries if entry.get("name") == PLUGIN_NAME]
@@ -53,9 +72,27 @@ def _validate_plugin_file_map(root: Path, result: ValidationResult) -> None:
     if not file_map_path.exists():
         return
     file_map_text = read_text(file_map_path)
-    for artifact in [PLUGIN_MARKETPLACE, PLUGIN_MANIFEST]:
+    for artifact in PLUGIN_ARTIFACTS:
         if f"`{artifact}`" not in file_map_text:
             result.add_failure(f"FILE_MAP.md missing registry row for plugin artifact: {artifact}")
+
+
+def _validate_plugin_skill_mirrors(root: Path, result: ValidationResult) -> None:
+    for skill_name, repo_skill_path in REPO_SKILLS.items():
+        _validate_mirrored_file(root, repo_skill_path, PLUGIN_SKILLS[skill_name], result)
+        _validate_mirrored_file(root, REPO_SKILL_METADATA[skill_name], PLUGIN_SKILL_METADATA[skill_name], result)
+
+
+def _validate_mirrored_file(root: Path, source: str, mirror: str, result: ValidationResult) -> None:
+    source_path = root / source
+    mirror_path = root / mirror
+    if not mirror_path.exists():
+        result.add_failure(f"Missing plugin skill mirror: {mirror}")
+        return
+    if not source_path.exists():
+        return
+    if read_text(source_path) != read_text(mirror_path):
+        result.add_failure(f"Plugin skill mirror drifted from canonical repo skill: {mirror}")
 
 
 def _read_json(path: Path, result: ValidationResult, label: str) -> dict:

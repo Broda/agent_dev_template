@@ -1,0 +1,6 @@
+interface:
+  display_name: "Development Governance"
+  short_description: "Follow finalized project governance"
+  default_prompt: "Use $development-governance to implement this finalized project change with the required validation evidence."
+policy:
+  allow_implicit_invocation: true

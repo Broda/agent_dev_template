@@ -1,0 +1,6 @@
+interface:
+  display_name: "Project Finalizer"
+  short_description: "Finalize ideas into development mode"
+  default_prompt: "Use $project-finalizer to check readiness and finalize this idea into development mode."
+policy:
+  allow_implicit_invocation: true
