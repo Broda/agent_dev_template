@@ -15,6 +15,8 @@ Lean file registry for the Project Idea Lab.
 | `.agents/skills/development-governance/agents/openai.yaml` | UI metadata for the development governance skill |
 | `.agents/skills/template-maintenance/SKILL.md` | Repo-scoped skill for maintaining this template itself |
 | `.agents/skills/template-maintenance/agents/openai.yaml` | UI metadata for the template maintenance skill |
+| `.agents/plugins/marketplace.json` | Local plugin marketplace entry for future reusable distribution |
+| `plugins/project-lifecycle-lab/.codex-plugin/plugin.json` | Local plugin manifest scaffold for the lifecycle skill package |
 | `brainstorming/AGENTS.brainstorming.md` | Brainstorming-mode contract |
 | `brainstorming/CONVERSATIONAL_MODE.md` | Plain-language interaction and milestone capture |
 | `brainstorming/COMMANDS.md` | Optional backend command mapping |
@@ -77,6 +79,7 @@ Lean file registry for the Project Idea Lab.
 | `.gitignore` | Local/derived file exclusions |
 | `scripts/python/template_cli/io_helpers.py` | I/O primitives, regex constants, ValidationResult, and summary printers shared across the CLI |
 | `scripts/python/template_cli/validator_launchers.py` | Launcher consistency checks for shell and PowerShell entrypoints |
+| `scripts/python/template_cli/validator_plugins.py` | Local plugin manifest and marketplace validation helpers |
 | `scripts/python/template_cli/validator_skills.py` | Repo-scoped skill and skill metadata validation helpers |
 | `scripts/python/template_cli/render_helpers.py` | State-extraction, file-manipulation, and hydration helpers for development doc rendering |
 | `scripts/python/template_cli/render_templates.py` | Pure template functions for README and PROJECT_CONTEXT document generation |

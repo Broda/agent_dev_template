@@ -362,6 +362,22 @@ class LabWorkflowTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("PowerShell launcher scripts/lab.ps1 is missing expected snippet", result.stdout)
 
+    def test_validate_brainstorming_checks_plugin_marketplace_entry(self) -> None:
+        marketplace_path = self.repo / ".agents/plugins/marketplace.json"
+        marketplace_path.write_text(
+            marketplace_path.read_text(encoding="utf-8").replace(
+                "./plugins/project-lifecycle-lab",
+                "./plugins/wrong-plugin",
+                1,
+            ),
+            encoding="utf-8",
+        )
+
+        result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Plugin marketplace path is incorrect for project-lifecycle-lab", result.stdout)
+
     def test_render_and_validate_development_from_checked_in_fixture(self) -> None:
         self.write_render_fixture()
         run_cmd(["./scripts/render-development-docs"], cwd=self.repo)

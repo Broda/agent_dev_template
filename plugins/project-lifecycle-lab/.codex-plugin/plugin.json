@@ -1,0 +1,29 @@
+{
+  "name": "project-lifecycle-lab",
+  "version": "0.1.0",
+  "description": "Reusable project brainstorming, finalization, governance, and template-maintenance workflows.",
+  "author": {
+    "name": "David Green",
+    "email": "drgreen@gmail.com",
+    "url": "https://github.com/Broda"
+  },
+  "homepage": "https://github.com/Broda/agent_dev_template",
+  "repository": "https://github.com/Broda/agent_dev_template",
+  "license": "MIT",
+  "keywords": ["codex", "skills", "project-lifecycle", "template"],
+  "interface": {
+    "displayName": "Project Lifecycle Lab",
+    "shortDescription": "Reusable project lifecycle workflows",
+    "longDescription": "Project Lifecycle Lab packages the brainstorming, finalization, development-governance, and template-maintenance workflows being refined in this template. The active repo-scoped skills remain under .agents/skills until plugin distribution is ready.",
+    "developerName": "David Green",
+    "category": "Productivity",
+    "capabilities": ["Read", "Write"],
+    "websiteURL": "https://github.com/Broda/agent_dev_template",
+    "defaultPrompt": [
+      "Use the project lifecycle workflows for this repo.",
+      "Help finalize this idea into development mode.",
+      "Maintain this template safely."
+    ],
+    "brandColor": "#2563EB"
+  }
+}

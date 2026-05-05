@@ -15,6 +15,7 @@ from template_cli.intents import (
     render_intent_docs_to_memory,
 )
 from template_cli.validator_launchers import validate_python_launchers
+from template_cli.validator_plugins import validate_repo_plugins
 from template_cli.validator_skills import validate_repo_skills
 from template_cli.io_helpers import (
     ADR_LINK_RE,
@@ -174,6 +175,7 @@ def run_validate_brainstorming(root: Path) -> int:
         ".agents/skills/development-governance/agents/openai.yaml",
         ".agents/skills/template-maintenance/SKILL.md",
         ".agents/skills/template-maintenance/agents/openai.yaml",
+        ".agents/plugins/marketplace.json",
         "brainstorming/AGENTS.brainstorming.md",
         "brainstorming/CONVERSATIONAL_MODE.md",
         "brainstorming/COMMANDS.md",
@@ -232,6 +234,7 @@ def run_validate_brainstorming(root: Path) -> int:
         ".github/workflows/ci.yml",
         ".github/workflows/governance-audit.yml",
         ".github/PULL_REQUEST_TEMPLATE.md",
+        "plugins/project-lifecycle-lab/.codex-plugin/plugin.json",
     ]
 
     for artifact in core_artifacts:
@@ -287,6 +290,7 @@ def run_validate_brainstorming(root: Path) -> int:
     validate_intent_registry(root, result)
     validate_intent_sync_ci(root, result)
     validate_python_launchers(root, result)
+    validate_repo_plugins(root, result)
     validate_repo_skills(root, result)
 
     if read_mode(root) != "brainstorming":
@@ -321,6 +325,7 @@ def run_validate_development(root: Path) -> int:
         ".agents/skills/development-governance/agents/openai.yaml",
         ".agents/skills/template-maintenance/SKILL.md",
         ".agents/skills/template-maintenance/agents/openai.yaml",
+        ".agents/plugins/marketplace.json",
         "NOTES_CATALOG.md",
         "sessions/",
         "notes/",
@@ -341,6 +346,7 @@ def run_validate_development(root: Path) -> int:
         "docs/RUNTIME_VERIFICATION_REPORT.md",
         "docs/adr/ADR-0001-record-architecture-decisions.md",
         "docs/adr/ADR-TEMPLATE.md",
+        "plugins/project-lifecycle-lab/.codex-plugin/plugin.json",
         "state/project-init.json",
     ]
 
@@ -431,6 +437,7 @@ def run_validate_development(root: Path) -> int:
 
     validate_notes_catalog(root, result)
     validate_python_launchers(root, result)
+    validate_repo_plugins(root, result)
     validate_repo_skills(root, result)
     return print_development_summary(result)
 

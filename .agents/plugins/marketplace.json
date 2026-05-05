@@ -1,0 +1,20 @@
+{
+  "name": "agent-dev-template",
+  "interface": {
+    "displayName": "Agent Dev Template"
+  },
+  "plugins": [
+    {
+      "name": "project-lifecycle-lab",
+      "source": {
+        "source": "local",
+        "path": "./plugins/project-lifecycle-lab"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
