@@ -16,6 +16,7 @@ from template_cli.validators import (  # noqa: E402
     run_validate_governance,
 )
 from template_cli.bootstrap import run_project_harness_new  # noqa: E402
+from template_cli.evidence import run_lab_evidence  # noqa: E402
 from template_cli.io_helpers import read_mode  # noqa: E402
 from template_cli.notes import run_lab_note  # noqa: E402
 from template_cli.plugin_sync import run_sync_plugin_skills  # noqa: E402
@@ -72,6 +73,12 @@ def build_parser() -> argparse.ArgumentParser:
     doctor_parser = subparsers.add_parser("lab-doctor")
     doctor_parser.add_argument("--idea-id", default="")
     subparsers.add_parser("lab-audit")
+    evidence_parser = subparsers.add_parser("lab-evidence")
+    evidence_parser.add_argument("--task", required=True)
+    evidence_parser.add_argument("--command", dest="evidence_command", required=True)
+    evidence_parser.add_argument("--result", required=True)
+    evidence_parser.add_argument("--note", action="append", default=[])
+    evidence_parser.add_argument("--no-complete", action="store_true")
     push_parser = subparsers.add_parser("lab-push")
     commit_parser = subparsers.add_parser("lab-commit")
     commit_parser.add_argument("--message", default="brainstorm: milestone update")
@@ -244,6 +251,15 @@ def main(argv: list[str] | None = None) -> int:
         return run_lab_doctor(Path.cwd(), idea_id=args.idea_id)
     if args.command == "lab-audit":
         return run_lab_audit(Path.cwd())
+    if args.command == "lab-evidence":
+        return run_lab_evidence(
+            Path.cwd(),
+            task=args.task,
+            command=args.evidence_command,
+            result=args.result,
+            notes=args.note,
+            no_complete=args.no_complete,
+        )
     if args.command == "lab-commit":
         return run_lab_commit_command(Path.cwd(), message=args.message)
     if args.command == "lab-push":

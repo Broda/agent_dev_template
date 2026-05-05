@@ -44,6 +44,7 @@ It is for agent dispatch: humans can speak the phrase family naturally, and agen
 | "what's the current state?", "show me status", "where are we now?" | `brainstorming`, `development` | `/lab status` |
 | "why is finalize blocked?", "what exactly is missing before finalize?", "show me where finalize is getting values from" | `brainstorming` | `/lab doctor [<idea-id>]` |
 | "run audit", "validate the repo", "check governance" | `brainstorming`, `development` | `/lab audit` |
+| "record this as evidence", "mark this task done", "save verification for this task" | `development` | `/lab evidence <task>` |
 | "commit this milestone", "make a commit", "commit these changes" | `brainstorming`, `development` | `/lab commit [message]` |
 | "push these changes", "push this branch", "publish the branch" | `brainstorming`, `development` | `/lab push` |
 | "sync the repo", "commit and push this", "sync these changes" | `brainstorming`, `development` | `/lab sync [message]` |
@@ -135,6 +136,20 @@ It is for agent dispatch: humans can speak the phrase family naturally, and agen
 
 ### `/lab audit`
 - Run `scripts/validate-governance`.
+
+### `/lab evidence <task>`
+- Development-mode command.
+- Find exactly one matching checkbox task in `docs/ROADMAP.md`.
+- Mark the task complete unless `--no-complete` is supplied.
+- Insert verification evidence directly beneath the matched task.
+- Required fields:
+  - `--task "<roadmap task text>"`
+  - `--command "<command run>"`
+  - `--result "<observed result>"`
+- Optional repeated note:
+  - `--note "<extra context>"`
+- Example:
+  - `./scripts/lab evidence --task "Tests pass" --command "python3 -m unittest discover -s tests -v" --result "60 tests passed"`
 
 ### `/lab status`
 - Report current mode, per-status idea counts, active idea context, inferred finalize target, and finalize-readiness gaps.

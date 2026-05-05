@@ -219,6 +219,21 @@
       "writeBehavior": "no-write"
     },
     {
+      "command": "evidence",
+      "backendIntent": "/lab evidence <task>",
+      "modes": [
+        "development"
+      ],
+      "phrases": [
+        "record this as evidence",
+        "mark this task done",
+        "save verification for this task"
+      ],
+      "description": "mark a roadmap task complete and record verification evidence",
+      "filesTouched": "`docs/ROADMAP.md`",
+      "writeBehavior": "write"
+    },
+    {
       "command": "commit",
       "backendIntent": "/lab commit [message]",
       "modes": [

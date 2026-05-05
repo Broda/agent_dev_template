@@ -30,6 +30,7 @@ Use shared harness commands with development semantics:
 
 - `./scripts/lab status` for finalized project, active milestone, governance coverage, and roadmap task counts.
 - `./scripts/lab audit` for governance validation.
+- `./scripts/lab evidence` for marking a roadmap checkbox task complete and recording verification evidence beneath it.
 - `./scripts/lab note` for durable research notes that may require follow-up ADR, roadmap, architecture, or policy updates.
 - `./scripts/lab commit`, `./scripts/lab push`, and `./scripts/lab sync` only for explicit git operations after coherent development slices.
 

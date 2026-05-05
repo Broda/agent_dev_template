@@ -47,6 +47,7 @@ Shared commands keep development-specific meaning:
 
 - `./scripts/lab status` reports finalized project context, active milestone, governance-doc coverage, and roadmap task counts.
 - `./scripts/lab audit` runs harness governance validation.
+- `./scripts/lab evidence` marks a matching roadmap checkbox task complete and records verification evidence beneath it.
 - `./scripts/lab note` captures durable research notes; if the note changes direction, update ADRs, roadmap, architecture, or policy in the same slice.
 - `./scripts/lab commit`, `./scripts/lab push`, and `./scripts/lab sync` are explicit git operations after a coherent development slice.
 
