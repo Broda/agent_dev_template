@@ -14,6 +14,7 @@ from template_cli.intents import (
     registry_commands,
     render_intent_docs_to_memory,
 )
+from template_cli.validator_code_size import validate_python_file_sizes
 from template_cli.validator_launchers import validate_python_launchers
 from template_cli.validator_plugins import PLUGIN_MANIFEST, PLUGIN_MARKETPLACE, validate_repo_plugins
 from template_cli.validator_skills import REPO_SKILLS, REPO_SKILL_METADATA, validate_repo_skills
@@ -294,6 +295,7 @@ def run_validate_brainstorming(root: Path) -> int:
     validate_lab_command_parity(root, result)
     validate_intent_registry(root, result)
     validate_intent_sync_ci(root, result)
+    validate_python_file_sizes(root, result)
     validate_python_launchers(root, result)
     validate_repo_plugins(root, result)
     validate_repo_skills(root, result)
@@ -433,6 +435,7 @@ def run_validate_development(root: Path) -> int:
                 break
 
     validate_notes_catalog(root, result)
+    validate_python_file_sizes(root, result)
     validate_python_launchers(root, result)
     validate_repo_plugins(root, result)
     validate_repo_skills(root, result)
