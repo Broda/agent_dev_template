@@ -46,6 +46,7 @@ Lean file registry for the Project Harness Template.
 | `tests/` | Regression tests for CLI and workflow runtime |
 | `tests/workflow_test_helpers.py` | Shared temp-repo fixtures and command helpers for workflow tests |
 | `tests/test_development_rendering.py` | Development doc render and validation regression tests |
+| `tests/test_finalization_regression.py` | End-to-end finalization regression tests for multi-session detail carryover |
 | `tests/test_intent_registry_contract.py` | Intent-registry render, parity, and CI-contract regression suite |
 | `tests/test_lab_lifecycle.py` | Lab command, finalize, status, doctor, and review regression tests |
 | `tests/test_template_validation.py` | Template governance, skill, plugin, and launcher validation tests |

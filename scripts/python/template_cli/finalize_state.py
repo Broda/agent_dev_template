@@ -106,7 +106,7 @@ def _write_mode_development(root: Path) -> None:
     )
 
 
-def resolve_finalize_idea_id(root: Path, explicit_idea_id: str = "") -> str:
+def resolve_finalize_idea_id(root: Path, explicit_idea_id: str = "", *, interactive: bool = False) -> str:
     catalog_path = root / "IDEA_CATALOG.md"
     if not catalog_path.exists():
         raise SystemExit("IDEA_CATALOG.md not found.")
@@ -140,12 +140,26 @@ def resolve_finalize_idea_id(root: Path, explicit_idea_id: str = "") -> str:
     if len(active_rows) == 1:
         return active_rows[0][0]
     if len(active_rows) > 1:
+        if not interactive:
+            candidates = "\n".join(f"- {idea_id} ({title or idea_id})" for idea_id, title, _ in active_rows)
+            raise SystemExit(
+                "Cannot infer which idea to finalize: multiple active ideas found.\n"
+                f"{candidates}\n"
+                "Pass --idea-id explicitly or keep exactly one idea active."
+            )
         return choose_idea_to_finalize(active_rows)
     if len(all_rows) == 1:
         return all_rows[0][0]
     if len(finalized_rows) == 1:
         return finalized_rows[0][0]
     if len(all_rows) > 1:
+        if not interactive:
+            candidates = "\n".join(f"- {idea_id} ({title or idea_id}, {status})" for idea_id, title, status in all_rows)
+            raise SystemExit(
+                "Cannot infer which idea to finalize: multiple ideas are available.\n"
+                f"{candidates}\n"
+                "Pass --idea-id explicitly or rerun with --interactive."
+            )
         return choose_idea_to_finalize(all_rows)
 
     raise SystemExit(

@@ -13,6 +13,7 @@ Use this skill when finalizing an idea into development mode or diagnosing why f
 2. Run `./scripts/lab status` for the inferred target and readiness summary.
 3. Run `./scripts/lab doctor [--idea-id <id>]` when fields, sessions, or source artifacts are unclear.
 4. If multiple ideas are active, require an explicit `--idea-id`.
+5. Treat non-interactive finalization as the default; use `--interactive` only when the user explicitly wants prompt-fill mode.
 
 ## Required Sources
 
@@ -32,6 +33,7 @@ Run one of:
 - `./scripts/finalize-project --idea-id <id> --write-export`
 
 Use `--write-export` only when the user wants an archival summary under `exports/`.
+Use `--interactive` to opt into prompts for missing or editable finalization fields. Without `--interactive`, missing required fields should fail with guidance instead of prompting.
 
 ## After Finalization
 

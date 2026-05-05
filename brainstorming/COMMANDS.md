@@ -116,8 +116,10 @@ This table is generated from `brainstorming/intent_registry.json` via `./scripts
 - Finalize in place with `./scripts/finalize-project`.
 - Use `--write-export` only when an archival summary snapshot is desired.
 - Default target is the current idea from canonical state or the single active idea.
-- If multiple ideas are active or inference is ambiguous, prompt with a numbered choice list.
+- Finalization is non-interactive by default: complete state finalizes directly, missing fields fail with fix-up guidance.
+- If multiple ideas are active or inference is ambiguous, fail and require `--idea-id`.
 - `--idea-id <idea-id>` remains available as an explicit override.
+- Use `--interactive` to opt into the older prompt-fill flow.
 - Switch `MODE.md` to development after successful rendering and validation.
 - Example:
   - `./scripts/lab finalize --idea-id idea-template-hardening --write-export`

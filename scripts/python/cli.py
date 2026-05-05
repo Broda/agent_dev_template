@@ -58,6 +58,7 @@ def build_parser() -> argparse.ArgumentParser:
     finalize_parser = subparsers.add_parser("finalize-project")
     finalize_parser.add_argument("--idea-id", default="")
     finalize_parser.add_argument("--write-export", action="store_true")
+    finalize_parser.add_argument("--interactive", action="store_true")
     note_parser = subparsers.add_parser("lab-note")
     note_parser.add_argument("--topic", required=True)
     note_parser.add_argument("--source", default="recent assistant research context")
@@ -76,6 +77,7 @@ def build_parser() -> argparse.ArgumentParser:
     lab_finalize_parser = subparsers.add_parser("lab-finalize")
     lab_finalize_parser.add_argument("--idea-id", default="")
     lab_finalize_parser.add_argument("--write-export", action="store_true")
+    lab_finalize_parser.add_argument("--interactive", action="store_true")
 
     capture_parser = subparsers.add_parser("lab-capture")
     capture_parser.add_argument("--idea-id", required=True)
@@ -179,7 +181,12 @@ def main(argv: list[str] | None = None) -> int:
             no_git=args.no_git,
         )
     if args.command == "finalize-project":
-        return run_finalize_project(Path.cwd(), args.idea_id or "", write_export=args.write_export)
+        return run_finalize_project(
+            Path.cwd(),
+            args.idea_id or "",
+            write_export=args.write_export,
+            interactive=args.interactive,
+        )
     if args.command == "lab-note":
         return run_lab_note(
             Path.cwd(),
@@ -203,7 +210,12 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "lab-push":
         return run_lab_push_command(Path.cwd())
     if args.command == "lab-finalize":
-        return run_lab_finalize(Path.cwd(), idea_id=args.idea_id, write_export=args.write_export)
+        return run_lab_finalize(
+            Path.cwd(),
+            idea_id=args.idea_id,
+            write_export=args.write_export,
+            interactive=args.interactive,
+        )
     if args.command == "lab-capture":
         return run_lab_capture(
             Path.cwd(),

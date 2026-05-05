@@ -23,6 +23,7 @@ from template_cli.finalize_helpers import (
     trim,
     unique_values,
 )
+from template_cli.workflow_data import FINALIZE_REQUIRED_FIELDS
 from template_cli.finalize_state import (
     BackupManager,
     _update_catalog_transition,
@@ -44,8 +45,32 @@ from template_cli.validators import (
 )
 
 
-def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False) -> int:
-    idea_id = resolve_finalize_idea_id(root, idea_id)
+def _required_value(value: str, field: str, missing: list[str]) -> str:
+    value = trim(value)
+    if not value:
+        missing.append(field)
+    return value
+
+
+def _fail_noninteractive(missing: list[str], idea_id: str) -> None:
+    unique_missing = unique_values(missing)
+    lines = [
+        "Cannot finalize non-interactively because required fields are missing.",
+        f"Idea ID: {idea_id}",
+        "Missing fields:",
+    ]
+    lines.extend(f"- {field}" for field in unique_missing)
+    lines.append("Next step: update state/project-init.json or the active idea/session, then rerun ./scripts/lab doctor.")
+    lines.append("Use --interactive to fill missing values with prompts.")
+    raise SystemExit("\n".join(lines))
+
+
+def _pick_noninteractive_choice(value: str, field: str, missing: list[str]) -> str:
+    return _required_value(value, field, missing)
+
+
+def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False, interactive: bool = False) -> int:
+    idea_id = resolve_finalize_idea_id(root, idea_id, interactive=interactive)
     catalog_path = root / "IDEA_CATALOG.md"
 
     catalog_cells = None
@@ -143,7 +168,11 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
             objective = first_value_for_label(hydrate_files, label)
             if objective:
                 break
-    objective = ask_non_empty("One-sentence objective", objective)
+    missing_fields: list[str] = []
+    if interactive:
+        objective = ask_non_empty("One-sentence objective", objective)
+    else:
+        objective = _required_value(objective, "purpose / one-sentence objective", missing_fields)
 
     problem_statement = existing_problem_statement or first_value_for_label(hydrate_files, "Problem statement")
     target_users = existing_target_users or first_value_for_label(hydrate_files, "Affected users/personas") or first_value_for_label(
@@ -175,35 +204,71 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
     if not constraints_source:
         constraints_source = first_value_for_label(hydrate_files, "Constraints")
 
-    project_type = choose_project_type(existing_project_type or infer_project_type(project_name, objective))
-    language = ask_non_empty("Language", existing_language)
-    runtime = ask_non_empty("Runtime", existing_runtime)
-    framework = ask_non_empty("Framework (if any, else 'None')", existing_framework or "None")
-    package_tool = ask_non_empty(
-        "Package manager/build tool (if any, else 'None')", existing_package_tool or "None"
-    )
-    persistence = choose_from_list(
-        "Persistence",
-        existing_persistence,
-        ["None", "File-based (JSON/YAML/etc.)", "SQLite", "Postgres/MySQL/Other RDBMS"],
-    )
-    authentication = choose_from_list(
-        "Authentication", existing_authentication, ["None", "Local users", "External auth provider"]
-    )
-    determinism = choose_from_list(
-        "Determinism/correctness sensitivity", existing_determinism, ["Normal", "High"]
-    )
-    packaging = choose_from_list(
-        "Packaging/distribution planned",
-        existing_packaging,
-        ["None", "Yes (desktop installers / containers / artifacts)"],
-    )
-    constraints = ask_non_empty(
-        "Constraints (comma-separated; use 'None' if none)", constraints_source or "None"
-    )
-    build_command = ask_non_empty("Build command", existing_build_command)
-    run_command = ask_non_empty("Run command", existing_run_command)
-    test_command = ask_non_empty("Test command", existing_test_command)
+    if interactive:
+        project_type = choose_project_type(existing_project_type or infer_project_type(project_name, objective))
+        language = ask_non_empty("Language", existing_language)
+        runtime = ask_non_empty("Runtime", existing_runtime)
+        framework = ask_non_empty("Framework (if any, else 'None')", existing_framework or "None")
+        package_tool = ask_non_empty(
+            "Package manager/build tool (if any, else 'None')", existing_package_tool or "None"
+        )
+        persistence = choose_from_list(
+            "Persistence",
+            existing_persistence,
+            ["None", "File-based (JSON/YAML/etc.)", "SQLite", "Postgres/MySQL/Other RDBMS"],
+        )
+        authentication = choose_from_list(
+            "Authentication", existing_authentication, ["None", "Local users", "External auth provider"]
+        )
+        determinism = choose_from_list(
+            "Determinism/correctness sensitivity", existing_determinism, ["Normal", "High"]
+        )
+        packaging = choose_from_list(
+            "Packaging/distribution planned",
+            existing_packaging,
+            ["None", "Yes (desktop installers / containers / artifacts)"],
+        )
+        constraints = ask_non_empty(
+            "Constraints (comma-separated; use 'None' if none)", constraints_source or "None"
+        )
+        build_command = ask_non_empty("Build command", existing_build_command)
+        run_command = ask_non_empty("Run command", existing_run_command)
+        test_command = ask_non_empty("Test command", existing_test_command)
+    else:
+        project_type = _pick_noninteractive_choice(
+            existing_project_type or infer_project_type(project_name, objective),
+            "project type",
+            missing_fields,
+        )
+        language = _required_value(existing_language, "language", missing_fields)
+        runtime = _required_value(existing_runtime, "runtime", missing_fields)
+        framework = _required_value(existing_framework or "None", "framework", missing_fields)
+        package_tool = _required_value(existing_package_tool or "None", "package manager/build tool", missing_fields)
+        persistence = _pick_noninteractive_choice(existing_persistence, "persistence", missing_fields)
+        authentication = _pick_noninteractive_choice(existing_authentication, "authentication", missing_fields)
+        determinism = _pick_noninteractive_choice(existing_determinism, "determinism/correctness sensitivity", missing_fields)
+        packaging = _pick_noninteractive_choice(existing_packaging, "packaging/distribution planned", missing_fields)
+        constraints = _required_value(constraints_source or "None", "constraints", missing_fields)
+        build_command = _required_value(existing_build_command, "build command", missing_fields)
+        run_command = _required_value(existing_run_command, "run command", missing_fields)
+        test_command = _required_value(existing_test_command, "test command", missing_fields)
+
+        if not session_paths:
+            missing_fields.append("session history")
+        for display_name, state_keys, label in FINALIZE_REQUIRED_FIELDS:
+            if display_name in {"build command", "run command", "test command"}:
+                continue
+            value = ""
+            for state_key in state_keys:
+                value = existing_state_value(root, state_key)
+                if value and not is_placeholder_value(value):
+                    break
+            if not value and label:
+                value = first_value_for_label(hydrate_files, label)
+            if not value or is_placeholder_value(value):
+                missing_fields.append(display_name)
+        if missing_fields:
+            _fail_noninteractive(missing_fields, idea_id)
     key_decisions = existing_key_decisions or summarize_decisions(
         project_type, persistence, authentication, determinism, packaging
     )

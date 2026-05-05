@@ -128,10 +128,18 @@ Then run:
 ./scripts/finalize-project
 ```
 
+Finalization is non-interactive by default. If the inferred idea has complete canonical state, it converts directly. If required fields are missing or multiple active ideas make the target ambiguous, it stops with explicit fix-up guidance instead of prompting.
+
 If needed, override the inferred current idea with:
 
 ```sh
 ./scripts/finalize-project --idea-id <idea-id>
+```
+
+To use the older prompt-fill flow:
+
+```sh
+./scripts/finalize-project --interactive
 ```
 
 If you also want an archival summary snapshot:

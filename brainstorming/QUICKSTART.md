@@ -13,6 +13,8 @@ For a concrete start-to-finish example, see `brainstorming/EXAMPLE_LIFECYCLE.md`
 5. Record decisions/risks only when useful.
 6. When done, say "finalize this repo" or run `./scripts/finalize-project --idea-id <id>`.
 7. If you also want an archival summary snapshot, rerun with `./scripts/finalize-project --write-export`.
+
+Finalization is non-interactive by default: complete canonical state converts directly, missing fields fail with fix-up guidance, and `--interactive` opts into prompt-fill mode.
 8. Run audit:
 
 ```sh

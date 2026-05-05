@@ -104,6 +104,8 @@ Shell:
 ./scripts/finalize-project --idea-id idea-template-hardening
 ```
 
+Finalization is non-interactive by default. If readiness is blocked, the command exits with the exact missing fields; use `./scripts/lab doctor --idea-id idea-template-hardening` for source details or rerun with `--interactive` to fill values from prompts.
+
 Optional archival summary during finalize:
 
 ```sh

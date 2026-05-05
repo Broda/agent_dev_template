@@ -49,12 +49,57 @@ class LabLifecycleTests(LabWorkflowTestCase):
             input_text="\n" * 12,
         )
         self.assertIn("successfully finalized", result.stdout.lower())
+        self.assertNotIn("One-sentence objective", result.stdout)
         self.assertIn("Current mode: development", (self.repo / "MODE.md").read_text(encoding="utf-8"))
         sessions = sorted((self.repo / "sessions").glob("*FINALIZATION_SESSION*.md"))
         self.assertTrue(sessions)
         exports = sorted((self.repo / "exports").glob("*PROJECT_SUMMARY*.md"))
         self.assertTrue(exports)
         run_cmd(["./scripts/validate-development"], cwd=self.repo)
+
+    def test_lab_finalize_defaults_to_single_active_idea_without_prompts(self) -> None:
+        self.write_finalize_fixture("idea-default-finalize")
+        result = run_cmd(["./scripts/lab", "finalize"], cwd=self.repo)
+        self.assertIn("successfully finalized", result.stdout.lower())
+        self.assertNotIn("One-sentence objective", result.stdout)
+        state = json.loads((self.repo / "state/project-init.json").read_text(encoding="utf-8"))
+        self.assertEqual(state["ideaId"], "idea-default-finalize")
+        self.assertEqual(state["status"], "finalized")
+        run_cmd(["./scripts/validate-development"], cwd=self.repo)
+
+    def test_lab_finalize_interactive_preserves_prompt_fill_flow(self) -> None:
+        self.write_finalize_fixture("idea-interactive-finalize")
+        result = run_cmd(
+            ["./scripts/lab", "finalize", "--idea-id", "idea-interactive-finalize", "--interactive"],
+            cwd=self.repo,
+            input_text="\n" * 12,
+        )
+        self.assertIn("successfully finalized", result.stdout.lower())
+        self.assertIn("One-sentence objective", result.stdout)
+        run_cmd(["./scripts/validate-development"], cwd=self.repo)
+
+    def test_lab_finalize_missing_fields_fail_without_prompting(self) -> None:
+        run_cmd(
+            [
+                "./scripts/lab",
+                "capture",
+                "--idea-id",
+                "idea-incomplete-finalize",
+                "--title",
+                "Incomplete Finalize",
+                "--no-sync",
+            ],
+            cwd=self.repo,
+        )
+        run_cmd(["./scripts/lab", "activate", "--idea-id", "idea-incomplete-finalize", "--no-sync"], cwd=self.repo)
+        result = run_cmd(["./scripts/lab", "finalize"], cwd=self.repo, check=False)
+        combined = result.stdout + result.stderr
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Cannot finalize non-interactively because required fields are missing.", combined)
+        self.assertIn("- language", combined)
+        self.assertIn("- build command", combined)
+        self.assertIn("- MVP scope", combined)
+        self.assertNotIn("One-sentence objective", combined)
 
     def test_lab_finalize_preserves_curated_artifact_references(self) -> None:
         self.write_finalize_fixture("idea-finalize-preserve")
@@ -114,7 +159,8 @@ class LabLifecycleTests(LabWorkflowTestCase):
         )
         result = run_cmd(["./scripts/lab", "finalize"], cwd=self.repo, check=False)
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("select idea to finalize", result.stderr.lower() + result.stdout.lower())
+        self.assertIn("multiple active ideas found", result.stderr.lower() + result.stdout.lower())
+        self.assertIn("pass --idea-id explicitly", result.stderr.lower() + result.stdout.lower())
 
     def test_lab_status_reports_ready_target_context(self) -> None:
         self.write_finalize_fixture("idea-status-ready")

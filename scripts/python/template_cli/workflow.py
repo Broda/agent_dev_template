@@ -333,8 +333,8 @@ def run_lab_audit(root: Path) -> int:
     return run_validate_governance(root)
 
 
-def run_lab_finalize(root: Path, *, idea_id: str = "", write_export: bool = False) -> int:
-    return run_finalize_project(root, idea_id, write_export=write_export)
+def run_lab_finalize(root: Path, *, idea_id: str = "", write_export: bool = False, interactive: bool = False) -> int:
+    return run_finalize_project(root, idea_id, write_export=write_export, interactive=interactive)
 
 
 def run_lab_commit_command(root: Path, *, message: str = "brainstorm: milestone update") -> int:
