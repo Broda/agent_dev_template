@@ -14,6 +14,7 @@ PLUGIN_MARKETPLACE = ".agents/plugins/marketplace.json"
 def validate_repo_plugins(root: Path, result: ValidationResult) -> None:
     manifest = _read_json(root / PLUGIN_MANIFEST, result, "plugin manifest")
     marketplace = _read_json(root / PLUGIN_MARKETPLACE, result, "plugin marketplace")
+    _validate_plugin_file_map(root, result)
     if not manifest or not marketplace:
         return
 
@@ -34,6 +35,16 @@ def validate_repo_plugins(root: Path, result: ValidationResult) -> None:
     policy = entry.get("policy", {})
     if policy.get("installation") != "AVAILABLE" or policy.get("authentication") != "ON_INSTALL":
         result.add_failure(f"Plugin marketplace policy is incorrect for {PLUGIN_NAME}.")
+
+
+def _validate_plugin_file_map(root: Path, result: ValidationResult) -> None:
+    file_map_path = root / "brainstorming/FILE_MAP.md"
+    if not file_map_path.exists():
+        return
+    file_map_text = read_text(file_map_path)
+    for artifact in [PLUGIN_MARKETPLACE, PLUGIN_MANIFEST]:
+        if f"`{artifact}`" not in file_map_text:
+            result.add_failure(f"FILE_MAP.md missing registry row for plugin artifact: {artifact}")
 
 
 def _read_json(path: Path, result: ValidationResult, label: str) -> dict:
