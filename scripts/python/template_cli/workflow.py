@@ -9,11 +9,15 @@ from template_cli.finalize import (
     run_finalize_project,
 )
 from template_cli.sync import run_lab_commit, run_lab_push
-from template_cli.validators import (
+from template_cli.io_helpers import (
     IDEA_ROW_RE,
     clean_backticks,
     parse_markdown_table_rows,
     path_exists,
+    read_mode,
+    read_text,
+)
+from template_cli.validators import (
     run_validate_governance,
 )
 from template_cli.workflow_commands import (
@@ -108,7 +112,6 @@ def _status_signal_details(
         if value and not _is_placeholderish_value(value):
             return value, f"{idea_lookup[0]}:{idea_label}"
     if idea_label:
-        from template_cli.validators import read_text
         idea_relpath = idea_lookup[0] if idea_lookup is not None else ""
         for path in hydration_files:
             relpath = path.relative_to(root).as_posix()
@@ -159,7 +162,6 @@ def _status_readiness(root: Path, row: dict[str, str]) -> tuple[str, list[str], 
 
 
 def run_lab_status(root: Path) -> int:
-    from template_cli.validators import read_mode
     mode = read_mode(root) or "unknown"
     rows = parse_markdown_table_rows(root / "IDEA_CATALOG.md", IDEA_ROW_RE)
     active = [cells for cells in rows if len(cells) > 2 and cells[2].strip() == "active"]
@@ -224,7 +226,6 @@ def run_lab_status(root: Path) -> int:
 
 
 def run_lab_doctor(root: Path, *, idea_id: str = "") -> int:
-    from template_cli.validators import read_mode
     mode = read_mode(root) or "unknown"
     rows = parse_markdown_table_rows(root / "IDEA_CATALOG.md", IDEA_ROW_RE)
     active = [cells for cells in rows if len(cells) > 2 and cells[2].strip() == "active"]

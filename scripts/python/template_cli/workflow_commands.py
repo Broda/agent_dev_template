@@ -30,7 +30,7 @@ from template_cli.workflow_data import (
     _timestamp,
     _upsert_catalog_row,
 )
-from template_cli.validators import path_exists
+from template_cli.io_helpers import path_exists
 
 
 def run_lab_capture(

@@ -17,7 +17,7 @@ from template_cli.finalize_helpers import (
     trim,
     unique_values,
 )
-from template_cli.validators import IDEA_ROW_RE, parse_markdown_table_rows, read_text, write_text
+from template_cli.io_helpers import IDEA_ROW_RE, parse_markdown_table_rows, read_text, write_text
 
 
 class BackupManager(AbstractContextManager["BackupManager"]):

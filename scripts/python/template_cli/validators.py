@@ -33,8 +33,6 @@ from template_cli.io_helpers import (
     print_development_summary,
     read_mode,
     read_text,
-    replace_literal,
-    write_text,
 )
 
 

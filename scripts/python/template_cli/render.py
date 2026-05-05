@@ -18,7 +18,7 @@ from template_cli.render_helpers import (
     _state_value,
 )
 from template_cli.render_templates import _render_project_context, _render_readme
-from template_cli.validators import read_text, write_text
+from template_cli.io_helpers import read_text, write_text
 
 
 def _render_architecture(

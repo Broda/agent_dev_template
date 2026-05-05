@@ -5,7 +5,7 @@ import re
 import shutil
 from pathlib import Path
 
-from template_cli.validators import read_text, replace_literal, write_text
+from template_cli.io_helpers import read_text, replace_literal, write_text
 
 
 MILESTONE_NAME = "Milestone 0 — Foundation"

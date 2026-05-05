@@ -11,7 +11,7 @@ from template_cli.finalize import (
     first_value_for_label,
 )
 from template_cli.sync import run_lab_sync
-from template_cli.validators import (
+from template_cli.io_helpers import (
     IDEA_ROW_RE,
     clean_backticks,
     parse_markdown_table_rows,

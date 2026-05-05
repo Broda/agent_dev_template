@@ -31,14 +31,16 @@ from template_cli.finalize_state import (
     resolve_finalize_idea_id,
 )
 from template_cli.render import run_render_development_docs
-from template_cli.validators import (
+from template_cli.io_helpers import (
     IDEA_ROW_RE,
     clean_backticks,
     parse_markdown_table_rows,
     path_exists,
     read_text,
-    run_validate_development,
     write_text,
+)
+from template_cli.validators import (
+    run_validate_development,
 )
 
 

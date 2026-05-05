@@ -5,7 +5,7 @@ import re
 import sys
 from pathlib import Path
 
-from template_cli.validators import clean_backticks, parse_markdown_table_rows, path_exists, read_text, write_text
+from template_cli.io_helpers import clean_backticks, parse_markdown_table_rows, path_exists, read_text, write_text
 
 
 STATE_FILE = "state/project-init.json"
