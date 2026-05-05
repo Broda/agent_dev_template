@@ -22,6 +22,7 @@ This template starts in brainstorming mode and finalizes in place into developme
 
 ## Brainstorming Phase
 
+- Repo-scoped skill: `.agents/skills/brainstorming-lab/SKILL.md`
 - Conversational rules: `brainstorming/CONVERSATIONAL_MODE.md`
 - Backend contract: `brainstorming/COMMANDS.md`
 - Quickstart: `brainstorming/QUICKSTART.md`
@@ -88,6 +89,8 @@ Do not hand-edit the generated intent tables directly. Edit the registry, rerend
 
 ## Finalize In Place
 
+Repo-scoped skill: `.agents/skills/project-finalizer/SKILL.md`
+
 Check the inferred target and readiness first if needed:
 
 ```sh
@@ -122,7 +125,13 @@ This will:
 
 ## Development Phase
 
+Repo-scoped skill: `.agents/skills/development-governance/SKILL.md`
+
 After finalization, the active runtime rules come from `development/AGENTS.development.md` and the live governance docs under `docs/`.
+
+## Template Maintenance
+
+Repo-scoped skill: `.agents/skills/template-maintenance/SKILL.md`
 
 ## Notes Policy
 
