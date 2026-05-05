@@ -2,50 +2,32 @@
 
 This repository is a two-phase project template. It starts in **brainstorming mode** and finalizes in place into **development mode**.
 
-## Step 1: Check the current mode
+## Start Here
 
-Read `MODE.md`. It will say either `brainstorming` or `development`.
+1. Read `MODE.md`.
+2. Do not mix brainstorming and development rule sets in one task.
+3. Use the matching repo skill when your agent supports skills:
 
-Do not mix the two rule sets in one task.
-
-## Step 2: Follow the mode contract
-
-| Mode | Full contract | Purpose |
+| Situation | Skill | Legacy contract |
 |---|---|---|
-| `brainstorming` | `brainstorming/AGENTS.brainstorming.md` | Capture ideas, decisions, risks; finalize into a project definition |
-| `development` | `development/AGENTS.development.md` | Execute delivery work against the finalized governance docs in `docs/` |
+| `MODE.md` says `brainstorming` | `$brainstorming-lab` | `brainstorming/AGENTS.brainstorming.md` |
+| Preparing or running finalization | `$project-finalizer` | `brainstorming/AGENTS.brainstorming.md` |
+| `MODE.md` says `development` | `$development-governance` | `development/AGENTS.development.md` |
+| Maintaining this template repo itself | `$template-maintenance` | this file plus current mode contract |
 
-## Agent-specific guidance
+The legacy contracts remain available for agents that do not support skills.
 
-- **Claude Code**: Also read `CLAUDE.md` before acting. It covers tool usage, auto-sync behavior, topic-shift nudging, and the finalize flow.
-- **Other agents**: The mode contracts above are self-contained. Key facts that apply to all agents:
-  - `./scripts/lab` is the canonical CLI interface. All commands handle git commit and push automatically.
-  - Topic-shift nudging (in the brainstorming contract) is advisory and applies to agents with multi-turn conversational sessions. Skip it if your agent operates command-by-command.
-  - For finalization, pre-populate `state/project-init.json` with known values, then run `./scripts/finalize-project --idea-id <id>`.
+## Stable Runtime
 
-## Key scripts (Python 3 required)
+Python 3 is required. Keep these command paths stable:
 
 ```sh
-./scripts/lab status                 # current mode, idea counts, finalize readiness
-./scripts/lab doctor                 # detailed finalize-readiness report
+./scripts/lab status
+./scripts/lab doctor
 ./scripts/lab capture --idea-id <id> --title "Title"
 ./scripts/lab activate --idea-id <id>
-./scripts/finalize-project --idea-id <id>   # switches mode to development
-./scripts/validate-governance        # governance audit (run after any structural change)
+./scripts/finalize-project --idea-id <id>
+./scripts/validate-governance
 ```
 
-## Brainstorming mode summary
-
-- Primary UX: freeform conversation. Artifacts are written at milestones, not per-turn.
-- Milestones: new idea captured, state transition, major decision/risk, note saved, export/finalize.
-- Each `./scripts/lab` command auto-commits and auto-pushes on success (push failures are non-blocking).
-- Idea lifecycle: inbox → active → (parked | killed | finalized).
-- Finalization writes `state/project-init.json`, renders `docs/`, and switches `MODE.md` to `development`.
-
-## Development mode summary
-
-- Before any meaningful change: read `docs/GOVERNANCE_INDEX.md` and all documents it lists.
-- Identify the active milestone in `docs/ROADMAP.md`; confirm the change is in scope.
-- Definition of Done requires: build passes, tests pass, docs updated, evidence recorded in `ROADMAP.md`.
-- Public contracts (API, CLI, config formats) require an ADR before changing.
-- Research notes: use `./scripts/lab-note`; stored in `notes/`, indexed in `NOTES_CATALOG.md`.
+`./scripts/lab` is the canonical brainstorming CLI. Milestone writes auto-commit and best-effort push unless `--no-sync` is used.

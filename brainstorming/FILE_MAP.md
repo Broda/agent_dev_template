@@ -7,6 +7,10 @@ Lean file registry for the Project Idea Lab.
 | `README.md` | Lightweight overview and usage |
 | `AGENTS.md` | Agent behavior contract |
 | `MODE.md` | Active repository phase selector |
+| `.agents/skills/brainstorming-lab/SKILL.md` | Repo-scoped skill for brainstorming-mode lifecycle work |
+| `.agents/skills/project-finalizer/SKILL.md` | Repo-scoped skill for finalization readiness and mode transition |
+| `.agents/skills/development-governance/SKILL.md` | Repo-scoped skill for development-mode governance |
+| `.agents/skills/template-maintenance/SKILL.md` | Repo-scoped skill for maintaining this template itself |
 | `brainstorming/AGENTS.brainstorming.md` | Brainstorming-mode contract |
 | `brainstorming/CONVERSATIONAL_MODE.md` | Plain-language interaction and milestone capture |
 | `brainstorming/COMMANDS.md` | Optional backend command mapping |
