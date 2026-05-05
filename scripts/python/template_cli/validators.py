@@ -15,8 +15,8 @@ from template_cli.intents import (
     render_intent_docs_to_memory,
 )
 from template_cli.validator_launchers import validate_python_launchers
-from template_cli.validator_plugins import validate_repo_plugins
-from template_cli.validator_skills import validate_repo_skills
+from template_cli.validator_plugins import PLUGIN_MANIFEST, PLUGIN_MARKETPLACE, validate_repo_plugins
+from template_cli.validator_skills import REPO_SKILLS, REPO_SKILL_METADATA, validate_repo_skills
 from template_cli.io_helpers import (
     ADR_LINK_RE,
     DEVELOPMENT_SEMANTIC_DOCS,
@@ -38,6 +38,15 @@ from template_cli.io_helpers import (
     replace_literal,
     write_text,
 )
+
+
+REPO_SKILL_ARTIFACTS = [
+    artifact
+    for skill_path, metadata_path in zip(REPO_SKILLS.values(), REPO_SKILL_METADATA.values())
+    for artifact in (skill_path, metadata_path)
+]
+REPO_PLUGIN_ARTIFACTS = [PLUGIN_MARKETPLACE, PLUGIN_MANIFEST]
+
 
 def validate_notes_catalog(root: Path, result: ValidationResult) -> None:
     notes_catalog_path = root / "NOTES_CATALOG.md"
@@ -167,15 +176,8 @@ def run_validate_brainstorming(root: Path) -> int:
         "README.md",
         "AGENTS.md",
         "MODE.md",
-        ".agents/skills/brainstorming-lab/SKILL.md",
-        ".agents/skills/brainstorming-lab/agents/openai.yaml",
-        ".agents/skills/project-finalizer/SKILL.md",
-        ".agents/skills/project-finalizer/agents/openai.yaml",
-        ".agents/skills/development-governance/SKILL.md",
-        ".agents/skills/development-governance/agents/openai.yaml",
-        ".agents/skills/template-maintenance/SKILL.md",
-        ".agents/skills/template-maintenance/agents/openai.yaml",
-        ".agents/plugins/marketplace.json",
+        *REPO_SKILL_ARTIFACTS,
+        *REPO_PLUGIN_ARTIFACTS,
         "brainstorming/AGENTS.brainstorming.md",
         "brainstorming/CONVERSATIONAL_MODE.md",
         "brainstorming/COMMANDS.md",
@@ -234,7 +236,6 @@ def run_validate_brainstorming(root: Path) -> int:
         ".github/workflows/ci.yml",
         ".github/workflows/governance-audit.yml",
         ".github/PULL_REQUEST_TEMPLATE.md",
-        "plugins/project-lifecycle-lab/.codex-plugin/plugin.json",
     ]
 
     for artifact in core_artifacts:
@@ -317,15 +318,8 @@ def run_validate_development(root: Path) -> int:
         "README.md",
         "CHANGELOG.md",
         ".gitignore",
-        ".agents/skills/brainstorming-lab/SKILL.md",
-        ".agents/skills/brainstorming-lab/agents/openai.yaml",
-        ".agents/skills/project-finalizer/SKILL.md",
-        ".agents/skills/project-finalizer/agents/openai.yaml",
-        ".agents/skills/development-governance/SKILL.md",
-        ".agents/skills/development-governance/agents/openai.yaml",
-        ".agents/skills/template-maintenance/SKILL.md",
-        ".agents/skills/template-maintenance/agents/openai.yaml",
-        ".agents/plugins/marketplace.json",
+        *REPO_SKILL_ARTIFACTS,
+        *REPO_PLUGIN_ARTIFACTS,
         "NOTES_CATALOG.md",
         "sessions/",
         "notes/",
@@ -346,7 +340,6 @@ def run_validate_development(root: Path) -> int:
         "docs/RUNTIME_VERIFICATION_REPORT.md",
         "docs/adr/ADR-0001-record-architecture-decisions.md",
         "docs/adr/ADR-TEMPLATE.md",
-        "plugins/project-lifecycle-lab/.codex-plugin/plugin.json",
         "state/project-init.json",
     ]
 
