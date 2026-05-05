@@ -36,6 +36,13 @@ from template_cli.io_helpers import (
     write_text,
 )
 
+REPO_SKILLS = {
+    "brainstorming-lab": ".agents/skills/brainstorming-lab/SKILL.md",
+    "project-finalizer": ".agents/skills/project-finalizer/SKILL.md",
+    "development-governance": ".agents/skills/development-governance/SKILL.md",
+    "template-maintenance": ".agents/skills/template-maintenance/SKILL.md",
+}
+
 
 def validate_notes_catalog(root: Path, result: ValidationResult) -> None:
     notes_catalog_path = root / "NOTES_CATALOG.md"
@@ -158,6 +165,41 @@ def validate_intent_sync_ci(root: Path, result: ValidationResult) -> None:
             result.add_failure(f"CI workflow is missing the generated intent sync contract: {label}")
 
 
+def _skill_frontmatter(text: str) -> dict[str, str]:
+    if not text.startswith("---\n"):
+        return {}
+    _, frontmatter, _body = text.split("---", 2)
+    values: dict[str, str] = {}
+    for line in frontmatter.splitlines():
+        if ":" not in line:
+            continue
+        key, value = line.split(":", 1)
+        values[key.strip()] = value.strip().strip('"')
+    return values
+
+
+def validate_repo_skills(root: Path, result: ValidationResult) -> None:
+    agents_text = read_text(root / "AGENTS.md") if (root / "AGENTS.md").exists() else ""
+    file_map_text = read_text(root / "brainstorming/FILE_MAP.md") if (root / "brainstorming/FILE_MAP.md").exists() else ""
+
+    for skill_name, relative_path in REPO_SKILLS.items():
+        skill_path = root / relative_path
+        if not skill_path.exists():
+            result.add_failure(f"Missing required repo skill: {relative_path}")
+            continue
+
+        text = read_text(skill_path)
+        frontmatter = _skill_frontmatter(text)
+        if frontmatter.get("name") != skill_name:
+            result.add_failure(f"Repo skill has incorrect name in {relative_path}: {frontmatter.get('name', '')}")
+        if not frontmatter.get("description"):
+            result.add_failure(f"Repo skill is missing description in {relative_path}")
+        if f"${skill_name}" not in agents_text:
+            result.add_failure(f"AGENTS.md does not reference repo skill: ${skill_name}")
+        if f"`{relative_path}`" not in file_map_text:
+            result.add_failure(f"FILE_MAP.md missing registry row for repo skill: {relative_path}")
+
+
 def run_validate_brainstorming(root: Path) -> int:
     result = ValidationResult()
 
@@ -165,6 +207,10 @@ def run_validate_brainstorming(root: Path) -> int:
         "README.md",
         "AGENTS.md",
         "MODE.md",
+        ".agents/skills/brainstorming-lab/SKILL.md",
+        ".agents/skills/project-finalizer/SKILL.md",
+        ".agents/skills/development-governance/SKILL.md",
+        ".agents/skills/template-maintenance/SKILL.md",
         "brainstorming/AGENTS.brainstorming.md",
         "brainstorming/CONVERSATIONAL_MODE.md",
         "brainstorming/COMMANDS.md",
@@ -277,6 +323,7 @@ def run_validate_brainstorming(root: Path) -> int:
     validate_lab_command_parity(root, result)
     validate_intent_registry(root, result)
     validate_intent_sync_ci(root, result)
+    validate_repo_skills(root, result)
 
     if read_mode(root) != "brainstorming":
         result.add_failure(

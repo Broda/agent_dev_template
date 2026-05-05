@@ -295,6 +295,34 @@ class LabWorkflowTests(unittest.TestCase):
     def test_validate_brainstorming_clean_template(self) -> None:
         run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo)
 
+    def test_validate_brainstorming_requires_repo_skills(self) -> None:
+        skill_path = self.repo / ".agents/skills/brainstorming-lab/SKILL.md"
+        skill_path.unlink()
+        result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Missing required artifact: .agents/skills/brainstorming-lab/SKILL.md", result.stdout)
+        self.assertIn("Missing required repo skill: .agents/skills/brainstorming-lab/SKILL.md", result.stdout)
+
+    def test_validate_brainstorming_checks_skill_frontmatter_and_dispatcher(self) -> None:
+        skill_path = self.repo / ".agents/skills/project-finalizer/SKILL.md"
+        skill_text = skill_path.read_text(encoding="utf-8").replace(
+            "name: project-finalizer",
+            "name: wrong-finalizer",
+            1,
+        )
+        skill_path.write_text(skill_text, encoding="utf-8")
+        agents_path = self.repo / "AGENTS.md"
+        agents_path.write_text(
+            agents_path.read_text(encoding="utf-8").replace("$project-finalizer", "$missing-finalizer", 1),
+            encoding="utf-8",
+        )
+
+        result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Repo skill has incorrect name in .agents/skills/project-finalizer/SKILL.md", result.stdout)
+        self.assertIn("AGENTS.md does not reference repo skill: $project-finalizer", result.stdout)
+
     def test_render_and_validate_development_from_checked_in_fixture(self) -> None:
         self.write_render_fixture()
         run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
