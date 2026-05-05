@@ -14,6 +14,7 @@ from template_cli.intents import (
     registry_commands,
     render_intent_docs_to_memory,
 )
+from template_cli.validator_launchers import validate_python_launchers
 from template_cli.io_helpers import (
     ADR_LINK_RE,
     DEVELOPMENT_SEMANTIC_DOCS,
@@ -323,6 +324,7 @@ def run_validate_brainstorming(root: Path) -> int:
     validate_lab_command_parity(root, result)
     validate_intent_registry(root, result)
     validate_intent_sync_ci(root, result)
+    validate_python_launchers(root, result)
     validate_repo_skills(root, result)
 
     if read_mode(root) != "brainstorming":
@@ -462,6 +464,7 @@ def run_validate_development(root: Path) -> int:
                 break
 
     validate_notes_catalog(root, result)
+    validate_python_launchers(root, result)
     validate_repo_skills(root, result)
     return print_development_summary(result)
 
