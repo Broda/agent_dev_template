@@ -103,6 +103,7 @@ Intentional evolution over drift.
 
 
 def _render_project_context(
+    project_name: str,
     purpose: str,
     project_type: str,
     language: str,
@@ -118,7 +119,11 @@ def _render_project_context(
     mvp_scope: str,
     out_of_scope: str,
     constraints: str,
+    key_decisions: str,
     top_risks: str,
+    mitigation_plans: str,
+    contingencies: str,
+    latest_review_outcome: str,
     build_command: str,
     run_command: str,
     test_command: str,
@@ -134,6 +139,8 @@ This is a structured, milestone-driven project.
 ---
 
 # 1. Project Purpose
+
+Project: {project_name}
 
 {purpose}
 
@@ -213,7 +220,17 @@ Refactors must be intentional and milestone-scoped.
 
 ---
 
-# 6. Product Risks To Respect
+# 6. Finalized Governance
+
+- Key decisions: {key_decisions}
+- {top_risks}
+- Mitigation plans: {mitigation_plans}
+- Contingencies: {contingencies}
+- Latest review outcome: {latest_review_outcome}
+
+---
+
+# 7. Product Risks To Respect
 
 - {top_risks}
 - Preserve authority around validation, persistence, and security-sensitive behavior.
@@ -222,7 +239,7 @@ Refactors must be intentional and milestone-scoped.
 
 ---
 
-# 7. Documentation Discipline
+# 8. Documentation Discipline
 
 When a meaningful decision is made:
 
@@ -235,7 +252,7 @@ Do not silently introduce structural changes.
 
 ---
 
-# 8. Definition of Done (Mandatory)
+# 9. Definition of Done (Mandatory)
 
 A task may be marked complete only when:
 
@@ -254,7 +271,7 @@ No exceptions.
 
 ---
 
-# 9. Milestone Discipline
+# 10. Milestone Discipline
 
 - Only one active milestone at a time.
 - All work must align with the active milestone.
@@ -264,4 +281,3 @@ No exceptions.
 ROADMAP.md is the execution map.
 It is not a scratchpad.
 """
-

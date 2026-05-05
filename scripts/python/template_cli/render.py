@@ -17,7 +17,7 @@ from template_cli.render_helpers import (
     _replace_file_literals,
     _state_value,
 )
-from template_cli.render_governance_templates import _render_architecture, _render_roadmap
+from template_cli.render_governance_templates import _render_architecture, _render_decision_adr, _render_roadmap
 from template_cli.render_templates import _render_project_context, _render_readme
 from template_cli.io_helpers import read_text, write_text
 
@@ -56,9 +56,14 @@ def run_render_development_docs(root: Path) -> int:
     out_of_scope = _state_value(state, "product.outOfScope") or _first_value_for_label(
         hydration_files, ["Out of scope"]
     ) or "Track non-goals explicitly."
+    key_decisions = _state_value(state, "governance.keyDecisions") or "See canonical state and related sessions."
     top_risks = _state_value(state, "governance.topRisks") or _first_value_for_label(
         hydration_files, ["Top risks", "Top risks (link to risk entries)"]
     ) or "Capture implementation risks during the first milestone."
+    mitigation_plans = _state_value(state, "governance.mitigationPlans") or "Validate early and keep milestone scope narrow."
+    contingencies = _state_value(state, "governance.contingencies") or "Reduce scope and re-baseline roadmap if assumptions fail."
+    latest_review_outcome = _state_value(state, "governance.latestReviewOutcome") or "conditional-pass"
+    session_files = [str(item) for item in state.get("artifacts", {}).get("sessionFiles", []) if str(item).strip()]
     domain_concepts = _infer_domain_concepts(
         " ".join([purpose, problem_statement, solution_summary, mvp_scope, out_of_scope])
     )
@@ -150,6 +155,7 @@ def run_render_development_docs(root: Path) -> int:
     write_text(
         root / "docs/PROJECT_CONTEXT.md",
         _render_project_context(
+            project_name,
             purpose,
             project_type,
             language,
@@ -165,7 +171,11 @@ def run_render_development_docs(root: Path) -> int:
             mvp_scope,
             out_of_scope,
             constraints or "None recorded",
+            key_decisions,
             top_risks,
+            mitigation_plans,
+            contingencies,
+            latest_review_outcome,
             build_command,
             run_command,
             test_command,
@@ -185,6 +195,19 @@ def run_render_development_docs(root: Path) -> int:
             solution_summary,
             constraints or "None recorded",
             domain_concepts,
+        ),
+    )
+    write_text(
+        root / "docs/adr/ADR-0001-record-architecture-decisions.md",
+        _render_decision_adr(
+            project_name,
+            purpose,
+            key_decisions,
+            top_risks,
+            mitigation_plans,
+            contingencies,
+            latest_review_outcome,
+            session_files,
         ),
     )
     write_text(
