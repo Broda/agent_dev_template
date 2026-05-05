@@ -7,10 +7,7 @@ import sys
 from pathlib import Path
 
 from template_cli.intents import (
-    COMMANDS_DOC,
-    CONVERSATIONAL_DOC,
     IntentRegistryError,
-    INTENT_REGISTRY_FILE,
     registry_commands,
     render_intent_docs_to_memory,
 )
