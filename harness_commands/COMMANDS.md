@@ -1,6 +1,6 @@
-﻿# Commands
+﻿# Harness Commands
 
-Backend contract for conversational operations in the Project Idea Lab.
+Backend contract for conversational operations in the project harness.
 
 Python 3 is required for the `scripts/` command implementations referenced in this document.
 
@@ -9,7 +9,7 @@ Python 3 is required for the `scripts/` command implementations referenced in th
 - Primary UX: conversational intent (plain language).
 - `/lab` command syntax remains optional and supported.
 - The backend contract is executable through `./scripts/lab <command> ...`.
-- Milestone writes implicitly run commit + push synchronization.
+- Milestone writes in brainstorming mode implicitly run commit + push synchronization.
 - Default brainstorming runtime uses Focus Mode (quiet background ops).
 - Autosync push is best-effort; push failures are silent by default while local commits are retained.
 
@@ -24,29 +24,29 @@ Python 3 is required for the `scripts/` command implementations referenced in th
 
 ## Conversational Intent Mapping
 
-This table is generated from `brainstorming/intent_registry.json` via `./scripts/render-intent-docs`.
+This table is generated from `harness_commands/intent_registry.json` via `./scripts/render-intent-docs`.
 It is for agent dispatch: humans can speak the phrase family naturally, and agents translate it to the backend intent before running deterministic harness commands.
 
 <!-- BEGIN GENERATED CONVERSATIONAL INTENT MAPPING -->
-| Conversational phrase family | Backend intent |
-|---|---|
-| "capture this idea", "save this idea", "log this idea" | `/lab capture <idea-id>` |
-| "make this active", "promote this idea", "work on this now" | `/lab activate <idea-id>` |
-| "decision: ... because ...", "we should do X", "record this decision" | `/lab decide <decision-slug>` |
-| "risk: ...", "log this risk", "what could go wrong here?" | `/lab risk <idea-id>` |
-| "save path note", "record this branch", "note why we deferred that" | `/lab path-note <idea-id>` |
-| "save that info in notes", "save a note on <topic>", "save that research" | `/lab note <topic-or-ref>` |
-| "review this idea", "gate this idea", "is this ready?" | `/lab review <idea-id>` |
-| "save a summary snapshot", "export a summary", "make a handoff summary" | `/lab export <idea-id>` |
-| "finalize this repo", "switch to development mode", "finalize this idea" | `/lab finalize [<idea-id>]` |
-| "park this", "pause this idea", "put this on hold" | `/lab park <idea-id>` |
-| "kill this", "drop this idea", "archive this as dead" | `/lab kill <idea-id>` |
-| "what's the current state?", "show me status", "where are we now?" | `/lab status` |
-| "why is finalize blocked?", "what exactly is missing before finalize?", "show me where finalize is getting values from" | `/lab doctor [<idea-id>]` |
-| "run audit", "validate the repo", "check governance" | `/lab audit` |
-| "commit this milestone", "make a commit", "commit these changes" | `/lab commit [message]` |
-| "push these changes", "push this branch", "publish the branch" | `/lab push` |
-| "sync the repo", "commit and push this", "sync these changes" | `/lab sync [message]` |
+| Conversational phrase family | Modes | Backend intent |
+|---|---|---|
+| "capture this idea", "save this idea", "log this idea" | `brainstorming` | `/lab capture <idea-id>` |
+| "make this active", "promote this idea", "work on this now" | `brainstorming` | `/lab activate <idea-id>` |
+| "decision: ... because ...", "we should do X", "record this decision" | `brainstorming` | `/lab decide <decision-slug>` |
+| "risk: ...", "log this risk", "what could go wrong here?" | `brainstorming` | `/lab risk <idea-id>` |
+| "save path note", "record this branch", "note why we deferred that" | `brainstorming` | `/lab path-note <idea-id>` |
+| "save that info in notes", "save a note on <topic>", "save that research" | `brainstorming`, `development` | `/lab note <topic-or-ref>` |
+| "review this idea", "gate this idea", "is this ready?" | `brainstorming` | `/lab review <idea-id>` |
+| "save a summary snapshot", "export a summary", "make a handoff summary" | `brainstorming` | `/lab export <idea-id>` |
+| "finalize this repo", "switch to development mode", "finalize this idea" | `brainstorming` | `/lab finalize [<idea-id>]` |
+| "park this", "pause this idea", "put this on hold" | `brainstorming` | `/lab park <idea-id>` |
+| "kill this", "drop this idea", "archive this as dead" | `brainstorming` | `/lab kill <idea-id>` |
+| "what's the current state?", "show me status", "where are we now?" | `brainstorming`, `development` | `/lab status` |
+| "why is finalize blocked?", "what exactly is missing before finalize?", "show me where finalize is getting values from" | `brainstorming` | `/lab doctor [<idea-id>]` |
+| "run audit", "validate the repo", "check governance" | `brainstorming`, `development` | `/lab audit` |
+| "commit this milestone", "make a commit", "commit these changes" | `brainstorming`, `development` | `/lab commit [message]` |
+| "push these changes", "push this branch", "publish the branch" | `brainstorming`, `development` | `/lab push` |
+| "sync the repo", "commit and push this", "sync these changes" | `brainstorming`, `development` | `/lab sync [message]` |
 <!-- END GENERATED CONVERSATIONAL INTENT MAPPING -->
 
 ## Commands (Backend Contract)

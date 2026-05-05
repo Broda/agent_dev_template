@@ -56,11 +56,11 @@ Optional summary snapshot:
 
 ## Maintaining Intent Docs
 
-When changing brainstorming NL intent mappings:
+When changing harness command intent mappings:
 
 ```sh
 ./scripts/render-intent-docs
 ./scripts/validate-governance
 ```
 
-Edit `brainstorming/intent_registry.json` first. The intent tables in `brainstorming/CONVERSATIONAL_MODE.md` and `brainstorming/COMMANDS.md` are generated.
+Edit `harness_commands/intent_registry.json` first. The intent tables in `harness_commands/CONVERSATIONAL_MODE.md` and `harness_commands/COMMANDS.md` are generated.

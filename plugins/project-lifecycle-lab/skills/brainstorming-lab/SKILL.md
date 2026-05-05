@@ -10,7 +10,7 @@ Use this skill after `MODE.md` confirms `brainstorming`.
 ## Operating Model
 
 - Keep conversation natural; do not force slash commands during ordinary brainstorming.
-- Treat user phrasing as the primary interface. Map milestone intent through `brainstorming/intent_registry.json` and `brainstorming/COMMANDS.md`, then run deterministic `./scripts/lab ...` commands as the backend.
+- Treat user phrasing as the primary interface. Map milestone intent through `harness_commands/intent_registry.json` and `harness_commands/COMMANDS.md`, then run deterministic `./scripts/lab ...` commands as the backend.
 - Persist only milestone events: new idea, state transition, major decision, risk, research note, export, or finalize.
 - Use Focus Mode: report user-facing outcomes and consequential failures; keep routine sync chatter quiet.
 - Do not load `notes/` by default. Search `NOTES_CATALOG.md` first only when prior research is requested or referenced.

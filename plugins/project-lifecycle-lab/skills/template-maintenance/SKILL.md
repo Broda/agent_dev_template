@@ -11,7 +11,7 @@ Use this skill when maintaining the harness template rather than brainstorming a
 
 - Python under `scripts/python/template_cli/` is the canonical tooling implementation.
 - Shell and PowerShell entrypoints should stay thin wrappers.
-- `brainstorming/intent_registry.json` is the source for generated intent tables.
+- `harness_commands/intent_registry.json` is the source for generated intent tables.
 - Development docs are rendered from `development/templates/` and `state/project-init.json`.
 
 ## Editing Rules
@@ -19,8 +19,8 @@ Use this skill when maintaining the harness template rather than brainstorming a
 - Keep command names and entrypoint paths stable unless the user explicitly asks for a breaking change.
 - Update `brainstorming/FILE_MAP.md` when the retained harness template inventory changes.
 - Update tests or fixtures when behavior changes.
-- Do not hand-edit generated intent tables in `brainstorming/CONVERSATIONAL_MODE.md` or `brainstorming/COMMANDS.md`.
-- To change natural-language mappings, edit `brainstorming/intent_registry.json`, run `./scripts/render-intent-docs`, then validate.
+- Do not hand-edit generated intent tables in `harness_commands/CONVERSATIONAL_MODE.md` or `harness_commands/COMMANDS.md`.
+- To change natural-language mappings, edit `harness_commands/intent_registry.json`, run `./scripts/render-intent-docs`, then validate.
 
 ## Verification
 

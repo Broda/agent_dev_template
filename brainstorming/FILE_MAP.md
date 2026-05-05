@@ -27,10 +27,10 @@ Lean file registry for the Project Harness Template.
 | `plugins/project-lifecycle-lab/skills/development-governance/agents/openai.yaml` | Plugin mirror of development skill UI metadata |
 | `plugins/project-lifecycle-lab/skills/template-maintenance/SKILL.md` | Plugin mirror of the harness template maintenance skill |
 | `plugins/project-lifecycle-lab/skills/template-maintenance/agents/openai.yaml` | Plugin mirror of maintenance skill UI metadata |
+| `harness_commands/CONVERSATIONAL_MODE.md` | Agent-facing plain-language intent map across harness modes |
+| `harness_commands/COMMANDS.md` | Backend command contract for human-agent workflow intents |
+| `harness_commands/intent_registry.json` | Canonical harness command intent registry for generated NL mapping tables |
 | `brainstorming/AGENTS.brainstorming.md` | Brainstorming-mode contract |
-| `brainstorming/CONVERSATIONAL_MODE.md` | Plain-language interaction and milestone capture |
-| `brainstorming/COMMANDS.md` | Optional backend command mapping |
-| `brainstorming/intent_registry.json` | Canonical brainstorming intent registry for generated NL mapping tables |
 | `brainstorming/QUICKSTART.md` | Fast start workflow |
 | `brainstorming/EXAMPLE_LIFECYCLE.md` | End-to-end example from capture through finalize |
 | `brainstorming/FILE_MAP.md` | Registry of retained files |

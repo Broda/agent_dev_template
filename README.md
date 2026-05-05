@@ -17,7 +17,7 @@ This harness is optimized for human-agent development, not for humans memorizing
 
 1. The human describes what should happen in normal language.
 2. The agent reads `MODE.md` and follows the active repo-scoped skill.
-3. In brainstorming mode, the agent maps natural-language requests through `brainstorming/intent_registry.json` and the generated intent docs.
+3. The agent maps natural-language requests through `harness_commands/intent_registry.json` and the generated command docs.
 4. The agent runs deterministic `./scripts/lab ...` or validation commands to persist state and evidence.
 5. The agent reports the outcome, validation evidence, and the next decision point.
 
@@ -78,8 +78,8 @@ This creates an independent Git repository with a baseline commit and no remote.
 ## Brainstorming Phase
 
 - Repo-scoped skill: `.agents/skills/brainstorming-lab/SKILL.md`
-- Conversational rules: `brainstorming/CONVERSATIONAL_MODE.md`
-- Backend contract: `brainstorming/COMMANDS.md`
+- Conversational rules: `harness_commands/CONVERSATIONAL_MODE.md`
+- Backend contract: `harness_commands/COMMANDS.md`
 - Quickstart: `brainstorming/QUICKSTART.md`
 - Example walkthrough: `brainstorming/EXAMPLE_LIFECYCLE.md`
 - Shell runtime: `./scripts/lab <command> ...`

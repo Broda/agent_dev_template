@@ -4,14 +4,15 @@ import json
 from pathlib import Path
 
 
-INTENT_REGISTRY_FILE = "brainstorming/intent_registry.json"
-CONVERSATIONAL_DOC = "brainstorming/CONVERSATIONAL_MODE.md"
-COMMANDS_DOC = "brainstorming/COMMANDS.md"
+INTENT_REGISTRY_FILE = "harness_commands/intent_registry.json"
+CONVERSATIONAL_DOC = "harness_commands/CONVERSATIONAL_MODE.md"
+COMMANDS_DOC = "harness_commands/COMMANDS.md"
 CONVERSATIONAL_MARKER_START = "<!-- BEGIN GENERATED INTENT MAP -->"
 CONVERSATIONAL_MARKER_END = "<!-- END GENERATED INTENT MAP -->"
 COMMANDS_MARKER_START = "<!-- BEGIN GENERATED CONVERSATIONAL INTENT MAPPING -->"
 COMMANDS_MARKER_END = "<!-- END GENERATED CONVERSATIONAL INTENT MAPPING -->"
 ALLOWED_WRITE_BEHAVIORS = {"write", "no-write", "git"}
+ALLOWED_MODES = {"brainstorming", "development"}
 
 
 class IntentRegistryError(Exception):
@@ -47,14 +48,18 @@ def validate_intent_registry(data: dict) -> None:
         raise IntentRegistryError("Intent registry root must be an object.")
     if data.get("schemaVersion") != 1:
         raise IntentRegistryError("Intent registry schemaVersion must be 1.")
-    if data.get("mode") != "brainstorming":
-        raise IntentRegistryError("Intent registry mode must be 'brainstorming'.")
+    modes = data.get("modes")
+    if not isinstance(modes, list) or not modes:
+        raise IntentRegistryError("Intent registry must include a non-empty modes list.")
+    invalid_modes = sorted({_trim(str(mode)) for mode in modes} - ALLOWED_MODES)
+    if invalid_modes:
+        raise IntentRegistryError(f"Intent registry contains invalid modes: {', '.join(invalid_modes)}")
     intents = data.get("intents")
     if not isinstance(intents, list) or not intents:
         raise IntentRegistryError("Intent registry must include a non-empty intents array.")
 
     seen_commands: set[str] = set()
-    required_keys = {"command", "backendIntent", "phrases", "description", "filesTouched", "writeBehavior"}
+    required_keys = {"command", "backendIntent", "modes", "phrases", "description", "filesTouched", "writeBehavior"}
     for index, intent in enumerate(intents, start=1):
         if not isinstance(intent, dict):
             raise IntentRegistryError(f"Intent entry #{index} must be an object.")
@@ -72,6 +77,16 @@ def validate_intent_registry(data: dict) -> None:
         backend_intent = _trim(str(intent.get("backendIntent", "")))
         if not backend_intent:
             raise IntentRegistryError(f"Intent '{command}' must include a non-empty backendIntent.")
+
+        intent_modes = intent.get("modes")
+        if not isinstance(intent_modes, list) or not intent_modes:
+            raise IntentRegistryError(f"Intent '{command}' must include a non-empty modes list.")
+        cleaned_modes = [_trim(str(mode)) for mode in intent_modes]
+        invalid_intent_modes = sorted(set(cleaned_modes) - ALLOWED_MODES)
+        if invalid_intent_modes:
+            raise IntentRegistryError(
+                f"Intent '{command}' contains invalid modes: {', '.join(invalid_intent_modes)}"
+            )
 
         phrases = intent.get("phrases")
         if not isinstance(phrases, list) or not phrases:
@@ -105,15 +120,20 @@ def _render_phrase_family(phrases: list[str]) -> str:
     return ", ".join(f'"{_trim(str(phrase))}"' for phrase in phrases)
 
 
+def _render_modes(modes: list[str]) -> str:
+    return ", ".join(f"`{_trim(str(mode))}`" for mode in modes)
+
+
 def render_conversational_intent_table(root: Path) -> str:
     data = load_intent_registry(root)
     lines = [
-        "| Natural phrase family | Action | Files touched |",
-        "|---|---|---|",
+        "| Natural phrase family | Modes | Action | Files touched |",
+        "|---|---|---|---|",
     ]
     for intent in data["intents"]:
         lines.append(
             f"| {_render_phrase_family(intent['phrases'])} | "
+            f"{_render_modes(intent['modes'])} | "
             f"{_trim(str(intent['description']))} | "
             f"{_trim(str(intent['filesTouched']))} |"
         )
@@ -123,12 +143,13 @@ def render_conversational_intent_table(root: Path) -> str:
 def render_commands_intent_table(root: Path) -> str:
     data = load_intent_registry(root)
     lines = [
-        "| Conversational phrase family | Backend intent |",
-        "|---|---|",
+        "| Conversational phrase family | Modes | Backend intent |",
+        "|---|---|---|",
     ]
     for intent in data["intents"]:
         lines.append(
             f"| {_render_phrase_family(intent['phrases'])} | "
+            f"{_render_modes(intent['modes'])} | "
             f"`{_trim(str(intent['backendIntent']))}` |"
         )
     return "\n".join(lines)
@@ -173,5 +194,5 @@ def run_render_intent_docs(root: Path) -> int:
     rendered = render_intent_docs_to_memory(root)
     for relative_path, content in rendered.items():
         _write_text(root / relative_path, content)
-    print("Rendered brainstorming intent docs from brainstorming/intent_registry.json")
+    print("Rendered harness command docs from harness_commands/intent_registry.json")
     return 0

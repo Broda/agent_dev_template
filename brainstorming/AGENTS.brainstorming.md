@@ -25,6 +25,6 @@ Important invariants:
 
 ## References
 
-- `brainstorming/CONVERSATIONAL_MODE.md`
-- `brainstorming/COMMANDS.md`
+- `harness_commands/CONVERSATIONAL_MODE.md`
+- `harness_commands/COMMANDS.md`
 - `scripts/validate-governance`

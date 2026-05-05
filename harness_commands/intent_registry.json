@@ -1,10 +1,16 @@
 {
   "schemaVersion": 1,
-  "mode": "brainstorming",
+  "modes": [
+    "brainstorming",
+    "development"
+  ],
   "intents": [
     {
       "command": "capture",
       "backendIntent": "/lab capture <idea-id>",
+      "modes": [
+        "brainstorming"
+      ],
       "phrases": [
         "capture this idea",
         "save this idea",
@@ -17,6 +23,9 @@
     {
       "command": "activate",
       "backendIntent": "/lab activate <idea-id>",
+      "modes": [
+        "brainstorming"
+      ],
       "phrases": [
         "make this active",
         "promote this idea",
@@ -29,6 +38,9 @@
     {
       "command": "decide",
       "backendIntent": "/lab decide <decision-slug>",
+      "modes": [
+        "brainstorming"
+      ],
       "phrases": [
         "decision: ... because ...",
         "we should do X",
@@ -41,6 +53,9 @@
     {
       "command": "risk",
       "backendIntent": "/lab risk <idea-id>",
+      "modes": [
+        "brainstorming"
+      ],
       "phrases": [
         "risk: ...",
         "log this risk",
@@ -53,6 +68,9 @@
     {
       "command": "path-note",
       "backendIntent": "/lab path-note <idea-id>",
+      "modes": [
+        "brainstorming"
+      ],
       "phrases": [
         "save path note",
         "record this branch",
@@ -65,6 +83,10 @@
     {
       "command": "note",
       "backendIntent": "/lab note <topic-or-ref>",
+      "modes": [
+        "brainstorming",
+        "development"
+      ],
       "phrases": [
         "save that info in notes",
         "save a note on <topic>",
@@ -77,6 +99,9 @@
     {
       "command": "review",
       "backendIntent": "/lab review <idea-id>",
+      "modes": [
+        "brainstorming"
+      ],
       "phrases": [
         "review this idea",
         "gate this idea",
@@ -89,6 +114,9 @@
     {
       "command": "export",
       "backendIntent": "/lab export <idea-id>",
+      "modes": [
+        "brainstorming"
+      ],
       "phrases": [
         "save a summary snapshot",
         "export a summary",
@@ -101,6 +129,9 @@
     {
       "command": "finalize",
       "backendIntent": "/lab finalize [<idea-id>]",
+      "modes": [
+        "brainstorming"
+      ],
       "phrases": [
         "finalize this repo",
         "switch to development mode",
@@ -113,6 +144,9 @@
     {
       "command": "park",
       "backendIntent": "/lab park <idea-id>",
+      "modes": [
+        "brainstorming"
+      ],
       "phrases": [
         "park this",
         "pause this idea",
@@ -125,6 +159,9 @@
     {
       "command": "kill",
       "backendIntent": "/lab kill <idea-id>",
+      "modes": [
+        "brainstorming"
+      ],
       "phrases": [
         "kill this",
         "drop this idea",
@@ -137,6 +174,10 @@
     {
       "command": "status",
       "backendIntent": "/lab status",
+      "modes": [
+        "brainstorming",
+        "development"
+      ],
       "phrases": [
         "what's the current state?",
         "show me status",
@@ -149,6 +190,9 @@
     {
       "command": "doctor",
       "backendIntent": "/lab doctor [<idea-id>]",
+      "modes": [
+        "brainstorming"
+      ],
       "phrases": [
         "why is finalize blocked?",
         "what exactly is missing before finalize?",
@@ -161,6 +205,10 @@
     {
       "command": "audit",
       "backendIntent": "/lab audit",
+      "modes": [
+        "brainstorming",
+        "development"
+      ],
       "phrases": [
         "run audit",
         "validate the repo",
@@ -173,6 +221,10 @@
     {
       "command": "commit",
       "backendIntent": "/lab commit [message]",
+      "modes": [
+        "brainstorming",
+        "development"
+      ],
       "phrases": [
         "commit this milestone",
         "make a commit",
@@ -185,6 +237,10 @@
     {
       "command": "push",
       "backendIntent": "/lab push",
+      "modes": [
+        "brainstorming",
+        "development"
+      ],
       "phrases": [
         "push these changes",
         "push this branch",
@@ -197,6 +253,10 @@
     {
       "command": "sync",
       "backendIntent": "/lab sync [message]",
+      "modes": [
+        "brainstorming",
+        "development"
+      ],
       "phrases": [
         "sync the repo",
         "commit and push this",

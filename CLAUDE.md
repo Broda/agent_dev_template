@@ -57,7 +57,7 @@ python3 -m unittest discover -s tests -v
 For changes to this harness template itself:
 
 - Keep command paths stable.
-- Edit `brainstorming/intent_registry.json` before regenerating generated intent docs.
+- Edit `harness_commands/intent_registry.json` before regenerating generated intent docs.
 - Run `./scripts/sync-plugin-skills` after changing repo-scoped skills.
 - Update `brainstorming/FILE_MAP.md` when retained template inventory changes.
 - Run `./scripts/validate-governance` and the regression suite before finishing.

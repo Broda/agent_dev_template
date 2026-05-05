@@ -70,7 +70,7 @@ def validate_notes_catalog(root: Path, result: ValidationResult) -> None:
 
 
 def documented_lab_commands(root: Path) -> set[str]:
-    commands_path = root / "brainstorming/COMMANDS.md"
+    commands_path = root / "harness_commands/COMMANDS.md"
     if not commands_path.exists():
         return set()
     commands: set[str] = set()
@@ -121,7 +121,7 @@ def validate_intent_registry(root: Path, result: ValidationResult) -> None:
 
     missing_doc_sections = sorted(registry_command_names - documented)
     for command in missing_doc_sections:
-        result.add_failure(f"Intent registry command is missing a command section in COMMANDS.md: {command}")
+        result.add_failure(f"Intent registry command is missing a command section in harness_commands/COMMANDS.md: {command}")
 
     unknown_registry_commands = sorted(registry_command_names - registered)
     for command in unknown_registry_commands:
@@ -174,7 +174,7 @@ def validate_intent_sync_ci(root: Path, result: ValidationResult) -> None:
         ),
         (
             "focused generated-doc diff",
-            "git diff -- brainstorming/CONVERSATIONAL_MODE.md brainstorming/COMMANDS.md",
+            "git diff -- harness_commands/CONVERSATIONAL_MODE.md harness_commands/COMMANDS.md",
         ),
     ]
     for label, snippet in required_checks:

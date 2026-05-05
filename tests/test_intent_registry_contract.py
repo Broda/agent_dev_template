@@ -48,16 +48,16 @@ class IntentRegistryContractTests(unittest.TestCase):
 
     def test_render_intent_docs_is_idempotent_on_clean_repo(self) -> None:
         run_cmd(["./scripts/render-intent-docs"], cwd=self.repo)
-        first_conv = (self.repo / "brainstorming/CONVERSATIONAL_MODE.md").read_text(encoding="utf-8")
-        first_commands = (self.repo / "brainstorming/COMMANDS.md").read_text(encoding="utf-8")
+        first_conv = (self.repo / "harness_commands/CONVERSATIONAL_MODE.md").read_text(encoding="utf-8")
+        first_commands = (self.repo / "harness_commands/COMMANDS.md").read_text(encoding="utf-8")
         run_cmd(["./scripts/render-intent-docs"], cwd=self.repo)
-        second_conv = (self.repo / "brainstorming/CONVERSATIONAL_MODE.md").read_text(encoding="utf-8")
-        second_commands = (self.repo / "brainstorming/COMMANDS.md").read_text(encoding="utf-8")
+        second_conv = (self.repo / "harness_commands/CONVERSATIONAL_MODE.md").read_text(encoding="utf-8")
+        second_commands = (self.repo / "harness_commands/COMMANDS.md").read_text(encoding="utf-8")
         self.assertEqual(first_conv, second_conv)
         self.assertEqual(first_commands, second_commands)
 
     def test_validate_governance_fails_on_stale_generated_intent_section(self) -> None:
-        conv_path = self.repo / "brainstorming/CONVERSATIONAL_MODE.md"
+        conv_path = self.repo / "harness_commands/CONVERSATIONAL_MODE.md"
         conv_text = conv_path.read_text(encoding="utf-8").replace(
             '"capture this idea", "save this idea", "log this idea"',
             '"capture this idea", "stale phrase", "log this idea"',
@@ -71,7 +71,7 @@ class IntentRegistryContractTests(unittest.TestCase):
         run_cmd(["./scripts/validate-governance"], cwd=self.repo)
 
     def test_validate_governance_fails_on_unknown_registry_command(self) -> None:
-        registry_path = self.repo / "brainstorming/intent_registry.json"
+        registry_path = self.repo / "harness_commands/intent_registry.json"
         registry = json.loads(registry_path.read_text(encoding="utf-8"))
         registry["intents"][0]["command"] = "unknown-command"
         registry_path.write_text(json.dumps(registry, indent=2) + "\n", encoding="utf-8")
@@ -80,7 +80,7 @@ class IntentRegistryContractTests(unittest.TestCase):
         self.assertIn("Intent registry command is not registered in CLI: unknown-command", result.stdout + result.stderr)
 
     def test_validate_governance_fails_on_backend_intent_command_drift(self) -> None:
-        registry_path = self.repo / "brainstorming/intent_registry.json"
+        registry_path = self.repo / "harness_commands/intent_registry.json"
         registry = json.loads(registry_path.read_text(encoding="utf-8"))
         registry["intents"][0]["backendIntent"] = "/lab missing <idea-id>"
         registry_path.write_text(json.dumps(registry, indent=2) + "\n", encoding="utf-8")
@@ -91,7 +91,7 @@ class IntentRegistryContractTests(unittest.TestCase):
         self.assertIn("Intent 'capture' backendIntent maps to unsupported lab command: missing", output)
 
     def test_validate_governance_fails_on_non_lab_backend_intent(self) -> None:
-        registry_path = self.repo / "brainstorming/intent_registry.json"
+        registry_path = self.repo / "harness_commands/intent_registry.json"
         registry = json.loads(registry_path.read_text(encoding="utf-8"))
         registry["intents"][0]["backendIntent"] = "/scripts/custom-capture <idea-id>"
         registry_path.write_text(json.dumps(registry, indent=2) + "\n", encoding="utf-8")
@@ -116,7 +116,7 @@ class IntentRegistryContractTests(unittest.TestCase):
     def test_validate_governance_fails_when_ci_focused_diff_is_removed(self) -> None:
         ci_path = self.repo / ".github/workflows/ci.yml"
         ci_text = ci_path.read_text(encoding="utf-8").replace(
-            "            git diff -- brainstorming/CONVERSATIONAL_MODE.md brainstorming/COMMANDS.md\n",
+            "            git diff -- harness_commands/CONVERSATIONAL_MODE.md harness_commands/COMMANDS.md\n",
             "",
             1,
         )
@@ -144,14 +144,14 @@ class IntentRegistryContractTests(unittest.TestCase):
         )
 
     def test_render_intent_docs_fails_on_malformed_registry(self) -> None:
-        registry_path = self.repo / "brainstorming/intent_registry.json"
+        registry_path = self.repo / "harness_commands/intent_registry.json"
         registry_path.write_text("{\n", encoding="utf-8")
         result = run_cmd(["./scripts/render-intent-docs"], cwd=self.repo, check=False)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("Invalid JSON", result.stdout + result.stderr)
 
     def test_render_intent_docs_fails_on_duplicate_registry_command(self) -> None:
-        registry_path = self.repo / "brainstorming/intent_registry.json"
+        registry_path = self.repo / "harness_commands/intent_registry.json"
         registry = json.loads(registry_path.read_text(encoding="utf-8"))
         registry["intents"][1]["command"] = registry["intents"][0]["command"]
         registry_path.write_text(json.dumps(registry, indent=2) + "\n", encoding="utf-8")
@@ -160,7 +160,7 @@ class IntentRegistryContractTests(unittest.TestCase):
         self.assertIn("Duplicate intent command", result.stdout + result.stderr)
 
     def test_render_intent_docs_fails_on_missing_phrases(self) -> None:
-        registry_path = self.repo / "brainstorming/intent_registry.json"
+        registry_path = self.repo / "harness_commands/intent_registry.json"
         registry = json.loads(registry_path.read_text(encoding="utf-8"))
         registry["intents"][0]["phrases"] = []
         registry_path.write_text(json.dumps(registry, indent=2) + "\n", encoding="utf-8")
@@ -168,8 +168,26 @@ class IntentRegistryContractTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("non-empty phrases list", result.stdout + result.stderr)
 
+    def test_render_intent_docs_fails_on_missing_modes(self) -> None:
+        registry_path = self.repo / "harness_commands/intent_registry.json"
+        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+        registry["intents"][0].pop("modes")
+        registry_path.write_text(json.dumps(registry, indent=2) + "\n", encoding="utf-8")
+        result = run_cmd(["./scripts/render-intent-docs"], cwd=self.repo, check=False)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("missing required keys: modes", result.stdout + result.stderr)
+
+    def test_render_intent_docs_fails_on_invalid_modes(self) -> None:
+        registry_path = self.repo / "harness_commands/intent_registry.json"
+        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+        registry["intents"][0]["modes"] = ["brainstorming", "unsupported"]
+        registry_path.write_text(json.dumps(registry, indent=2) + "\n", encoding="utf-8")
+        result = run_cmd(["./scripts/render-intent-docs"], cwd=self.repo, check=False)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Intent 'capture' contains invalid modes: unsupported", result.stdout + result.stderr)
+
     def test_render_intent_docs_fails_on_missing_markers(self) -> None:
-        commands_path = self.repo / "brainstorming/COMMANDS.md"
+        commands_path = self.repo / "harness_commands/COMMANDS.md"
         commands_text = commands_path.read_text(encoding="utf-8").replace(
             "<!-- BEGIN GENERATED CONVERSATIONAL INTENT MAPPING -->\n",
             "",
@@ -181,7 +199,7 @@ class IntentRegistryContractTests(unittest.TestCase):
         self.assertIn("Missing or invalid generated section markers", result.stdout + result.stderr)
 
     def test_render_intent_docs_preserves_surrounding_text(self) -> None:
-        commands_path = self.repo / "brainstorming/COMMANDS.md"
+        commands_path = self.repo / "harness_commands/COMMANDS.md"
         original = commands_path.read_text(encoding="utf-8")
         updated = original.replace(
             "## Commands (Backend Contract)",

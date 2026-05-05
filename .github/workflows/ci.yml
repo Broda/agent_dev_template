@@ -27,7 +27,7 @@ jobs:
           ./scripts/render-intent-docs
           git diff --stat --exit-code || {
             echo "Generated intent docs are out of sync. Run ./scripts/render-intent-docs and commit the result."
-            git diff -- brainstorming/CONVERSATIONAL_MODE.md brainstorming/COMMANDS.md
+            git diff -- harness_commands/CONVERSATIONAL_MODE.md harness_commands/COMMANDS.md
             exit 1
           }
 
