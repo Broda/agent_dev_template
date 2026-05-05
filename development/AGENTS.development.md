@@ -24,6 +24,17 @@ Research note capture remains active in development mode:
 - Search `NOTES_CATALOG.md` before opening note files.
 - Update governance docs when research changes direction or constraints.
 
+## Harness Commands
+
+Use shared harness commands with development semantics:
+
+- `./scripts/lab status` for finalized project, active milestone, governance coverage, and roadmap task counts.
+- `./scripts/lab audit` for governance validation.
+- `./scripts/lab note` for durable research notes that may require follow-up ADR, roadmap, architecture, or policy updates.
+- `./scripts/lab commit`, `./scripts/lab push`, and `./scripts/lab sync` only for explicit git operations after coherent development slices.
+
+Brainstorming-only commands are intentionally blocked in development mode by `harness_commands/intent_registry.json`.
+
 ## Principle
 
 Correctness over convenience.

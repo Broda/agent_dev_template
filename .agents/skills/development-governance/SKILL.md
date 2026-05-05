@@ -39,6 +39,19 @@ After meaningful changes run:
 
 Record evidence in `docs/ROADMAP.md`.
 
+## Harness Commands
+
+Natural language remains the primary user interface in development mode. Map user intent through `harness_commands/intent_registry.json` and run the deterministic backend only when a durable workflow action is needed.
+
+Shared commands keep development-specific meaning:
+
+- `./scripts/lab status` reports finalized project context, active milestone, governance-doc coverage, and roadmap task counts.
+- `./scripts/lab audit` runs harness governance validation.
+- `./scripts/lab note` captures durable research notes; if the note changes direction, update ADRs, roadmap, architecture, or policy in the same slice.
+- `./scripts/lab commit`, `./scripts/lab push`, and `./scripts/lab sync` are explicit git operations after a coherent development slice.
+
+Brainstorming-only commands remain unavailable after finalization. Do not use `capture`, `activate`, `decide`, `risk`, `review`, `export`, `finalize`, `park`, `kill`, or `doctor` in development mode unless the registry explicitly changes.
+
 ## Research Notes
 
 Use `./scripts/lab-note` for durable research notes. Notes complement governance docs; update ADRs, roadmap, architecture, or policy when research changes direction.
