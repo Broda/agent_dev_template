@@ -23,13 +23,13 @@ from template_cli.workflow_data import (
     _find_idea_block,
     _next_sequence_id,
     _remove_idea_from_buckets,
-    _render_idea_block,
     _sync,
     _title_from_idea_id,
     _today,
     _timestamp,
     _upsert_catalog_row,
 )
+from template_cli.workflow_render import _render_idea_block
 from template_cli.io_helpers import path_exists
 
 
