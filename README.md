@@ -26,6 +26,20 @@ The harness remains self-contained. Project state, deterministic scripts, valida
 | Plugin package | Optional portable distribution of reusable agent behavior | `plugins/project-lifecycle-lab/` |
 | Future bootstrap helper | Optional convenience for creating/updating harness instances | not required for current use |
 
+## Using This Public Harness
+
+Start each real project from its own clone or generated repository. The harness is meant to travel with the project so brainstorming history, finalization evidence, governance docs, and local scripts remain inspectable in the same Git history as the implementation work.
+
+After creating a project repo:
+
+1. Point `origin` at the new project remote.
+2. Keep `MODE.md` as `brainstorming` until finalization.
+3. Use `./scripts/lab status` and `./scripts/lab doctor` to check readiness.
+4. Treat `ideas/`, `sessions/`, `notes/`, `exports/`, and `state/project-init.json` as project-local history.
+5. Run `./scripts/finalize-project` only when the project definition is ready to become development governance.
+
+The public template should stay generic. Project-specific product decisions belong in idea records, sessions, notes, and finalized development docs, not in the reusable harness scripts or template-maintenance skills.
+
 ## Start Here
 
 - Read `AGENTS.md`
