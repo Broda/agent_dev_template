@@ -50,6 +50,9 @@ def run_project_harness_new(
         init_result = _run(["git", "init", "-b", "main"], target_path)
         if init_result != 0:
             return init_result
+        identity_result = _ensure_initial_commit_identity(target_path)
+        if identity_result != 0:
+            return identity_result
         add_result = _run(["git", "add", "-A"], target_path)
         if add_result != 0:
             return add_result
@@ -103,3 +106,28 @@ def _run(command: list[str], cwd: Path) -> int:
     if result.stderr:
         print(result.stderr, end="")
     return result.returncode
+
+
+def _ensure_initial_commit_identity(root: Path) -> int:
+    if not _git_config_value(root, "user.name"):
+        name_result = _run(["git", "config", "user.name", "Project Harness"], root)
+        if name_result != 0:
+            return name_result
+    if not _git_config_value(root, "user.email"):
+        email_result = _run(["git", "config", "user.email", "project-harness@example.invalid"], root)
+        if email_result != 0:
+            return email_result
+    return 0
+
+
+def _git_config_value(root: Path, key: str) -> str:
+    result = subprocess.run(
+        ["git", "config", "--get", key],
+        cwd=root,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return ""
+    return result.stdout.strip()

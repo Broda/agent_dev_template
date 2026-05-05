@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+
 from tests.workflow_test_helpers import LabWorkflowTestCase, run_cmd
 
 
@@ -19,6 +21,27 @@ class ProjectHarnessBootstrapTests(LabWorkflowTestCase):
         self.assertIn("Initialize project harness", log.stdout)
         self.assertIn("Current mode: brainstorming", (target / "MODE.md").read_text(encoding="utf-8"))
         run_cmd(["./scripts/validate-governance"], cwd=target)
+
+    def test_project_harness_new_commits_without_global_git_identity(self) -> None:
+        target = self.tmpdir / "ci-project"
+        empty_home = self.tmpdir / "empty-home"
+        empty_xdg = self.tmpdir / "empty-xdg"
+        empty_home.mkdir()
+        empty_xdg.mkdir()
+        env = os.environ.copy()
+        env["HOME"] = str(empty_home)
+        env["XDG_CONFIG_HOME"] = str(empty_xdg)
+        env["GIT_CONFIG_GLOBAL"] = str(self.tmpdir / "missing-global-gitconfig")
+
+        result = run_cmd(["./scripts/project-harness", "new", str(target)], cwd=self.repo, env=env)
+
+        self.assertIn("Created project harness:", result.stdout)
+        log = run_cmd(["git", "log", "--oneline", "-1"], cwd=target, env=env)
+        self.assertIn("Initialize project harness", log.stdout)
+        name = run_cmd(["git", "config", "--get", "user.name"], cwd=target, env=env)
+        email = run_cmd(["git", "config", "--get", "user.email"], cwd=target, env=env)
+        self.assertEqual(name.stdout.strip(), "Project Harness")
+        self.assertEqual(email.stdout.strip(), "project-harness@example.invalid")
 
     def test_project_harness_new_no_git_creates_plain_copy(self) -> None:
         target = self.tmpdir / "plain-project"

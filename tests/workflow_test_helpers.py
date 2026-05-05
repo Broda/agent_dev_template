@@ -16,12 +16,14 @@ def run_cmd(
     args: list[str],
     *,
     cwd: Path,
+    env: dict[str, str] | None = None,
     input_text: str | None = None,
     check: bool = True,
 ) -> subprocess.CompletedProcess[str]:
     result = subprocess.run(
         args,
         cwd=cwd,
+        env=env,
         input=input_text,
         text=True,
         capture_output=True,
