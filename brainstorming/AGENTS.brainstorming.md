@@ -1,6 +1,6 @@
 # Brainstorming Mode Contract
 
-This compatibility contract is kept for agents that do not load repo-scoped skills automatically.
+This contract defines the brainstorming-mode operating rules for agents working in this harness.
 
 ## Canonical Workflow
 
