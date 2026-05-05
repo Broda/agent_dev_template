@@ -36,3 +36,4 @@ When renderer/finalizer behavior changes, also validate rendered development doc
 - Keep `SKILL.md` concise and task-focused.
 - Put deterministic behavior in scripts when a workflow is fragile or repeated.
 - Start skills repo-scoped under `.agents/skills`; package as a plugin only after the workflow proves reusable.
+- After changing repo-scoped skills, run `./scripts/sync-plugin-skills` so plugin mirrors stay in lockstep.

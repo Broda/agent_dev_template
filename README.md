@@ -134,7 +134,13 @@ After finalization, the active runtime rules come from `development/AGENTS.devel
 
 Repo-scoped skill: `.agents/skills/template-maintenance/SKILL.md`
 
-Use this skill when changing the template runtime, generated intent mappings, validators, wrappers, development templates, repo-scoped skills, or future plugin packaging.
+Use this skill when changing the template runtime, generated intent mappings, validators, wrappers, development templates, repo-scoped skills, or plugin packaging.
+
+When repo-scoped skills change, sync their plugin mirrors before validating:
+
+```sh
+./scripts/sync-plugin-skills
+```
 
 ## Notes Policy
 

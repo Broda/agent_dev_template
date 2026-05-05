@@ -11,6 +11,7 @@ PYTHON_COMMAND_LAUNCHERS = {
     "lab-sync": "lab-sync",
     "render-development-docs": "render-development-docs",
     "render-intent-docs": "render-intent-docs",
+    "sync-plugin-skills": "sync-plugin-skills",
     "validate-brainstorming": "validate-brainstorming",
     "validate-development": "validate-development",
     "validate-governance": "validate-governance",

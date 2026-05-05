@@ -64,6 +64,7 @@ Lean file registry for the Project Harness Template.
 | `scripts/lab-sync` | Cross-platform launcher for Python commit+push sync |
 | `scripts/lab-note` | Cross-platform launcher for Python research note capture |
 | `scripts/render-intent-docs` | Cross-platform launcher for generated intent table rendering |
+| `scripts/sync-plugin-skills` | Cross-platform launcher for syncing canonical repo skills into the plugin package |
 | `scripts/finalize-project` | Cross-platform launcher for Python in-place finalization |
 | `scripts/render-development-docs` | Development doc renderer from canonical state |
 | `scripts/validate-development` | Development-mode integrity validator |
@@ -73,9 +74,11 @@ Lean file registry for the Project Harness Template.
 | `scripts/lab-sync.ps1` | PowerShell launcher for Python commit+push sync |
 | `scripts/lab-note.ps1` | PowerShell launcher for Python research note capture |
 | `scripts/render-intent-docs.ps1` | PowerShell launcher for generated intent table rendering |
+| `scripts/sync-plugin-skills.ps1` | PowerShell launcher for plugin skill mirror syncing |
 | `scripts/validate-brainstorming.ps1` | Windows brainstorming validator |
 | `scripts/finalize-project.sh` | POSIX launcher for Python in-place finalization |
 | `scripts/render-intent-docs.sh` | POSIX launcher for generated intent table rendering |
+| `scripts/sync-plugin-skills.sh` | POSIX launcher for plugin skill mirror syncing |
 | `scripts/render-development-docs.sh` | Native macOS/Linux development doc renderer |
 | `scripts/validate-development.sh` | Native macOS/Linux development validator |
 | `scripts/validate-brainstorming.sh` | Native macOS/Linux brainstorming validator |
@@ -93,6 +96,7 @@ Lean file registry for the Project Harness Template.
 | `scripts/python/template_cli/validator_launchers.py` | Launcher consistency checks for shell and PowerShell entrypoints |
 | `scripts/python/template_cli/validator_plugins.py` | Local plugin manifest and marketplace validation helpers |
 | `scripts/python/template_cli/validator_skills.py` | Repo-scoped skill and skill metadata validation helpers |
+| `scripts/python/template_cli/plugin_sync.py` | Plugin skill mirror sync command implementation |
 | `scripts/python/template_cli/render_helpers.py` | State-extraction, file-manipulation, and hydration helpers for development doc rendering |
 | `scripts/python/template_cli/render_templates.py` | Pure template functions for README and PROJECT_CONTEXT document generation |
 | `scripts/python/template_cli/finalize_helpers.py` | Utility functions, interactive prompts, markdown extraction, and state helpers for finalization |

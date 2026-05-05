@@ -32,6 +32,7 @@ Python 3 is required. The shell and PowerShell entrypoints are wrappers; canonic
 ./scripts/lab export --idea-id <id>
 ./scripts/finalize-project --idea-id <id> [--write-export]
 ./scripts/render-intent-docs
+./scripts/sync-plugin-skills
 ./scripts/validate-governance
 python3 -m unittest discover -s tests -v
 ```
@@ -57,5 +58,6 @@ For changes to this harness template itself:
 
 - Keep command paths stable.
 - Edit `brainstorming/intent_registry.json` before regenerating generated intent docs.
+- Run `./scripts/sync-plugin-skills` after changing repo-scoped skills.
 - Update `brainstorming/FILE_MAP.md` when retained template inventory changes.
 - Run `./scripts/validate-governance` and the regression suite before finishing.

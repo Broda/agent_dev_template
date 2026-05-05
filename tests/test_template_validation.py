@@ -133,6 +133,16 @@ class TemplateValidationTests(LabWorkflowTestCase):
             result.stdout,
         )
 
+    def test_sync_plugin_skills_repairs_mirror_drift(self) -> None:
+        source_skill_path = self.repo / ".agents/skills/brainstorming-lab/SKILL.md"
+        plugin_skill_path = self.repo / "plugins/project-lifecycle-lab/skills/brainstorming-lab/SKILL.md"
+        plugin_skill_path.write_text("stale plugin copy\n", encoding="utf-8")
+
+        result = run_cmd(["./scripts/sync-plugin-skills"], cwd=self.repo)
+
+        self.assertIn("Synced plugin skill mirrors from canonical repo skills", result.stdout)
+        self.assertEqual(source_skill_path.read_text(encoding="utf-8"), plugin_skill_path.read_text(encoding="utf-8"))
+
     def test_validate_brainstorming_checks_plugin_file_map_rows(self) -> None:
         file_map_path = self.repo / "brainstorming/FILE_MAP.md"
         file_map_path.write_text(
