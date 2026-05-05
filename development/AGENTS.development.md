@@ -1,100 +1,28 @@
 # Development Mode Contract
 
-This repository follows Structured Mode discipline after in-place finalization.
+This compatibility contract is kept for agents that do not load repo-scoped skills automatically.
 
-## Mandatory Pre-Work Read Phase
+## Canonical Workflow
 
-Before making any meaningful change:
+Read `.agents/skills/development-governance/SKILL.md` before meaningful development work.
 
-1. Read `docs/GOVERNANCE_INDEX.md`.
-2. Then read all governance documents listed in that index.
-3. Also read the most recent ADRs in `docs/adr/`.
-4. Read `CHANGELOG.md` if present.
+Core requirements:
 
-If persistence exists, include `docs/MIGRATION_POLICY.md`.
-
-## Active Milestone Alignment
-
-Before implementing changes:
-
+- Read `docs/GOVERNANCE_INDEX.md`, every listed governance document, recent ADRs, and `CHANGELOG.md`.
 - Identify the active milestone in `docs/ROADMAP.md`.
-- Confirm the change is in scope.
-- Classify the change as feature, bug fix, refactor, migration, security fix, or docs-only.
-
-## Definition Of Done
-
-A task may only be checked off in `docs/ROADMAP.md` when all are true:
-
-- Project builds successfully.
-- Application runs successfully.
-- Relevant tests exist and pass.
-- No architectural boundary violations were introduced.
-- Documentation is updated if required.
-- Evidence commands are recorded under the completed task.
-
-Evidence format example:
-
-- Evidence: `<test command>` (pass), `<build command>` (success), `<run command>` (smoke verified)
-
-## Validation Commands
-
-Build, run, and test commands for this project are recorded in `docs/PROJECT_CONTEXT.md` under the "Commands" section and in `state/project-init.json` under `commands`.
-
-After completing a task:
-
-- Run the test command to verify correctness.
-- Run the build command to confirm no build breakage.
-- Run `./scripts/validate-governance` to confirm governance integrity.
-- Run `./scripts/validate-development` to confirm development doc integrity.
-
-Record each command and its result as evidence under the completed task in `docs/ROADMAP.md`.
-
-## Code Structure
-
-- Keep every code file at or under **500 lines**. If a file exceeds this limit, refactor it into multiple files or modules before the task is considered done.
-- Prefer splitting by responsibility: one module per cohesive concern. Do not split arbitrarily to hit the line target.
-- When splitting, update `docs/FILE_MAP.md` and `docs/ARCHITECTURE.md` to reflect the new module boundaries.
-
-## Public Contract Discipline
-
-Do not change public contracts without an ADR and version alignment.
-
-Public contracts include:
-
-- API endpoints
-- IPC channels
-- DTO structures
-- CLI commands
-- Library exports
-- Config file formats
-- File formats
-
-## Policy Discipline
-
-- Follow `docs/VERSIONING_AND_RELEASE_POLICY.md`.
-- Follow `docs/SECURITY_POLICY.md`.
-- Follow `docs/MIGRATION_POLICY.md` when persistence exists.
-- Update `CHANGELOG.md` for user-visible changes.
-
-## Documentation Update Rules
-
-When making meaningful changes:
-
-- Update `docs/ROADMAP.md` if scope changes.
-- Update `docs/ARCHITECTURE.md` if structure changes.
-- Create or update ADRs for architectural decisions.
-- Update `docs/GOVERNANCE_INDEX.md` if governance files change.
+- Run the project validation commands from `docs/PROJECT_CONTEXT.md` and `state/project-init.json`.
+- Record evidence under completed roadmap tasks.
+- Keep code files at or under 500 lines.
+- Treat public contract changes as ADR- and version-aligned work.
 
 ## Research Notes
 
-Research note capture remains active in development mode.
+Research note capture remains active in development mode:
 
-- Use `./scripts/lab-note` to persist external research, investigation results, implementation notes, and follow-up context.
-- Notes are stored under `notes/` and indexed in `NOTES_CATALOG.md`.
-- Notes complement governance docs; they do not replace ADRs, roadmap entries, or architecture updates when those are required.
-- If a note materially changes project direction or constraints, update the relevant governance docs as well.
-- Do not load note contents into working context by default during normal development sessions.
-- Only search `NOTES_CATALOG.md` or open note files when the user asks for prior research or explicitly references notes.
+- Use `./scripts/lab-note`.
+- Notes live under `notes/` and are indexed in `NOTES_CATALOG.md`.
+- Search `NOTES_CATALOG.md` before opening note files.
+- Update governance docs when research changes direction or constraints.
 
 ## Principle
 

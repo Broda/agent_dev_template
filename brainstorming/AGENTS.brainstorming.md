@@ -1,95 +1,27 @@
 # Brainstorming Mode Contract
 
-Keep brainstorming natural while recording milestone artifacts for later finalization.
+This compatibility contract is kept for agents that do not load repo-scoped skills automatically.
 
-## Interaction Mode
+## Canonical Workflow
 
-- Primary UX: freeform conversational brainstorming.
-- Persistence style: auto-journaling at milestones.
-- Do not force slash commands during normal chat.
-- Focus Mode: on by default.
+Read `.agents/skills/brainstorming-lab/SKILL.md` for brainstorming-mode behavior:
 
-## Git Sync Behavior
+- Natural conversation first.
+- Persist only milestone events.
+- Use `./scripts/lab` for durable idea lifecycle writes.
+- Keep research notes archival unless explicitly requested.
+- Use topic-shift nudges only in persistent multi-turn sessions.
 
-- `./scripts/lab` commands handle commit and push automatically. Do not run separate git commands for milestone writes unless recovery is needed.
-- Auto-commit on each milestone write.
-- Auto-push after each auto-commit.
-- Push target: current branch to `origin/<current-branch>`.
-- Push safety: push only if working tree is clean after commit.
-- Autosync runs in quiet mode by default.
-- Push failures are silent and non-blocking in default brainstorming flow.
+## Finalization
 
-Focus Mode visibility rules:
-- Show: direct user responses, required user questions/prompts, consequential failures.
-- Hide: routine recording/commit/push success chatter and other inconsequential background status.
+For transition into development mode, read `.agents/skills/project-finalizer/SKILL.md`.
 
-## Milestone Capture Rule
+Important invariants:
 
-Persist updates only when one of these occurs:
-
-- New idea captured
-- State transition
-- Major decision or risk
-- Research note captured
-- Export/finalize action
-
-Avoid per-turn file churn for exploratory discussion.
-
-## Finalization Rule
-
-- Persist canonical answers in `state/project-init.json` first.
-- Treat `state/project-init.json` and `sessions/` as the source of truth for transition into development mode.
-- Finalize in place with `./scripts/finalize-project`.
-- Use `./scripts/finalize-project --write-export` only when you also want an archival summary snapshot in `exports/`.
-- If multiple ideas are active or inference is ambiguous, pass `--idea-id <idea-id>`.
+- `state/project-init.json` and `sessions/` are the finalization source of truth.
+- Finalize in place with `./scripts/finalize-project --idea-id <idea-id>`.
+- Use `--write-export` only for an archival summary snapshot in `exports/`.
 - Do not clone another repository during finalize.
-
-## Topic-Shift Continuity Nudges
-
-The following applies to agents with persistent, multi-turn conversational sessions. Agents that operate command-by-command may skip this section.
-
-To reduce idea loss during exploratory branching:
-
-- Maintain session-scoped nudge state:
-  - `last_milestone_ts`
-  - `last_nudge_ts`
-  - `current_thread_signature` (lightweight keyword/topic summary)
-- Use heuristic topic-shift detection (no ML requirement):
-  - Explicit shift phrases (e.g., "switching", "new topic", "another idea", "unrelated")
-  - Abrupt keyword/domain drift from recent turns
-  - Decision/risk intent markers (e.g., "we should", "let's do", "tradeoff", "risk")
-- Only auto-nudge when confidence is `medium` or `high`.
-- Cooldown: at most one auto-nudge every 10 minutes.
-- Nudges are advisory, not mandatory.
-
-When a nudge triggers, ask:
-- "Before we switch, save the previous thread?"
-- Quick actions:
-  - `capture idea`
-  - `record decision`
-  - `log risk`
-  - `save path note`
-  - `skip`
-
-Session boundary checkpoint:
-- On a new session start in the same repo, ask once:
-  - "Any key prior thread to persist before we continue?"
-- Offer the same quick actions.
-
-## Research Note Retrieval
-
-- `notes/` and `NOTES_CATALOG.md` are a durable research archive.
-- Do not load note contents into working context by default at session start.
-- Do not search or read notes unless the user asks for them or clearly references prior research.
-- When the user asks, search `NOTES_CATALOG.md` first, then open only the relevant note files.
-- Treat notes as supporting context, not as always-on governance.
-
-## Required Artifacts For Finalization
-
-- Idea record in `ideas/_*.md` and `IDEA_CATALOG.md`
-- At least one session file in `sessions/`
-- Canonical handoff state in `state/project-init.json` after finalization
-- Optional archival summary in `exports/`
 
 ## References
 
