@@ -188,6 +188,20 @@ class LabLifecycleTests(LabWorkflowTestCase):
         self.assertEqual(result.returncode, 0)
         self.assertIn("Mode: development", result.stdout)
 
+    def test_lab_status_reports_development_context_after_finalize(self) -> None:
+        self.write_render_fixture()
+        run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
+        result = run_cmd(["./scripts/lab", "status"], cwd=self.repo)
+        self.assertIn("Mode: development", result.stdout)
+        self.assertIn("Project: Render Fixture", result.stdout)
+        self.assertIn("Canonical state: finalized for idea-render-fixture", result.stdout)
+        self.assertIn("Active milestone: Milestone 0", result.stdout)
+        self.assertIn("Governance docs:", result.stdout)
+        self.assertIn("Roadmap tasks:", result.stdout)
+        self.assertIn("Validation command:", result.stdout)
+        self.assertNotIn("Finalize readiness:", result.stdout)
+        self.assertNotIn("Finalize target:", result.stdout)
+
     def test_lab_status_reports_ready_target_context(self) -> None:
         self.write_finalize_fixture("idea-status-ready")
         result = run_cmd(["./scripts/lab", "status"], cwd=self.repo)

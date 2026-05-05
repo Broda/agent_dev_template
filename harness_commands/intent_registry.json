@@ -183,7 +183,7 @@
         "show me status",
         "where are we now?"
       ],
-      "description": "report current mode, active idea context, and finalize readiness",
+      "description": "report current mode plus brainstorming or development context",
       "filesTouched": "no write",
       "writeBehavior": "no-write"
     },

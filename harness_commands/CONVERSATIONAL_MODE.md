@@ -43,7 +43,7 @@ It is the agent-facing interface across harness modes: the user can speak natura
 | "finalize this repo", "switch to development mode", "finalize this idea" | `brainstorming` | persist canonical state, append finalization history, and switch this repo into development mode | `sessions/*`, `state/project-init.json`, `MODE.md`, `docs/*`, `IDEA_CATALOG.md` |
 | "park this", "pause this idea", "put this on hold" | `brainstorming` | move idea to parked state | `ideas/_parked.md`, `IDEA_CATALOG.md` |
 | "kill this", "drop this idea", "archive this as dead" | `brainstorming` | move idea to killed state | `ideas/_killed.md`, `IDEA_CATALOG.md` |
-| "what's the current state?", "show me status", "where are we now?" | `brainstorming`, `development` | report current mode, active idea context, and finalize readiness | no write |
+| "what's the current state?", "show me status", "where are we now?" | `brainstorming`, `development` | report current mode plus brainstorming or development context | no write |
 | "why is finalize blocked?", "what exactly is missing before finalize?", "show me where finalize is getting values from" | `brainstorming` | explain finalize-readiness and source evidence | no write |
 | "run audit", "validate the repo", "check governance" | `brainstorming`, `development` | validate integrity | `scripts/validate-governance` |
 | "commit this milestone", "make a commit", "commit these changes" | `brainstorming`, `development` | create an explicit git commit | git metadata and working tree |
