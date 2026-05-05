@@ -26,6 +26,8 @@ The harness remains self-contained. Project state, deterministic scripts, valida
 | Plugin package | Optional portable distribution of reusable agent behavior | `plugins/project-lifecycle-lab/` |
 | Future bootstrap helper | Optional convenience for creating/updating harness instances | `BOOTSTRAP_TOOL.md` |
 
+The harness-first streamlining phase is summarized in `HARNESS_STREAMLINING.md`.
+
 ## Using This Public Harness
 
 Start each real project from its own clone or generated repository. The harness is meant to travel with the project so brainstorming history, finalization evidence, governance docs, and local scripts remain inspectable in the same Git history as the implementation work.
