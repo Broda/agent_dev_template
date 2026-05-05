@@ -22,6 +22,7 @@ def validate_repo_plugins(root: Path, result: ValidationResult) -> None:
         result.add_failure(f"Plugin manifest name must be {PLUGIN_NAME}: {PLUGIN_MANIFEST}")
     if not manifest.get("interface", {}).get("displayName"):
         result.add_failure(f"Plugin manifest must include interface.displayName: {PLUGIN_MANIFEST}")
+    _validate_plugin_boundary(manifest, result)
 
     entries = marketplace.get("plugins", [])
     matching_entries = [entry for entry in entries if entry.get("name") == PLUGIN_NAME]
@@ -35,6 +36,16 @@ def validate_repo_plugins(root: Path, result: ValidationResult) -> None:
     policy = entry.get("policy", {})
     if policy.get("installation") != "AVAILABLE" or policy.get("authentication") != "ON_INSTALL":
         result.add_failure(f"Plugin marketplace policy is incorrect for {PLUGIN_NAME}.")
+
+
+def _validate_plugin_boundary(manifest: dict, result: ValidationResult) -> None:
+    description = manifest.get("description", "")
+    long_description = manifest.get("interface", {}).get("longDescription", "")
+    if "agent workflows" not in description or "project harness" not in description:
+        result.add_failure(f"Plugin description must frame {PLUGIN_NAME} as agent workflows for the harness.")
+    for phrase in ["harness runtime stays in the repo", "Repo-scoped skills", ".agents/skills"]:
+        if phrase not in long_description:
+            result.add_failure(f"Plugin longDescription must preserve harness/plugin boundary phrase: {phrase}")
 
 
 def _validate_plugin_file_map(root: Path, result: ValidationResult) -> None:
