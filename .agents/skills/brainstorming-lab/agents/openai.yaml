@@ -1,0 +1,6 @@
+interface:
+  display_name: "Brainstorming Lab"
+  short_description: "Capture and evolve project ideas"
+  default_prompt: "Use $brainstorming-lab to capture and evolve this project idea with milestone persistence."
+policy:
+  allow_implicit_invocation: true

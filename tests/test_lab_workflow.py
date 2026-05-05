@@ -323,6 +323,21 @@ class LabWorkflowTests(unittest.TestCase):
         self.assertIn("Repo skill has incorrect name in .agents/skills/project-finalizer/SKILL.md", result.stdout)
         self.assertIn("AGENTS.md does not reference repo skill: $project-finalizer", result.stdout)
 
+    def test_validate_brainstorming_checks_skill_ui_metadata(self) -> None:
+        metadata_path = self.repo / ".agents/skills/template-maintenance/agents/openai.yaml"
+        metadata_path.write_text(
+            metadata_path.read_text(encoding="utf-8").replace("$template-maintenance", "$wrong-skill", 1),
+            encoding="utf-8",
+        )
+
+        result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(
+            "Repo skill UI metadata must include default_prompt with $template-maintenance",
+            result.stdout,
+        )
+
     def test_validate_brainstorming_checks_python_launcher_delegation(self) -> None:
         launcher_path = self.repo / "scripts/render-intent-docs.sh"
         launcher_path.write_text(

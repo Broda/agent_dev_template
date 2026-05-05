@@ -1,0 +1,6 @@
+interface:
+  display_name: "Template Maintenance"
+  short_description: "Maintain template tooling and skills"
+  default_prompt: "Use $template-maintenance to update this template runtime, skills, validators, or generated docs safely."
+policy:
+  allow_implicit_invocation: true
