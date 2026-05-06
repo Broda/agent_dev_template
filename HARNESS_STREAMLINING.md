@@ -6,8 +6,6 @@ As each item is finished, delete it from this file in the same commit as the cha
 
 ## Runtime Module Cleanup
 
-- Review `scripts/python/template_cli/validators.py` for any remaining mixed responsibilities. Extract validator families only where the resulting modules match existing validation boundaries.
-
 ## Test Suite Cleanup
 
 - Keep Python test files below the governance size limit as new coverage is added. If finalization or lifecycle tests grow again, split by command family rather than adding broad catch-all files.

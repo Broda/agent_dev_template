@@ -110,6 +110,7 @@ Lean file registry for the Project Harness Template.
 | `scripts/python/template_cli/finalize.py` | In-place finalization orchestration |
 | `scripts/python/template_cli/validator_artifacts.py` | Retained artifact lists for brainstorming and development validation |
 | `scripts/python/template_cli/validator_code_size.py` | Python file-size validation for template tooling and tests |
+| `scripts/python/template_cli/validator_intents.py` | Intent registry, generated command docs, and CI sync validation helpers |
 | `scripts/python/template_cli/validator_launchers.py` | Launcher consistency checks for shell and PowerShell entrypoints |
 | `scripts/python/template_cli/validator_module_boundaries.py` | Import-boundary checks for template CLI modules |
 | `scripts/python/template_cli/validator_plugins.py` | Local plugin manifest and marketplace validation helpers |
