@@ -131,4 +131,5 @@ Lean file registry for the Project Harness Template.
 | `scripts/python/template_cli/workflow_data.py` | Idea-block I/O, catalog helpers, session helpers, and data primitives for lab workflow commands |
 | `scripts/python/template_cli/workflow_commands.py` | Lab lifecycle mutation commands (capture, activate, park, kill, decide, risk, review, export) |
 | `scripts/python/template_cli/workflow_render.py` | Pure markdown renderers for lab workflow artifacts |
+| `scripts/python/template_cli/workflow_status.py` | Lab status and finalize-doctor reporting helpers |
 | `scripts/python/template_cli/workflow.py` | Lab status, doctor, audit, and finalize command orchestration |
