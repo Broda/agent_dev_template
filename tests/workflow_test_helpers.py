@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 import tempfile
@@ -20,6 +21,7 @@ def run_cmd(
     input_text: str | None = None,
     check: bool = True,
 ) -> subprocess.CompletedProcess[str]:
+    args = _platform_command(args, cwd)
     result = subprocess.run(
         args,
         cwd=cwd,
@@ -34,6 +36,22 @@ def run_cmd(
             f"Command failed ({result.returncode}): {' '.join(args)}\nSTDOUT:\n{result.stdout}\nSTDERR:\n{result.stderr}"
         )
     return result
+
+
+def _platform_command(args: list[str], cwd: Path) -> list[str]:
+    if os.name != "nt" or not args:
+        return args
+    command = args[0]
+    if not command.startswith("./scripts/"):
+        return args
+    script_name = Path(command).name
+    ps1_script = cwd / "scripts" / f"{script_name}.ps1"
+    if not ps1_script.exists():
+        return args
+    powershell = shutil.which("pwsh") or shutil.which("powershell")
+    if not powershell:
+        return args
+    return [powershell, "-ExecutionPolicy", "Bypass", "-File", str(ps1_script), *args[1:]]
 
 
 class LabWorkflowTestCase(unittest.TestCase):

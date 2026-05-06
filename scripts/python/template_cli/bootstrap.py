@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 from template_cli.io_helpers import read_mode, write_text
@@ -64,7 +65,7 @@ def run_project_harness_new(
         if origin_result != 0:
             return origin_result
 
-    validation_result = _run(["./scripts/validate-governance"], target_path)
+    validation_result = _run(_template_cli_command("validate-governance"), target_path)
     if validation_result != 0:
         return validation_result
 
@@ -79,13 +80,13 @@ def run_project_harness_new(
 
 
 def run_project_harness_validate(root: Path) -> int:
-    commands = [["./scripts/validate-governance"]]
+    commands = [("validate-governance", "./scripts/validate-governance")]
     if read_mode(root) == "development":
-        commands.append(["./scripts/validate-development"])
+        commands.append(("validate-development", "./scripts/validate-development"))
 
-    for command in commands:
-        print(f"Running: {' '.join(command)}")
-        result = _run(command, root)
+    for cli_command, display_command in commands:
+        print(f"Running: {display_command}")
+        result = _run(_template_cli_command(cli_command), root)
         print(f"Exit code: {result}")
         if result != 0:
             return result
@@ -120,6 +121,10 @@ def _run(command: list[str], cwd: Path) -> int:
     if result.stderr:
         print(result.stderr, end="")
     return result.returncode
+
+
+def _template_cli_command(command: str) -> list[str]:
+    return [sys.executable, str(Path("scripts") / "python" / "cli.py"), command]
 
 
 def _ensure_initial_commit_identity(root: Path) -> int:

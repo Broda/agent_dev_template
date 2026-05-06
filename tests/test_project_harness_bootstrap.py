@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import os
+import shutil
+import unittest
 
 from tests.workflow_test_helpers import LabWorkflowTestCase, run_cmd
 
@@ -51,6 +53,31 @@ class ProjectHarnessBootstrapTests(LabWorkflowTestCase):
         self.assertIn("Git was not initialized because --no-git was supplied.", result.stdout)
         self.assertFalse((target / ".git").exists())
         run_cmd(["./scripts/validate-governance"], cwd=target)
+
+    @unittest.skipUnless(os.name == "nt", "PowerShell launcher regression is Windows-specific")
+    def test_project_harness_new_ps1_validates_copy_on_windows(self) -> None:
+        powershell = shutil.which("pwsh") or shutil.which("powershell")
+        if not powershell:
+            self.skipTest("PowerShell is not available")
+        target = self.tmpdir / "windows-project"
+
+        result = run_cmd(
+            [
+                powershell,
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                str(self.repo / "scripts/project-harness.ps1"),
+                "new",
+                str(target),
+                "--no-git",
+            ],
+            cwd=self.repo,
+        )
+
+        self.assertIn("Created project harness:", result.stdout)
+        self.assertIn("Git was not initialized because --no-git was supplied.", result.stdout)
+        self.assertTrue((target / "README.md").exists())
 
     def test_project_harness_new_refuses_existing_target(self) -> None:
         target = self.tmpdir / "existing-project"
