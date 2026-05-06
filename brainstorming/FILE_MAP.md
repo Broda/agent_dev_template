@@ -6,7 +6,7 @@ Lean file registry for the Project Harness Template.
 |---|---|
 | `README.md` | Lightweight overview and usage |
 | `BOOTSTRAP_TOOL.md` | Planning contract for a future harness bootstrap helper |
-| `HARNESS_STREAMLINING.md` | Active streamlining backlog for the harness template |
+| `HARNESS_STREAMLINING.md` | Live streamlining backlog when a cleanup phase is active |
 | `AGENTS.md` | Agent behavior contract |
 | `MODE.md` | Active repository phase selector |
 | `.agents/skills/brainstorming-lab/SKILL.md` | Repo-scoped skill for brainstorming-mode lifecycle work |
@@ -18,6 +18,7 @@ Lean file registry for the Project Harness Template.
 | `.agents/skills/template-maintenance/SKILL.md` | Repo-scoped skill for maintaining this harness template |
 | `.agents/skills/template-maintenance/agents/openai.yaml` | UI metadata for the template maintenance skill |
 | `.agents/plugins/marketplace.json` | Local plugin marketplace entry for agent-behavior distribution |
+| `plugins/project-lifecycle-lab/README.md` | Plugin packaging decision and external use check |
 | `plugins/project-lifecycle-lab/.codex-plugin/plugin.json` | Local plugin manifest for the lifecycle agent-behavior package |
 | `plugins/project-lifecycle-lab/skills/brainstorming-lab/SKILL.md` | Plugin mirror of the brainstorming lifecycle skill |
 | `plugins/project-lifecycle-lab/skills/brainstorming-lab/agents/openai.yaml` | Plugin mirror of brainstorming skill UI metadata |

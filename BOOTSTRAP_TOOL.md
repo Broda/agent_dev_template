@@ -1,6 +1,6 @@
 # Harness Bootstrap Tool Sketch
 
-This is a planning contract for a possible future `project-harness` helper. It is not required for current use.
+This is the planning and implementation contract for the local `project-harness` helper.
 
 The public template remains the canonical, inspectable harness. A bootstrap helper should make clone/update workflows easier without moving lifecycle runtime out of project repositories.
 
@@ -9,10 +9,10 @@ The public template remains the canonical, inspectable harness. A bootstrap help
 ```sh
 ./scripts/project-harness new <project-name>
 project-harness update
-project-harness validate
+./scripts/project-harness validate
 ```
 
-The first local command is implemented as `./scripts/project-harness new <path>`.
+The local `new` and `validate` commands are implemented. `update` remains deferred until the safe refresh boundary is designed in more detail.
 
 ## `new`
 
@@ -48,6 +48,8 @@ Behavior:
 
 Bring harness-maintained files in an existing project up to date from a selected template version.
 
+Status: deferred.
+
 Expected behavior:
 
 1. Show a dry-run summary before changing files.
@@ -59,6 +61,12 @@ Expected behavior:
 ## `validate`
 
 Run the same local checks the harness already exposes.
+
+Current local interface:
+
+```sh
+./scripts/project-harness validate
+```
 
 Expected behavior:
 

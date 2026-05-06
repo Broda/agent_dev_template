@@ -16,6 +16,7 @@ Usage: ./scripts/project-harness <command> [args]
 
 Commands:
   new <path> [--origin <url>] [--no-git]
+  validate
 '@
     exit 0
 }
@@ -23,6 +24,8 @@ Commands:
 switch ($Command) {
     # Delegates to project-harness-new.
     'new' { $cliCommand = 'project-harness-new' }
+    # Delegates to project-harness-validate.
+    'validate' { $cliCommand = 'project-harness-validate' }
     default {
         Write-Error "Unknown project-harness command: $Command"
         exit 2

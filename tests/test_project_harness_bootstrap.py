@@ -99,6 +99,12 @@ class ProjectHarnessBootstrapTests(LabWorkflowTestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("--origin cannot be used with --no-git.", result.stdout)
 
+    def test_project_harness_validate_runs_governance_checks(self) -> None:
+        result = run_cmd(["./scripts/project-harness", "validate"], cwd=self.repo)
+
+        self.assertIn("Running: ./scripts/validate-governance", result.stdout)
+        self.assertIn("Exit code: 0", result.stdout)
+
 
 if __name__ == "__main__":
     import unittest

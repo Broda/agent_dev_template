@@ -15,7 +15,7 @@ from template_cli.validators import (  # noqa: E402
     run_validate_development,
     run_validate_governance,
 )
-from template_cli.bootstrap import run_project_harness_new  # noqa: E402
+from template_cli.bootstrap import run_project_harness_new, run_project_harness_validate  # noqa: E402
 from template_cli.io_helpers import read_mode  # noqa: E402
 from template_cli.lab_cli import add_lab_subparsers, dispatch_lab_command  # noqa: E402
 from template_cli.plugin_sync import run_sync_plugin_skills  # noqa: E402
@@ -38,6 +38,7 @@ def build_parser() -> argparse.ArgumentParser:
     harness_new_parser.add_argument("target")
     harness_new_parser.add_argument("--origin", default="")
     harness_new_parser.add_argument("--no-git", action="store_true")
+    subparsers.add_parser("project-harness-validate")
     finalize_parser = subparsers.add_parser("finalize-project")
     finalize_parser.add_argument("--idea-id", default="")
     finalize_parser.add_argument("--write-export", action="store_true")
@@ -108,6 +109,8 @@ def main(argv: list[str] | None = None) -> int:
             origin=args.origin,
             no_git=args.no_git,
         )
+    if args.command == "project-harness-validate":
+        return run_project_harness_validate(Path.cwd())
     if args.command == "finalize-project":
         return run_finalize_project(
             Path.cwd(),

@@ -4,7 +4,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
-from template_cli.io_helpers import write_text
+from template_cli.io_helpers import read_mode, write_text
 
 
 COPY_IGNORE = shutil.ignore_patterns(
@@ -75,6 +75,20 @@ def run_project_harness_new(
         print("Git was not initialized because --no-git was supplied.")
     else:
         print("Initialized independent Git repository with no remote.")
+    return 0
+
+
+def run_project_harness_validate(root: Path) -> int:
+    commands = [["./scripts/validate-governance"]]
+    if read_mode(root) == "development":
+        commands.append(["./scripts/validate-development"])
+
+    for command in commands:
+        print(f"Running: {' '.join(command)}")
+        result = _run(command, root)
+        print(f"Exit code: {result}")
+        if result != 0:
+            return result
     return 0
 
 
