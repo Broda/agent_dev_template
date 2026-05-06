@@ -1,241 +1,35 @@
 from __future__ import annotations
 
-import json
-import re
 from pathlib import Path
 
-from template_cli.finalize_helpers import existing_state_value, files_containing, first_value_for_label
-from template_cli.io_helpers import IDEA_ROW_RE, clean_backticks, parse_markdown_table_rows, path_exists, read_mode, read_text
+from template_cli.finalize_helpers import existing_state_value, files_containing
+from template_cli.io_helpers import IDEA_ROW_RE, clean_backticks, parse_markdown_table_rows, path_exists, read_mode
 from template_cli.workflow_data import (
     FINALIZE_ADVISORY_FIELDS,
     FINALIZE_REQUIRED_FIELDS,
     _collect_session_links,
     _default_owner,
     _extract_catalog_row,
-    _extract_label_from_text,
     _find_idea_block,
-    _is_placeholderish_value,
     _title_from_idea_id,
 )
-
-
-DEVELOPMENT_GOVERNANCE_DOCS = [
-    "docs/GOVERNANCE_INDEX.md",
-    "docs/PROJECT_CONTEXT.md",
-    "docs/ROADMAP.md",
-    "docs/ARCHITECTURE.md",
-    "docs/FILE_MAP.md",
-    "docs/RUNTIME_VERIFICATION_REPORT.md",
-    "docs/adr/ADR-0001-record-architecture-decisions.md",
-]
-
-
-def _read_state(root: Path) -> dict:
-    state_path = root / "state/project-init.json"
-    if not state_path.exists():
-        return {}
-    try:
-        loaded = json.loads(read_text(state_path))
-    except json.JSONDecodeError:
-        return {}
-    return loaded if isinstance(loaded, dict) else {}
-
-
-def _development_active_milestone(root: Path) -> str:
-    project_context = root / "docs/PROJECT_CONTEXT.md"
-    if project_context.exists():
-        lines = read_text(project_context).splitlines()
-        for index, line in enumerate(lines):
-            if line.strip() == "Active Milestone:":
-                for candidate in lines[index + 1 :]:
-                    value = candidate.strip()
-                    if value and not value.startswith("#"):
-                        return value
-            match = re.search(r"Active Milestone:\s*(.+)$", line)
-            if match and match.group(1).strip():
-                return match.group(1).strip()
-
-    readme = root / "README.md"
-    if readme.exists():
-        for line in read_text(readme).splitlines():
-            match = re.search(r"Active Milestone:\s*(.+)$", line)
-            if match and match.group(1).strip():
-                return match.group(1).strip()
-
-    roadmap = root / "docs/ROADMAP.md"
-    if roadmap.exists():
-        for line in read_text(roadmap).splitlines():
-            if line.startswith("# Milestone ") and "Template" not in line:
-                return line.lstrip("#").strip()
-    return "not set"
-
-
-def _roadmap_task_counts(root: Path) -> tuple[int, int]:
-    roadmap = root / "docs/ROADMAP.md"
-    if not roadmap.exists():
-        return 0, 0
-    content = read_text(roadmap)
-    completed = len(re.findall(r"(?m)^\s*-\s+\[[xX]\]\s+", content))
-    open_tasks = len(re.findall(r"(?m)^\s*-\s+\[\s\]\s+", content))
-    return open_tasks, completed
-
-
-def _run_development_status(root: Path) -> int:
-    state = _read_state(root)
-    idea_id = str(state.get("ideaId") or existing_state_value(root, "ideaId") or "").strip()
-    state_status = str(state.get("status") or existing_state_value(root, "status") or "").strip()
-    project_name = str(state.get("projectName") or "unnamed project").strip()
-    validation_command = str((state.get("commands") or {}).get("test") or "").strip()
-    present_docs = [relpath for relpath in DEVELOPMENT_GOVERNANCE_DOCS if (root / relpath).exists()]
-    missing_docs = [relpath for relpath in DEVELOPMENT_GOVERNANCE_DOCS if not (root / relpath).exists()]
-    open_tasks, completed_tasks = _roadmap_task_counts(root)
-
-    print("Mode: development")
-    print(f"Project: {project_name}")
-    if idea_id:
-        if state_status:
-            print(f"Canonical state: {state_status} for {idea_id}")
-        else:
-            print(f"Canonical state: {idea_id}")
-    else:
-        print("Canonical state: no finalized idea recorded")
-    print(f"Active milestone: {_development_active_milestone(root)}")
-    print(f"Governance docs: {len(present_docs)}/{len(DEVELOPMENT_GOVERNANCE_DOCS)} present")
-    if missing_docs:
-        print("Missing governance docs: " + ", ".join(missing_docs))
-    print(f"Roadmap tasks: {open_tasks} open, {completed_tasks} complete")
-    if validation_command:
-        print(f"Validation command: {validation_command}")
-    else:
-        print("Validation command: not set")
-    print("Next step: align changes with docs/ROADMAP.md and record evidence under completed tasks")
-    return 0
-
-
-def _status_counts(rows: list[list[str]]) -> dict[str, int]:
-    counts = {name: 0 for name in ["inbox", "active", "parked", "killed", "finalized"]}
-    for cells in rows:
-        if len(cells) > 2:
-            status = cells[2].strip()
-            if status in counts:
-                counts[status] += 1
-    return counts
-
-
-def _resolved_finalize_target(root: Path, active_rows: list[list[str]]) -> tuple[dict[str, str] | None, str]:
-    state_idea_id = existing_state_value(root, "ideaId")
-    if state_idea_id:
-        row = _extract_catalog_row(root, state_idea_id)
-        if row.get("idea_id"):
-            return row, "canonical state"
-
-    if len(active_rows) == 1:
-        idea_id = active_rows[0][0].strip()
-        row = _extract_catalog_row(root, idea_id)
-        if row.get("idea_id"):
-            return row, "single active idea"
-
-    if len(active_rows) > 1:
-        return None, "ambiguous"
-    return None, "none"
-
-
-def _status_signal(
-    root: Path,
-    *,
-    state_keys: list[str],
-    idea_block: str,
-    hydration_files: list[Path],
-    label: str = "",
-) -> str:
-    for state_key in state_keys:
-        value = existing_state_value(root, state_key)
-        if value and not _is_placeholderish_value(value):
-            return value
-    if label:
-        direct_value = _extract_label_from_text(idea_block, label)
-        if direct_value and not _is_placeholderish_value(direct_value):
-            return direct_value
-        hydrated_value = first_value_for_label(hydration_files, label)
-        if hydrated_value and not _is_placeholderish_value(hydrated_value):
-            return hydrated_value
-    return ""
-
-
-def _status_signal_details(
-    root: Path,
-    *,
-    state_keys: list[str],
-    idea_label: str,
-    idea_lookup: tuple[str, str] | None,
-    hydration_files: list[Path],
-) -> tuple[str, str]:
-    for state_key in state_keys:
-        value = existing_state_value(root, state_key)
-        if value and not _is_placeholderish_value(value):
-            return value, f"state.{state_key}"
-    if idea_label and idea_lookup is not None:
-        value = _extract_label_from_text(idea_lookup[1], idea_label)
-        if value and not _is_placeholderish_value(value):
-            return value, f"{idea_lookup[0]}:{idea_label}"
-    if idea_label:
-        idea_relpath = idea_lookup[0] if idea_lookup is not None else ""
-        for path in hydration_files:
-            relpath = path.relative_to(root).as_posix()
-            if relpath == idea_relpath:
-                continue
-            value = _extract_label_from_text(read_text(path), idea_label)
-            if value and not _is_placeholderish_value(value):
-                return value, f"{relpath}:{idea_label}"
-    return "", ""
-
-
-def _status_readiness(root: Path, row: dict[str, str]) -> tuple[str, list[str], list[str], list[str]]:
-    idea_id = row["idea_id"]
-    idea_lookup = _find_idea_block(root, idea_id)
-    idea_block = idea_lookup[1] if idea_lookup else ""
-    session_files = _collect_session_links(root, idea_id, row)
-    hydration_files = [
-        root / rel
-        for rel in files_containing(root, "ideas", idea_id) + session_files
-        if path_exists(root, rel)
-    ]
-
-    required_missing: list[str] = []
-    advisory_missing: list[str] = []
-
-    if not session_files:
-        required_missing.append("session history")
-
-    for display_name, state_keys, label in FINALIZE_REQUIRED_FIELDS:
-        if not _status_signal(root, state_keys=state_keys, idea_block=idea_block, hydration_files=hydration_files, label=label):
-            required_missing.append(display_name)
-
-    for display_name, state_keys, label in FINALIZE_ADVISORY_FIELDS:
-        if not _status_signal(root, state_keys=state_keys, idea_block=idea_block, hydration_files=hydration_files, label=label):
-            advisory_missing.append(display_name)
-
-    summary_export = clean_backticks(row.get("summary_export", ""))
-    if summary_export and summary_export != "_n/a_":
-        advisory_present = [f"summary snapshot: {summary_export}"]
-    else:
-        advisory_present = []
-
-    if required_missing:
-        return "needs-input", required_missing, advisory_missing, advisory_present
-    if advisory_missing:
-        return "ready-with-advisories", required_missing, advisory_missing, advisory_present
-    return "ready", required_missing, advisory_missing, advisory_present
+from template_cli.workflow_development_status import run_development_status
+from template_cli.workflow_readiness import (
+    resolved_finalize_target,
+    status_counts,
+    status_readiness,
+    status_signal_details,
+)
 
 
 def run_lab_status(root: Path) -> int:
     mode = read_mode(root) or "unknown"
     if mode == "development":
-        return _run_development_status(root)
+        return run_development_status(root)
 
     rows = parse_markdown_table_rows(root / "IDEA_CATALOG.md", IDEA_ROW_RE)
     active = [cells for cells in rows if len(cells) > 2 and cells[2].strip() == "active"]
-    counts = _status_counts(rows)
+    counts = status_counts(rows)
     state_idea_id = existing_state_value(root, "ideaId")
     state_status = existing_state_value(root, "status")
 
@@ -261,7 +55,7 @@ def run_lab_status(root: Path) -> int:
                 cells.append("")
             print(f"- {cells[0].strip()} ({cells[1].strip() or 'untitled'})")
 
-    target_row, target_source = _resolved_finalize_target(root, active)
+    target_row, target_source = resolved_finalize_target(root, active)
     if target_row is None:
         if target_source == "ambiguous":
             print("Finalize target: ambiguous")
@@ -284,7 +78,7 @@ def run_lab_status(root: Path) -> int:
     else:
         print("Summary snapshot: none")
 
-    readiness, required_missing, advisory_missing, advisory_present = _status_readiness(root, target_row)
+    readiness, required_missing, advisory_missing, advisory_present = status_readiness(root, target_row)
     print(f"Finalize readiness: {readiness}")
     if required_missing:
         print("Missing before low-friction finalize: " + ", ".join(required_missing))
@@ -313,7 +107,7 @@ def run_lab_doctor(root: Path, *, idea_id: str = "") -> int:
             return 0
         target_source = "explicit --idea-id"
     else:
-        target_row, target_source = _resolved_finalize_target(root, active)
+        target_row, target_source = resolved_finalize_target(root, active)
 
     if target_row is None:
         if target_source == "ambiguous":
@@ -338,7 +132,7 @@ def run_lab_doctor(root: Path, *, idea_id: str = "") -> int:
         for rel in files_containing(root, "ideas", resolved_idea_id) + session_files
         if path_exists(root, rel)
     ]
-    readiness, required_missing, advisory_missing, advisory_present = _status_readiness(root, target_row)
+    readiness, required_missing, advisory_missing, advisory_present = status_readiness(root, target_row)
 
     print(f"Finalize target: {resolved_idea_id} (from {target_source})")
     print(f"Target title: {target_row.get('title') or _title_from_idea_id(resolved_idea_id)}")
@@ -367,7 +161,7 @@ def run_lab_doctor(root: Path, *, idea_id: str = "") -> int:
         print(f"- session history: OK via {session_files[-1]}")
 
     for display_name, state_keys, label in FINALIZE_REQUIRED_FIELDS + FINALIZE_ADVISORY_FIELDS:
-        value, source = _status_signal_details(
+        value, source = status_signal_details(
             root,
             state_keys=state_keys,
             idea_label=label,
