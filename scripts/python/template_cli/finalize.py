@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import json
-import subprocess
 from datetime import date
 from pathlib import Path
 
+from template_cli.finalize_context import load_finalize_context
 from template_cli.finalize_helpers import (
     STATE_FILE,
     STATE_SCHEMA_VERSION,
@@ -12,13 +12,11 @@ from template_cli.finalize_helpers import (
     choose_from_list,
     choose_project_type,
     existing_state_value,
-    files_containing,
     first_value_for_label,
     infer_project_type,
     is_placeholder_value,
     join_lines,
     latest_session_path,
-    split_linkish_values,
     summarize_decisions,
     trim,
     unique_values,
@@ -33,10 +31,6 @@ from template_cli.finalize_state import (
 )
 from template_cli.render import run_render_development_docs
 from template_cli.io_helpers import (
-    IDEA_ROW_RE,
-    clean_backticks,
-    parse_markdown_table_rows,
-    path_exists,
     read_text,
     write_text,
 )
@@ -72,51 +66,13 @@ def _pick_noninteractive_choice(value: str, field: str, missing: list[str]) -> s
 
 def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False, interactive: bool = False) -> int:
     idea_id = resolve_finalize_idea_id(root, idea_id, interactive=interactive)
-    catalog_path = root / "IDEA_CATALOG.md"
-
-    catalog_cells = None
-    for cells in parse_markdown_table_rows(catalog_path, IDEA_ROW_RE):
-        if cells and cells[0] == idea_id:
-            catalog_cells = cells
-            break
-    if catalog_cells is None:
-        raise SystemExit(f"Idea '{idea_id}' not found in IDEA_CATALOG.md.")
-
-    project_name = trim(catalog_cells[1] if len(catalog_cells) > 1 else "") or idea_id
-    owner = trim(catalog_cells[3] if len(catalog_cells) > 3 else "")
-    sessions_col = trim(catalog_cells[4] if len(catalog_cells) > 4 else "")
-    existing_export_path = clean_backticks(catalog_cells[5] if len(catalog_cells) > 5 else "")
-    notes_col = trim(catalog_cells[6] if len(catalog_cells) > 6 else "")
-
-    if not owner or owner == "unassigned":
-        result = subprocess.run(
-            ["git", "config", "--get", "user.name"],
-            cwd=root,
-            text=True,
-            capture_output=True,
-            check=False,
-        )
-        owner = trim(result.stdout) or "unassigned"
-
-    idea_files = files_containing(root, "ideas", idea_id)
-    if not idea_files:
-        raise SystemExit(
-            f"Idea '{idea_id}' does not have a recorded idea entry under ideas/.\n"
-            "Capture or activate the idea before finalizing."
-        )
-
-    session_paths: list[str] = []
-    for match in split_linkish_values(sessions_col, ("sessions",)):
-        if path_exists(root, match) and match not in session_paths:
-            session_paths.append(match)
-    for match in files_containing(root, "sessions", idea_id):
-        if match not in session_paths:
-            session_paths.append(match)
-    if not session_paths:
-        raise SystemExit(
-            f"Idea '{idea_id}' does not have a related session under sessions/.\n"
-            "Create at least one session before finalizing."
-        )
+    context = load_finalize_context(root, idea_id)
+    project_name = context.project_name
+    owner = context.owner
+    notes_col = context.notes_col
+    idea_files = context.idea_files
+    session_paths = context.session_paths
+    hydrate_files = context.hydrate_files
 
     existing_project_name = existing_state_value(root, "projectName")
     existing_purpose = existing_state_value(root, "purpose")
@@ -152,10 +108,6 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
 
     if existing_project_name:
         project_name = existing_project_name
-
-    hydrate_files = [root / rel for rel in idea_files + session_paths]
-    if existing_export_path and path_exists(root, existing_export_path):
-        hydrate_files.append(root / existing_export_path)
 
     objective = existing_purpose or ""
     if not objective:

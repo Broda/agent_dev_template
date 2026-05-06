@@ -188,11 +188,11 @@ class TemplateValidationTests(LabWorkflowTestCase):
         self.assertIn("Python code file exceeds 500 lines: tests/oversized_fixture.py (501)", result.stdout)
 
     def test_validate_brainstorming_checks_workflow_finalize_helper_imports(self) -> None:
-        workflow_path = self.repo / "scripts/python/template_cli/workflow_data.py"
+        workflow_path = self.repo / "scripts/python/template_cli/workflow.py"
         workflow_path.write_text(
             workflow_path.read_text(encoding="utf-8").replace(
-                "from template_cli.finalize_helpers import (",
-                "from template_cli.finalize import (",
+                "from template_cli.finalize import run_finalize_project",
+                "from template_cli.finalize import run_finalize_project, _required_value",
                 1,
             ),
             encoding="utf-8",
@@ -202,7 +202,7 @@ class TemplateValidationTests(LabWorkflowTestCase):
 
         self.assertNotEqual(result.returncode, 0)
         self.assertIn(
-            "Workflow module must import finalize helper 'files_containing' from a helper module",
+            "Workflow module must import finalize helper '_required_value' from a helper module",
             result.stdout,
         )
 
