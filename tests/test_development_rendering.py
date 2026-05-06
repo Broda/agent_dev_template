@@ -24,6 +24,10 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
         self.assertIn("python3 -m py_compile scripts/python/cli.py scripts/python/template_cli/*.py", ci)
         self.assertIn("./scripts/validate-development", ci)
         self.assertIn("./scripts/validate-governance", ci)
+        self.assertIn("uses: actions/checkout@v6", ci)
+        self.assertIn("uses: actions/setup-python@v6", ci)
+        self.assertNotIn("uses: actions/checkout@v4", ci)
+        self.assertNotIn("uses: actions/setup-python@v5", ci)
 
     def test_render_and_validate_development_with_non_game_web_app_fixture(self) -> None:
         self.write_render_fixture("finalized_state_web_app_v2.json")
