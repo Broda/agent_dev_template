@@ -65,6 +65,15 @@ class LabLifecycleTests(LabWorkflowTestCase):
         state = json.loads((self.repo / "state/project-init.json").read_text(encoding="utf-8"))
         self.assertEqual(state["ideaId"], "idea-default-finalize")
         self.assertEqual(state["status"], "finalized")
+        self.assertEqual(
+            state["documentation"]["wiki"],
+            {
+                "enabled": False,
+                "pathEnv": "PROJECT_HARNESS_WIKI_DIR",
+                "defaultCheckout": "../repo.wiki",
+                "remote": "",
+            },
+        )
         run_cmd(["./scripts/validate-development"], cwd=self.repo)
 
     def test_lab_finalize_interactive_preserves_prompt_fill_flow(self) -> None:
@@ -116,6 +125,14 @@ class LabLifecycleTests(LabWorkflowTestCase):
         state["artifacts"]["adrReferences"] = [
             "docs/adr/ADR-0099-custom-preserved-reference.md",
         ]
+        state["documentation"] = {
+            "wiki": {
+                "enabled": True,
+                "pathEnv": "CUSTOM_WIKI_DIR",
+                "defaultCheckout": "../custom.wiki",
+                "remote": "git@example.com:owner/custom.wiki.git",
+            }
+        }
         state_path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
 
         result = run_cmd(
@@ -140,6 +157,10 @@ class LabLifecycleTests(LabWorkflowTestCase):
             "docs/adr/ADR-0001-record-architecture-decisions.md",
             artifacts["adrReferences"],
         )
+        self.assertEqual(finalized_state["documentation"]["wiki"]["enabled"], True)
+        self.assertEqual(finalized_state["documentation"]["wiki"]["pathEnv"], "CUSTOM_WIKI_DIR")
+        self.assertEqual(finalized_state["documentation"]["wiki"]["defaultCheckout"], "../custom.wiki")
+        self.assertEqual(finalized_state["documentation"]["wiki"]["remote"], "git@example.com:owner/custom.wiki.git")
         run_cmd(["./scripts/validate-development"], cwd=self.repo)
 
     def test_lab_finalize_requires_explicit_choice_when_multiple_ideas_active(self) -> None:

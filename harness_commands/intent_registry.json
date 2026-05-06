@@ -249,6 +249,36 @@
       "writeBehavior": "write"
     },
     {
+      "command": "wiki-render",
+      "backendIntent": "/lab wiki-render",
+      "modes": [
+        "development"
+      ],
+      "phrases": [
+        "generate the wiki",
+        "update the wiki pages",
+        "render wiki docs"
+      ],
+      "description": "render friendly GitHub Wiki pages when wiki support is enabled",
+      "filesTouched": "sibling wiki checkout",
+      "writeBehavior": "write"
+    },
+    {
+      "command": "wiki-check",
+      "backendIntent": "/lab wiki-check",
+      "modes": [
+        "development"
+      ],
+      "phrases": [
+        "check wiki sync",
+        "verify the wiki is current",
+        "check wiki drift"
+      ],
+      "description": "verify user-facing changes are paired with wiki updates when enabled",
+      "filesTouched": "sibling wiki checkout status",
+      "writeBehavior": "no-write"
+    },
+    {
       "command": "commit",
       "backendIntent": "/lab commit [message]",
       "modes": [

@@ -48,10 +48,18 @@ Shared commands keep development-specific meaning:
 - `./scripts/lab status` reports finalized project context, active milestone, governance-doc coverage, and roadmap task counts.
 - `./scripts/lab audit` runs harness governance validation.
 - `./scripts/lab evidence` marks a matching roadmap checkbox task complete and records verification evidence beneath it.
+- `./scripts/lab wiki-render` generates friendly GitHub Wiki pages only when `state/project-init.json` enables `documentation.wiki.enabled`.
+- `./scripts/lab wiki-check` verifies user-facing repo changes are paired with wiki checkout updates only when wiki support is enabled.
 - `./scripts/lab note` captures durable research notes; if the note changes direction, update ADRs, roadmap, architecture, or policy in the same slice.
 - `./scripts/lab commit`, `./scripts/lab push`, and `./scripts/lab sync` are explicit git operations after a coherent development slice.
 
 Brainstorming-only commands remain unavailable after finalization. Do not use `capture`, `activate`, `decide`, `risk`, `review`, `export`, `finalize`, `park`, `kill`, or `doctor` in development mode unless the registry explicitly changes.
+
+## Wiki Docs
+
+Wiki tooling is opt-in. Check `state/project-init.json` before running it. If `documentation.wiki.enabled` is not `true`, do not create wiki pages or enforce wiki sync.
+
+When wiki support is enabled, run `./scripts/lab wiki-render` after changes to public behavior, README, changelog, architecture, roadmap, ADRs, verification guidance, command registry, development templates, or user-facing runtime/source files. Run `./scripts/lab wiki-check` before closing the slice.
 
 ## Research Notes
 

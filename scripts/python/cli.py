@@ -25,6 +25,7 @@ from template_cli.render import run_render_development_docs  # noqa: E402
 from template_cli.intents import IntentRegistryError, modes_for_command, run_render_intent_docs  # noqa: E402
 from template_cli.finalize import run_finalize_project  # noqa: E402
 from template_cli.sync import run_lab_sync_from_argv  # noqa: E402
+from template_cli.wiki import run_lab_wiki_check, run_lab_wiki_render  # noqa: E402
 from template_cli.workflow import (  # noqa: E402
     run_lab_activate,
     run_lab_audit,
@@ -74,6 +75,8 @@ def build_parser() -> argparse.ArgumentParser:
     doctor_parser = subparsers.add_parser("lab-doctor")
     doctor_parser.add_argument("--idea-id", default="")
     subparsers.add_parser("lab-audit")
+    subparsers.add_parser("lab-wiki-render")
+    subparsers.add_parser("lab-wiki-check")
     adr_parser = subparsers.add_parser("lab-adr")
     adr_parser.add_argument("--title", required=True)
     adr_parser.add_argument("--context", action="append", default=[])
@@ -262,6 +265,10 @@ def main(argv: list[str] | None = None) -> int:
         return run_lab_doctor(Path.cwd(), idea_id=args.idea_id)
     if args.command == "lab-audit":
         return run_lab_audit(Path.cwd())
+    if args.command == "lab-wiki-render":
+        return run_lab_wiki_render(Path.cwd())
+    if args.command == "lab-wiki-check":
+        return run_lab_wiki_check(Path.cwd())
     if args.command == "lab-adr":
         return run_lab_adr(
             Path.cwd(),

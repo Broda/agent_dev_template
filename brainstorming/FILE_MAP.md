@@ -48,6 +48,7 @@ Lean file registry for the Project Harness Template.
 | `tests/test_development_adr.py` | Development ADR command regression tests |
 | `tests/test_development_evidence.py` | Development roadmap evidence command regression tests |
 | `tests/test_development_rendering.py` | Development doc render and validation regression tests |
+| `tests/test_development_wiki.py` | Development wiki render and sync-check regression tests |
 | `tests/test_finalization_regression.py` | End-to-end finalization regression tests for multi-session detail carryover |
 | `tests/test_intent_registry_contract.py` | Intent-registry render, parity, and CI-contract regression suite |
 | `tests/test_lab_lifecycle.py` | Lab command, finalize, status, doctor, and review regression tests |
@@ -122,6 +123,7 @@ Lean file registry for the Project Harness Template.
 | `scripts/python/template_cli/sync.py` | Git sync helpers for milestone commit and push flows |
 | `scripts/python/template_cli/validator_placeholders.py` | Precise unresolved-placeholder detection for generated development docs |
 | `scripts/python/template_cli/validators.py` | Brainstorming and development validation orchestration |
+| `scripts/python/template_cli/wiki.py` | Optional development GitHub Wiki render and sync-check command implementation |
 | `scripts/python/template_cli/finalize_helpers.py` | Utility functions, interactive prompts, markdown extraction, and state helpers for finalization |
 | `scripts/python/template_cli/finalize_state.py` | BackupManager, catalog transition functions, and summary export writer for finalization |
 | `scripts/python/template_cli/workflow_data.py` | Idea-block I/O, catalog helpers, session helpers, and data primitives for lab workflow commands |

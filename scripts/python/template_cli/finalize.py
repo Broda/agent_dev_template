@@ -43,6 +43,7 @@ from template_cli.io_helpers import (
 from template_cli.validators import (
     run_validate_development,
 )
+from template_cli.wiki import default_wiki_config
 
 
 def _required_value(value: str, field: str, missing: list[str]) -> str:
@@ -323,6 +324,15 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
         preserved_adr_references = existing_artifacts.get("adrReferences", [])
         if not isinstance(preserved_adr_references, list):
             preserved_adr_references = []
+        preserved_documentation = existing_state.get("documentation", {}) if isinstance(existing_state, dict) else {}
+        if not isinstance(preserved_documentation, dict):
+            preserved_documentation = {}
+        documentation = dict(preserved_documentation)
+        wiki_config = default_wiki_config(root)
+        existing_wiki_config = documentation.get("wiki", {})
+        if isinstance(existing_wiki_config, dict):
+            wiki_config.update(existing_wiki_config)
+        documentation["wiki"] = wiki_config
 
         adr_references = unique_values(
             list(preserved_adr_references) + ["docs/adr/ADR-0001-record-architecture-decisions.md"]
@@ -362,6 +372,7 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
                 "run": run_command,
                 "test": test_command,
             },
+            "documentation": documentation,
             "product": {
                 "problemStatement": problem_statement or objective,
                 "targetUsers": target_users or "See related sessions",

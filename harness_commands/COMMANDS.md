@@ -46,6 +46,8 @@ It is for agent dispatch: humans can speak the phrase family naturally, and agen
 | "run audit", "validate the repo", "check governance" | `brainstorming`, `development` | `/lab audit` |
 | "record this as evidence", "mark this task done", "save verification for this task" | `development` | `/lab evidence <task>` |
 | "write an ADR", "record this architecture decision", "capture this decision as an ADR" | `development` | `/lab adr <title>` |
+| "generate the wiki", "update the wiki pages", "render wiki docs" | `development` | `/lab wiki-render` |
+| "check wiki sync", "verify the wiki is current", "check wiki drift" | `development` | `/lab wiki-check` |
 | "commit this milestone", "make a commit", "commit these changes" | `brainstorming`, `development` | `/lab commit [message]` |
 | "push these changes", "push this branch", "publish the branch" | `brainstorming`, `development` | `/lab push` |
 | "sync the repo", "commit and push this", "sync these changes" | `brainstorming`, `development` | `/lab sync [message]` |
@@ -170,6 +172,23 @@ It is for agent dispatch: humans can speak the phrase family naturally, and agen
   - `--date "YYYY-MM-DD"`
 - Example:
   - `./scripts/lab adr --title "Adopt deterministic ADR capture" --decision "Use ./scripts/lab adr for development decisions"`
+
+### `/lab wiki-render`
+- Development-mode command.
+- No-op unless `state/project-init.json` has `documentation.wiki.enabled` set to `true`.
+- Resolve the wiki checkout from `PROJECT_HARNESS_WIKI_DIR`, then `documentation.wiki.defaultCheckout`.
+- Clone the wiki remote automatically when enabled and the checkout is missing.
+- Render friendly GitHub Wiki pages while leaving the wiki checkout dirty for review.
+- Example:
+  - `./scripts/lab wiki-render`
+
+### `/lab wiki-check`
+- Development-mode command.
+- No-op unless `state/project-init.json` has `documentation.wiki.enabled` set to `true`.
+- Clone the wiki remote automatically when enabled and the checkout is missing.
+- Fail when user-facing repo changes are present but the wiki checkout is clean.
+- Example:
+  - `./scripts/lab wiki-check`
 
 ### `/lab status`
 - Report current mode, per-status idea counts, active idea context, inferred finalize target, and finalize-readiness gaps.
