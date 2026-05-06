@@ -202,7 +202,7 @@ class TemplateValidationTests(LabWorkflowTestCase):
 
         self.assertNotEqual(result.returncode, 0)
         self.assertIn(
-            "Workflow module must import finalize helper 'existing_state_value' from a helper module",
+            "Workflow module must import finalize helper 'files_containing' from a helper module",
             result.stdout,
         )
 

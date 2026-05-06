@@ -9,6 +9,7 @@ from template_cli.io_helpers import ValidationResult, read_text
 ALLOWED_FINALIZE_IMPORTS = {"run_finalize_project"}
 WORKFLOW_MODULES = [
     "scripts/python/template_cli/workflow.py",
+    "scripts/python/template_cli/workflow_catalog.py",
     "scripts/python/template_cli/workflow_commands.py",
     "scripts/python/template_cli/workflow_data.py",
     "scripts/python/template_cli/workflow_development_status.py",

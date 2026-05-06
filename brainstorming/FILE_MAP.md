@@ -128,7 +128,8 @@ Lean file registry for the Project Harness Template.
 | `scripts/python/template_cli/wiki.py` | Optional development GitHub Wiki render and sync-check command implementation |
 | `scripts/python/template_cli/finalize_helpers.py` | Utility functions, interactive prompts, markdown extraction, and state helpers for finalization |
 | `scripts/python/template_cli/finalize_state.py` | BackupManager, catalog transition functions, and summary export writer for finalization |
-| `scripts/python/template_cli/workflow_data.py` | Idea-block I/O, catalog helpers, session helpers, and data primitives for lab workflow commands |
+| `scripts/python/template_cli/workflow_catalog.py` | IDEA_CATALOG row parsing and upsert helpers for lab workflow state |
+| `scripts/python/template_cli/workflow_data.py` | Idea-block I/O, session helpers, and data primitives for lab workflow commands |
 | `scripts/python/template_cli/workflow_commands.py` | Session-scoped lab mutation commands for path notes, decisions, risks, and reviews |
 | `scripts/python/template_cli/workflow_development_status.py` | Development-mode status reporting helpers |
 | `scripts/python/template_cli/workflow_idea_commands.py` | Idea lifecycle command handlers for capture, activation, parking, killing, and export |
