@@ -59,8 +59,11 @@ class FinalizationRegressionTests(LabWorkflowTestCase):
             "ROADMAP": (self.repo / "docs/ROADMAP.md").read_text(encoding="utf-8"),
             "ADR": (self.repo / "docs/adr/ADR-0001-record-architecture-decisions.md").read_text(encoding="utf-8"),
             "EXPORT": summary_export.read_text(encoding="utf-8"),
+            "CI": (self.repo / ".github/workflows/ci.yml").read_text(encoding="utf-8"),
         }
-        for content in outputs.values():
+        for label, content in outputs.items():
+            if label == "CI":
+                continue
             self.assertIn(project_name, content)
         self.assertIn(purpose, outputs["README"])
         self.assertIn('python3 -m pytest "tests/integration cases" -k "happy path"', outputs["README"])
@@ -80,6 +83,11 @@ class FinalizationRegressionTests(LabWorkflowTestCase):
         self.assertIn(session_two, outputs["ADR"])
         self.assertIn(key_decisions, outputs["EXPORT"])
         self.assertIn(custom_adr, outputs["EXPORT"])
+        self.assertNotIn("python3 -m unittest discover -s tests -v", outputs["CI"])
+        self.assertIn('pnpm build && python3 -m py_compile "src/app/main.py"', outputs["CI"])
+        self.assertIn('python3 -m pytest "tests/integration cases" -k "happy path"', outputs["CI"])
+        self.assertIn("./scripts/validate-governance", outputs["CI"])
+        self.assertIn("./scripts/validate-development", outputs["CI"])
         run_cmd(["./scripts/validate-development"], cwd=self.repo)
 
     def _write_rich_brainstorming_state(

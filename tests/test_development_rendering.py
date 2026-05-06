@@ -14,11 +14,16 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
         readme = (self.repo / "README.md").read_text(encoding="utf-8")
         project_context = (self.repo / "docs/PROJECT_CONTEXT.md").read_text(encoding="utf-8")
         roadmap = (self.repo / "docs/ROADMAP.md").read_text(encoding="utf-8")
+        ci = (self.repo / ".github/workflows/ci.yml").read_text(encoding="utf-8")
         self.assertIn("# Render Fixture", readme)
         self.assertIn("Render development docs from a finalized canonical state fixture.", readme)
         self.assertIn("Development-mode rendering needs a stable, reusable finalized-state fixture.", project_context)
         self.assertIn("Rendered docs drift from the state schema or validation contract.", project_context)
         self.assertIn("./scripts/validate-development", roadmap)
+        self.assertNotIn("python3 -m unittest discover -s tests -v", ci)
+        self.assertIn("python3 -m py_compile scripts/python/cli.py scripts/python/template_cli/*.py", ci)
+        self.assertIn("./scripts/validate-development", ci)
+        self.assertIn("./scripts/validate-governance", ci)
 
     def test_render_and_validate_development_with_non_game_web_app_fixture(self) -> None:
         self.write_render_fixture("finalized_state_web_app_v2.json")
@@ -28,6 +33,7 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
         project_context = (self.repo / "docs/PROJECT_CONTEXT.md").read_text(encoding="utf-8").lower()
         architecture = (self.repo / "docs/ARCHITECTURE.md").read_text(encoding="utf-8").lower()
         roadmap = (self.repo / "docs/ROADMAP.md").read_text(encoding="utf-8").lower()
+        ci = (self.repo / ".github/workflows/ci.yml").read_text(encoding="utf-8")
         for banned_term in [
             "gameplay",
             "player",
@@ -46,6 +52,7 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
         self.assertIn("editor-first internal web platform", readme)
         self.assertIn("shared postgresql", architecture)
         self.assertIn("pnpm build", roadmap)
+        self.assertIn("cargo fmt --check", ci)
 
     def test_render_and_validate_development_with_persistence_fixture(self) -> None:
         self.write_render_fixture("finalized_state_with_persistence_v2.json")
@@ -69,6 +76,7 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
             "docs/PROJECT_CONTEXT.md": (self.repo / "docs/PROJECT_CONTEXT.md").read_text(encoding="utf-8"),
             "docs/ROADMAP.md": (self.repo / "docs/ROADMAP.md").read_text(encoding="utf-8"),
             "docs/MIGRATION_POLICY.md": (self.repo / "docs/MIGRATION_POLICY.md").read_text(encoding="utf-8"),
+            ".github/workflows/ci.yml": (self.repo / ".github/workflows/ci.yml").read_text(encoding="utf-8"),
         }
         run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
         second_snapshot = {
@@ -77,6 +85,7 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
             "docs/PROJECT_CONTEXT.md": (self.repo / "docs/PROJECT_CONTEXT.md").read_text(encoding="utf-8"),
             "docs/ROADMAP.md": (self.repo / "docs/ROADMAP.md").read_text(encoding="utf-8"),
             "docs/MIGRATION_POLICY.md": (self.repo / "docs/MIGRATION_POLICY.md").read_text(encoding="utf-8"),
+            ".github/workflows/ci.yml": (self.repo / ".github/workflows/ci.yml").read_text(encoding="utf-8"),
         }
         self.assertEqual(first_snapshot, second_snapshot)
         run_cmd(["./scripts/validate-development"], cwd=self.repo)
@@ -164,6 +173,7 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
         roadmap = (self.repo / "docs/ROADMAP.md").read_text(encoding="utf-8")
         architecture = (self.repo / "docs/ARCHITECTURE.md").read_text(encoding="utf-8")
         adr = (self.repo / "docs/adr/ADR-0001-record-architecture-decisions.md").read_text(encoding="utf-8")
+        ci = (self.repo / ".github/workflows/ci.yml").read_text(encoding="utf-8")
         self.assertIn("## Milestone 1 MVP Contract", roadmap)
         self.assertIn("devos-core", roadmap)
         self.assertIn("SQL migrations embedded with include_str!", roadmap)
@@ -173,6 +183,7 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
         self.assertIn("timestamps are normalized before storage", architecture)
         self.assertIn("### Finalized Implementation Contract", adr)
         self.assertIn("cargo test across workspace crates", adr)
+        self.assertIn("cargo fmt --check", ci)
 
 
 if __name__ == "__main__":

@@ -308,6 +308,7 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
             "docs/MIGRATION_POLICY.md",
             "docs/adr/ADR-0001-record-architecture-decisions.md",
             "docs/adr/ADR-TEMPLATE.md",
+            ".github/workflows/ci.yml",
             "IDEA_CATALOG.md",
             "MODE.md",
             session_path,
