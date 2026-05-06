@@ -234,6 +234,21 @@
       "writeBehavior": "write"
     },
     {
+      "command": "adr",
+      "backendIntent": "/lab adr <title>",
+      "modes": [
+        "development"
+      ],
+      "phrases": [
+        "write an ADR",
+        "record this architecture decision",
+        "capture this decision as an ADR"
+      ],
+      "description": "create the next sequential development ADR",
+      "filesTouched": "`docs/adr/ADR-XXXX-*.md`",
+      "writeBehavior": "write"
+    },
+    {
       "command": "commit",
       "backendIntent": "/lab commit [message]",
       "modes": [

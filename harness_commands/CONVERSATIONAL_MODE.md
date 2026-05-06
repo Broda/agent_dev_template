@@ -47,6 +47,7 @@ It is the agent-facing interface across harness modes: the user can speak natura
 | "why is finalize blocked?", "what exactly is missing before finalize?", "show me where finalize is getting values from" | `brainstorming` | explain finalize-readiness and source evidence | no write |
 | "run audit", "validate the repo", "check governance" | `brainstorming`, `development` | validate integrity | `scripts/validate-governance` |
 | "record this as evidence", "mark this task done", "save verification for this task" | `development` | mark a roadmap task complete and record verification evidence | `docs/ROADMAP.md` |
+| "write an ADR", "record this architecture decision", "capture this decision as an ADR" | `development` | create the next sequential development ADR | `docs/adr/ADR-XXXX-*.md` |
 | "commit this milestone", "make a commit", "commit these changes" | `brainstorming`, `development` | create an explicit git commit | git metadata and working tree |
 | "push these changes", "push this branch", "publish the branch" | `brainstorming`, `development` | push the current branch to origin | git metadata and working tree |
 | "sync the repo", "commit and push this", "sync these changes" | `brainstorming`, `development` | perform explicit commit plus push sync | git metadata and working tree |

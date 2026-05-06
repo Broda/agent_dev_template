@@ -45,6 +45,7 @@ Lean file registry for the Project Harness Template.
 | `exports/` | Optional archival project summaries |
 | `tests/` | Regression tests for CLI and workflow runtime |
 | `tests/workflow_test_helpers.py` | Shared temp-repo fixtures and command helpers for workflow tests |
+| `tests/test_development_adr.py` | Development ADR command regression tests |
 | `tests/test_development_evidence.py` | Development roadmap evidence command regression tests |
 | `tests/test_development_rendering.py` | Development doc render and validation regression tests |
 | `tests/test_finalization_regression.py` | End-to-end finalization regression tests for multi-session detail carryover |
@@ -100,6 +101,7 @@ Lean file registry for the Project Harness Template.
 | `.github/PULL_REQUEST_TEMPLATE.md` | PR checklist |
 | `.gitignore` | Local/derived file exclusions |
 | `scripts/python/template_cli/io_helpers.py` | I/O primitives, regex constants, ValidationResult, and summary printers shared across the CLI |
+| `scripts/python/template_cli/adr.py` | Development ADR capture command implementation |
 | `scripts/python/template_cli/bootstrap.py` | Project harness bootstrap command implementation |
 | `scripts/python/template_cli/evidence.py` | Development roadmap evidence capture command implementation |
 | `scripts/python/template_cli/finalize.py` | In-place finalization orchestration |

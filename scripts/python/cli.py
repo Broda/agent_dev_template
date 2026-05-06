@@ -16,6 +16,7 @@ from template_cli.validators import (  # noqa: E402
     run_validate_governance,
 )
 from template_cli.bootstrap import run_project_harness_new  # noqa: E402
+from template_cli.adr import run_lab_adr  # noqa: E402
 from template_cli.evidence import run_lab_evidence  # noqa: E402
 from template_cli.io_helpers import read_mode  # noqa: E402
 from template_cli.notes import run_lab_note  # noqa: E402
@@ -73,6 +74,16 @@ def build_parser() -> argparse.ArgumentParser:
     doctor_parser = subparsers.add_parser("lab-doctor")
     doctor_parser.add_argument("--idea-id", default="")
     subparsers.add_parser("lab-audit")
+    adr_parser = subparsers.add_parser("lab-adr")
+    adr_parser.add_argument("--title", required=True)
+    adr_parser.add_argument("--context", action="append", default=[])
+    adr_parser.add_argument("--decision", required=True)
+    adr_parser.add_argument("--consequence", action="append", default=[])
+    adr_parser.add_argument("--alternative", action="append", default=[])
+    adr_parser.add_argument("--status", default="Accepted")
+    adr_parser.add_argument("--deciders", default="")
+    adr_parser.add_argument("--supersedes", default="")
+    adr_parser.add_argument("--date", dest="adr_date", default="")
     evidence_parser = subparsers.add_parser("lab-evidence")
     evidence_parser.add_argument("--task", required=True)
     evidence_parser.add_argument("--command", dest="evidence_command", required=True)
@@ -251,6 +262,19 @@ def main(argv: list[str] | None = None) -> int:
         return run_lab_doctor(Path.cwd(), idea_id=args.idea_id)
     if args.command == "lab-audit":
         return run_lab_audit(Path.cwd())
+    if args.command == "lab-adr":
+        return run_lab_adr(
+            Path.cwd(),
+            title=args.title,
+            context=args.context,
+            decision=args.decision,
+            consequence=args.consequence,
+            alternative=args.alternative,
+            status=args.status,
+            deciders=args.deciders,
+            supersedes=args.supersedes,
+            adr_date=args.adr_date,
+        )
     if args.command == "lab-evidence":
         return run_lab_evidence(
             Path.cwd(),

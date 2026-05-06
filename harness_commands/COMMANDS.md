@@ -45,6 +45,7 @@ It is for agent dispatch: humans can speak the phrase family naturally, and agen
 | "why is finalize blocked?", "what exactly is missing before finalize?", "show me where finalize is getting values from" | `brainstorming` | `/lab doctor [<idea-id>]` |
 | "run audit", "validate the repo", "check governance" | `brainstorming`, `development` | `/lab audit` |
 | "record this as evidence", "mark this task done", "save verification for this task" | `development` | `/lab evidence <task>` |
+| "write an ADR", "record this architecture decision", "capture this decision as an ADR" | `development` | `/lab adr <title>` |
 | "commit this milestone", "make a commit", "commit these changes" | `brainstorming`, `development` | `/lab commit [message]` |
 | "push these changes", "push this branch", "publish the branch" | `brainstorming`, `development` | `/lab push` |
 | "sync the repo", "commit and push this", "sync these changes" | `brainstorming`, `development` | `/lab sync [message]` |
@@ -150,6 +151,25 @@ It is for agent dispatch: humans can speak the phrase family naturally, and agen
   - `--note "<extra context>"`
 - Example:
   - `./scripts/lab evidence --task "Tests pass" --command "python3 -m unittest discover -s tests -v" --result "60 tests passed"`
+
+### `/lab adr <title>`
+- Development-mode command.
+- Create the next sequential ADR file in `docs/adr/`.
+- Preserve the human-readable title in the ADR while normalizing the filename slug.
+- Required fields:
+  - `--title "<short decision title>"`
+  - `--decision "<chosen approach>"`
+- Optional repeated fields:
+  - `--context "<context bullet>"`
+  - `--consequence "<consequence bullet>"`
+  - `--alternative "<alternative considered>"`
+- Optional metadata:
+  - `--status "<status>"`
+  - `--deciders "<names>"`
+  - `--supersedes "ADR-####"`
+  - `--date "YYYY-MM-DD"`
+- Example:
+  - `./scripts/lab adr --title "Adopt deterministic ADR capture" --decision "Use ./scripts/lab adr for development decisions"`
 
 ### `/lab status`
 - Report current mode, per-status idea counts, active idea context, inferred finalize target, and finalize-readiness gaps.
