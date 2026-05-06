@@ -13,8 +13,10 @@ Use this skill when finalizing an idea into development mode or diagnosing why f
 2. Treat phrases like "finalize this repo" and "switch to development mode" as first-class agent intents that map to `./scripts/lab finalize`.
 3. Run `./scripts/lab status` for the inferred target and readiness summary.
 4. Run `./scripts/lab doctor [--idea-id <id>]` when fields, sessions, or source artifacts are unclear.
-5. If multiple ideas are active, require an explicit `--idea-id`.
-6. Treat non-interactive finalization as the default; use `--interactive` only when the user explicitly wants prompt-fill mode.
+5. Run `./scripts/lab handoff [--idea-id <id>] --check` when rich brainstormed details should be carried forward or finalization fields are incomplete.
+6. Run `./scripts/lab handoff [--idea-id <id>]` before finalizing when the check shows useful fields can be distilled into `state/project-init.json`.
+7. If multiple ideas are active, require an explicit `--idea-id`.
+8. Treat non-interactive finalization as the default; use `--interactive` only when the user explicitly wants prompt-fill mode.
 
 ## Required Sources
 
@@ -35,6 +37,7 @@ Run one of:
 
 Use `--write-export` only when the user wants an archival summary under `exports/`.
 Use `--interactive` to opt into prompts for missing or editable finalization fields. Without `--interactive`, missing required fields should fail with guidance instead of prompting.
+Use `./scripts/lab handoff` before these commands when the source sessions contain detailed implementation requirements that should become canonical state.
 
 ## After Finalization
 

@@ -142,6 +142,21 @@
       "writeBehavior": "write"
     },
     {
+      "command": "handoff",
+      "backendIntent": "/lab handoff [<idea-id>]",
+      "modes": [
+        "brainstorming"
+      ],
+      "phrases": [
+        "prepare the handoff",
+        "make sure nothing gets lost",
+        "distill this idea for finalization"
+      ],
+      "description": "compile brainstormed idea and session details into canonical draft state before finalization",
+      "filesTouched": "`state/project-init.json`, `sessions/*`",
+      "writeBehavior": "write"
+    },
+    {
       "command": "park",
       "backendIntent": "/lab park <idea-id>",
       "modes": [

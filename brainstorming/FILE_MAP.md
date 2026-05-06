@@ -51,6 +51,7 @@ Lean file registry for the Project Harness Template.
 | `tests/test_development_rendering.py` | Development doc render and validation regression tests |
 | `tests/test_development_wiki.py` | Development wiki render and sync-check regression tests |
 | `tests/test_finalization_regression.py` | End-to-end finalization regression tests for multi-session detail carryover |
+| `tests/test_lab_handoff.py` | Lab handoff compiler regression tests for lossless brainstorming-to-finalization state |
 | `tests/test_lab_finalization.py` | Lab finalization command regression tests |
 | `tests/test_intent_registry_contract.py` | Intent-registry render, parity, and CI-contract regression suite |
 | `tests/test_lab_lifecycle.py` | Lab command, finalize, status, doctor, and review regression tests |
@@ -109,6 +110,7 @@ Lean file registry for the Project Harness Template.
 | `scripts/python/template_cli/evidence.py` | Development roadmap evidence capture command implementation |
 | `scripts/python/template_cli/finalize_context.py` | Finalization target, owner, session, and hydration context resolution |
 | `scripts/python/template_cli/finalize.py` | In-place finalization orchestration |
+| `scripts/python/template_cli/handoff.py` | Brainstorming handoff compiler for draft canonical finalization state |
 | `scripts/python/template_cli/validator_artifacts.py` | Retained artifact lists for brainstorming and development validation |
 | `scripts/python/template_cli/validator_code_size.py` | Python file-size validation for template tooling and tests |
 | `scripts/python/template_cli/validator_intents.py` | Intent registry, generated command docs, and CI sync validation helpers |

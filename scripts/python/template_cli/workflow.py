@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from template_cli.finalize import run_finalize_project
+from template_cli.handoff import run_lab_handoff
 from template_cli.sync import run_lab_commit, run_lab_push
 from template_cli.validators import run_validate_governance
 from template_cli.workflow_commands import (

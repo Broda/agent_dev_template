@@ -137,7 +137,8 @@ class LabLifecycleTests(LabWorkflowTestCase):
         self.assertIn("- MVP scope: MISSING", result.stdout)
         self.assertIn("- build command: MISSING", result.stdout)
         self.assertIn("Blocked on:", result.stdout)
-        self.assertIn("update the active idea/session or prefill state/project-init.json", result.stdout)
+        self.assertIn("./scripts/lab handoff --idea-id idea-doctor-blocked --check", result.stdout)
+        self.assertIn("update the active idea/session or state/project-init.json", result.stdout)
 
     def test_lab_doctor_reports_sources_for_ready_target(self) -> None:
         self.write_finalize_fixture("idea-doctor-ready")

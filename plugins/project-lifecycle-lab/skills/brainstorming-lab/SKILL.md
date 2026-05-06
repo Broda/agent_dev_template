@@ -25,6 +25,7 @@ Use `./scripts/lab <command>` for durable brainstorming lifecycle writes:
 - Risk: `./scripts/lab risk --idea-id <id> --statement "<risk>"`
 - Review: `./scripts/lab review --idea-id <id> --result <pass|conditional-pass|revise|fail>`
 - Export: `./scripts/lab export --idea-id <id>`
+- Handoff: `./scripts/lab handoff [--idea-id <id>] [--check]`
 - Status: `./scripts/lab status`
 - Doctor: `./scripts/lab doctor [--idea-id <id>]`
 
@@ -47,3 +48,4 @@ Offer quick actions: `capture idea`, `record decision`, `log risk`, `save path n
 ## Finalization
 
 When the user wants to switch to development mode, use `$project-finalizer`.
+When the user is worried about losing detail, or the idea has rich implementation/session context, run `./scripts/lab handoff --check` first and then `./scripts/lab handoff` to distill source material into `state/project-init.json` before finalizing.

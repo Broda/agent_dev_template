@@ -39,6 +39,7 @@ It is for agent dispatch: humans can speak the phrase family naturally, and agen
 | "review this idea", "gate this idea", "is this ready?" | `brainstorming` | `/lab review <idea-id>` |
 | "save a summary snapshot", "export a summary", "make a handoff summary" | `brainstorming` | `/lab export <idea-id>` |
 | "finalize this repo", "switch to development mode", "finalize this idea" | `brainstorming` | `/lab finalize [<idea-id>]` |
+| "prepare the handoff", "make sure nothing gets lost", "distill this idea for finalization" | `brainstorming` | `/lab handoff [<idea-id>]` |
 | "park this", "pause this idea", "put this on hold" | `brainstorming` | `/lab park <idea-id>` |
 | "kill this", "drop this idea", "archive this as dead" | `brainstorming` | `/lab kill <idea-id>` |
 | "what's the current state?", "show me status", "where are we now?" | `brainstorming`, `development` | `/lab status` |
@@ -128,6 +129,18 @@ It is for agent dispatch: humans can speak the phrase family naturally, and agen
 - Switch `MODE.md` to development after successful rendering and validation.
 - Example:
   - `./scripts/lab finalize --idea-id idea-template-hardening --write-export`
+
+### `/lab handoff [<idea-id>]`
+- Brainstorming-mode command.
+- Compile idea, session, optional export, and existing state details into draft canonical state before finalization.
+- Default target is the current idea from canonical state or the single active idea.
+- Use `--idea-id <idea-id>` when multiple active ideas exist.
+- Use `--check` to report fillable fields and gaps without writing.
+- Default write mode updates `state/project-init.json` and appends a handoff session under `sessions/`.
+- Does not finalize, render development docs, switch `MODE.md`, or move idea state.
+- Example:
+  - `./scripts/lab handoff --idea-id idea-template-hardening`
+  - `./scripts/lab handoff --idea-id idea-template-hardening --check`
 
 ### `/lab park <idea-id>`
 - Move/update idea in `ideas/_parked.md`.

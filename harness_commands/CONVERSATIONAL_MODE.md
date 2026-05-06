@@ -41,6 +41,7 @@ It is the agent-facing interface across harness modes: the user can speak natura
 | "review this idea", "gate this idea", "is this ready?" | `brainstorming` | record review/gate | `sessions/*`, `IDEA_CATALOG.md` |
 | "save a summary snapshot", "export a summary", "make a handoff summary" | `brainstorming` | generate an optional archival project summary | `exports/*` |
 | "finalize this repo", "switch to development mode", "finalize this idea" | `brainstorming` | persist canonical state, append finalization history, and switch this repo into development mode | `sessions/*`, `state/project-init.json`, `MODE.md`, `docs/*`, `IDEA_CATALOG.md` |
+| "prepare the handoff", "make sure nothing gets lost", "distill this idea for finalization" | `brainstorming` | compile brainstormed idea and session details into canonical draft state before finalization | `state/project-init.json`, `sessions/*` |
 | "park this", "pause this idea", "put this on hold" | `brainstorming` | move idea to parked state | `ideas/_parked.md`, `IDEA_CATALOG.md` |
 | "kill this", "drop this idea", "archive this as dead" | `brainstorming` | move idea to killed state | `ideas/_killed.md`, `IDEA_CATALOG.md` |
 | "what's the current state?", "show me status", "where are we now?" | `brainstorming`, `development` | report current mode plus brainstorming or development context | no write |

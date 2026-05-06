@@ -18,6 +18,7 @@ from template_cli.workflow import (
     run_lab_doctor,
     run_lab_export,
     run_lab_finalize,
+    run_lab_handoff,
     run_lab_kill,
     run_lab_park,
     run_lab_path_note,
@@ -69,6 +70,10 @@ def add_lab_subparsers(subparsers: argparse._SubParsersAction[argparse.ArgumentP
     lab_finalize_parser.add_argument("--idea-id", default="")
     lab_finalize_parser.add_argument("--write-export", action="store_true")
     lab_finalize_parser.add_argument("--interactive", action="store_true")
+    handoff_parser = subparsers.add_parser("lab-handoff")
+    handoff_parser.add_argument("--idea-id", default="")
+    handoff_parser.add_argument("--check", action="store_true")
+    handoff_parser.add_argument("--no-sync", action="store_true")
 
     capture_parser = subparsers.add_parser("lab-capture")
     capture_parser.add_argument("--idea-id", required=True)
@@ -202,6 +207,8 @@ def dispatch_lab_command(root: Path, args: Any, remaining: list[str]) -> int | N
             write_export=args.write_export,
             interactive=args.interactive,
         )
+    if args.command == "lab-handoff":
+        return run_lab_handoff(root, idea_id=args.idea_id, check=args.check, no_sync=args.no_sync)
     if args.command == "lab-capture":
         return run_lab_capture(
             root,

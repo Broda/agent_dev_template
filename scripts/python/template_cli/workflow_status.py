@@ -182,7 +182,11 @@ def run_lab_doctor(root: Path, *, idea_id: str = "") -> int:
         print("Blocked on:")
         for item in required_missing:
             print(f"- {item}")
-        print("Next step: update the active idea/session or prefill state/project-init.json, then rerun ./scripts/lab doctor")
+        print(
+            "Next step: run ./scripts/lab handoff "
+            f"--idea-id {resolved_idea_id} --check to see what can be distilled from source material"
+        )
+        print("Then update the active idea/session or state/project-init.json for anything still missing.")
     elif advisory_missing:
         print("Advisories:")
         for item in advisory_missing:
