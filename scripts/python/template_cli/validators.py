@@ -25,7 +25,6 @@ from template_cli.io_helpers import (
     IDEA_ROW_RE,
     NOTE_DATE_RE,
     NOTE_ID_RE,
-    PLACEHOLDER_RE,
     ValidationResult,
     clean_backticks,
     find_markdown_files,
@@ -37,6 +36,7 @@ from template_cli.io_helpers import (
     read_mode,
     read_text,
 )
+from template_cli.validator_placeholders import find_unresolved_placeholders
 
 def validate_notes_catalog(root: Path, result: ValidationResult) -> None:
     notes_catalog_path = root / "NOTES_CATALOG.md"
@@ -288,14 +288,12 @@ def run_validate_development(root: Path) -> int:
     docs_dir = root / "docs"
     if docs_dir.exists():
         placeholder_files.extend(sorted(docs_dir.rglob("*.md")))
-    for path in placeholder_files:
-        if path.name == "ADR-TEMPLATE.md" and path.parent.name == "adr":
-            continue
-        if not path.exists():
-            continue
-        if PLACEHOLDER_RE.search(read_text(path)):
-            result.add_failure("Unresolved placeholders detected in generated development docs.")
-            break
+    for finding in find_unresolved_placeholders(root, placeholder_files):
+        result.add_failure(
+            "Unresolved placeholder in "
+            f"{finding.relative_path}:{finding.line_number}: {finding.token} "
+            f"(source: {finding.source}; line: {finding.line})"
+        )
 
     changelog_path = root / "CHANGELOG.md"
     if not changelog_path.exists() or "## [Unreleased]" not in read_text(changelog_path):

@@ -17,6 +17,7 @@ from template_cli.render_helpers import (
     _replace_file_literals,
     _state_value,
 )
+from template_cli.render_contract import collect_implementation_contract
 from template_cli.render_governance_templates import _render_architecture, _render_decision_adr, _render_roadmap
 from template_cli.render_templates import _render_project_context, _render_readme
 from template_cli.io_helpers import read_text, write_text
@@ -67,6 +68,7 @@ def run_render_development_docs(root: Path) -> int:
     domain_concepts = _infer_domain_concepts(
         " ".join([purpose, problem_statement, solution_summary, mvp_scope, out_of_scope])
     )
+    implementation_contract = collect_implementation_contract(state, hydration_files)
 
     _copy_base(root, "development/templates/docs/README.base.md", "README.md")
     _copy_base(root, "development/templates/docs/PROJECT_CONTEXT.base.md", "docs/PROJECT_CONTEXT.md")
@@ -195,6 +197,7 @@ def run_render_development_docs(root: Path) -> int:
             solution_summary,
             constraints or "None recorded",
             domain_concepts,
+            implementation_contract,
         ),
     )
     write_text(
@@ -208,6 +211,7 @@ def run_render_development_docs(root: Path) -> int:
             contingencies,
             latest_review_outcome,
             session_files,
+            implementation_contract,
         ),
     )
     write_text(
@@ -218,8 +222,10 @@ def run_render_development_docs(root: Path) -> int:
             run_command,
             test_command,
             solution_summary,
+            mvp_scope,
             top_risks,
             domain_concepts,
+            implementation_contract,
         ),
     )
     _replace_file_literals(

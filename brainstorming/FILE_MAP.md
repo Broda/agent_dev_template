@@ -113,10 +113,12 @@ Lean file registry for the Project Harness Template.
 | `scripts/python/template_cli/intents.py` | Intent registry rendering and generated intent-doc sync helpers |
 | `scripts/python/template_cli/notes.py` | Durable research note capture command implementation |
 | `scripts/python/template_cli/render.py` | Development document render orchestration |
+| `scripts/python/template_cli/render_contract.py` | Implementation contract extraction and formatting for finalized development docs |
 | `scripts/python/template_cli/render_helpers.py` | State-extraction, file-manipulation, and hydration helpers for development doc rendering |
 | `scripts/python/template_cli/render_governance_templates.py` | Pure templates for rendered architecture and roadmap governance docs |
 | `scripts/python/template_cli/render_templates.py` | Pure template functions for development document generation |
 | `scripts/python/template_cli/sync.py` | Git sync helpers for milestone commit and push flows |
+| `scripts/python/template_cli/validator_placeholders.py` | Precise unresolved-placeholder detection for generated development docs |
 | `scripts/python/template_cli/validators.py` | Brainstorming and development validation orchestration |
 | `scripts/python/template_cli/finalize_helpers.py` | Utility functions, interactive prompts, markdown extraction, and state helpers for finalization |
 | `scripts/python/template_cli/finalize_state.py` | BackupManager, catalog transition functions, and summary export writer for finalization |

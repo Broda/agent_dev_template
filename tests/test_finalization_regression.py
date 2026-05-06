@@ -69,6 +69,8 @@ class FinalizationRegressionTests(LabWorkflowTestCase):
         self.assertIn(contingency, outputs["PROJECT_CONTEXT"])
         self.assertIn("conditional-pass", outputs["PROJECT_CONTEXT"])
         self.assertIn('"client docs/final plan.md"', outputs["ARCHITECTURE"])
+        self.assertIn("Initial implementation must preserve structured MVP contract details.", outputs["ARCHITECTURE"])
+        self.assertIn("quote-scheduler-core", outputs["ROADMAP"])
         self.assertIn(top_risks, outputs["ROADMAP"])
         self.assertIn(key_decisions, outputs["ADR"])
         self.assertIn(top_risks, outputs["ADR"])
@@ -328,5 +330,11 @@ class FinalizationRegressionTests(LabWorkflowTestCase):
                 "summaryExport": "",
                 "finalizationSession": "",
                 "adrReferences": [custom_adr],
+            },
+            "implementation": {
+                "workspaceLayout": ["quote-scheduler-core", "quote-scheduler-web"],
+                "storageImplementation": [
+                    "Initial implementation must preserve structured MVP contract details."
+                ],
             },
         }

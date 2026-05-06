@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import json
+import textwrap
+
 from tests.workflow_test_helpers import LabWorkflowTestCase, run_cmd
 
 
@@ -77,6 +80,99 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
         }
         self.assertEqual(first_snapshot, second_snapshot)
         run_cmd(["./scripts/validate-development"], cwd=self.repo)
+
+    def test_command_metavariables_and_tbd_text_do_not_trip_placeholder_validation(self) -> None:
+        self.write_render_fixture()
+        state_path = self.repo / "state/project-init.json"
+        state = json.loads(state_path.read_text(encoding="utf-8"))
+        state["techStack"]["framework"] = "future TypeScript web/Discord framework TBD"
+        state["commands"]["run"] = "cargo run -p devos-cli -- <command>"
+        state["implementation"] = {
+            "cliCommandSurface": ["cargo run -p devos-cli -- <command>"],
+            "postMvpDecisions": ["future TypeScript web/Discord framework TBD"],
+        }
+        state_path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+
+        run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
+        run_cmd(["./scripts/validate-development"], cwd=self.repo)
+
+        roadmap = (self.repo / "docs/ROADMAP.md").read_text(encoding="utf-8")
+        self.assertIn("`cargo run -p devos-cli -- <command>`", roadmap)
+        self.assertIn("future TypeScript web/Discord framework TBD", roadmap)
+
+    def test_validate_development_reports_precise_placeholder_location(self) -> None:
+        self.write_render_fixture()
+        run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
+        roadmap_path = self.repo / "docs/ROADMAP.md"
+        roadmap_path.write_text(
+            roadmap_path.read_text(encoding="utf-8") + "\n- Bad generated value: <Project Name>\n",
+            encoding="utf-8",
+        )
+
+        result = run_cmd(["./scripts/validate-development"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Unresolved placeholder in docs/ROADMAP.md:", result.stdout)
+        self.assertIn("<Project Name>", result.stdout)
+        self.assertIn("source:", result.stdout)
+
+    def test_render_includes_detailed_mvp_contract_in_roadmap_and_architecture(self) -> None:
+        self.write_render_fixture()
+        state_path = self.repo / "state/project-init.json"
+        state = json.loads(state_path.read_text(encoding="utf-8"))
+        state["projectName"] = "DevOS"
+        state["purpose"] = "Build a local-first command center for project execution."
+        state["techStack"]["language"] = "Rust"
+        state["techStack"]["runtime"] = "Rust stable"
+        state["persistence"] = "SQLite with rusqlite"
+        state["commands"]["run"] = "cargo run -p devos-cli -- <command>"
+        state["product"]["mvpScope"] = "Ship the Rust CLI MVP with deterministic local storage."
+        state["implementation"] = {
+            "workspaceCrates": ["devos-core", "devos-storage", "devos-storage-sqlite", "devos-cli"],
+            "storageImplementation": [
+                "SQLite via rusqlite",
+                "SQL migrations embedded with include_str!",
+            ],
+            "cliCommandSurface": [
+                "devos init",
+                "project, item, schedule, and event commands",
+            ],
+            "domainStatuses": ["active, blocked, done, archived"],
+            "scheduleEventSemantics": ["timestamps are normalized before storage"],
+            "mvpExclusions": ["no hard delete"],
+            "testBaseline": ["cargo test across workspace crates"],
+        }
+        state_path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+        session_path = self.repo / "sessions/2026-04-03_idea-render-fixture.md"
+        session_path.write_text(
+            textwrap.dedent(
+                """\
+                # Brainstorming Session
+
+                ## CLI command surface
+
+                - devos.toml configuration
+                - slug rules are deterministic and lowercase
+                """
+            ),
+            encoding="utf-8",
+        )
+
+        run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
+        run_cmd(["./scripts/validate-development"], cwd=self.repo)
+
+        roadmap = (self.repo / "docs/ROADMAP.md").read_text(encoding="utf-8")
+        architecture = (self.repo / "docs/ARCHITECTURE.md").read_text(encoding="utf-8")
+        adr = (self.repo / "docs/adr/ADR-0001-record-architecture-decisions.md").read_text(encoding="utf-8")
+        self.assertIn("## Milestone 1 MVP Contract", roadmap)
+        self.assertIn("devos-core", roadmap)
+        self.assertIn("SQL migrations embedded with include_str!", roadmap)
+        self.assertIn("devos.toml configuration", roadmap)
+        self.assertIn("# 6. Concrete Implementation Boundaries", architecture)
+        self.assertIn("devos-storage-sqlite", architecture)
+        self.assertIn("timestamps are normalized before storage", architecture)
+        self.assertIn("### Finalized Implementation Contract", adr)
+        self.assertIn("cargo test across workspace crates", adr)
 
 
 if __name__ == "__main__":

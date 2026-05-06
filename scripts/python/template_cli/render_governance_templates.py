@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from template_cli.render_helpers import MILESTONE_NAME
+from template_cli.render_contract import format_contract_sections
 
 
 def _render_architecture(
@@ -15,8 +16,10 @@ def _render_architecture(
     solution_summary: str,
     constraints: str,
     domain_concepts: list[str],
+    implementation_contract: list[tuple[str, list[str]]],
 ) -> str:
     concept_lines = "\n".join(f"- {concept}" for concept in domain_concepts)
+    contract_sections = format_contract_sections(implementation_contract, heading_level=2)
     return f"""# ARCHITECTURE.md — Structured Mode v2
 
 This document defines structure and boundaries.
@@ -74,7 +77,13 @@ Interface
 
 ---
 
-# 6. Layer Responsibilities
+# 6. Concrete Implementation Boundaries
+
+{contract_sections}
+
+---
+
+# 7. Layer Responsibilities
 
 ## Interface Layer
 
@@ -118,7 +127,7 @@ Must NOT:
 
 ---
 
-# 7. Public Contracts
+# 8. Public Contracts
 
 Public contracts include:
 
@@ -132,7 +141,7 @@ Changes require ADR.
 
 ---
 
-# 8. Evolution Strategy
+# 9. Evolution Strategy
 
 Refactors must:
 
@@ -152,8 +161,10 @@ def _render_decision_adr(
     contingencies: str,
     latest_review_outcome: str,
     session_files: list[str],
+    implementation_contract: list[tuple[str, list[str]]],
 ) -> str:
     session_lines = "\n".join(f"- `{session}`" for session in session_files) or "- See canonical state."
+    contract_sections = format_contract_sections(implementation_contract, heading_level=3)
     return f"""# ADR-0001: Record Initial Architecture Decisions
 
 ## Status
@@ -178,6 +189,10 @@ Source sessions:
 ## Decision
 
 {key_decisions}
+
+### Finalized Implementation Contract
+
+{contract_sections}
 
 ## Consequences
 
@@ -205,11 +220,14 @@ def _render_roadmap(
     run_command: str,
     test_command: str,
     solution_summary: str,
+    mvp_scope: str,
     top_risks: str,
     domain_concepts: list[str],
+    implementation_contract: list[tuple[str, list[str]]],
 ) -> str:
     domain_focus = "; ".join(domain_concepts[:4]) or "Core domain entities and rules"
     extra_domain = "\n".join(f"- [ ] Define rules for {concept.lower()}" for concept in domain_concepts[:4])
+    contract_sections = format_contract_sections(implementation_contract, heading_level=3)
     return f"""# ROADMAP.md — Structured Mode v2
 
 This roadmap defines execution.
@@ -244,6 +262,14 @@ Product focus:
 Primary risk pressure:
 
 - {top_risks}
+
+---
+
+## Milestone 1 MVP Contract
+
+{mvp_scope}
+
+{contract_sections}
 
 ---
 
@@ -299,7 +325,7 @@ Focus areas:
 
 Evidence target:
 
-- Evidence: {build_command} (success), {test_command} (pass), {run_command} (smoke verified)
+- Evidence: `{build_command}` (success), `{test_command}` (pass), `{run_command}` (smoke verified)
 
 ---
 

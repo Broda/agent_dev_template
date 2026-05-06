@@ -392,6 +392,10 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
                 "adrReferences": adr_references,
             },
         }
+        for detail_key in ["implementation", "mvpContract"]:
+            existing_detail = existing_state.get(detail_key) if isinstance(existing_state, dict) else None
+            if isinstance(existing_detail, dict) and existing_detail:
+                state[detail_key] = existing_detail
         write_text(root / STATE_FILE, json.dumps(state, indent=2) + "\n")
         if write_export:
             _write_summary_export(root, export_path, state)
