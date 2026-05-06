@@ -38,7 +38,7 @@ Examples: "capture this idea", "what's missing before finalize?", "finalize this
 | Plugin package | Optional portable distribution of reusable agent behavior | `plugins/project-lifecycle-lab/` |
 | Future bootstrap helper | Optional convenience for creating/updating harness instances | `BOOTSTRAP_TOOL.md` |
 
-The harness-first streamlining phase is summarized in `HARNESS_STREAMLINING.md`.
+Remaining streamlining work is tracked in `HARNESS_STREAMLINING.md`.
 
 ## Using This Public Harness
 

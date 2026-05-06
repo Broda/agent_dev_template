@@ -1,46 +1,42 @@
-# Harness Streamlining Phase
+# Harness Streamlining Backlog
 
-This note records the close of the harness-first streamlining phase that began at the annotated tag `before-skills-plugin-streamline`.
+This file is the active list of remaining streamlining work for the project harness template.
 
-## Done In This Phase
+As each item is finished, delete it from this file in the same commit as the change. When this file is empty, do one final project survey before declaring the streamlining pass complete.
 
-- Reframed the public repository as a project harness template.
-- Kept deterministic lifecycle tooling inside the repo.
-- Established `.agents/skills` as the canonical repo-scoped agent layer.
-- Packaged mirrored plugin skills under `plugins/project-lifecycle-lab/skills/`.
-- Added plugin mirror drift validation and `./scripts/sync-plugin-skills`.
-- Added a bootstrap-tool contract without moving runtime behavior into a global tool.
-- Split large validation, rendering, and workflow modules into smaller helper modules.
-- Added guardrails for plugin boundary language, launcher consistency, module boundaries, Python file size, and FILE_MAP coverage.
+## Runtime Module Cleanup
 
-## Current Boundary
+- Split `scripts/python/template_cli/workflow_commands.py` into smaller command-family modules. Start with idea lifecycle commands (`capture`, `activate`, `park`, `kill`, `export`) because they are cohesive and lower-risk than finalization.
+- Split `scripts/python/template_cli/workflow_status.py` so status rendering, doctor diagnostics, and shared formatting helpers are easier to read independently.
+- Review `scripts/python/template_cli/workflow_data.py` for separable persistence helpers, catalog helpers, and path discovery helpers. Extract only if the split reduces real maintenance pressure.
+- Split `scripts/python/template_cli/finalize.py` after lower-risk workflow cleanup is done. Prefer extracting state assembly, target resolution, and orchestration helpers without changing command behavior.
+- Review `scripts/python/template_cli/validators.py` for any remaining mixed responsibilities. Extract validator families only where the resulting modules match existing validation boundaries.
 
-The repository remains the source of truth for project state and deterministic behavior:
+## Test Suite Cleanup
 
-- `MODE.md`
-- `ideas/`
-- `sessions/`
-- `notes/`
-- `exports/`
-- `state/project-init.json`
-- `scripts/`
-- `scripts/python/template_cli/`
-- generated development governance docs after finalization
+- Keep Python test files below the governance size limit as new coverage is added. If finalization or lifecycle tests grow again, split by command family rather than adding broad catch-all files.
+- Add focused regression coverage around any module split that changes imports or command wiring, even when behavior is intended to stay identical.
 
-The plugin package is a portable agent-behavior layer. It should not own project state, validators, finalization behavior, or generated governance docs.
+## Plugin And Skill Packaging
 
-## Deferred To Next Phase
+- Validate the `plugins/project-lifecycle-lab` package in an external install/use path once the local plugin workflow is ready for that test.
+- Decide whether plugin skill mirrors should remain copied files or become generated artifacts from `.agents/skills`.
+- If plugin mirrors stay copied, keep `./scripts/sync-plugin-skills` and drift validation as the canonical maintenance path.
+- If plugin mirrors become generated, update the validator, file map, and maintenance skill so generated status is explicit.
 
-- Build an actual `project-harness new/update/validate` helper if the documented bootstrap contract proves worth automating.
-- Decide whether plugin skill mirrors should remain copied or become generated artifacts.
-- Continue tactical module cleanup only when it reduces real maintenance pressure.
-- Validate the plugin package in an external install/use path when the local plugin workflow is ready for that test.
+## Bootstrap Helper
 
-## Completion Check
+- Decide whether the documented bootstrap contract in `BOOTSTRAP_TOOL.md` should become a real `project-harness update` and `project-harness validate` workflow.
+- If update support is added, define what can be refreshed safely without overwriting project-specific state, docs, ideas, sessions, notes, or generated development artifacts.
+- If validate support is added, keep it focused on harness integrity checks that make sense inside a cloned project.
 
-This phase is complete when:
+## Wiki Tooling Follow-Up
 
-- `./scripts/validate-governance` passes.
-- `python3 -m unittest discover -s tests -v` passes.
-- `git status --short --branch` is clean.
-- `main` is pushed to `origin`.
+- Exercise `wiki-render` and `wiki-check` against a real initialized GitHub Wiki checkout when a suitable test repository is available.
+- Decide whether wiki page generation should include any additional canonical user-facing surfaces beyond README, changelog, architecture, roadmap, ADRs, verification, and release notes.
+
+## Final Survey
+
+- Search docs, skills, plugin mirrors, scripts, tests, and generated command docs for stale language from earlier template/plugin framing.
+- Re-run the full validation suite after the backlog is empty.
+- Confirm `git status --short --branch` is clean and `main` is pushed.

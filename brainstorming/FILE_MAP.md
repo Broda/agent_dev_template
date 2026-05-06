@@ -6,7 +6,7 @@ Lean file registry for the Project Harness Template.
 |---|---|
 | `README.md` | Lightweight overview and usage |
 | `BOOTSTRAP_TOOL.md` | Planning contract for a future harness bootstrap helper |
-| `HARNESS_STREAMLINING.md` | Closeout note for the harness-first streamlining phase |
+| `HARNESS_STREAMLINING.md` | Active streamlining backlog for the harness template |
 | `AGENTS.md` | Agent behavior contract |
 | `MODE.md` | Active repository phase selector |
 | `.agents/skills/brainstorming-lab/SKILL.md` | Repo-scoped skill for brainstorming-mode lifecycle work |
