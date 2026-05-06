@@ -11,6 +11,7 @@ WORKFLOW_MODULES = [
     "scripts/python/template_cli/workflow.py",
     "scripts/python/template_cli/workflow_commands.py",
     "scripts/python/template_cli/workflow_data.py",
+    "scripts/python/template_cli/workflow_idea_commands.py",
 ]
 
 

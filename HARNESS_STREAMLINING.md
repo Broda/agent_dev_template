@@ -6,7 +6,6 @@ As each item is finished, delete it from this file in the same commit as the cha
 
 ## Runtime Module Cleanup
 
-- Split `scripts/python/template_cli/workflow_commands.py` into smaller command-family modules. Start with idea lifecycle commands (`capture`, `activate`, `park`, `kill`, `export`) because they are cohesive and lower-risk than finalization.
 - Split `scripts/python/template_cli/workflow_status.py` so status rendering, doctor diagnostics, and shared formatting helpers are easier to read independently.
 - Review `scripts/python/template_cli/workflow_data.py` for separable persistence helpers, catalog helpers, and path discovery helpers. Extract only if the split reduces real maintenance pressure.
 - Split `scripts/python/template_cli/finalize.py` after lower-risk workflow cleanup is done. Prefer extracting state assembly, target resolution, and orchestration helpers without changing command behavior.
