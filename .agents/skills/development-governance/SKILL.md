@@ -63,4 +63,11 @@ When wiki support is enabled, run `./scripts/lab wiki-render` after changes to p
 
 ## Research Notes
 
-Use `./scripts/lab-note` for durable research notes. Notes complement governance docs; update ADRs, roadmap, architecture, or policy when research changes direction.
+Use `./scripts/lab-note` for durable research notes. When saving a discussion, pass the actual captured details through structured fields instead of only a short summary:
+
+- `--summary` or `--detail` for captured information and discussion points.
+- `--fact` for constraints, decisions, or durable facts.
+- `--question` for open questions and follow-ups.
+- `--link` for related docs, ADRs, issues, URLs, or future planning areas.
+
+For longer notes, use `--details-file`, `--facts-file`, `--questions-file`, or `--links-file`; pass `-` to a file option to read that section from stdin. Notes complement governance docs; update ADRs, roadmap, architecture, or policy when research changes direction.

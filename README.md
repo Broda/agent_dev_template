@@ -195,3 +195,18 @@ They are archival by default:
 - not auto-loaded each session
 - not part of the mandatory read path
 - only searched when explicitly requested or referenced
+
+Capture detailed notes with structured fields so the saved note is useful without
+manual cleanup:
+
+```sh
+./scripts/lab-note \
+  --topic "Service identity boundary" \
+  --summary "DevOS may eventually need dedicated integration identities." \
+  --detail "A GitHub App is preferred over a broad bot account for most repo workflows." \
+  --fact "Secrets must stay outside git." \
+  --question "Should inbound email be read-only at first?"
+```
+
+For longer captures, use `--details-file`, `--facts-file`, `--questions-file`,
+or `--links-file`; pass `-` to one file option to read that section from stdin.

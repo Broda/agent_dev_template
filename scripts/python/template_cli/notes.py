@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import sys
 from datetime import date
 from pathlib import Path
 
@@ -20,6 +21,40 @@ def _trim(value: str | None) -> str:
     return (value or "").strip()
 
 
+def _strip_list_marker(value: str) -> str:
+    return re.sub(r"^\s*[-*]\s+", "", value).strip()
+
+
+def _read_items_file(path_value: str) -> list[str]:
+    path_value = _trim(path_value)
+    if not path_value:
+        return []
+    if path_value == "-":
+        text = sys.stdin.read()
+    else:
+        text = Path(path_value).read_text(encoding="utf-8")
+    return [_strip_list_marker(line) for line in text.splitlines() if _strip_list_marker(line)]
+
+
+def _section_items(values: list[str] | None = None, file_values: list[str] | None = None) -> list[str]:
+    items: list[str] = []
+    for value in values or []:
+        for line in value.splitlines():
+            item = _strip_list_marker(line)
+            if item:
+                items.append(item)
+    for file_value in file_values or []:
+        items.extend(_read_items_file(file_value))
+    return items
+
+
+def _append_bullets(lines: list[str], items: list[str], placeholder: str) -> None:
+    if items:
+        lines.extend(f"- {item}" for item in items)
+    else:
+        lines.append(f"- {placeholder}")
+
+
 def run_lab_note(
     root: Path,
     *,
@@ -28,13 +63,28 @@ def run_lab_note(
     idea_id: str = "",
     tags: str = "",
     summaries: list[str] | None = None,
+    summary_files: list[str] | None = None,
+    details: list[str] | None = None,
+    detail_files: list[str] | None = None,
+    facts: list[str] | None = None,
+    fact_files: list[str] | None = None,
+    questions: list[str] | None = None,
+    question_files: list[str] | None = None,
+    links: list[str] | None = None,
+    link_files: list[str] | None = None,
     no_sync: bool = False,
 ) -> int:
     topic = _trim(topic)
     if not topic:
         raise SystemExit("--topic is required.")
 
-    summaries = summaries or []
+    captured_items = [
+        *_section_items(summaries, summary_files),
+        *_section_items(details, detail_files),
+    ]
+    fact_items = _section_items(facts, fact_files)
+    question_items = _section_items(questions, question_files)
+    link_items = _section_items(links, link_files)
     mode = read_mode(root) or "brainstorming"
     notes_dir = root / "notes"
     notes_dir.mkdir(parents=True, exist_ok=True)
@@ -68,24 +118,33 @@ def run_lab_note(
         "## Captured Information",
         "",
     ]
-    if summaries:
-        lines.extend(f"- {summary}" for summary in summaries)
-    else:
-        lines.append("- Summary pending: fill in captured research details.")
+    _append_bullets(lines, captured_items, "Summary pending: fill in captured research details.")
     lines.extend(
         [
             "",
             "## Key Facts / Constraints",
             "",
-            "- ",
+        ]
+    )
+    _append_bullets(lines, fact_items, "None recorded.")
+    lines.extend(
+        [
             "",
             "## Open Questions / Follow-ups",
             "",
-            "- ",
+        ]
+    )
+    _append_bullets(lines, question_items, "None recorded.")
+    lines.extend(
+        [
             "",
             "## Links",
             "",
-            "- ",
+        ]
+    )
+    _append_bullets(lines, link_items, "None recorded.")
+    lines.extend(
+        [
             "",
         ]
     )

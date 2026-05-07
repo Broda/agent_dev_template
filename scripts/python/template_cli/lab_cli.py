@@ -36,6 +36,15 @@ def add_lab_subparsers(subparsers: argparse._SubParsersAction[argparse.ArgumentP
     note_parser.add_argument("--idea-id", default="")
     note_parser.add_argument("--tags", default="")
     note_parser.add_argument("--summary", action="append", default=[])
+    note_parser.add_argument("--summary-file", action="append", default=[])
+    note_parser.add_argument("--detail", action="append", default=[])
+    note_parser.add_argument("--details-file", action="append", default=[])
+    note_parser.add_argument("--fact", action="append", default=[])
+    note_parser.add_argument("--facts-file", action="append", default=[])
+    note_parser.add_argument("--question", action="append", default=[])
+    note_parser.add_argument("--questions-file", action="append", default=[])
+    note_parser.add_argument("--link", action="append", default=[])
+    note_parser.add_argument("--links-file", action="append", default=[])
     note_parser.add_argument("--no-sync", action="store_true")
     subparsers.add_parser("lab-sync")
     subparsers.add_parser("lab-status")
@@ -160,6 +169,15 @@ def dispatch_lab_command(root: Path, args: Any, remaining: list[str]) -> int | N
             idea_id=args.idea_id,
             tags=args.tags,
             summaries=args.summary,
+            summary_files=args.summary_file,
+            details=args.detail,
+            detail_files=args.details_file,
+            facts=args.fact,
+            fact_files=args.facts_file,
+            questions=args.question,
+            question_files=args.questions_file,
+            links=args.link,
+            link_files=args.links_file,
             no_sync=args.no_sync,
         )
     if args.command == "lab-sync":

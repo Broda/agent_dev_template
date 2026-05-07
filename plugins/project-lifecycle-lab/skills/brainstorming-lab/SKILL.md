@@ -31,6 +31,8 @@ Use `./scripts/lab <command>` for durable brainstorming lifecycle writes:
 
 `./scripts/lab` milestone writes auto-commit and best-effort push unless `--no-sync` is passed.
 
+Use `./scripts/lab-note` for durable research notes. When saving a discussion, include the important details directly with `--summary` or `--detail`, durable constraints with `--fact`, unresolved items with `--question`, and references with `--link`. For longer captures, use the matching `--details-file`, `--facts-file`, `--questions-file`, or `--links-file` options; pass `-` to read one section from stdin.
+
 ## Topic Continuity
 
 For persistent multi-turn sessions, keep lightweight in-context nudge state:
