@@ -58,6 +58,26 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
         self.assertIn("pnpm build", roadmap)
         self.assertIn("cargo fmt --check", ci)
 
+    def test_render_and_validate_development_allows_game_domain_terms_for_game_projects(self) -> None:
+        self.write_render_fixture("finalized_state_v2.json")
+        state_path = self.repo / "state/project-init.json"
+        state = json.loads(state_path.read_text(encoding="utf-8"))
+        state["projectType"] = "Game"
+        state["purpose"] = "Build a playable tactical game prototype."
+        state["product"]["problemStatement"] = "Players need a short battle loop that teaches movement and resource economy."
+        state["product"]["solutionSummary"] = "Render a gameplay-first prototype with onboarding and starter progression."
+        state["product"]["mvpScope"] = "Ship one playable loop with player actions, battle feedback, and a small market."
+        state["governance"]["keyDecisions"] = "Treat gameplay, player, battle, economy, market, and onboarding as valid game-domain language."
+        state_path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+
+        run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
+        run_cmd(["./scripts/validate-development"], cwd=self.repo)
+
+        readme = (self.repo / "README.md").read_text(encoding="utf-8").lower()
+        roadmap = (self.repo / "docs/ROADMAP.md").read_text(encoding="utf-8").lower()
+        self.assertIn("playable tactical game prototype", readme)
+        self.assertIn("gameplay-first prototype", roadmap)
+
     def test_render_and_validate_development_with_persistence_fixture(self) -> None:
         self.write_render_fixture("finalized_state_with_persistence_v2.json")
         run_cmd(["./scripts/render-development-docs"], cwd=self.repo)

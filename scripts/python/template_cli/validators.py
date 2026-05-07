@@ -184,6 +184,7 @@ def run_validate_development(root: Path) -> int:
     if not changelog_path.exists() or "## [Unreleased]" not in read_text(changelog_path):
         result.add_failure("CHANGELOG.md is missing the [Unreleased] section.")
 
+    state: dict = {}
     state_path = root / "state/project-init.json"
     if state_path.exists():
         try:
@@ -233,17 +234,18 @@ def run_validate_development(root: Path) -> int:
                     f"state/project-init.json references a missing summary export: {summary_export}"
                 )
 
-    for relative_path in DEVELOPMENT_SEMANTIC_DOCS:
-        path = root / relative_path
-        if not path.exists():
-            continue
-        text = read_text(path).lower()
-        for term in FORBIDDEN_DEVELOPMENT_TEMPLATE_TERMS:
-            if term in text:
-                result.add_failure(
-                    f"Generated development docs contain template-specific language '{term}' in {relative_path}."
-                )
-                break
+    if not _state_allows_game_terms(state):
+        for relative_path in DEVELOPMENT_SEMANTIC_DOCS:
+            path = root / relative_path
+            if not path.exists():
+                continue
+            text = read_text(path).lower()
+            for term in FORBIDDEN_DEVELOPMENT_TEMPLATE_TERMS:
+                if term in text:
+                    result.add_failure(
+                        f"Generated development docs contain template-specific language '{term}' in {relative_path}."
+                    )
+                    break
 
     validate_notes_catalog(root, result)
     validate_module_boundaries(root, result)
@@ -252,6 +254,27 @@ def run_validate_development(root: Path) -> int:
     validate_repo_plugins(root, result)
     validate_repo_skills(root, result)
     return print_development_summary(result)
+
+
+def _state_allows_game_terms(state: dict) -> bool:
+    if not isinstance(state, dict):
+        return False
+    project_type = str(state.get("projectType", "")).strip().lower()
+    if "game" in project_type:
+        return True
+    text = _state_text(state).lower()
+    text = re.sub(r"\b(?:non-game|not a game|not game|game-template|game template)\b", "", text)
+    return bool(re.search(r"\b(game|gameplay|player|playable|battle)\b", text))
+
+
+def _state_text(value: object) -> str:
+    if isinstance(value, dict):
+        return " ".join(_state_text(child) for child in value.values())
+    if isinstance(value, list):
+        return " ".join(_state_text(child) for child in value)
+    if value is None:
+        return ""
+    return str(value)
 
 
 def run_validate_governance(root: Path) -> int:

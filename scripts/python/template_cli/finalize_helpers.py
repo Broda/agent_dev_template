@@ -58,6 +58,8 @@ def existing_state_value(root: Path, dotted_path: str) -> str:
 
 def infer_project_type(project_name: str, objective: str) -> str:
     text = f"{project_name} {objective}".lower()
+    if any(token in text for token in ("game", "gameplay", "player", "playable")):
+        return "Game"
     if "cli" in text or "command line" in text:
         return "CLI"
     if "desktop" in text or "electron" in text:
@@ -99,8 +101,9 @@ def ask_non_empty(prompt: str, current: str = "") -> str:
 
 
 def choose_project_type(current: str) -> str:
+    options = ["Game", "CLI", "Desktop", "Web App", "API", "Library"]
     eprint("Project type options:")
-    for idx, option in enumerate(["CLI", "Desktop", "Web App", "API", "Library"], start=1):
+    for idx, option in enumerate(options, start=1):
         eprint(f"{idx}) {option}")
     if current:
         eprint(f"Detected: {current}")
@@ -108,7 +111,7 @@ def choose_project_type(current: str) -> str:
     while True:
         try:
             response = input(
-                f"Select project type [1-5]{f' (current: {current})' if current else ''}: "
+                f"Select project type [1-{len(options)}]{f' (current: {current})' if current else ''}: "
             )
         except EOFError:
             if current:
@@ -117,9 +120,10 @@ def choose_project_type(current: str) -> str:
         response = trim(response)
         if not response and current:
             return current
-        mapping = {"1": "CLI", "2": "Desktop", "3": "Web App", "4": "API", "5": "Library"}
-        if response in mapping:
-            return mapping[response]
+        if response.isdigit():
+            idx = int(response)
+            if 1 <= idx <= len(options):
+                return options[idx - 1]
 
 
 def choose_from_list(prompt: str, current: str, options: list[str]) -> str:
