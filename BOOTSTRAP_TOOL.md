@@ -39,10 +39,30 @@ Behavior:
 - Copies the harness working tree to a new path.
 - Refuses to overwrite an existing target.
 - Excludes local Git history and common cache/dependency directories.
+- Stamps `harness_commands/harness_manifest.json` with the source checkout commit when available.
 - Initializes a fresh Git repository with no remote by default.
 - Creates an initial commit by default.
 - Adds `origin` only when `--origin` is supplied.
 - Skips Git initialization only when `--no-git` is supplied.
+
+## Harness Manifest
+
+The checked-in manifest lives at `harness_commands/harness_manifest.json`.
+Validation treats it as the compatibility contract for generated projects.
+
+The manifest records:
+
+- manifest schema version and harness release version
+- template repository URL and source commit provenance
+- wrapper/runtime compatibility versions
+- supported modes
+- stable wrapper entrypoints and their backend commands
+- expected `state/project-init.json` schema version
+- artifact ownership classes: harness-owned, project-owned, mixed/generated, and archival
+
+Future `update` work should load this manifest rather than scraping Markdown
+docs. Update tooling must preserve project-owned and archival paths by default
+and classify mixed/generated paths conservatively.
 
 ## `update`
 

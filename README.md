@@ -42,6 +42,23 @@ Examples: "capture this idea", "what's missing before finalize?", "finalize this
 
 `HARNESS_IMPROVEMENT_ROADMAP.md` tracks public-template improvement milestones.
 
+## Harness Manifest
+
+`harness_commands/harness_manifest.json` records the template provenance and
+compatibility contract a generated project expects. It includes the manifest
+schema version, harness release version, template repository URL, source commit
+provenance, supported modes, stable wrapper entrypoints, the expected
+`state/project-init.json` schema version, and artifact ownership classes for
+future conservative update tooling.
+
+In the template repository, `sourceCommitType` is `template`. When
+`./scripts/project-harness new` creates a project from a Git checkout, it stamps
+the generated copy with the source checkout's exact 40-character commit SHA and
+sets `sourceCommitType` to `git`. The `sourceWorktreeDirty` flag records whether
+the source checkout had uncommitted changes at generation time. If the source is
+not a Git checkout, the copy is stamped as `unknown` instead of inventing
+provenance.
+
 ## Using This Public Harness
 
 Start each real project from its own clone or generated repository. The harness is meant to travel with the project so brainstorming history, finalization evidence, governance docs, and local scripts remain inspectable in the same Git history as the implementation work.

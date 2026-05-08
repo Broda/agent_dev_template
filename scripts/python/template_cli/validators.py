@@ -13,6 +13,7 @@ from template_cli.validator_intents import (
     validate_lab_command_parity,
 )
 from template_cli.validator_launchers import validate_python_launchers
+from template_cli.validator_manifest import validate_harness_manifest
 from template_cli.validator_module_boundaries import validate_module_boundaries
 from template_cli.validator_plugins import validate_repo_plugins
 from template_cli.validator_skills import validate_repo_skills
@@ -141,6 +142,7 @@ def run_validate_brainstorming(root: Path) -> int:
     validate_module_boundaries(root, result)
     validate_python_file_sizes(root, result)
     validate_python_launchers(root, result)
+    validate_harness_manifest(root, result)
     validate_repo_plugins(root, result)
     validate_repo_skills(root, result)
 
@@ -251,6 +253,7 @@ def run_validate_development(root: Path) -> int:
     validate_module_boundaries(root, result)
     validate_python_file_sizes(root, result)
     validate_python_launchers(root, result)
+    validate_harness_manifest(root, result)
     validate_repo_plugins(root, result)
     validate_repo_skills(root, result)
     return print_development_summary(result)

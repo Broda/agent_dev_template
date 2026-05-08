@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "harnessVersion": "0.1.0",
+  "templateRepository": "https://github.com/Broda/agent_dev_template",
+  "sourceCommit": "template-source",
+  "sourceCommitType": "template",
+  "sourceWorktreeDirty": false,
+  "compatibility": {
+    "wrapperRuntimeVersion": 1,
+    "capabilityVersion": 1,
+    "stateSchemaVersion": 2
+  },
+  "supportedModes": [
+    "brainstorming",
+    "development"
+  ],
+  "stableWrappers": [
+    {
+      "path": "scripts/lab",
+      "backendCommand": "lab-<command>"
+    },
+    {
+      "path": "scripts/finalize-project",
+      "backendCommand": "finalize-project"
+    },
+    {
+      "path": "scripts/validate-governance",
+      "backendCommand": "validate-governance"
+    },
+    {
+      "path": "scripts/project-harness",
+      "backendCommand": "project-harness-new | project-harness-validate"
+    },
+    {
+      "path": "scripts/render-intent-docs",
+      "backendCommand": "render-intent-docs"
+    },
+    {
+      "path": "scripts/sync-plugin-skills",
+      "backendCommand": "sync-plugin-skills"
+    }
+  ],
+  "artifactInventory": {
+    "harnessOwned": [
+      "AGENTS.md",
+      "BOOTSTRAP_TOOL.md",
+      "HARNESS_IMPROVEMENT_ROADMAP.md",
+      "harness_commands/intent_registry.json",
+      "scripts/",
+      ".agents/skills/",
+      "plugins/project-lifecycle-lab/"
+    ],
+    "projectOwned": [
+      "ideas/",
+      "sessions/",
+      "notes/",
+      "exports/",
+      "state/project-init.json",
+      "docs/",
+      "src/",
+      "tests/"
+    ],
+    "mixedGenerated": [
+      "README.md",
+      "CHANGELOG.md",
+      ".gitignore",
+      "MODE.md",
+      "brainstorming/FILE_MAP.md",
+      "harness_commands/harness_manifest.json",
+      "harness_commands/COMMANDS.md",
+      "harness_commands/CONVERSATIONAL_MODE.md"
+    ],
+    "archival": [
+      "brainstorming/docs/adr/",
+      "docs/adr/",
+      "NOTES_CATALOG.md",
+      "IDEA_CATALOG.md"
+    ]
+  }
+}

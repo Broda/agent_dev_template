@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 from template_cli.io_helpers import read_mode, write_text
+from template_cli.validator_manifest import stamp_harness_manifest
 
 
 COPY_IGNORE = shutil.ignore_patterns(
@@ -42,6 +43,7 @@ def run_project_harness_new(
 
     shutil.copytree(root, target_path, ignore=COPY_IGNORE)
     _write_brainstorming_mode(target_path)
+    stamp_harness_manifest(target_path, root)
 
     if origin and no_git:
         print("--origin cannot be used with --no-git.")

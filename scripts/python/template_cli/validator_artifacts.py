@@ -25,6 +25,7 @@ BRAINSTORMING_CORE_ARTIFACTS = [
     *REPO_PLUGIN_ARTIFACTS,
     "harness_commands/CONVERSATIONAL_MODE.md",
     "harness_commands/COMMANDS.md",
+    "harness_commands/harness_manifest.json",
     "harness_commands/intent_registry.json",
     "brainstorming/AGENTS.brainstorming.md",
     "brainstorming/QUICKSTART.md",
@@ -81,6 +82,7 @@ BRAINSTORMING_CORE_ARTIFACTS = [
     "tests/test_development_rendering.py",
     "tests/test_lab_lifecycle.py",
     "tests/test_lab_launcher.py",
+    "tests/test_harness_manifest.py",
     "tests/test_finalization_regression.py",
     "tests/test_intent_registry_contract.py",
     "tests/test_template_validation.py",
@@ -130,4 +132,5 @@ DEVELOPMENT_REQUIRED_ARTIFACTS = [
     "docs/adr/ADR-0001-record-architecture-decisions.md",
     "docs/adr/ADR-TEMPLATE.md",
     "state/project-init.json",
+    "harness_commands/harness_manifest.json",
 ]

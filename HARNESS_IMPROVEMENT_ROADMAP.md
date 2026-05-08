@@ -54,30 +54,30 @@ Exit criteria:
 Goal: make every generated project able to identify which harness runtime and
 capabilities it expects.
 
-- [ ] Define a checked-in harness manifest path, such as
+- [x] Define a checked-in harness manifest path, such as
       `harness_commands/harness_manifest.json`.
-- [ ] Include a manifest schema version.
-- [ ] Include a human harness release version.
-- [ ] Include the template source repository URL.
-- [ ] Include the exact source commit when creating a new harness copy.
-- [ ] Include a compatibility/capability version for wrapper and runtime checks.
-- [ ] Include supported modes: `brainstorming` and `development`.
-- [ ] Include stable wrapper entrypoints and the canonical backend command each
+- [x] Include a manifest schema version.
+- [x] Include a human harness release version.
+- [x] Include the template source repository URL.
+- [x] Include the exact source commit when creating a new harness copy.
+- [x] Include a compatibility/capability version for wrapper and runtime checks.
+- [x] Include supported modes: `brainstorming` and `development`.
+- [x] Include stable wrapper entrypoints and the canonical backend command each
       wrapper invokes.
-- [ ] Include the current `state/project-init.json` schema version expected by
+- [x] Include the current `state/project-init.json` schema version expected by
       finalization/rendering.
-- [ ] Include a retained artifact inventory grouped by ownership class:
+- [x] Include a retained artifact inventory grouped by ownership class:
       harness-owned, project-owned, mixed/generated, and archival.
-- [ ] Add a validator for required manifest fields and supported version values.
-- [ ] Add tests proving `project-harness new` stamps or preserves provenance
+- [x] Add a validator for required manifest fields and supported version values.
+- [x] Add tests proving `project-harness new` stamps or preserves provenance
       correctly.
-- [ ] Document the manifest in `README.md` and `BOOTSTRAP_TOOL.md`.
+- [x] Document the manifest in `README.md` and `BOOTSTRAP_TOOL.md`.
 
 Exit criteria:
 
-- [ ] New project copies record source commit/version provenance.
-- [ ] Validation fails on missing or malformed manifest fields.
-- [ ] Manifest ownership classes are sufficient to drive an update dry run.
+- [x] New project copies record source commit/version provenance.
+- [x] Validation fails on missing or malformed manifest fields.
+- [x] Manifest ownership classes are sufficient to drive an update dry run.
 
 ## Milestone 2 - Machine-Readable Command And Capability Surface
 

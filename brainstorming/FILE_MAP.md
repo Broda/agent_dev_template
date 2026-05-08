@@ -34,6 +34,7 @@ Lean file registry for the Project Harness Template.
 | `plugins/project-lifecycle-lab/skills/template-maintenance/agents/openai.yaml` | Plugin mirror of maintenance skill UI metadata |
 | `harness_commands/CONVERSATIONAL_MODE.md` | Agent-facing plain-language intent map across harness modes |
 | `harness_commands/COMMANDS.md` | Backend command contract for human-agent workflow intents |
+| `harness_commands/harness_manifest.json` | Harness provenance, compatibility, wrapper, and artifact ownership manifest |
 | `harness_commands/intent_registry.json` | Canonical harness command intent registry for generated NL mapping tables |
 | `brainstorming/AGENTS.brainstorming.md` | Brainstorming-mode contract |
 | `brainstorming/QUICKSTART.md` | Fast start workflow |
@@ -55,6 +56,7 @@ Lean file registry for the Project Harness Template.
 | `tests/test_development_rendering.py` | Development doc render and validation regression tests |
 | `tests/test_development_wiki.py` | Development wiki render and sync-check regression tests |
 | `tests/test_finalization_regression.py` | End-to-end finalization regression tests for multi-session detail carryover |
+| `tests/test_harness_manifest.py` | Harness manifest validation and provenance stamping regression tests |
 | `tests/test_lab_handoff.py` | Lab handoff compiler regression tests for lossless brainstorming-to-finalization state |
 | `tests/test_lab_finalization.py` | Lab finalization command regression tests |
 | `tests/test_intent_registry_contract.py` | Intent-registry render, parity, and CI-contract regression suite |
@@ -119,6 +121,7 @@ Lean file registry for the Project Harness Template.
 | `scripts/python/template_cli/validator_code_size.py` | Python file-size validation for template tooling and tests |
 | `scripts/python/template_cli/validator_intents.py` | Intent registry, generated command docs, and CI sync validation helpers |
 | `scripts/python/template_cli/validator_launchers.py` | Launcher consistency checks for shell and PowerShell entrypoints |
+| `scripts/python/template_cli/validator_manifest.py` | Harness manifest validation and provenance stamping helpers |
 | `scripts/python/template_cli/validator_module_boundaries.py` | Import-boundary checks for template CLI modules |
 | `scripts/python/template_cli/validator_plugins.py` | Local plugin manifest and marketplace validation helpers |
 | `scripts/python/template_cli/validator_skills.py` | Repo-scoped skill and skill metadata validation helpers |
