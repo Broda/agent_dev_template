@@ -1,4 +1,4 @@
-﻿# Harness Command Conversational Mode
+# Harness Command Conversational Mode
 
 Agent-facing command intent model for chat-first human-agent development.
 

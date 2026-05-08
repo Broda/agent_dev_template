@@ -1,4 +1,4 @@
-﻿# Project Summary Snapshot Template (Optional Archive)
+# Project Summary Snapshot Template (Optional Archive)
 
 ## 1. Executive Summary
 

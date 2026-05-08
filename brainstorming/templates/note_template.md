@@ -11,16 +11,16 @@
 
 ## Captured Information
 
-- 
+-
 
 ## Key Facts / Constraints
 
-- 
+-
 
 ## Open Questions / Follow-ups
 
-- 
+-
 
 ## Links
 
-- 
+-

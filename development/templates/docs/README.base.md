@@ -66,6 +66,6 @@ Notes are stored under `notes/` and indexed in `NOTES_CATALOG.md`.
 
 # Philosophy
 
-Correctness over convenience.  
-Structure over speed.  
+Correctness over convenience.
+Structure over speed.
 Intentional evolution over drift.

@@ -1,4 +1,4 @@
-﻿# Risk Template
+# Risk Template
 
 ## Metadata
 

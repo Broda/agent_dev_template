@@ -30,10 +30,10 @@ It is intended to evolve intentionally.
 
 The system follows strict layer separation:
 
-Interface Layer  
-→ Application Layer  
-→ Domain/Core Logic  
-→ Persistence Layer  
+Interface Layer
+→ Application Layer
+→ Domain/Core Logic
+→ Persistence Layer
 → Infrastructure/Storage
 
 ## 2.1 Boundary Rules
@@ -326,11 +326,11 @@ All development must support the active milestone first.
 
 # 18. Guiding Principles
 
-Correctness over convenience.  
-Structure over speed.  
-Intentional evolution over drift.  
-Explicit decisions over implicit behavior.  
-Milestones over scattered tasks.  
+Correctness over convenience.
+Structure over speed.
+Intentional evolution over drift.
+Explicit decisions over implicit behavior.
+Milestones over scattered tasks.
 
 This is a structured system.
 Maintain it accordingly.

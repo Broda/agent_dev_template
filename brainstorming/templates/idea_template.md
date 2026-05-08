@@ -1,4 +1,4 @@
-﻿# Idea Template (Governance)
+# Idea Template (Governance)
 
 ## Metadata
 

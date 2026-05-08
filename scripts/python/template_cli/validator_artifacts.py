@@ -12,6 +12,10 @@ REPO_SKILL_ARTIFACTS = [
 REPO_PLUGIN_ARTIFACTS = [PLUGIN_MARKETPLACE, PLUGIN_MANIFEST, *PLUGIN_SKILL_ARTIFACTS]
 
 BRAINSTORMING_CORE_ARTIFACTS = [
+    ".editorconfig",
+    ".gitattributes",
+    ".gitignore",
+    "LICENSE",
     "README.md",
     "BOOTSTRAP_TOOL.md",
     "HARNESS_IMPROVEMENT_ROADMAP.md",
@@ -76,6 +80,7 @@ BRAINSTORMING_CORE_ARTIFACTS = [
     "tests/workflow_test_helpers.py",
     "tests/test_development_rendering.py",
     "tests/test_lab_lifecycle.py",
+    "tests/test_lab_launcher.py",
     "tests/test_finalization_regression.py",
     "tests/test_intent_registry_contract.py",
     "tests/test_template_validation.py",
@@ -94,6 +99,9 @@ BRAINSTORMING_CORE_ARTIFACTS = [
 ]
 
 DEVELOPMENT_REQUIRED_ARTIFACTS = [
+    ".editorconfig",
+    ".gitattributes",
+    "LICENSE",
     "AGENTS.md",
     "MODE.md",
     "README.md",

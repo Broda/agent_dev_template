@@ -1,4 +1,4 @@
-﻿name: Governance Audit (Warn Only)
+name: Governance Audit (Warn Only)
 
 on:
   pull_request:

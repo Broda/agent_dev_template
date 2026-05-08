@@ -1,5 +1,36 @@
-.vscode/settings.json
-external/
-tasklist.md
+# Python
 __pycache__/
 **/__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.venv/
+venv/
+env/
+
+# Test and build output
+dist/
+build/
+*.egg-info/
+.cache/
+tmp/
+temp/
+
+# OS and editor state
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/settings.json
+
+# Local scratch and external checkouts
+external/
+tasklist.md

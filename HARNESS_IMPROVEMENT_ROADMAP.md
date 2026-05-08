@@ -23,31 +23,31 @@ itself.
 
 Goal: remove small public-template friction before deeper runtime changes.
 
-- [ ] Add a top-level `LICENSE` file matching the plugin manifest's MIT license.
-- [ ] Add `.gitattributes` to normalize text files and prevent accidental
+- [x] Add a top-level `LICENSE` file matching the plugin manifest's MIT license.
+- [x] Add `.gitattributes` to normalize text files and prevent accidental
       BOM/line-ending churn in generated docs and wrappers.
-- [ ] Add `.editorconfig` for indentation, final newline, charset, and line
+- [x] Add `.editorconfig` for indentation, final newline, charset, and line
       ending expectations.
-- [ ] Normalize existing text files intentionally after the line-ending policy is
+- [x] Normalize existing text files intentionally after the line-ending policy is
       committed.
-- [ ] Expand `.gitignore` for common Python, test, OS, editor, and temporary
+- [x] Expand `.gitignore` for common Python, test, OS, editor, and temporary
       artifacts while keeping template-owned files visible.
-- [ ] Fix `./scripts/lab --help` and `./scripts/lab help` so the canonical lab
+- [x] Fix `./scripts/lab --help` and `./scripts/lab help` so the canonical lab
       launcher prints useful command guidance instead of dispatching
       `lab---help` or `lab-help`.
-- [ ] Add launcher tests for lab help handling on POSIX.
-- [ ] Add or update PowerShell launcher tests for equivalent help behavior.
-- [ ] Decide whether `.github/workflows/governance-audit.yml` should be removed
+- [x] Add launcher tests for lab help handling on POSIX.
+- [x] Add or update PowerShell launcher tests for equivalent help behavior.
+- [x] Decide whether `.github/workflows/governance-audit.yml` should be removed
       or changed to run a distinct warn-only audit that is not already covered
       by blocking CI.
-- [ ] Update `README.md`, `brainstorming/FILE_MAP.md`, and validation fixtures
+- [x] Update `README.md`, `brainstorming/FILE_MAP.md`, and validation fixtures
       whenever public artifact inventory changes.
 
 Exit criteria:
 
-- [ ] `./scripts/validate-governance` passes.
-- [ ] `python3 -m unittest discover -s tests -v` passes.
-- [ ] A fresh `./scripts/project-harness new <tmp-path> --no-git` copy validates.
+- [x] `./scripts/validate-governance` passes.
+- [x] `python3 -m unittest discover -s tests -v` passes.
+- [x] A fresh `./scripts/project-harness new <tmp-path> --no-git` copy validates.
 
 ## Milestone 1 - Harness Provenance And Compatibility Manifest
 

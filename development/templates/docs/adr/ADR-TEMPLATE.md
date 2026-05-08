@@ -1,8 +1,8 @@
 # ADR-XXXX: <Short Title>
 
-Date: YYYY-MM-DD  
-Status: Proposed | Accepted | Superseded | Deprecated  
-Supersedes: ADR-#### (if applicable)  
+Date: YYYY-MM-DD
+Status: Proposed | Accepted | Superseded | Deprecated
+Supersedes: ADR-#### (if applicable)
 Superseded by: ADR-#### (if applicable)
 
 ---

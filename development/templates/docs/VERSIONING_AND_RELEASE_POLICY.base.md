@@ -170,9 +170,9 @@ Each release entry must align with version bump rules.
 
 If needed, use:
 
-1.4.0-alpha.1  
-1.4.0-beta.1  
-1.4.0-rc.1  
+1.4.0-alpha.1
+1.4.0-beta.1
+1.4.0-rc.1
 
 Pre-releases:
 
@@ -243,8 +243,8 @@ AI must:
 
 Version numbers communicate stability.
 
-Refactors preserve trust.  
-Minor versions expand capability.  
+Refactors preserve trust.
+Minor versions expand capability.
 Major versions break expectations — rarely.
 
 Version intentionally.

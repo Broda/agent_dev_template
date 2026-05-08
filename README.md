@@ -27,6 +27,8 @@ Examples: "capture this idea", "what's missing before finalize?", "finalize this
 
 - Python 3 is required for the repository automation scripts under `scripts/`.
 - The shell and PowerShell entrypoints are launchers; the canonical implementation lives in Python.
+- The public template is MIT licensed. See `LICENSE`.
+- Text files are normalized through `.gitattributes` and `.editorconfig` so generated docs and wrappers avoid accidental BOM or line-ending churn.
 
 ## Harness Architecture
 
@@ -61,6 +63,13 @@ To create a fresh harness copy from a local checkout:
 ```
 
 This creates an independent Git repository with a baseline commit and no remote. Pass `--origin <url>` only when you want to connect the new project to its own remote.
+
+To inspect available lab commands:
+
+```sh
+./scripts/lab --help
+./scripts/lab help
+```
 
 ## Start Here
 

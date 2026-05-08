@@ -73,7 +73,13 @@ def _validate_lab_launcher(root: Path, result: ValidationResult) -> None:
     shell_path = root / "scripts/lab.sh"
     if shell_path.exists():
         text = read_text(shell_path)
-        for snippet in ["Usage: ./scripts/lab <command> [args]", '"lab-$subcommand"', 'python/cli.py"']:
+        for snippet in [
+            "Usage: ./scripts/lab <command> [args]",
+            "Run ./scripts/lab <command> --help",
+            'subcommand="${1:-}"',
+            '"lab-$subcommand"',
+            'python/cli.py"',
+        ]:
             if snippet not in text:
                 result.add_failure(f"Shell launcher scripts/lab.sh is missing expected snippet: {snippet}")
 
@@ -83,6 +89,7 @@ def _validate_lab_launcher(root: Path, result: ValidationResult) -> None:
         for snippet in [
             "Set-StrictMode -Version Latest",
             "Usage: ./scripts/lab <command> [args]",
+            "Run ./scripts/lab <command> --help",
             'py -3 "$scriptDir/python/cli.py"',
             '("lab-" + $subcommand)',
         ]:

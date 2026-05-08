@@ -1,4 +1,4 @@
-﻿# Idea Catalog
+# Idea Catalog
 
 Central index of tracked ideas.
 

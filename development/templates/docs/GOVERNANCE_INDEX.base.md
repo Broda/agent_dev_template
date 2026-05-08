@@ -260,10 +260,10 @@ When uncertain about scope, architecture, or policy: surface the question to the
 
 Governance exists to prevent silent drift.
 
-Structure protects maintainability.  
-Versioning protects stability.  
-Migration discipline protects data.  
-Security protects users.  
-Verification protects confidence.  
+Structure protects maintainability.
+Versioning protects stability.
+Migration discipline protects data.
+Security protects users.
+Verification protects confidence.
 
 Follow governance deliberately.

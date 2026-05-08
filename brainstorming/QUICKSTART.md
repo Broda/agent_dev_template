@@ -1,4 +1,4 @@
-﻿# Quickstart
+# Quickstart
 
 Python 3 is required for the `scripts/` automation commands used below.
 

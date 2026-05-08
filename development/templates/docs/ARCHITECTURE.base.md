@@ -16,11 +16,11 @@ This document defines structure and boundaries.
 
 # 2. Layer Model
 
-Interface  
-→ Application  
-→ Domain/Core  
-→ Persistence  
-→ Infrastructure  
+Interface
+→ Application
+→ Domain/Core
+→ Persistence
+→ Infrastructure
 
 ---
 

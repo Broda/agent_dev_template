@@ -257,7 +257,7 @@ Security fixes must not bundle unrelated features.
 
 Security failures damage trust.
 
-Structure protects maintainability.  
-Security protects users.  
+Structure protects maintainability.
+Security protects users.
 
 Security discipline must never erode silently.

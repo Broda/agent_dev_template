@@ -1,4 +1,4 @@
-﻿# ADR Template
+# ADR Template
 
 - Status: Proposed
 - Date: YYYY-MM-DD
@@ -38,15 +38,15 @@ Chosen option and concise rationale.
 
 ### Positive
 
-- 
+-
 
 ### Negative
 
-- 
+-
 
 ### Neutral
 
-- 
+-
 
 ## Alternatives Considered But Rejected
 

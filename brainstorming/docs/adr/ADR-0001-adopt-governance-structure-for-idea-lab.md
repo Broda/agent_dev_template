@@ -1,4 +1,4 @@
-﻿# ADR-0001: Adopt Governance Structure for Idea Lab
+# ADR-0001: Adopt Governance Structure for Idea Lab
 
 - Status: Accepted
 - Date: 2026-02-17

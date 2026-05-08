@@ -1,9 +1,13 @@
-﻿# File Map
+# File Map
 
 Lean file registry for the Project Harness Template.
 
 | Path | Purpose |
 |---|---|
+| `LICENSE` | MIT license for the public harness template |
+| `.editorconfig` | Cross-editor indentation, charset, final-newline, and line-ending policy |
+| `.gitattributes` | Git text normalization and binary file classification policy |
+| `.gitignore` | Local/derived file exclusions |
 | `README.md` | Lightweight overview and usage |
 | `BOOTSTRAP_TOOL.md` | Planning contract for a future harness bootstrap helper |
 | `HARNESS_IMPROVEMENT_ROADMAP.md` | Public-template improvement roadmap and milestone backlog |
@@ -54,6 +58,7 @@ Lean file registry for the Project Harness Template.
 | `tests/test_lab_handoff.py` | Lab handoff compiler regression tests for lossless brainstorming-to-finalization state |
 | `tests/test_lab_finalization.py` | Lab finalization command regression tests |
 | `tests/test_intent_registry_contract.py` | Intent-registry render, parity, and CI-contract regression suite |
+| `tests/test_lab_launcher.py` | Lab shell and PowerShell launcher help regression tests |
 | `tests/test_lab_lifecycle.py` | Lab command, finalize, status, doctor, and review regression tests |
 | `tests/test_template_validation.py` | Template governance, skill, plugin, and launcher validation tests |
 | `tests/test_project_harness_bootstrap.py` | Project harness bootstrap command regression tests |
@@ -103,7 +108,6 @@ Lean file registry for the Project Harness Template.
 | `.github/workflows/ci.yml` | Blocking CI for tests and governance validation |
 | `.github/workflows/governance-audit.yml` | Warn-only CI audit |
 | `.github/PULL_REQUEST_TEMPLATE.md` | PR checklist |
-| `.gitignore` | Local/derived file exclusions |
 | `scripts/python/template_cli/io_helpers.py` | I/O primitives, regex constants, ValidationResult, and summary printers shared across the CLI |
 | `scripts/python/template_cli/adr.py` | Development ADR capture command implementation |
 | `scripts/python/template_cli/bootstrap.py` | Project harness bootstrap command implementation |

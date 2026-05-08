@@ -1,4 +1,4 @@
-﻿# Harness Commands
+# Harness Commands
 
 Backend contract for conversational operations in the project harness.
 

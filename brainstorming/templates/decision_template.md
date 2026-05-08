@@ -1,4 +1,4 @@
-﻿# Decision Template (Governance)
+# Decision Template (Governance)
 
 ## Metadata
 

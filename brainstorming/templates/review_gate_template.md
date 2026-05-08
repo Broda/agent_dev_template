@@ -1,4 +1,4 @@
-﻿# Review Gate Template
+# Review Gate Template
 
 Use this section in review sessions for `/lab review` outputs.
 

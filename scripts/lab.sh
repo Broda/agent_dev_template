@@ -1,15 +1,35 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ $# -lt 1 ]]; then
-  echo "Usage: ./scripts/lab <command> [args]" >&2
-  exit 1
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+subcommand="${1:-}"
+
+if [[ -z "$subcommand" || "$subcommand" == "-h" || "$subcommand" == "--help" || "$subcommand" == "help" ]]; then
+  cat <<'USAGE'
+Usage: ./scripts/lab <command> [args]
+
+Commands:
+  status
+  doctor [--idea-id <id>]
+  capture --idea-id <id> --title "Title"
+  activate --idea-id <id>
+  decide --idea-id <id> --chosen-option "Decision" --rationale "Reason"
+  risk --idea-id <id> --statement "Risk"
+  review --idea-id <id> --result <result>
+  handoff [--idea-id <id>] [--check]
+  finalize [--idea-id <id>] [--write-export]
+  note --topic "Topic" --summary "Summary"
+  audit
+  commit [--message "Message"]
+  push
+  sync [args]
+
+Run ./scripts/lab <command> --help for command-specific options.
+USAGE
+  exit 0
 fi
 
-subcommand="$1"
 shift
-
-script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 
 if command -v python3 >/dev/null 2>&1; then
   exec python3 "$script_dir/python/cli.py" "lab-$subcommand" "$@"
