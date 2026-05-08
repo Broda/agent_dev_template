@@ -64,6 +64,7 @@ Lean file registry for the Project Harness Template.
 | `tests/test_lab_lifecycle.py` | Lab command, finalize, status, doctor, and review regression tests |
 | `tests/test_template_validation.py` | Template governance, skill, plugin, and launcher validation tests |
 | `tests/test_project_harness_bootstrap.py` | Project harness bootstrap command regression tests |
+| `tests/test_project_harness_update.py` | Project harness update dry-run regression tests |
 | `tests/fixtures/finalized_state_v2.json` | Canonical finalized-state fixture for development render/validate regression |
 | `tests/fixtures/finalized_state_web_app_v2.json` | Non-game finalized-state fixture for product-neutral development rendering regression |
 | `tests/fixtures/finalized_state_with_persistence_v2.json` | Persistence-enabled finalized-state fixture for migration-policy render regression |

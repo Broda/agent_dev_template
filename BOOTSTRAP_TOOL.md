@@ -82,6 +82,19 @@ Bring harness-maintained files in an existing project up to date from a selected
 
 Status: deferred.
 
+Current local interface:
+
+```sh
+./scripts/project-harness update --dry-run --source-path <template-checkout>
+```
+
+The dry-run command is implemented for an explicit local source checkout. It
+loads the current project's recorded harness manifest, loads the source
+manifest, classifies candidate files by manifest ownership class, and prints a
+deterministic no-write plan. `--source-commit` and `--release-version` are
+reserved explicit source selectors; until release/source resolution exists, the
+local helper refuses them with guidance to use `--source-path`.
+
 Expected behavior:
 
 1. Show a dry-run summary before changing files.

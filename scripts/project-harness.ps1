@@ -16,6 +16,7 @@ Usage: ./scripts/project-harness <command> [args]
 
 Commands:
   new <path> [--origin <url>] [--no-git]
+  update --dry-run --source-path <template-checkout>
   validate
 '@
     exit 0
@@ -26,6 +27,8 @@ switch ($Command) {
     'new' { $cliCommand = 'project-harness-new' }
     # Delegates to project-harness-validate.
     'validate' { $cliCommand = 'project-harness-validate' }
+    # Delegates to project-harness-update.
+    'update' { $cliCommand = 'project-harness-update' }
     default {
         Write-Error "Unknown project-harness command: $Command"
         exit 2

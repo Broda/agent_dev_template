@@ -10,6 +10,7 @@ Usage: ./scripts/project-harness <command> [args]
 
 Commands:
   new <path> [--origin <url>] [--no-git]
+  update --dry-run --source-path <template-checkout>
   validate
 USAGE
   exit 0
@@ -25,6 +26,10 @@ case "$subcommand" in
   validate)
     # Delegates to project-harness-validate.
     cli_command="project-harness-validate"
+    ;;
+  update)
+    # Delegates to project-harness-update.
+    cli_command="project-harness-update"
     ;;
   *)
     echo "Unknown project-harness command: $subcommand" >&2

@@ -111,30 +111,30 @@ Exit criteria:
 
 Goal: let downstream projects inspect harness updates without changing files.
 
-- [ ] Extend `./scripts/project-harness` with an `update --dry-run` command.
-- [ ] Accept an explicit source template path, source commit, or release version.
-- [ ] Refuse ambiguous update sources.
-- [ ] Load the current project's recorded harness provenance.
+- [x] Extend `./scripts/project-harness` with an `update --dry-run` command.
+- [x] Accept an explicit source template path, source commit, or release version.
+- [x] Refuse ambiguous update sources.
+- [x] Load the current project's recorded harness provenance.
 - [ ] Compare current project files against the recorded source version and the
       target source version.
-- [ ] Classify each candidate file as harness-owned, project-owned,
+- [x] Classify each candidate file as harness-owned, project-owned,
       mixed/generated, missing, added, removed, or conflicted.
-- [ ] Preserve project-owned paths by default, including `ideas/`, `sessions/`,
+- [x] Preserve project-owned paths by default, including `ideas/`, `sessions/`,
       `notes/`, `exports/`, `state/project-init.json`, finalized `docs/`, and
       implementation source files.
-- [ ] Treat generated docs and wrapper scripts as mixed when local edits exist.
-- [ ] Print a deterministic dry-run plan with no file writes.
-- [ ] Include exact next commands for applying or skipping update groups once
+- [x] Treat generated docs and wrapper scripts as mixed when local edits exist.
+- [x] Print a deterministic dry-run plan with no file writes.
+- [x] Include exact next commands for applying or skipping update groups once
       apply mode exists.
-- [ ] Add regression tests for clean project, locally modified wrapper,
+- [x] Add regression tests for clean project, locally modified wrapper,
       finalized project, missing file, and conflicted mixed/generated file
       scenarios.
-- [ ] Document the update boundary in `BOOTSTRAP_TOOL.md`.
+- [x] Document the update boundary in `BOOTSTRAP_TOOL.md`.
 
 Exit criteria:
 
-- [ ] Dry run writes no files and exits nonzero only for unsafe/ambiguous input.
-- [ ] The plan is stable enough to use in tests and PR review.
+- [x] Dry run writes no files and exits nonzero only for unsafe/ambiguous input.
+- [x] The plan is stable enough to use in tests and PR review.
 
 ## Milestone 4 - Safe Harness Update Apply Path
 

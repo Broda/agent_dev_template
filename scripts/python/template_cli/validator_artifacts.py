@@ -87,6 +87,7 @@ BRAINSTORMING_CORE_ARTIFACTS = [
     "tests/test_intent_registry_contract.py",
     "tests/test_template_validation.py",
     "tests/test_project_harness_bootstrap.py",
+    "tests/test_project_harness_update.py",
     "tests/fixtures/finalized_state_v2.json",
     "tests/fixtures/finalized_state_web_app_v2.json",
     "tests/fixtures/finalized_state_with_persistence_v2.json",

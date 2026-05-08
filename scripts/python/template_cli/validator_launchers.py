@@ -25,6 +25,7 @@ def validate_python_launchers(root: Path, result: ValidationResult) -> None:
         _validate_shell_launcher(root, result, script_name, cli_command)
         _validate_powershell_launcher(root, result, script_name, cli_command)
     _validate_lab_launcher(root, result)
+    _validate_project_harness_update_launcher(root, result)
 
 
 def _validate_bare_launcher(root: Path, result: ValidationResult, script_name: str) -> None:
@@ -95,3 +96,13 @@ def _validate_lab_launcher(root: Path, result: ValidationResult) -> None:
         ]:
             if snippet not in text:
                 result.add_failure(f"PowerShell launcher scripts/lab.ps1 is missing expected snippet: {snippet}")
+
+
+def _validate_project_harness_update_launcher(root: Path, result: ValidationResult) -> None:
+    for relative_path in ["scripts/project-harness.sh", "scripts/project-harness.ps1"]:
+        path = root / relative_path
+        if not path.exists():
+            continue
+        text = read_text(path)
+        if "project-harness-update" not in text:
+            result.add_failure(f"Launcher {relative_path} is missing project-harness update delegation.")
