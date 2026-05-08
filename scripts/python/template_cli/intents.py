@@ -13,6 +13,7 @@ COMMANDS_MARKER_START = "<!-- BEGIN GENERATED CONVERSATIONAL INTENT MAPPING -->"
 COMMANDS_MARKER_END = "<!-- END GENERATED CONVERSATIONAL INTENT MAPPING -->"
 ALLOWED_WRITE_BEHAVIORS = {"write", "no-write", "git"}
 ALLOWED_MODES = {"brainstorming", "development"}
+ALLOWED_MUTATION_SCOPES = {"none", "project-files", "git", "external-wiki"}
 
 
 class IntentRegistryError(Exception):
@@ -59,7 +60,22 @@ def validate_intent_registry(data: dict) -> None:
         raise IntentRegistryError("Intent registry must include a non-empty intents array.")
 
     seen_commands: set[str] = set()
-    required_keys = {"command", "backendIntent", "modes", "phrases", "description", "filesTouched", "writeBehavior"}
+    required_keys = {
+        "command",
+        "backendIntent",
+        "modes",
+        "phrases",
+        "description",
+        "filesTouched",
+        "writeBehavior",
+        "requiredArgs",
+        "optionalArgs",
+        "wrapperPath",
+        "readOnlySafe",
+        "mutationScope",
+        "output",
+        "exitCodes",
+    }
     for index, intent in enumerate(intents, start=1):
         if not isinstance(intent, dict):
             raise IntentRegistryError(f"Intent entry #{index} must be an object.")
@@ -110,6 +126,46 @@ def validate_intent_registry(data: dict) -> None:
                 f"Expected one of: {', '.join(sorted(ALLOWED_WRITE_BEHAVIORS))}"
             )
 
+        for key in ("requiredArgs", "optionalArgs"):
+            values = intent.get(key)
+            if not isinstance(values, list):
+                raise IntentRegistryError(f"Intent '{command}' must include {key} as an array.")
+            if any(not isinstance(value, str) or not value.strip() for value in values):
+                raise IntentRegistryError(f"Intent '{command}' contains an empty {key} entry.")
+
+        wrapper_path = _trim(str(intent.get("wrapperPath", "")))
+        if not wrapper_path:
+            raise IntentRegistryError(f"Intent '{command}' must include a non-empty wrapperPath.")
+
+        if not isinstance(intent.get("readOnlySafe"), bool):
+            raise IntentRegistryError(f"Intent '{command}' must include readOnlySafe as true or false.")
+
+        mutation_scope = intent.get("mutationScope")
+        if not isinstance(mutation_scope, list) or not mutation_scope:
+            raise IntentRegistryError(f"Intent '{command}' must include a non-empty mutationScope array.")
+        invalid_scopes = sorted({_trim(str(scope)) for scope in mutation_scope} - ALLOWED_MUTATION_SCOPES)
+        if invalid_scopes:
+            raise IntentRegistryError(
+                f"Intent '{command}' contains invalid mutationScope values: {', '.join(invalid_scopes)}"
+            )
+        if write_behavior == "no-write" and set(mutation_scope) != {"none"}:
+            raise IntentRegistryError(f"Intent '{command}' with no-write behavior must use mutationScope ['none'].")
+        if write_behavior == "git" and "git" not in mutation_scope:
+            raise IntentRegistryError(f"Intent '{command}' with git behavior must include mutationScope 'git'.")
+        if intent["readOnlySafe"] != (write_behavior == "no-write"):
+            raise IntentRegistryError(f"Intent '{command}' readOnlySafe must match no-write behavior.")
+
+        output = _trim(str(intent.get("output", "")))
+        if not output:
+            raise IntentRegistryError(f"Intent '{command}' must include a non-empty output field.")
+
+        exit_codes = intent.get("exitCodes")
+        if not isinstance(exit_codes, dict) or not exit_codes:
+            raise IntentRegistryError(f"Intent '{command}' must include a non-empty exitCodes object.")
+        for code, meaning in exit_codes.items():
+            if not str(code).isdigit() or not _trim(str(meaning)):
+                raise IntentRegistryError(f"Intent '{command}' contains an invalid exitCodes entry.")
+
 
 def registry_commands(root: Path) -> set[str]:
     data = load_intent_registry(root)
@@ -136,17 +192,29 @@ def _render_modes(modes: list[str]) -> str:
     return ", ".join(f"`{_trim(str(mode))}`" for mode in modes)
 
 
+def _render_list(values: list[str]) -> str:
+    if not values:
+        return "none"
+    return ", ".join(f"`{_trim(str(value))}`" for value in values)
+
+
+def _render_bool(value: bool) -> str:
+    return "`yes`" if value else "`no`"
+
+
 def render_conversational_intent_table(root: Path) -> str:
     data = load_intent_registry(root)
     lines = [
-        "| Natural phrase family | Modes | Action | Files touched |",
-        "|---|---|---|---|",
+        "| Natural phrase family | Modes | Action | Read-only safe | Mutation scope | Files touched |",
+        "|---|---|---|---|---|---|",
     ]
     for intent in data["intents"]:
         lines.append(
             f"| {_render_phrase_family(intent['phrases'])} | "
             f"{_render_modes(intent['modes'])} | "
             f"{_trim(str(intent['description']))} | "
+            f"{_render_bool(bool(intent['readOnlySafe']))} | "
+            f"{_render_list(intent['mutationScope'])} | "
             f"{_trim(str(intent['filesTouched']))} |"
         )
     return "\n".join(lines)
@@ -155,14 +223,23 @@ def render_conversational_intent_table(root: Path) -> str:
 def render_commands_intent_table(root: Path) -> str:
     data = load_intent_registry(root)
     lines = [
-        "| Conversational phrase family | Modes | Backend intent |",
-        "|---|---|---|",
+        "| Command | Modes | Backend intent | Wrapper | Required args | Optional args | Write behavior | Output and exit codes |",
+        "|---|---|---|---|---|---|---|---|",
     ]
     for intent in data["intents"]:
+        exit_codes = ", ".join(
+            f"`{_trim(str(code))}` { _trim(str(meaning)) }"
+            for code, meaning in intent["exitCodes"].items()
+        )
         lines.append(
-            f"| {_render_phrase_family(intent['phrases'])} | "
+            f"| `/lab {_trim(str(intent['command']))}` | "
             f"{_render_modes(intent['modes'])} | "
-            f"`{_trim(str(intent['backendIntent']))}` |"
+            f"`{_trim(str(intent['backendIntent']))}` | "
+            f"`{_trim(str(intent['wrapperPath']))}` | "
+            f"{_render_list(intent['requiredArgs'])} | "
+            f"{_render_list(intent['optionalArgs'])} | "
+            f"`{_trim(str(intent['writeBehavior']))}` | "
+            f"{_trim(str(intent['output']))}; {exit_codes} |"
         )
     return "\n".join(lines)
 

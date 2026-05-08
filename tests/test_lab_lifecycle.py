@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import textwrap
 
 from tests.workflow_test_helpers import LabWorkflowTestCase, run_cmd
@@ -65,6 +66,21 @@ class LabLifecycleTests(LabWorkflowTestCase):
         result = run_cmd(["./scripts/lab", "status"], cwd=self.repo)
         self.assertEqual(result.returncode, 0)
         self.assertIn("Mode: development", result.stdout)
+
+    def test_lab_mode_enforcement_uses_registry_modes(self) -> None:
+        self.write_render_fixture()
+        registry_path = self.repo / "harness_commands/intent_registry.json"
+        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+        for intent in registry["intents"]:
+            if intent["command"] == "status":
+                intent["modes"] = ["brainstorming"]
+                break
+        registry_path.write_text(json.dumps(registry, indent=2) + "\n", encoding="utf-8")
+
+        result = run_cmd(["./scripts/lab", "status"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("/lab status is not available in development mode", result.stdout + result.stderr)
 
     def test_lab_status_reports_development_context_after_finalize(self) -> None:
         self.write_render_fixture()

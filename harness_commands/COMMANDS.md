@@ -28,30 +28,30 @@ This table is generated from `harness_commands/intent_registry.json` via `./scri
 It is for agent dispatch: humans can speak the phrase family naturally, and agents translate it to the backend intent before running deterministic harness commands.
 
 <!-- BEGIN GENERATED CONVERSATIONAL INTENT MAPPING -->
-| Conversational phrase family | Modes | Backend intent |
-|---|---|---|
-| "capture this idea", "save this idea", "log this idea" | `brainstorming` | `/lab capture <idea-id>` |
-| "make this active", "promote this idea", "work on this now" | `brainstorming` | `/lab activate <idea-id>` |
-| "decision: ... because ...", "we should do X", "record this decision" | `brainstorming` | `/lab decide <decision-slug>` |
-| "risk: ...", "log this risk", "what could go wrong here?" | `brainstorming` | `/lab risk <idea-id>` |
-| "save path note", "record this branch", "note why we deferred that" | `brainstorming` | `/lab path-note <idea-id>` |
-| "save that info in notes", "save a note on <topic>", "save that research" | `brainstorming`, `development` | `/lab note <topic-or-ref>` |
-| "review this idea", "gate this idea", "is this ready?" | `brainstorming` | `/lab review <idea-id>` |
-| "save a summary snapshot", "export a summary", "make a handoff summary" | `brainstorming` | `/lab export <idea-id>` |
-| "finalize this repo", "switch to development mode", "finalize this idea" | `brainstorming` | `/lab finalize [<idea-id>]` |
-| "prepare the handoff", "make sure nothing gets lost", "distill this idea for finalization" | `brainstorming` | `/lab handoff [<idea-id>]` |
-| "park this", "pause this idea", "put this on hold" | `brainstorming` | `/lab park <idea-id>` |
-| "kill this", "drop this idea", "archive this as dead" | `brainstorming` | `/lab kill <idea-id>` |
-| "what's the current state?", "show me status", "where are we now?" | `brainstorming`, `development` | `/lab status` |
-| "why is finalize blocked?", "what exactly is missing before finalize?", "show me where finalize is getting values from" | `brainstorming` | `/lab doctor [<idea-id>]` |
-| "run audit", "validate the repo", "check governance" | `brainstorming`, `development` | `/lab audit` |
-| "record this as evidence", "mark this task done", "save verification for this task" | `development` | `/lab evidence <task>` |
-| "write an ADR", "record this architecture decision", "capture this decision as an ADR" | `development` | `/lab adr <title>` |
-| "generate the wiki", "update the wiki pages", "render wiki docs" | `development` | `/lab wiki-render` |
-| "check wiki sync", "verify the wiki is current", "check wiki drift" | `development` | `/lab wiki-check` |
-| "commit this milestone", "make a commit", "commit these changes" | `brainstorming`, `development` | `/lab commit [message]` |
-| "push these changes", "push this branch", "publish the branch" | `brainstorming`, `development` | `/lab push` |
-| "sync the repo", "commit and push this", "sync these changes" | `brainstorming`, `development` | `/lab sync [message]` |
+| Command | Modes | Backend intent | Wrapper | Required args | Optional args | Write behavior | Output and exit codes |
+|---|---|---|---|---|---|---|---|
+| `/lab capture` | `brainstorming` | `/lab capture <idea-id>` | `scripts/lab` | `--idea-id` | `--title`, `--owner`, `--problem`, `--summary`, `--scope`, `--constraints`, `--no-sync` | `write` | human-readable command result on stdout; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
+| `/lab activate` | `brainstorming` | `/lab activate <idea-id>` | `scripts/lab` | `--idea-id` | `--title`, `--owner`, `--session`, `--no-sync` | `write` | human-readable command result on stdout; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
+| `/lab decide` | `brainstorming` | `/lab decide <decision-slug>` | `scripts/lab` | `--idea-id` | `--decision-id`, `--owner`, `--session`, `--decision-level`, `--situation`, `--rationale`, `--constraints`, `--no-sync` | `write` | human-readable command result on stdout; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
+| `/lab risk` | `brainstorming` | `/lab risk <idea-id>` | `scripts/lab` | `--idea-id` | `--risk-id`, `--owner`, `--session`, `--mitigation`, `--contingency`, `--probability`, `--impact`, `--no-sync` | `write` | human-readable command result on stdout; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
+| `/lab path-note` | `brainstorming` | `/lab path-note <idea-id>` | `scripts/lab` | `--idea-id`, `--title` | `--summary`, `--deferred`, `--session`, `--no-sync` | `write` | human-readable command result on stdout; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
+| `/lab note` | `brainstorming`, `development` | `/lab note <topic-or-ref>` | `scripts/lab` | `--topic` | `--source`, `--idea-id`, `--tags`, `--summary`, `--summary-file`, `--detail`, `--details-file`, `--fact`, `--facts-file`, `--question`, `--questions-file`, `--link`, `--links-file`, `--no-sync` | `write` | human-readable command result on stdout; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
+| `/lab review` | `brainstorming` | `/lab review <idea-id>` | `scripts/lab` | `--idea-id`, `--result` | `--owner`, `--session`, `--summary`, `--outcome`, `--next-action`, `--no-sync` | `write` | human-readable command result on stdout; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
+| `/lab export` | `brainstorming` | `/lab export <idea-id>` | `scripts/lab` | `--idea-id` | `--no-sync` | `write` | human-readable command result on stdout; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
+| `/lab finalize` | `brainstorming` | `/lab finalize [<idea-id>]` | `scripts/lab` | none | `--idea-id`, `--write-export`, `--interactive` | `write` | human-readable command result on stdout; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
+| `/lab handoff` | `brainstorming` | `/lab handoff [<idea-id>]` | `scripts/lab` | none | `--idea-id`, `--check`, `--no-sync` | `write` | human-readable command result on stdout; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
+| `/lab park` | `brainstorming` | `/lab park <idea-id>` | `scripts/lab` | `--idea-id` | `--owner`, `--reason`, `--no-sync` | `write` | human-readable command result on stdout; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
+| `/lab kill` | `brainstorming` | `/lab kill <idea-id>` | `scripts/lab` | `--idea-id` | `--owner`, `--reason`, `--no-sync` | `write` | human-readable command result on stdout; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
+| `/lab status` | `brainstorming`, `development` | `/lab status` | `scripts/lab` | none | none | `no-write` | human-readable status report on stdout; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
+| `/lab doctor` | `brainstorming` | `/lab doctor [<idea-id>]` | `scripts/lab` | none | `--idea-id` | `no-write` | human-readable status report on stdout; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
+| `/lab audit` | `brainstorming`, `development` | `/lab audit` | `scripts/lab` | none | none | `no-write` | governance validation summary on stdout; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
+| `/lab evidence` | `development` | `/lab evidence <task>` | `scripts/lab` | `--task`, `--command`, `--result` | `--note`, `--no-complete` | `write` | human-readable command result on stdout; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
+| `/lab adr` | `development` | `/lab adr <title>` | `scripts/lab` | `--title`, `--decision` | `--context`, `--consequence`, `--alternative`, `--status`, `--deciders`, `--supersedes`, `--date` | `write` | human-readable command result on stdout; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
+| `/lab wiki-render` | `development` | `/lab wiki-render` | `scripts/lab` | none | none | `write` | human-readable command result on stdout; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
+| `/lab wiki-check` | `development` | `/lab wiki-check` | `scripts/lab` | none | none | `no-write` | human-readable status report on stdout; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
+| `/lab commit` | `brainstorming`, `development` | `/lab commit [message]` | `scripts/lab` | none | `--message` | `git` | git command progress and result on stdout/stderr; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
+| `/lab push` | `brainstorming`, `development` | `/lab push` | `scripts/lab` | none | none | `git` | git command progress and result on stdout/stderr; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
+| `/lab sync` | `brainstorming`, `development` | `/lab sync [message]` | `scripts/lab` | none | `message and git sync args` | `git` | git command progress and result on stdout/stderr; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
 <!-- END GENERATED CONVERSATIONAL INTENT MAPPING -->
 
 ## Commands (Backend Contract)

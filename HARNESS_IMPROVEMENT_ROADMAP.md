@@ -84,28 +84,28 @@ Exit criteria:
 Goal: expose the harness command surface without requiring tools to scrape
 Markdown docs.
 
-- [ ] Decide whether the capability manifest extends
+- [x] Decide whether the capability manifest extends
       `harness_commands/intent_registry.json` or lives as a separate generated
       file.
-- [ ] Include command name, modes, write behavior, touched files, required
+- [x] Include command name, modes, write behavior, touched files, required
       arguments, optional arguments, and stable wrapper path for each command.
-- [ ] Include whether a command is safe for a read-only adapter to call.
-- [ ] Include whether a command can mutate git state, project files, external
+- [x] Include whether a command is safe for a read-only adapter to call.
+- [x] Include whether a command can mutate git state, project files, external
       wiki checkouts, or only print status.
-- [ ] Include output/exit-code expectations for automation consumers.
-- [ ] Validate parity between the capability manifest, argparse/lab parser
+- [x] Include output/exit-code expectations for automation consumers.
+- [x] Validate parity between the capability manifest, argparse/lab parser
       wiring, and generated command docs.
-- [ ] Render human docs from the same source so
+- [x] Render human docs from the same source so
       `harness_commands/COMMANDS.md` and
       `harness_commands/CONVERSATIONAL_MODE.md` stay secondary views.
-- [ ] Add tests for mode enforcement using the machine-readable command surface.
-- [ ] Document how external tools should discover commands without executing
+- [x] Add tests for mode enforcement using the machine-readable command surface.
+- [x] Document how external tools should discover commands without executing
       arbitrary repository scripts.
 
 Exit criteria:
 
-- [ ] Command docs, intent registry, and capability manifest cannot drift in CI.
-- [ ] External adapters have an allowlist-ready command/capability contract.
+- [x] Command docs, intent registry, and capability manifest cannot drift in CI.
+- [x] External adapters have an allowlist-ready command/capability contract.
 
 ## Milestone 3 - Safe `project-harness update --dry-run`
 

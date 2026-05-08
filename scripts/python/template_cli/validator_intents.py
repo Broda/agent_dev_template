@@ -75,6 +75,9 @@ def validate_intent_registry(root: Path, result: ValidationResult) -> None:
     for intent in registry["intents"]:
         command = str(intent["command"]).strip()
         backend_intent = str(intent["backendIntent"]).strip()
+        wrapper_path = str(intent["wrapperPath"]).strip()
+        if not (root / wrapper_path).exists():
+            result.add_failure(f"Intent '{command}' wrapperPath does not exist: {wrapper_path}")
         parts = backend_intent.split()
         if not parts or parts[0] != "/lab":
             result.add_failure(

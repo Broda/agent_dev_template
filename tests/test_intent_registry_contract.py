@@ -186,6 +186,50 @@ class IntentRegistryContractTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("Intent 'capture' contains invalid modes: unsupported", result.stdout + result.stderr)
 
+    def test_render_intent_docs_fails_on_missing_capability_field(self) -> None:
+        registry_path = self.repo / "harness_commands/intent_registry.json"
+        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+        registry["intents"][0].pop("readOnlySafe")
+        registry_path.write_text(json.dumps(registry, indent=2) + "\n", encoding="utf-8")
+
+        result = run_cmd(["./scripts/render-intent-docs"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("missing required keys: readOnlySafe", result.stdout + result.stderr)
+
+    def test_render_intent_docs_fails_on_read_only_capability_drift(self) -> None:
+        registry_path = self.repo / "harness_commands/intent_registry.json"
+        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+        registry["intents"][0]["readOnlySafe"] = True
+        registry_path.write_text(json.dumps(registry, indent=2) + "\n", encoding="utf-8")
+
+        result = run_cmd(["./scripts/render-intent-docs"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Intent 'capture' readOnlySafe must match no-write behavior", result.stdout + result.stderr)
+
+    def test_validate_governance_fails_on_missing_wrapper_path(self) -> None:
+        registry_path = self.repo / "harness_commands/intent_registry.json"
+        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+        registry["intents"][0]["wrapperPath"] = "scripts/missing-lab"
+        registry_path.write_text(json.dumps(registry, indent=2) + "\n", encoding="utf-8")
+        run_cmd(["./scripts/render-intent-docs"], cwd=self.repo)
+
+        result = run_cmd(["./scripts/validate-governance"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Intent 'capture' wrapperPath does not exist: scripts/missing-lab", result.stdout + result.stderr)
+
+    def test_generated_docs_include_capability_surface(self) -> None:
+        commands = (self.repo / "harness_commands/COMMANDS.md").read_text(encoding="utf-8")
+        conversational = (self.repo / "harness_commands/CONVERSATIONAL_MODE.md").read_text(encoding="utf-8")
+
+        self.assertIn("| Command | Modes | Backend intent | Wrapper | Required args |", commands)
+        self.assertIn("`scripts/lab`", commands)
+        self.assertIn("`--idea-id`", commands)
+        self.assertIn("Output and exit codes", commands)
+        self.assertIn("| Natural phrase family | Modes | Action | Read-only safe | Mutation scope |", conversational)
+
     def test_render_intent_docs_fails_on_missing_markers(self) -> None:
         commands_path = self.repo / "harness_commands/COMMANDS.md"
         commands_text = commands_path.read_text(encoding="utf-8").replace(

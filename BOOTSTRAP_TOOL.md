@@ -64,6 +64,18 @@ Future `update` work should load this manifest rather than scraping Markdown
 docs. Update tooling must preserve project-owned and archival paths by default
 and classify mixed/generated paths conservatively.
 
+## Command Discovery
+
+External adapters should read `harness_commands/intent_registry.json` for the
+allowlist-ready command surface. The registry records each `/lab` command's
+supported modes, backend intent, required and optional arguments, wrapper path,
+write behavior, read-only safety, mutation scope, and output/exit-code
+expectations.
+
+Do not discover command capability by scraping `harness_commands/COMMANDS.md` or
+by invoking repository scripts. Those Markdown docs are generated from the
+registry for human review.
+
 ## `update`
 
 Bring harness-maintained files in an existing project up to date from a selected template version.

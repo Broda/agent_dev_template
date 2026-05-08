@@ -23,6 +23,20 @@ This harness is optimized for human-agent development, not for humans memorizing
 
 Examples: "capture this idea", "what's missing before finalize?", "finalize this repo", and "commit this milestone" are agent-facing intents. Terminal commands remain documented so the workflow is inspectable and recoverable.
 
+## Command Discovery
+
+External tools should discover supported workflow commands by reading
+`harness_commands/intent_registry.json`, not by scraping Markdown or executing
+repository scripts. The registry is the machine-readable command and capability
+surface: command names, modes, backend intents, required and optional arguments,
+stable wrapper paths, write behavior, read-only safety, mutation scope, output
+expectations, and exit-code meanings.
+
+`harness_commands/COMMANDS.md` and
+`harness_commands/CONVERSATIONAL_MODE.md` are generated views of that registry.
+Run `./scripts/render-intent-docs` after changing the registry; governance
+validation fails if the generated views drift.
+
 ## Tooling Runtime
 
 - Python 3 is required for the repository automation scripts under `scripts/`.

@@ -18,7 +18,30 @@
       ],
       "description": "add idea intake",
       "filesTouched": "`ideas/_inbox.md`, `IDEA_CATALOG.md`",
-      "writeBehavior": "write"
+      "writeBehavior": "write",
+      "requiredArgs": [
+        "--idea-id"
+      ],
+      "optionalArgs": [
+        "--title",
+        "--owner",
+        "--problem",
+        "--summary",
+        "--scope",
+        "--constraints",
+        "--no-sync"
+      ],
+      "wrapperPath": "scripts/lab",
+      "readOnlySafe": false,
+      "mutationScope": [
+        "project-files"
+      ],
+      "output": "human-readable command result on stdout",
+      "exitCodes": {
+        "0": "success",
+        "1": "runtime or validation failure",
+        "2": "usage, mode, or registry error"
+      }
     },
     {
       "command": "activate",
@@ -33,7 +56,27 @@
       ],
       "description": "move to active",
       "filesTouched": "`ideas/_active.md`, `sessions/*`, `IDEA_CATALOG.md`",
-      "writeBehavior": "write"
+      "writeBehavior": "write",
+      "requiredArgs": [
+        "--idea-id"
+      ],
+      "optionalArgs": [
+        "--title",
+        "--owner",
+        "--session",
+        "--no-sync"
+      ],
+      "wrapperPath": "scripts/lab",
+      "readOnlySafe": false,
+      "mutationScope": [
+        "project-files"
+      ],
+      "output": "human-readable command result on stdout",
+      "exitCodes": {
+        "0": "success",
+        "1": "runtime or validation failure",
+        "2": "usage, mode, or registry error"
+      }
     },
     {
       "command": "decide",
@@ -48,7 +91,31 @@
       ],
       "description": "record decision",
       "filesTouched": "`sessions/*` and optionally `brainstorming/docs/adr/*`",
-      "writeBehavior": "write"
+      "writeBehavior": "write",
+      "requiredArgs": [
+        "--idea-id"
+      ],
+      "optionalArgs": [
+        "--decision-id",
+        "--owner",
+        "--session",
+        "--decision-level",
+        "--situation",
+        "--rationale",
+        "--constraints",
+        "--no-sync"
+      ],
+      "wrapperPath": "scripts/lab",
+      "readOnlySafe": false,
+      "mutationScope": [
+        "project-files"
+      ],
+      "output": "human-readable command result on stdout",
+      "exitCodes": {
+        "0": "success",
+        "1": "runtime or validation failure",
+        "2": "usage, mode, or registry error"
+      }
     },
     {
       "command": "risk",
@@ -63,7 +130,31 @@
       ],
       "description": "record risk",
       "filesTouched": "`sessions/*`",
-      "writeBehavior": "write"
+      "writeBehavior": "write",
+      "requiredArgs": [
+        "--idea-id"
+      ],
+      "optionalArgs": [
+        "--risk-id",
+        "--owner",
+        "--session",
+        "--mitigation",
+        "--contingency",
+        "--probability",
+        "--impact",
+        "--no-sync"
+      ],
+      "wrapperPath": "scripts/lab",
+      "readOnlySafe": false,
+      "mutationScope": [
+        "project-files"
+      ],
+      "output": "human-readable command result on stdout",
+      "exitCodes": {
+        "0": "success",
+        "1": "runtime or validation failure",
+        "2": "usage, mode, or registry error"
+      }
     },
     {
       "command": "path-note",
@@ -78,7 +169,28 @@
       ],
       "description": "append exploration note to current session file",
       "filesTouched": "`sessions/*`",
-      "writeBehavior": "write"
+      "writeBehavior": "write",
+      "requiredArgs": [
+        "--idea-id",
+        "--title"
+      ],
+      "optionalArgs": [
+        "--summary",
+        "--deferred",
+        "--session",
+        "--no-sync"
+      ],
+      "wrapperPath": "scripts/lab",
+      "readOnlySafe": false,
+      "mutationScope": [
+        "project-files"
+      ],
+      "output": "human-readable command result on stdout",
+      "exitCodes": {
+        "0": "success",
+        "1": "runtime or validation failure",
+        "2": "usage, mode, or registry error"
+      }
     },
     {
       "command": "note",
@@ -94,7 +206,37 @@
       ],
       "description": "create research note from prior gathered context or explicit topic",
       "filesTouched": "`notes/*`, `NOTES_CATALOG.md`",
-      "writeBehavior": "write"
+      "writeBehavior": "write",
+      "requiredArgs": [
+        "--topic"
+      ],
+      "optionalArgs": [
+        "--source",
+        "--idea-id",
+        "--tags",
+        "--summary",
+        "--summary-file",
+        "--detail",
+        "--details-file",
+        "--fact",
+        "--facts-file",
+        "--question",
+        "--questions-file",
+        "--link",
+        "--links-file",
+        "--no-sync"
+      ],
+      "wrapperPath": "scripts/lab",
+      "readOnlySafe": false,
+      "mutationScope": [
+        "project-files"
+      ],
+      "output": "human-readable command result on stdout",
+      "exitCodes": {
+        "0": "success",
+        "1": "runtime or validation failure",
+        "2": "usage, mode, or registry error"
+      }
     },
     {
       "command": "review",
@@ -109,7 +251,30 @@
       ],
       "description": "record review/gate",
       "filesTouched": "`sessions/*`, `IDEA_CATALOG.md`",
-      "writeBehavior": "write"
+      "writeBehavior": "write",
+      "requiredArgs": [
+        "--idea-id",
+        "--result"
+      ],
+      "optionalArgs": [
+        "--owner",
+        "--session",
+        "--summary",
+        "--outcome",
+        "--next-action",
+        "--no-sync"
+      ],
+      "wrapperPath": "scripts/lab",
+      "readOnlySafe": false,
+      "mutationScope": [
+        "project-files"
+      ],
+      "output": "human-readable command result on stdout",
+      "exitCodes": {
+        "0": "success",
+        "1": "runtime or validation failure",
+        "2": "usage, mode, or registry error"
+      }
     },
     {
       "command": "export",
@@ -124,7 +289,24 @@
       ],
       "description": "generate an optional archival project summary",
       "filesTouched": "`exports/*`",
-      "writeBehavior": "write"
+      "writeBehavior": "write",
+      "requiredArgs": [
+        "--idea-id"
+      ],
+      "optionalArgs": [
+        "--no-sync"
+      ],
+      "wrapperPath": "scripts/lab",
+      "readOnlySafe": false,
+      "mutationScope": [
+        "project-files"
+      ],
+      "output": "human-readable command result on stdout",
+      "exitCodes": {
+        "0": "success",
+        "1": "runtime or validation failure",
+        "2": "usage, mode, or registry error"
+      }
     },
     {
       "command": "finalize",
@@ -139,7 +321,24 @@
       ],
       "description": "persist canonical state, append finalization history, and switch this repo into development mode",
       "filesTouched": "`sessions/*`, `state/project-init.json`, `MODE.md`, `docs/*`, `IDEA_CATALOG.md`",
-      "writeBehavior": "write"
+      "writeBehavior": "write",
+      "requiredArgs": [],
+      "optionalArgs": [
+        "--idea-id",
+        "--write-export",
+        "--interactive"
+      ],
+      "wrapperPath": "scripts/lab",
+      "readOnlySafe": false,
+      "mutationScope": [
+        "project-files"
+      ],
+      "output": "human-readable command result on stdout",
+      "exitCodes": {
+        "0": "success",
+        "1": "runtime or validation failure",
+        "2": "usage, mode, or registry error"
+      }
     },
     {
       "command": "handoff",
@@ -154,7 +353,24 @@
       ],
       "description": "compile brainstormed idea and session details into canonical draft state before finalization",
       "filesTouched": "`state/project-init.json`, `sessions/*`",
-      "writeBehavior": "write"
+      "writeBehavior": "write",
+      "requiredArgs": [],
+      "optionalArgs": [
+        "--idea-id",
+        "--check",
+        "--no-sync"
+      ],
+      "wrapperPath": "scripts/lab",
+      "readOnlySafe": false,
+      "mutationScope": [
+        "project-files"
+      ],
+      "output": "human-readable command result on stdout",
+      "exitCodes": {
+        "0": "success",
+        "1": "runtime or validation failure",
+        "2": "usage, mode, or registry error"
+      }
     },
     {
       "command": "park",
@@ -169,7 +385,26 @@
       ],
       "description": "move idea to parked state",
       "filesTouched": "`ideas/_parked.md`, `IDEA_CATALOG.md`",
-      "writeBehavior": "write"
+      "writeBehavior": "write",
+      "requiredArgs": [
+        "--idea-id"
+      ],
+      "optionalArgs": [
+        "--owner",
+        "--reason",
+        "--no-sync"
+      ],
+      "wrapperPath": "scripts/lab",
+      "readOnlySafe": false,
+      "mutationScope": [
+        "project-files"
+      ],
+      "output": "human-readable command result on stdout",
+      "exitCodes": {
+        "0": "success",
+        "1": "runtime or validation failure",
+        "2": "usage, mode, or registry error"
+      }
     },
     {
       "command": "kill",
@@ -184,7 +419,26 @@
       ],
       "description": "move idea to killed state",
       "filesTouched": "`ideas/_killed.md`, `IDEA_CATALOG.md`",
-      "writeBehavior": "write"
+      "writeBehavior": "write",
+      "requiredArgs": [
+        "--idea-id"
+      ],
+      "optionalArgs": [
+        "--owner",
+        "--reason",
+        "--no-sync"
+      ],
+      "wrapperPath": "scripts/lab",
+      "readOnlySafe": false,
+      "mutationScope": [
+        "project-files"
+      ],
+      "output": "human-readable command result on stdout",
+      "exitCodes": {
+        "0": "success",
+        "1": "runtime or validation failure",
+        "2": "usage, mode, or registry error"
+      }
     },
     {
       "command": "status",
@@ -200,7 +454,20 @@
       ],
       "description": "report current mode plus brainstorming or development context",
       "filesTouched": "no write",
-      "writeBehavior": "no-write"
+      "writeBehavior": "no-write",
+      "requiredArgs": [],
+      "optionalArgs": [],
+      "wrapperPath": "scripts/lab",
+      "readOnlySafe": true,
+      "mutationScope": [
+        "none"
+      ],
+      "output": "human-readable status report on stdout",
+      "exitCodes": {
+        "0": "success",
+        "1": "runtime or validation failure",
+        "2": "usage, mode, or registry error"
+      }
     },
     {
       "command": "doctor",
@@ -215,7 +482,22 @@
       ],
       "description": "explain finalize-readiness and source evidence",
       "filesTouched": "no write",
-      "writeBehavior": "no-write"
+      "writeBehavior": "no-write",
+      "requiredArgs": [],
+      "optionalArgs": [
+        "--idea-id"
+      ],
+      "wrapperPath": "scripts/lab",
+      "readOnlySafe": true,
+      "mutationScope": [
+        "none"
+      ],
+      "output": "human-readable status report on stdout",
+      "exitCodes": {
+        "0": "success",
+        "1": "runtime or validation failure",
+        "2": "usage, mode, or registry error"
+      }
     },
     {
       "command": "audit",
@@ -231,7 +513,20 @@
       ],
       "description": "validate integrity",
       "filesTouched": "`scripts/validate-governance`",
-      "writeBehavior": "no-write"
+      "writeBehavior": "no-write",
+      "requiredArgs": [],
+      "optionalArgs": [],
+      "wrapperPath": "scripts/lab",
+      "readOnlySafe": true,
+      "mutationScope": [
+        "none"
+      ],
+      "output": "governance validation summary on stdout",
+      "exitCodes": {
+        "0": "success",
+        "1": "runtime or validation failure",
+        "2": "usage, mode, or registry error"
+      }
     },
     {
       "command": "evidence",
@@ -246,7 +541,27 @@
       ],
       "description": "mark a roadmap task complete and record verification evidence",
       "filesTouched": "`docs/ROADMAP.md`",
-      "writeBehavior": "write"
+      "writeBehavior": "write",
+      "requiredArgs": [
+        "--task",
+        "--command",
+        "--result"
+      ],
+      "optionalArgs": [
+        "--note",
+        "--no-complete"
+      ],
+      "wrapperPath": "scripts/lab",
+      "readOnlySafe": false,
+      "mutationScope": [
+        "project-files"
+      ],
+      "output": "human-readable command result on stdout",
+      "exitCodes": {
+        "0": "success",
+        "1": "runtime or validation failure",
+        "2": "usage, mode, or registry error"
+      }
     },
     {
       "command": "adr",
@@ -261,7 +576,31 @@
       ],
       "description": "create the next sequential development ADR",
       "filesTouched": "`docs/adr/ADR-XXXX-*.md`",
-      "writeBehavior": "write"
+      "writeBehavior": "write",
+      "requiredArgs": [
+        "--title",
+        "--decision"
+      ],
+      "optionalArgs": [
+        "--context",
+        "--consequence",
+        "--alternative",
+        "--status",
+        "--deciders",
+        "--supersedes",
+        "--date"
+      ],
+      "wrapperPath": "scripts/lab",
+      "readOnlySafe": false,
+      "mutationScope": [
+        "project-files"
+      ],
+      "output": "human-readable command result on stdout",
+      "exitCodes": {
+        "0": "success",
+        "1": "runtime or validation failure",
+        "2": "usage, mode, or registry error"
+      }
     },
     {
       "command": "wiki-render",
@@ -276,7 +615,20 @@
       ],
       "description": "render friendly GitHub Wiki pages when wiki support is enabled",
       "filesTouched": "sibling wiki checkout",
-      "writeBehavior": "write"
+      "writeBehavior": "write",
+      "requiredArgs": [],
+      "optionalArgs": [],
+      "wrapperPath": "scripts/lab",
+      "readOnlySafe": false,
+      "mutationScope": [
+        "external-wiki"
+      ],
+      "output": "human-readable command result on stdout",
+      "exitCodes": {
+        "0": "success",
+        "1": "runtime or validation failure",
+        "2": "usage, mode, or registry error"
+      }
     },
     {
       "command": "wiki-check",
@@ -291,7 +643,20 @@
       ],
       "description": "verify user-facing changes are paired with wiki updates when enabled",
       "filesTouched": "sibling wiki checkout status",
-      "writeBehavior": "no-write"
+      "writeBehavior": "no-write",
+      "requiredArgs": [],
+      "optionalArgs": [],
+      "wrapperPath": "scripts/lab",
+      "readOnlySafe": true,
+      "mutationScope": [
+        "none"
+      ],
+      "output": "human-readable status report on stdout",
+      "exitCodes": {
+        "0": "success",
+        "1": "runtime or validation failure",
+        "2": "usage, mode, or registry error"
+      }
     },
     {
       "command": "commit",
@@ -307,7 +672,22 @@
       ],
       "description": "create an explicit git commit",
       "filesTouched": "git metadata and working tree",
-      "writeBehavior": "git"
+      "writeBehavior": "git",
+      "requiredArgs": [],
+      "optionalArgs": [
+        "--message"
+      ],
+      "wrapperPath": "scripts/lab",
+      "readOnlySafe": false,
+      "mutationScope": [
+        "git"
+      ],
+      "output": "git command progress and result on stdout/stderr",
+      "exitCodes": {
+        "0": "success",
+        "1": "runtime or validation failure",
+        "2": "usage, mode, or registry error"
+      }
     },
     {
       "command": "push",
@@ -323,7 +703,20 @@
       ],
       "description": "push the current branch to origin",
       "filesTouched": "git metadata and working tree",
-      "writeBehavior": "git"
+      "writeBehavior": "git",
+      "requiredArgs": [],
+      "optionalArgs": [],
+      "wrapperPath": "scripts/lab",
+      "readOnlySafe": false,
+      "mutationScope": [
+        "git"
+      ],
+      "output": "git command progress and result on stdout/stderr",
+      "exitCodes": {
+        "0": "success",
+        "1": "runtime or validation failure",
+        "2": "usage, mode, or registry error"
+      }
     },
     {
       "command": "sync",
@@ -339,7 +732,22 @@
       ],
       "description": "perform explicit commit plus push sync",
       "filesTouched": "git metadata and working tree",
-      "writeBehavior": "git"
+      "writeBehavior": "git",
+      "requiredArgs": [],
+      "optionalArgs": [
+        "message and git sync args"
+      ],
+      "wrapperPath": "scripts/lab",
+      "readOnlySafe": false,
+      "mutationScope": [
+        "git"
+      ],
+      "output": "git command progress and result on stdout/stderr",
+      "exitCodes": {
+        "0": "success",
+        "1": "runtime or validation failure",
+        "2": "usage, mode, or registry error"
+      }
     }
   ]
 }
