@@ -80,6 +80,7 @@ jobs:
           ./scripts/project-harness.ps1 new $project --no-git
           Pop-Location
 
+          Copy-Item -Path (Join-Path $source "MODE.md") -Destination (Join-Path $project "MODE.md") -Force
           Add-Content -Path (Join-Path $source "scripts/lab.sh") -Value "# windows update smoke"
 
           Push-Location $project
