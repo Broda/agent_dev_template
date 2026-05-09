@@ -5,6 +5,7 @@ from pathlib import Path
 
 from template_cli.render_helpers import (
     MILESTONE_NAME,
+    DEFAULT_CI_POLICY,
     STATE_FILE,
     RenderError,
     _append_unique_lines,
@@ -13,9 +14,11 @@ from template_cli.render_helpers import (
     _first_value_for_label,
     _infer_domain_concepts,
     _load_state,
+    _render_artifact_source_table,
     _related_hydration_files_from_state,
     _replace_file_literals,
     _state_value,
+    _write_rendered_text,
 )
 from template_cli.render_contract import collect_implementation_contract
 from template_cli.render_governance_templates import _render_architecture, _render_decision_adr, _render_roadmap
@@ -146,16 +149,13 @@ def run_render_development_docs(root: Path) -> int:
     mitigation_plans = _state_value(state, "governance.mitigationPlans") or "Validate early and keep milestone scope narrow."
     contingencies = _state_value(state, "governance.contingencies") or "Reduce scope and re-baseline roadmap if assumptions fail."
     latest_review_outcome = _state_value(state, "governance.latestReviewOutcome") or "conditional-pass"
+    ci_policy = _state_value(state, "documentation.ciPolicy") or DEFAULT_CI_POLICY
     session_files = [str(item) for item in state.get("artifacts", {}).get("sessionFiles", []) if str(item).strip()]
     domain_concepts = _infer_domain_concepts(
         " ".join([purpose, problem_statement, solution_summary, mvp_scope, out_of_scope])
     )
     implementation_contract = collect_implementation_contract(state, hydration_files)
 
-    _copy_base(root, "development/templates/docs/README.base.md", "README.md")
-    _copy_base(root, "development/templates/docs/PROJECT_CONTEXT.base.md", "docs/PROJECT_CONTEXT.md")
-    _copy_base(root, "development/templates/docs/ROADMAP.base.md", "docs/ROADMAP.md")
-    _copy_base(root, "development/templates/docs/ARCHITECTURE.base.md", "docs/ARCHITECTURE.md")
     _copy_base(root, "development/templates/docs/FILE_MAP.base.md", "docs/FILE_MAP.md")
     _copy_base(root, "development/templates/docs/GOVERNANCE_INDEX.base.md", "docs/GOVERNANCE_INDEX.md")
     _copy_base(
@@ -168,11 +168,6 @@ def run_render_development_docs(root: Path) -> int:
         root,
         "development/templates/docs/RUNTIME_VERIFICATION_REPORT.base.md",
         "docs/RUNTIME_VERIFICATION_REPORT.md",
-    )
-    _copy_base(
-        root,
-        "development/templates/docs/adr/ADR-0001-record-architecture-decisions.md",
-        "docs/adr/ADR-0001-record-architecture-decisions.md",
     )
     _copy_base(root, "development/templates/docs/adr/ADR-TEMPLATE.md", "docs/adr/ADR-TEMPLATE.md")
     _copy_base(root, "development/templates/docs/CHANGELOG.base.md", "CHANGELOG.md")
@@ -196,8 +191,9 @@ def run_render_development_docs(root: Path) -> int:
     if persistence and persistence != "None":
         _append_unique_lines(root / ".gitignore", ["*.db", "*.sqlite", "*.sqlite3"])
 
-    write_text(
-        root / ".github/workflows/ci.yml",
+    _write_rendered_text(
+        root,
+        ".github/workflows/ci.yml",
         _render_development_ci(language, runtime, package_tool, build_command, test_command),
     )
 
@@ -207,26 +203,22 @@ def run_render_development_docs(root: Path) -> int:
         ("<Build command>", build_command),
         ("<Run command>", run_command),
         ("<Test command>", test_command),
+        ("<Rendered artifact source table>", _render_artifact_source_table(bool(persistence and persistence != "None"))),
     ]
 
     for relative_path in [
-        "README.md",
-        "docs/PROJECT_CONTEXT.md",
-        "docs/ROADMAP.md",
-        "docs/ARCHITECTURE.md",
         "docs/FILE_MAP.md",
         "docs/GOVERNANCE_INDEX.md",
         "docs/VERSIONING_AND_RELEASE_POLICY.md",
         "docs/SECURITY_POLICY.md",
         "docs/RUNTIME_VERIFICATION_REPORT.md",
-        "docs/adr/ADR-0001-record-architecture-decisions.md",
         "docs/adr/ADR-TEMPLATE.md",
     ]:
         _replace_file_literals(root / relative_path, shared_replacements)
 
-    readme_path = root / "README.md"
-    write_text(
-        readme_path,
+    _write_rendered_text(
+        root,
+        "README.md",
         _render_readme(
             project_name,
             purpose,
@@ -241,8 +233,9 @@ def run_render_development_docs(root: Path) -> int:
             mvp_scope,
         ),
     )
-    write_text(
-        root / "docs/PROJECT_CONTEXT.md",
+    _write_rendered_text(
+        root,
+        "docs/PROJECT_CONTEXT.md",
         _render_project_context(
             project_name,
             purpose,
@@ -265,13 +258,15 @@ def run_render_development_docs(root: Path) -> int:
             mitigation_plans,
             contingencies,
             latest_review_outcome,
+            ci_policy,
             build_command,
             run_command,
             test_command,
         ),
     )
-    write_text(
-        root / "docs/ARCHITECTURE.md",
+    _write_rendered_text(
+        root,
+        "docs/ARCHITECTURE.md",
         _render_architecture(
             project_name,
             project_type,
@@ -287,8 +282,9 @@ def run_render_development_docs(root: Path) -> int:
             implementation_contract,
         ),
     )
-    write_text(
-        root / "docs/adr/ADR-0001-record-architecture-decisions.md",
+    _write_rendered_text(
+        root,
+        "docs/adr/ADR-0001-record-architecture-decisions.md",
         _render_decision_adr(
             project_name,
             purpose,
@@ -301,8 +297,9 @@ def run_render_development_docs(root: Path) -> int:
             implementation_contract,
         ),
     )
-    write_text(
-        root / "docs/ROADMAP.md",
+    _write_rendered_text(
+        root,
+        "docs/ROADMAP.md",
         _render_roadmap(
             project_name,
             build_command,

@@ -3,8 +3,8 @@
 This document defines how versions are incremented, how releases are cut,
 and how public contract stability is preserved.
 
-This project does not require CI/CD,
-but it does require disciplined versioning.
+This project does not rely on CI/CD alone,
+but it does require disciplined versioning and local verification.
 
 ---
 

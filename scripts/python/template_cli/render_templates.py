@@ -124,6 +124,7 @@ def _render_project_context(
     mitigation_plans: str,
     contingencies: str,
     latest_review_outcome: str,
+    ci_policy: str,
     build_command: str,
     run_command: str,
     test_command: str,
@@ -210,7 +211,7 @@ If unsure, prefer placing logic deeper (Domain/App) rather than higher (Interfac
 - Local-first development.
 - Manual verification required.
 - Tests required for core logic.
-- No CI/CD required at this stage.
+- CI policy: {ci_policy}
 - Milestone-driven execution.
 - Build command: `{build_command}`
 - Run command: `{run_command}`

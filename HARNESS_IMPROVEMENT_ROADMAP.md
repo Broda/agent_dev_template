@@ -185,22 +185,22 @@ Exit criteria:
 
 Goal: make generated development docs easier to reason about and update.
 
-- [ ] Decide which rendered artifacts are template-driven and which are pure
+- [x] Decide which rendered artifacts are template-driven and which are pure
       Python renderer output.
-- [ ] Avoid copying base templates only to fully overwrite them later.
-- [ ] Move reusable prose into templates when human editing is expected.
-- [ ] Keep computed sections in small renderer functions with narrow inputs.
-- [ ] Make render idempotency tests cover every generated artifact.
-- [ ] Clarify the relationship between generated CI and rendered governance
+- [x] Avoid copying base templates only to fully overwrite them later.
+- [x] Move reusable prose into templates when human editing is expected.
+- [x] Keep computed sections in small renderer functions with narrow inputs.
+- [x] Make render idempotency tests cover every generated artifact.
+- [x] Clarify the relationship between generated CI and rendered governance
       wording that currently says CI/CD is not required.
-- [ ] Add a state option or policy note for generated CI behavior.
-- [ ] Document which generated files are safe to edit after finalization and
+- [x] Add a state option or policy note for generated CI behavior.
+- [x] Document which generated files are safe to edit after finalization and
       which should be regenerated from state.
 
 Exit criteria:
 
-- [ ] A maintainer can identify the source of every rendered line.
-- [ ] Rendered docs no longer contain conflicting CI guidance.
+- [x] A maintainer can identify the source of every rendered line.
+- [x] Rendered docs no longer contain conflicting CI guidance.
 
 ## Milestone 7 - Cross-Platform Validation
 

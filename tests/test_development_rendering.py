@@ -7,6 +7,24 @@ from tests.workflow_test_helpers import LabWorkflowTestCase, run_cmd
 
 
 class DevelopmentRenderingTests(LabWorkflowTestCase):
+    RENDERED_ARTIFACTS_WITH_PERSISTENCE = [
+        "README.md",
+        "CHANGELOG.md",
+        ".gitignore",
+        ".github/workflows/ci.yml",
+        "docs/PROJECT_CONTEXT.md",
+        "docs/ROADMAP.md",
+        "docs/ARCHITECTURE.md",
+        "docs/FILE_MAP.md",
+        "docs/GOVERNANCE_INDEX.md",
+        "docs/VERSIONING_AND_RELEASE_POLICY.md",
+        "docs/SECURITY_POLICY.md",
+        "docs/RUNTIME_VERIFICATION_REPORT.md",
+        "docs/MIGRATION_POLICY.md",
+        "docs/adr/ADR-0001-record-architecture-decisions.md",
+        "docs/adr/ADR-TEMPLATE.md",
+    ]
+
     def test_render_and_validate_development_from_checked_in_fixture(self) -> None:
         self.write_render_fixture()
         run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
@@ -28,6 +46,20 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
         self.assertIn("uses: actions/setup-python@v6", ci)
         self.assertNotIn("uses: actions/checkout@v4", ci)
         self.assertNotIn("uses: actions/setup-python@v5", ci)
+        self.assertIn("Generated GitHub Actions CI is included as a baseline guardrail", project_context)
+        self.assertNotIn("No CI/CD required at this stage.", project_context)
+
+        file_map = (self.repo / "docs/FILE_MAP.md").read_text(encoding="utf-8")
+        self.assertIn("# Rendered Source Of Truth", file_map)
+        self.assertIn("| `README.md` | Python renderer | Regenerate from state |", file_map)
+        self.assertIn("| `docs/FILE_MAP.md` | Base template | Human-editable as implementation files are added |", file_map)
+
+        version_policy = (self.repo / "docs/VERSIONING_AND_RELEASE_POLICY.md").read_text(encoding="utf-8")
+        runtime_report = (self.repo / "docs/RUNTIME_VERIFICATION_REPORT.md").read_text(encoding="utf-8")
+        self.assertIn("does not rely on CI/CD alone", version_policy)
+        self.assertIn("Manual verification complements generated CI", runtime_report)
+        self.assertNotIn("This project does not require CI/CD", version_policy)
+        self.assertNotIn("Manual verification replaces CI", runtime_report)
 
     def test_render_and_validate_development_with_non_game_web_app_fixture(self) -> None:
         self.write_render_fixture("finalized_state_web_app_v2.json")
@@ -94,25 +126,26 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
     def test_render_development_docs_is_idempotent_with_persistence_fixture(self) -> None:
         self.write_render_fixture("finalized_state_with_persistence_v2.json")
         run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
-        first_snapshot = {
-            "README.md": (self.repo / "README.md").read_text(encoding="utf-8"),
-            ".gitignore": (self.repo / ".gitignore").read_text(encoding="utf-8"),
-            "docs/PROJECT_CONTEXT.md": (self.repo / "docs/PROJECT_CONTEXT.md").read_text(encoding="utf-8"),
-            "docs/ROADMAP.md": (self.repo / "docs/ROADMAP.md").read_text(encoding="utf-8"),
-            "docs/MIGRATION_POLICY.md": (self.repo / "docs/MIGRATION_POLICY.md").read_text(encoding="utf-8"),
-            ".github/workflows/ci.yml": (self.repo / ".github/workflows/ci.yml").read_text(encoding="utf-8"),
-        }
+        first_snapshot = self._rendered_artifact_snapshot()
         run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
-        second_snapshot = {
-            "README.md": (self.repo / "README.md").read_text(encoding="utf-8"),
-            ".gitignore": (self.repo / ".gitignore").read_text(encoding="utf-8"),
-            "docs/PROJECT_CONTEXT.md": (self.repo / "docs/PROJECT_CONTEXT.md").read_text(encoding="utf-8"),
-            "docs/ROADMAP.md": (self.repo / "docs/ROADMAP.md").read_text(encoding="utf-8"),
-            "docs/MIGRATION_POLICY.md": (self.repo / "docs/MIGRATION_POLICY.md").read_text(encoding="utf-8"),
-            ".github/workflows/ci.yml": (self.repo / ".github/workflows/ci.yml").read_text(encoding="utf-8"),
-        }
+        second_snapshot = self._rendered_artifact_snapshot()
         self.assertEqual(first_snapshot, second_snapshot)
         run_cmd(["./scripts/validate-development"], cwd=self.repo)
+
+    def test_render_uses_state_ci_policy_when_present(self) -> None:
+        self.write_render_fixture()
+        state_path = self.repo / "state/project-init.json"
+        state = json.loads(state_path.read_text(encoding="utf-8"))
+        state["documentation"] = {
+            "ciPolicy": "Generated CI is advisory; release decisions require local smoke evidence."
+        }
+        state_path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+
+        run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
+        run_cmd(["./scripts/validate-development"], cwd=self.repo)
+
+        project_context = (self.repo / "docs/PROJECT_CONTEXT.md").read_text(encoding="utf-8")
+        self.assertIn("Generated CI is advisory; release decisions require local smoke evidence.", project_context)
 
     def test_command_metavariables_and_tbd_text_do_not_trip_placeholder_validation(self) -> None:
         self.write_render_fixture()
@@ -208,6 +241,12 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
         self.assertIn("### Finalized Implementation Contract", adr)
         self.assertIn("cargo test across workspace crates", adr)
         self.assertIn("cargo fmt --check", ci)
+
+    def _rendered_artifact_snapshot(self) -> dict[str, str]:
+        return {
+            relative_path: (self.repo / relative_path).read_text(encoding="utf-8")
+            for relative_path in self.RENDERED_ARTIFACTS_WITH_PERSISTENCE
+        }
 
 
 if __name__ == "__main__":

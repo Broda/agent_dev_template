@@ -54,7 +54,7 @@ If unsure, prefer placing logic deeper (Domain/App) rather than higher (Interfac
 - Local-first development.
 - Manual verification required.
 - Tests required for core logic.
-- No CI/CD required at this stage.
+- Generated CI may be present as a baseline guardrail; local verification remains authoritative.
 - Milestone-driven execution.
 
 Refactors must be intentional and milestone-scoped.

@@ -59,7 +59,14 @@
         "test": { "type": "string" }
       }
     },
-    "documentation": { "type": "object" },
+    "documentation": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "ciPolicy": { "type": "string" },
+        "wiki": { "type": "object" }
+      }
+    },
     "product": {
       "type": "object",
       "additionalProperties": false,

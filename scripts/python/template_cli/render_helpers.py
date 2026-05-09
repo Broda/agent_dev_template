@@ -11,6 +11,27 @@ from template_cli.state_schema import validate_project_state_data
 
 MILESTONE_NAME = "Milestone 0 — Foundation"
 STATE_FILE = "state/project-init.json"
+DEFAULT_CI_POLICY = (
+    "Generated GitHub Actions CI is included as a baseline guardrail; local build, "
+    "test, and manual verification remain authoritative."
+)
+RENDERED_ARTIFACTS = [
+    ("README.md", "Python renderer", "Regenerate from state"),
+    ("CHANGELOG.md", "Base template plus renderer insert", "Human-editable after initialization"),
+    (".gitignore", "Stack-specific gitignore template", "Regenerate when stack or persistence changes"),
+    (".github/workflows/ci.yml", "Python renderer", "Regenerate from state commands"),
+    ("docs/PROJECT_CONTEXT.md", "Python renderer", "Regenerate from state"),
+    ("docs/ROADMAP.md", "Python renderer", "Regenerate from state, then track milestone evidence manually"),
+    ("docs/ARCHITECTURE.md", "Python renderer", "Regenerate from state, then update through ADR-backed changes"),
+    ("docs/FILE_MAP.md", "Base template", "Human-editable as implementation files are added"),
+    ("docs/GOVERNANCE_INDEX.md", "Base template", "Human-editable as governance records grow"),
+    ("docs/VERSIONING_AND_RELEASE_POLICY.md", "Base template", "Human-editable by policy decision"),
+    ("docs/SECURITY_POLICY.md", "Base template", "Human-editable by policy decision"),
+    ("docs/RUNTIME_VERIFICATION_REPORT.md", "Base template plus command replacement", "Human-editable evidence log"),
+    ("docs/MIGRATION_POLICY.md", "Base template when persistence is enabled", "Human-editable by policy decision"),
+    ("docs/adr/ADR-0001-record-architecture-decisions.md", "Python renderer", "Regenerate from state or supersede with a later ADR"),
+    ("docs/adr/ADR-TEMPLATE.md", "Base template", "Human-editable template for future ADRs"),
+]
 
 
 class RenderError(Exception):
@@ -85,6 +106,26 @@ def _copy_base(root: Path, src: str, dst: str) -> None:
     dst_path = root / dst
     dst_path.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(src_path, dst_path)
+
+
+def _write_rendered_text(root: Path, relative_path: str, content: str) -> None:
+    path = root / relative_path
+    path.parent.mkdir(parents=True, exist_ok=True)
+    write_text(path, content)
+
+
+def _render_artifact_source_table(include_migration_policy: bool) -> str:
+    rows = [
+        artifact
+        for artifact in RENDERED_ARTIFACTS
+        if include_migration_policy or artifact[0] != "docs/MIGRATION_POLICY.md"
+    ]
+    lines = [
+        "| Artifact | Render Source | Edit Policy |",
+        "|---|---|---|",
+    ]
+    lines.extend(f"| `{path}` | {source} | {policy} |" for path, source, policy in rows)
+    return "\n".join(lines)
 
 
 def _replace_file_literals(path: Path, replacements: list[tuple[str, str]]) -> None:

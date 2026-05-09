@@ -220,6 +220,6 @@ Date:
 
 # Guiding Rule
 
-Manual verification replaces CI in Structured Mode.
+Manual verification complements generated CI in Structured Mode.
 
 Do not mark milestones complete without this report.

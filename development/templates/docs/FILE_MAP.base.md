@@ -46,6 +46,16 @@ Architecture, roadmap, ADRs.
 
 ---
 
+# Rendered Source Of Truth
+
+Development docs are initialized from `state/project-init.json`,
+`development/templates/`, and renderer code under `scripts/python/template_cli/`.
+Use this table to decide whether to regenerate a file or edit it directly.
+
+<Rendered artifact source table>
+
+---
+
 # AI Prompt Targeting
 
 When prompting an AI agent, specify the layer:

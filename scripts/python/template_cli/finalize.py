@@ -287,6 +287,11 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
         if isinstance(existing_wiki_config, dict):
             wiki_config.update(existing_wiki_config)
         documentation["wiki"] = wiki_config
+        documentation.setdefault(
+            "ciPolicy",
+            "Generated GitHub Actions CI is included as a baseline guardrail; local build, "
+            "test, and manual verification remain authoritative.",
+        )
 
         adr_references = unique_values(
             list(preserved_adr_references) + ["docs/adr/ADR-0001-record-architecture-decisions.md"]
