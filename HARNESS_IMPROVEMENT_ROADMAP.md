@@ -388,7 +388,7 @@ can stay small and reviewable.
       checking modules.
 - [x] Split lab idea summary export handling out of
       `workflow_idea_commands.py`.
-- [ ] Lower the Python code-size validation threshold in stages after the large
+- [x] Lower the Python code-size validation threshold in stages after the large
       modules above are decomposed.
   - Target: lower the enforced Python file-size threshold to 350 lines as the
     normal template guardrail, then reevaluate whether a stricter 300-line cap
@@ -398,6 +398,8 @@ can stay small and reviewable.
 - [x] Lower the Python code-size validation threshold from 475 to 350 lines.
 - [x] Lower the Python code-size validation threshold from 500 to 475 lines
       after the `finalize.py` decomposition.
+- [ ] Reevaluate whether a stricter 300-line Python code-size guardrail is worth
+      the extra module splitting after maintainers have worked with the 350-line cap.
 - [x] Add import-boundary validation for new workflow helper modules as they are
       split out.
 - [ ] Run Ruff formatting/linting in CI once local violations are either fixed
