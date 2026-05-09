@@ -362,6 +362,8 @@ can stay small and reviewable.
 - [ ] Split `finalize.py` into value collection, state assembly, artifact
       writing, validation, and user-facing output modules.
 - [x] Split existing finalized-state value collection out of `finalize.py`.
+- [x] Split hydrated finalization value collection from existing state and
+      source files out of `finalize.py`.
 - [x] Split finalization user-facing success output out of `finalize.py`.
 - [x] Split finalization artifact setup, backup registration, existing-state
       loading, and session-log writing out of `finalize.py`.

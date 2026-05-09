@@ -122,6 +122,7 @@ BRAINSTORMING_CORE_ARTIFACTS = [
     "scripts/python/template_cli/finalize_output.py",
     "scripts/python/template_cli/finalize_state_builder.py",
     "scripts/python/template_cli/finalize_validation.py",
+    "scripts/python/template_cli/finalize_value_collection.py",
     "scripts/python/template_cli/handoff_contract.py",
     "scripts/python/template_cli/handoff_implementation.py",
     "scripts/python/template_cli/handoff_labels.py",

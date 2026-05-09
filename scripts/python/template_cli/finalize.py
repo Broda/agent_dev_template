@@ -16,10 +16,7 @@ from template_cli.finalize_helpers import (
     ask_non_empty,
     choose_from_list,
     choose_project_type,
-    first_value_for_label,
     infer_project_type,
-    is_placeholder_value,
-    latest_session_path,
     summarize_decisions,
 )
 from template_cli.finalize_existing import _load_existing_finalize_values
@@ -38,6 +35,7 @@ from template_cli.finalize_validation import (
     _pick_noninteractive_choice,
     _required_value,
 )
+from template_cli.finalize_value_collection import _hydrate_finalize_values
 from template_cli.io_helpers import (
     ValidationResult,
     write_text,
@@ -64,53 +62,13 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
     if existing.project_name:
         project_name = existing.project_name
 
-    objective = existing.purpose or ""
-    if not objective:
-        for label in [
-            "One-sentence objective",
-            "Problem statement",
-            "Value hypothesis",
-            "Summary rationale",
-            "Situation summary",
-        ]:
-            objective = first_value_for_label(hydrate_files, label)
-            if objective:
-                break
+    hydrated = _hydrate_finalize_values(existing, hydrate_files, session_paths)
+    objective = hydrated.objective
     missing_fields: list[str] = []
     if interactive:
         objective = ask_non_empty("One-sentence objective", objective)
     else:
         objective = _required_value(objective, "purpose / one-sentence objective", missing_fields)
-
-    problem_statement = existing.problem_statement or first_value_for_label(hydrate_files, "Problem statement")
-    target_users = existing.target_users or first_value_for_label(hydrate_files, "Affected users/personas") or first_value_for_label(
-        hydrate_files, "Target users"
-    )
-    why_now = existing.why_now or first_value_for_label(hydrate_files, "Why now")
-    expected_value = existing.expected_value or first_value_for_label(hydrate_files, "Expected value") or first_value_for_label(
-        hydrate_files, "Value hypothesis"
-    )
-    solution_summary = existing.solution_summary or first_value_for_label(hydrate_files, "Solution summary")
-    mvp_scope = existing.mvp_scope or first_value_for_label(hydrate_files, "MVP scope")
-    out_of_scope = existing.out_of_scope or first_value_for_label(hydrate_files, "Out of scope")
-    assumptions = existing.assumptions or first_value_for_label(hydrate_files, "Assumptions")
-    non_goals = existing.non_goals or first_value_for_label(hydrate_files, "Non-goals")
-    top_risks = existing.top_risks or first_value_for_label(hydrate_files, "Top risks") or first_value_for_label(
-        hydrate_files, "Top risks (link to risk entries)"
-    )
-    mitigation_plans = existing.mitigation_plans or first_value_for_label(hydrate_files, "Mitigation plans") or first_value_for_label(
-        hydrate_files, "Preventive mitigation"
-    )
-    contingencies = existing.contingencies or first_value_for_label(hydrate_files, "Contingency plan")
-    remaining_risks = existing.remaining_risks or first_value_for_label(hydrate_files, "Remaining accepted risks")
-    latest_review_outcome = existing.latest_review_outcome or first_value_for_label(hydrate_files, "Latest review outcome") or first_value_for_label(
-        hydrate_files, "Result"
-    )
-    latest_review_session = existing.latest_review_session or latest_session_path(session_paths)
-
-    constraints_source = existing.constraints if not is_placeholder_value(existing.constraints) else ""
-    if not constraints_source:
-        constraints_source = first_value_for_label(hydrate_files, "Constraints")
 
     if interactive:
         project_type = choose_project_type(existing.project_type or infer_project_type(project_name, objective))
@@ -137,7 +95,7 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
             ["None", "Yes (desktop installers / containers / artifacts)"],
         )
         constraints = ask_non_empty(
-            "Constraints (comma-separated; use 'None' if none)", constraints_source or "None"
+            "Constraints (comma-separated; use 'None' if none)", hydrated.constraints_source or "None"
         )
         build_command = ask_non_empty("Build command", existing.build_command)
         run_command = ask_non_empty("Run command", existing.run_command)
@@ -156,7 +114,7 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
         authentication = _pick_noninteractive_choice(existing.authentication, "authentication", missing_fields)
         determinism = _pick_noninteractive_choice(existing.determinism, "determinism/correctness sensitivity", missing_fields)
         packaging = _pick_noninteractive_choice(existing.packaging, "packaging/distribution planned", missing_fields)
-        constraints = _required_value(constraints_source or "None", "constraints", missing_fields)
+        constraints = _required_value(hydrated.constraints_source or "None", "constraints", missing_fields)
         build_command = _required_value(existing.build_command, "build command", missing_fields)
         run_command = _required_value(existing.run_command, "run command", missing_fields)
         test_command = _required_value(existing.test_command, "test command", missing_fields)
@@ -204,22 +162,22 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
             build_command=build_command,
             run_command=run_command,
             test_command=test_command,
-            problem_statement=problem_statement,
-            target_users=target_users,
-            why_now=why_now,
-            expected_value=expected_value,
-            solution_summary=solution_summary,
-            mvp_scope=mvp_scope,
-            out_of_scope=out_of_scope,
-            assumptions=assumptions,
-            non_goals=non_goals,
+            problem_statement=hydrated.problem_statement,
+            target_users=hydrated.target_users,
+            why_now=hydrated.why_now,
+            expected_value=hydrated.expected_value,
+            solution_summary=hydrated.solution_summary,
+            mvp_scope=hydrated.mvp_scope,
+            out_of_scope=hydrated.out_of_scope,
+            assumptions=hydrated.assumptions,
+            non_goals=hydrated.non_goals,
             key_decisions=key_decisions,
-            top_risks=top_risks,
-            mitigation_plans=mitigation_plans,
-            contingencies=contingencies,
-            remaining_risks=remaining_risks,
-            latest_review_outcome=latest_review_outcome,
-            latest_review_session=latest_review_session,
+            top_risks=hydrated.top_risks,
+            mitigation_plans=hydrated.mitigation_plans,
+            contingencies=hydrated.contingencies,
+            remaining_risks=hydrated.remaining_risks,
+            latest_review_outcome=hydrated.latest_review_outcome,
+            latest_review_session=hydrated.latest_review_session,
             idea_files=idea_files,
             session_paths=session_paths,
             session_path=session_path,
