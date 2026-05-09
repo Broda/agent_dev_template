@@ -597,7 +597,7 @@ Next-task sequencing:
     runtime without changing user-facing command names.
   - Acceptance: extraction can be reverted independently and does not change
     generated project behavior.
-- [ ] Add an ADR before introducing any compiled binary, Homebrew formula, Cargo
+- [x] Add an ADR before introducing any compiled binary, Homebrew formula, Cargo
       package, or GitHub release artifact as an official install path.
   - ADR must compare Python package, compiled binary, Homebrew, Cargo, GitHub
     releases, and source checkout installation.

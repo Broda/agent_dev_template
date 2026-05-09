@@ -151,6 +151,12 @@ or standalone binary path is considered. Thin wrappers may discover an installed
 runtime later, but they must validate the recorded harness manifest first and
 preserve `scripts/python/cli.py` as the repo-local fallback.
 
+ADR-0004 defers official compiled binary, Homebrew, Cargo, and GitHub runtime
+artifact install paths. Source archives and release notes may be published, but
+no official external runtime artifact should be advertised until the first
+read-only extraction proves compatibility, fallback, verification, and rollback
+behavior.
+
 The planned installed Python package is `project_harness_runtime` with a
 `project-harness-runtime` console entrypoint. Wrappers may call
 `project-harness-runtime version --json` for `runtimeVersion`,
