@@ -303,7 +303,7 @@ can stay small and reviewable.
       such as DevOS or personal owner placeholders.
 - [x] Align `NOTES_CATALOG.md` tags and metadata with generalized retained note
       wording.
-- [ ] Review plugin author/contact metadata for public release suitability.
+- [x] Review plugin author/contact metadata for public release suitability.
 
 ### Update Tooling And Provenance
 

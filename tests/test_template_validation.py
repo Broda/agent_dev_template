@@ -129,6 +129,22 @@ class TemplateValidationTests(LabWorkflowTestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("Plugin manifest version must match harnessVersion 0.1.0", result.stdout)
 
+    def test_validate_brainstorming_checks_plugin_public_author_metadata(self) -> None:
+        manifest_path = self.repo / "plugins/project-lifecycle-lab/.codex-plugin/plugin.json"
+        manifest_path.write_text(
+            manifest_path.read_text(encoding="utf-8").replace(
+                '"email": "maintainers@example.invalid"',
+                '"email": "person@example.com"',
+                1,
+            ),
+            encoding="utf-8",
+        )
+
+        result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Plugin manifest author.email must be maintainers@example.invalid", result.stdout)
+
     def test_validate_brainstorming_checks_plugin_readme_boundary(self) -> None:
         readme_path = self.repo / "plugins/project-lifecycle-lab/README.md"
         readme_path.write_text(

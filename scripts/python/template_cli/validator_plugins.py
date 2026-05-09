@@ -27,6 +27,8 @@ PLUGIN_SKILL_ARTIFACTS = [
     for artifact in (skill_path, metadata_path)
 ]
 PLUGIN_ARTIFACTS = [PLUGIN_MARKETPLACE, PLUGIN_README, PLUGIN_MANIFEST, *PLUGIN_SKILL_ARTIFACTS]
+EXPECTED_PLUGIN_AUTHOR_NAME = "Project Harness Template Maintainers"
+EXPECTED_PLUGIN_AUTHOR_EMAIL = "maintainers@example.invalid"
 
 
 def validate_repo_plugins(root: Path, result: ValidationResult) -> None:
@@ -44,6 +46,7 @@ def validate_repo_plugins(root: Path, result: ValidationResult) -> None:
         )
     if manifest.get("skills") != "./skills/":
         result.add_failure(f"Plugin manifest skills path must be ./skills/: {PLUGIN_MANIFEST}")
+    _validate_plugin_public_metadata(manifest, result)
     if not manifest.get("interface", {}).get("displayName"):
         result.add_failure(f"Plugin manifest must include interface.displayName: {PLUGIN_MANIFEST}")
     _validate_plugin_boundary(manifest, result)
@@ -62,6 +65,25 @@ def validate_repo_plugins(root: Path, result: ValidationResult) -> None:
     policy = entry.get("policy", {})
     if policy.get("installation") != "AVAILABLE" or policy.get("authentication") != "ON_INSTALL":
         result.add_failure(f"Plugin marketplace policy is incorrect for {PLUGIN_NAME}.")
+
+
+def _validate_plugin_public_metadata(manifest: dict, result: ValidationResult) -> None:
+    author = manifest.get("author", {})
+    if not isinstance(author, dict):
+        result.add_failure(f"Plugin manifest author must be an object: {PLUGIN_MANIFEST}")
+        return
+    if author.get("name") != EXPECTED_PLUGIN_AUTHOR_NAME:
+        result.add_failure(
+            f"Plugin manifest author.name must be {EXPECTED_PLUGIN_AUTHOR_NAME}: {PLUGIN_MANIFEST}"
+        )
+    if author.get("email") != EXPECTED_PLUGIN_AUTHOR_EMAIL:
+        result.add_failure(
+            f"Plugin manifest author.email must be {EXPECTED_PLUGIN_AUTHOR_EMAIL}: {PLUGIN_MANIFEST}"
+        )
+    if manifest.get("interface", {}).get("developerName") != EXPECTED_PLUGIN_AUTHOR_NAME:
+        result.add_failure(
+            f"Plugin manifest interface.developerName must be {EXPECTED_PLUGIN_AUTHOR_NAME}: {PLUGIN_MANIFEST}"
+        )
 
 
 def _validate_plugin_boundary(manifest: dict, result: ValidationResult) -> None:

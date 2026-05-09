@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "Reusable agent workflows for operating project harness templates.",
   "author": {
-    "name": "David Green",
-    "email": "drgreen@gmail.com",
+    "name": "Project Harness Template Maintainers",
+    "email": "maintainers@example.invalid",
     "url": "https://github.com/Broda"
   },
   "homepage": "https://github.com/Broda/agent_dev_template",
@@ -16,7 +16,7 @@
     "displayName": "Project Lifecycle Lab",
     "shortDescription": "Reusable project lifecycle workflows",
     "longDescription": "Project Lifecycle Lab packages reusable Codex operating knowledge for project harness templates. The harness runtime stays in the repo: project state, scripts, validators, and generated governance docs remain inspectable and local. Repo-scoped skills under .agents/skills stay canonical until plugin distribution is ready.",
-    "developerName": "David Green",
+    "developerName": "Project Harness Template Maintainers",
     "category": "Productivity",
     "capabilities": ["Read", "Write"],
     "websiteURL": "https://github.com/Broda/agent_dev_template",
