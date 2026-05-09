@@ -18,16 +18,20 @@ from template_cli.finalize_helpers import (
     join_lines,
     latest_session_path,
     summarize_decisions,
-    trim,
     unique_values,
 )
-from template_cli.workflow_data import FINALIZE_REQUIRED_FIELDS
 from template_cli.finalize_state import (
     BackupManager,
     _update_catalog_transition,
     _write_mode_development,
     _write_summary_export,
     resolve_finalize_idea_id,
+)
+from template_cli.finalize_validation import (
+    _collect_missing_noninteractive_fields,
+    _fail_noninteractive,
+    _pick_noninteractive_choice,
+    _required_value,
 )
 from template_cli.io_helpers import (
     ValidationResult,
@@ -40,30 +44,6 @@ from template_cli.validators import (
     run_validate_development,
 )
 from template_cli.wiki import default_wiki_config
-
-
-def _required_value(value: str, field: str, missing: list[str]) -> str:
-    value = trim(value)
-    if not value:
-        missing.append(field)
-    return value
-
-
-def _fail_noninteractive(missing: list[str], idea_id: str) -> None:
-    unique_missing = unique_values(missing)
-    lines = [
-        "Cannot finalize non-interactively because required fields are missing.",
-        f"Idea ID: {idea_id}",
-        "Missing fields:",
-    ]
-    lines.extend(f"- {field}" for field in unique_missing)
-    lines.append("Next step: update state/project-init.json or the active idea/session, then rerun ./scripts/lab doctor.")
-    lines.append("Use --interactive to fill missing values with prompts.")
-    raise SystemExit("\n".join(lines))
-
-
-def _pick_noninteractive_choice(value: str, field: str, missing: list[str]) -> str:
-    return _required_value(value, field, missing)
 
 
 def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False, interactive: bool = False) -> int:
@@ -208,20 +188,7 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
         run_command = _required_value(existing_run_command, "run command", missing_fields)
         test_command = _required_value(existing_test_command, "test command", missing_fields)
 
-        if not session_paths:
-            missing_fields.append("session history")
-        for display_name, state_keys, label in FINALIZE_REQUIRED_FIELDS:
-            if display_name in {"build command", "run command", "test command"}:
-                continue
-            value = ""
-            for state_key in state_keys:
-                value = existing_state_value(root, state_key)
-                if value and not is_placeholder_value(value):
-                    break
-            if not value and label:
-                value = first_value_for_label(hydrate_files, label)
-            if not value or is_placeholder_value(value):
-                missing_fields.append(display_name)
+        _collect_missing_noninteractive_fields(root, hydrate_files, session_paths, missing_fields)
         if missing_fields:
             _fail_noninteractive(missing_fields, idea_id)
     key_decisions = existing_key_decisions or summarize_decisions(
