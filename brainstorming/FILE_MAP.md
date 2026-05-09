@@ -38,6 +38,7 @@ Lean file registry for the Project Harness Template.
 | `plugins/project-lifecycle-lab/skills/template-maintenance/agents/openai.yaml` | Plugin mirror of maintenance skill UI metadata |
 | `harness_commands/CONVERSATIONAL_MODE.md` | Agent-facing plain-language intent map across harness modes |
 | `harness_commands/COMMANDS.md` | Backend command contract for human-agent workflow intents |
+| `harness_commands/finalization_overwrite_policy.json` | Finalization and rendered artifact overwrite/ownership policy |
 | `harness_commands/harness_manifest.json` | Harness provenance, compatibility, wrapper, and artifact ownership manifest |
 | `harness_commands/harness_manifest.schema.json` | JSON Schema contract for the harness manifest |
 | `harness_commands/intent_registry.json` | Canonical harness command intent registry for generated NL mapping tables |
@@ -152,6 +153,7 @@ Lean file registry for the Project Harness Template.
 | `scripts/python/template_cli/validator_launchers.py` | Launcher consistency checks for shell and PowerShell entrypoints |
 | `scripts/python/template_cli/validator_manifest.py` | Harness manifest validation and provenance stamping helpers |
 | `scripts/python/template_cli/validator_module_boundaries.py` | Import-boundary checks for template CLI modules |
+| `scripts/python/template_cli/validator_overwrite_policy.py` | Finalization/render output ownership policy validation helpers |
 | `scripts/python/template_cli/validator_plugins.py` | Local plugin manifest and marketplace validation helpers |
 | `scripts/python/template_cli/validator_python_config.py` | Python tool configuration validation helpers |
 | `scripts/python/template_cli/validator_skills.py` | Repo-scoped skill and skill metadata validation helpers |

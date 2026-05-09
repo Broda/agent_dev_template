@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 from tests.workflow_test_helpers import LabWorkflowTestCase, run_cmd
 
 
@@ -118,6 +120,31 @@ class TemplateValidationTests(LabWorkflowTestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn(
             "FILE_MAP.md missing registry row for template CLI module: scripts/python/template_cli/workflow_render.py",
+            result.stdout,
+        )
+
+    def test_validate_brainstorming_checks_finalization_overwrite_policy_paths(self) -> None:
+        policy_path = self.repo / "harness_commands/finalization_overwrite_policy.json"
+        policy = json.loads(policy_path.read_text(encoding="utf-8"))
+        del policy["paths"]["README.md"]
+        policy_path.write_text(json.dumps(policy, indent=2) + "\n", encoding="utf-8")
+
+        result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Finalization overwrite policy missing path: README.md", result.stdout)
+
+    def test_validate_brainstorming_checks_finalization_overwrite_policy_patterns(self) -> None:
+        policy_path = self.repo / "harness_commands/finalization_overwrite_policy.json"
+        policy = json.loads(policy_path.read_text(encoding="utf-8"))
+        del policy["patterns"]["sessions/*FINALIZATION_SESSION*.md"]
+        policy_path.write_text(json.dumps(policy, indent=2) + "\n", encoding="utf-8")
+
+        result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(
+            "Finalization overwrite policy missing pattern: sessions/*FINALIZATION_SESSION*.md",
             result.stdout,
         )
 

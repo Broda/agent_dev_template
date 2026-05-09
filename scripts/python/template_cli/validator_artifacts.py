@@ -30,6 +30,7 @@ BRAINSTORMING_CORE_ARTIFACTS = [
     "harness_commands/COMMANDS.md",
     "harness_commands/harness_manifest.json",
     "harness_commands/harness_manifest.schema.json",
+    "harness_commands/finalization_overwrite_policy.json",
     "harness_commands/intent_registry.json",
     "harness_commands/intent_registry.schema.json",
     "brainstorming/AGENTS.brainstorming.md",

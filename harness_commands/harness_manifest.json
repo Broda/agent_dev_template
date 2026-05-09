@@ -46,6 +46,7 @@
       "AGENTS.md",
       "BOOTSTRAP_TOOL.md",
       "HARNESS_IMPROVEMENT_ROADMAP.md",
+      "harness_commands/finalization_overwrite_policy.json",
       "harness_commands/harness_manifest.schema.json",
       "harness_commands/intent_registry.schema.json",
       "harness_commands/intent_registry.json",

@@ -483,7 +483,7 @@ Next-task sequencing:
     generated CI or policy files if their ownership semantics differ.
   - Acceptance: each preservation assertion maps to an ownership rule documented
     in the finalization overwrite policy task below.
-- [ ] Document and validate which generated files are overwritten by finalization
+- [x] Document and validate which generated files are overwritten by finalization
       versus intended to become human-owned after first render.
   - Add a concise ownership table for finalization/render outputs, including
     canonical state, catalog/mode files, session/export artifacts, development
