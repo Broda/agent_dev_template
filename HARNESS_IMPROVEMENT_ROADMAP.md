@@ -268,7 +268,7 @@ Exit criteria:
 
 ## Backlog
 
-- [ ] Add a `pyproject.toml` for formatter/linter/import hygiene.
+- [x] Add a `pyproject.toml` for formatter/linter/import hygiene.
 - [ ] Split orchestration-heavy modules when cohesive boundaries are clear:
       `finalize.py`, `handoff.py`, `render.py`,
       `render_governance_templates.py`, and `workflow_data.py`.

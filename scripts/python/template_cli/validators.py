@@ -16,6 +16,7 @@ from template_cli.validator_launchers import validate_python_launchers
 from template_cli.validator_manifest import validate_harness_manifest
 from template_cli.validator_module_boundaries import validate_module_boundaries
 from template_cli.validator_plugins import validate_repo_plugins
+from template_cli.validator_python_config import validate_python_tool_config
 from template_cli.validator_skills import validate_repo_skills
 from template_cli.io_helpers import (
     ADR_LINK_RE,
@@ -141,6 +142,7 @@ def run_validate_brainstorming(root: Path) -> int:
     validate_project_state_file(root, result, variant="draft")
     validate_template_cli_file_map(root, result)
     validate_module_boundaries(root, result)
+    validate_python_tool_config(root, result)
     validate_python_file_sizes(root, result)
     validate_python_launchers(root, result)
     validate_harness_manifest(root, result)
@@ -209,6 +211,7 @@ def run_validate_development(root: Path) -> int:
 
     validate_notes_catalog(root, result)
     validate_module_boundaries(root, result)
+    validate_python_tool_config(root, result)
     validate_python_file_sizes(root, result)
     validate_python_launchers(root, result)
     validate_harness_manifest(root, result)

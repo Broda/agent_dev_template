@@ -9,6 +9,7 @@ Lean file registry for the Project Harness Template.
 | `.gitattributes` | Git text normalization and binary file classification policy |
 | `.gitignore` | Local/derived file exclusions |
 | `README.md` | Lightweight overview and usage |
+| `pyproject.toml` | Python formatter, linter, and import-order tool configuration |
 | `BOOTSTRAP_TOOL.md` | Planning contract for a future harness bootstrap helper |
 | `HARNESS_IMPROVEMENT_ROADMAP.md` | Public-template improvement roadmap and milestone backlog |
 | `AGENTS.md` | Agent behavior contract |
@@ -130,6 +131,7 @@ Lean file registry for the Project Harness Template.
 | `scripts/python/template_cli/validator_manifest.py` | Harness manifest validation and provenance stamping helpers |
 | `scripts/python/template_cli/validator_module_boundaries.py` | Import-boundary checks for template CLI modules |
 | `scripts/python/template_cli/validator_plugins.py` | Local plugin manifest and marketplace validation helpers |
+| `scripts/python/template_cli/validator_python_config.py` | Python tool configuration validation helpers |
 | `scripts/python/template_cli/validator_skills.py` | Repo-scoped skill and skill metadata validation helpers |
 | `scripts/python/template_cli/plugin_sync.py` | Plugin skill mirror sync command implementation |
 | `scripts/python/template_cli/intents.py` | Intent registry rendering and generated intent-doc sync helpers |

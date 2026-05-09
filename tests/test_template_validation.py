@@ -226,6 +226,18 @@ class TemplateValidationTests(LabWorkflowTestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("Python code file exceeds 500 lines: tests/oversized_fixture.py (501)", result.stdout)
 
+    def test_validate_brainstorming_checks_python_tool_config(self) -> None:
+        pyproject_path = self.repo / "pyproject.toml"
+        pyproject_path.write_text(
+            pyproject_path.read_text(encoding="utf-8").replace("[tool.ruff.lint]\n", "", 1),
+            encoding="utf-8",
+        )
+
+        result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("pyproject.toml missing required section: [tool.ruff.lint]", result.stdout)
+
     def test_validate_brainstorming_checks_workflow_finalize_helper_imports(self) -> None:
         workflow_path = self.repo / "scripts/python/template_cli/workflow.py"
         workflow_path.write_text(

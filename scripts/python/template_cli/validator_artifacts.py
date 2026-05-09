@@ -17,6 +17,7 @@ BRAINSTORMING_CORE_ARTIFACTS = [
     ".gitignore",
     "LICENSE",
     "README.md",
+    "pyproject.toml",
     "BOOTSTRAP_TOOL.md",
     "HARNESS_IMPROVEMENT_ROADMAP.md",
     "AGENTS.md",
@@ -103,6 +104,7 @@ BRAINSTORMING_CORE_ARTIFACTS = [
     "scripts/python/template_cli/render_governance_templates.py",
     "scripts/python/template_cli/bootstrap.py",
     "scripts/python/template_cli/workflow_render.py",
+    "scripts/python/template_cli/validator_python_config.py",
 ]
 
 DEVELOPMENT_REQUIRED_ARTIFACTS = [
@@ -112,6 +114,7 @@ DEVELOPMENT_REQUIRED_ARTIFACTS = [
     "AGENTS.md",
     "MODE.md",
     "README.md",
+    "pyproject.toml",
     "CHANGELOG.md",
     ".gitignore",
     *REPO_SKILL_ARTIFACTS,
