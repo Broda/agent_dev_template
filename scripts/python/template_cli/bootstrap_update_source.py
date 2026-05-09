@@ -42,9 +42,7 @@ def resolve_update_source(
         )
         return 2
     if release_version:
-        print(f"Release version update source is unavailable locally: {release_version}")
-        print("Use --source-path <template-checkout> or --source-commit <40-char-sha>.")
-        return 1
+        return _resolve_release_version_update_source(root, release_version)
     if source_commit:
         return _resolve_source_commit_update_source(root, source_commit)
     return _resolve_source_path_update_source(root, source_path)
@@ -131,8 +129,73 @@ def _resolve_source_commit_update_source(root: Path, source_commit: str) -> Upda
     return UpdateSource(checkout_dir, current_manifest, target_manifest, cleanup_dir=checkout_dir)
 
 
+def _resolve_release_version_update_source(root: Path, release_version: str) -> UpdateSource | int:
+    release_version = release_version.strip()
+    if not release_version:
+        print("--release-version requires a non-empty version.")
+        return 2
+    try:
+        current_manifest = load_harness_manifest(root)
+    except (FileNotFoundError, OSError, ValueError) as exc:
+        print(f"Cannot load current harness manifest for update: {exc}")
+        return 1
+
+    template_repository = str(current_manifest.get("templateRepository", "")).strip()
+    if not template_repository:
+        print("Cannot resolve --release-version: current harness manifest has no templateRepository.")
+        return 1
+
+    checkout_dir = Path(tempfile.mkdtemp(prefix="project-harness-release-"))
+    clone_result = _run_quiet(["git", "clone", "--quiet", "--no-checkout", template_repository, str(checkout_dir)], root)
+    if clone_result != 0:
+        shutil.rmtree(checkout_dir, ignore_errors=True)
+        print(f"Cannot clone templateRepository for --release-version: {template_repository}")
+        return clone_result
+
+    release_refs = [release_version]
+    if not release_version.startswith("v"):
+        release_refs.insert(0, f"v{release_version}")
+    checked_out_ref = ""
+    for release_ref in release_refs:
+        if _run_quiet(["git", "checkout", "--quiet", release_ref], checkout_dir) == 0:
+            checked_out_ref = release_ref
+            break
+    if not checked_out_ref:
+        shutil.rmtree(checkout_dir, ignore_errors=True)
+        print(f"Cannot check out release version: {release_version}")
+        print("Tried refs: " + ", ".join(release_refs))
+        return 1
+
+    try:
+        target_manifest = load_harness_manifest(checkout_dir)
+    except (FileNotFoundError, OSError, ValueError) as exc:
+        shutil.rmtree(checkout_dir, ignore_errors=True)
+        print(f"Cannot load harness manifest for update release version: {exc}")
+        return 1
+    target_commit = _git_rev_parse(checkout_dir)
+    if target_commit:
+        target_manifest["sourceCommit"] = target_commit
+        target_manifest["sourceCommitType"] = "git"
+        target_manifest["sourceWorktreeDirty"] = False
+    return UpdateSource(checkout_dir, current_manifest, target_manifest, cleanup_dir=checkout_dir)
+
+
 def _looks_like_commit(value: str) -> bool:
     return len(value) == 40 and all(char in "0123456789abcdef" for char in value)
+
+
+def _git_rev_parse(root: Path) -> str:
+    result = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=root,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return ""
+    commit = result.stdout.strip()
+    return commit if _looks_like_commit(commit) else ""
 
 
 def _run_quiet(command: list[str], cwd: Path) -> int:

@@ -86,24 +86,26 @@ registry for human review.
 Bring harness-maintained files in an existing project up to date from a selected template version.
 
 Status: dry-run and conservative apply are implemented for explicit local source
-checkouts. Release/source resolution remains deferred.
+checkouts, Git source commits, and Git release tags.
 
 Current local interface:
 
 ```sh
 ./scripts/project-harness update --dry-run --source-path <template-checkout>
 ./scripts/project-harness update --dry-run --source-commit <40-char-sha>
+./scripts/project-harness update --dry-run --release-version <version>
 ./scripts/project-harness update --apply --source-path <template-checkout> --yes
 ./scripts/project-harness update --apply --source-commit <40-char-sha> --yes
+./scripts/project-harness update --apply --release-version <version> --yes
 ```
 
 The dry-run command is implemented for an explicit local source checkout or a
-40-character Git source commit. Commit resolution clones the current project's
-recorded `templateRepository` into a temporary detached checkout. It loads the
-current project's recorded harness manifest, loads the source manifest,
-classifies candidate files by manifest ownership class, and prints a
-deterministic no-write plan. `--release-version` remains a reserved explicit
-source selector until release lookup exists.
+40-character Git source commit. Release resolution checks out a matching Git
+tag from the current project's recorded `templateRepository`, trying `v<version>`
+before `<version>`. Commit and release resolution both use temporary detached
+checkouts. The helper loads the current project's recorded harness manifest,
+loads the source manifest, classifies candidate files by manifest ownership
+class, and prints a deterministic no-write plan.
 
 Apply mode is conservative. It applies only clean `harnessOwned` paths by
 default, refuses conflicts, refuses mixed/generated paths unless

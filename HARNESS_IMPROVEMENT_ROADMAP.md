@@ -315,7 +315,7 @@ can stay small and reviewable.
       CLI parser subcommands.
 - [x] Implement or intentionally remove the advertised `--source-commit` update
       source selector.
-- [ ] Implement or intentionally remove the advertised `--release-version`
+- [x] Implement or intentionally remove the advertised `--release-version`
       update source selector.
 - [ ] Add update apply support for clean harness-owned removals, with explicit
       dry-run visibility and tests.

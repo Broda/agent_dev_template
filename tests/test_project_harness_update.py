@@ -168,6 +168,40 @@ class ProjectHarnessUpdateTests(LabWorkflowTestCase):
         self.assertIn("Recorded source baseline: resolved", result.stdout)
         self.assertIn("scripts/lab.sh", result.stdout)
 
+    def test_update_dry_run_can_resolve_release_version_from_template_repository_tag(self) -> None:
+        source = self.copy_source()
+        self.init_git_source(source)
+        project = self.tmpdir / "generated-project"
+        run_cmd(["./scripts/project-harness", "new", str(project), "--no-git"], cwd=source)
+        project_manifest_path = project / "harness_commands/harness_manifest.json"
+        project_manifest = json.loads(project_manifest_path.read_text(encoding="utf-8"))
+        project_manifest["templateRepository"] = source.as_posix()
+        project_manifest_path.write_text(json.dumps(project_manifest, indent=2) + "\n", encoding="utf-8")
+
+        source_wrapper = source / "scripts/lab.sh"
+        source_wrapper.write_text(
+            source_wrapper.read_text(encoding="utf-8") + "\n# tagged release update\n",
+            encoding="utf-8",
+        )
+        source_manifest_path = source / "harness_commands/harness_manifest.json"
+        source_manifest = json.loads(source_manifest_path.read_text(encoding="utf-8"))
+        source_manifest["harnessVersion"] = "0.2.0"
+        source_manifest_path.write_text(json.dumps(source_manifest, indent=2) + "\n", encoding="utf-8")
+        run_cmd(["git", "add", "scripts/lab.sh", "harness_commands/harness_manifest.json"], cwd=source)
+        run_cmd(["git", "commit", "-m", "release 0.2.0"], cwd=source)
+        target_commit = run_cmd(["git", "rev-parse", "HEAD"], cwd=source).stdout.strip()
+        run_cmd(["git", "tag", "v0.2.0"], cwd=source)
+
+        result = run_cmd(
+            ["./scripts/project-harness", "update", "--dry-run", "--release-version", "0.2.0"],
+            cwd=project,
+        )
+
+        self.assertIn(f"Target harness: 0.2.0 ({target_commit})", result.stdout)
+        self.assertIn("Target source worktree: clean", result.stdout)
+        self.assertIn("Recorded source baseline: resolved", result.stdout)
+        self.assertIn("scripts/lab.sh", result.stdout)
+
     def test_update_dry_run_conflicts_when_current_and_target_changed_from_recorded_source(self) -> None:
         source = self.copy_source()
         self.init_git_source(source)
