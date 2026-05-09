@@ -317,7 +317,7 @@ can stay small and reviewable.
       source selector.
 - [x] Implement or intentionally remove the advertised `--release-version`
       update source selector.
-- [ ] Add update apply support for clean harness-owned removals, with explicit
+- [x] Add update apply support for clean harness-owned removals, with explicit
       dry-run visibility and tests.
 - [ ] Add an update rollback command or automatic rollback path when hooks or
       validation fail after file copies.

@@ -107,11 +107,12 @@ checkouts. The helper loads the current project's recorded harness manifest,
 loads the source manifest, classifies candidate files by manifest ownership
 class, and prints a deterministic no-write plan.
 
-Apply mode is conservative. It applies only clean `harnessOwned` paths by
-default, refuses conflicts, refuses mixed/generated paths unless
-`--include-mixed` is supplied, writes backups under `.harness-update-backups/`,
-runs generated-file hooks when relevant, validates before provenance stamping,
-then validates the stamped manifest. Review changed paths with `git diff`.
+Apply mode is conservative. It applies only clean `harnessOwned` additions,
+changes, and removals by default, refuses conflicts, refuses mixed/generated
+paths unless `--include-mixed` is supplied, writes backups under
+`.harness-update-backups/`, runs generated-file hooks when relevant, validates
+before provenance stamping, then validates the stamped manifest. Review changed
+paths with `git diff`.
 
 Expected behavior:
 

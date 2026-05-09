@@ -70,7 +70,7 @@ def _apply_update_source(root: Path, source: UpdateSource, *, yes: bool, include
         for path in plan["mixed-generated"]:
             print(f"  - {path}")
         return 1
-    update_paths = list(plan["harness-owned"])
+    update_paths = list(plan["harness-owned"]) + list(plan["removed"])
     if include_mixed:
         update_paths.extend(plan["mixed-generated"])
     update_paths = sorted(update_paths)
@@ -89,7 +89,10 @@ def _apply_update_source(root: Path, source: UpdateSource, *, yes: bool, include
             backup_path = backup_dir / relative_path
             backup_path.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(current_path, backup_path)
-        _copy_source_file(source.root / relative_path, current_path)
+        if relative_path in plan["removed"]:
+            current_path.unlink()
+        else:
+            _copy_source_file(source.root / relative_path, current_path)
 
     hook_results: list[tuple[str, int]] = []
     if any(path.startswith(".agents/skills/") for path in update_paths):
@@ -180,7 +183,10 @@ def _build_update_plan(
             continue
         if current_exists and not source_exists:
             if ownership == "harnessOwned":
-                categories["removed"].append(relative_path)
+                if _cleanly_removed_from_source(root, source_root, baseline_commit, baseline_available, relative_path):
+                    categories["removed"].append(relative_path)
+                else:
+                    categories["conflicted"].append(relative_path)
             else:
                 categories["added"].append(relative_path)
             continue
@@ -264,6 +270,20 @@ def _add_update_category(categories: dict[str, list[str]], ownership: str, relat
         categories["mixed-generated"].append(relative_path)
     else:
         categories["mixed-generated"].append(relative_path)
+
+
+def _cleanly_removed_from_source(
+    root: Path,
+    source_root: Path,
+    baseline_commit: str,
+    baseline_available: bool,
+    relative_path: str,
+) -> bool:
+    if baseline_available:
+        current_content = _file_content(root / relative_path)
+        baseline_content = _baseline_file_content(source_root, baseline_commit, relative_path)
+        return current_content == baseline_content and baseline_content is not None
+    return not _git_file_dirty(root, relative_path)
 
 
 def _tracked_candidate_files(root: Path) -> set[str]:

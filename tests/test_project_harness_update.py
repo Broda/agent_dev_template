@@ -271,6 +271,53 @@ class ProjectHarnessUpdateTests(LabWorkflowTestCase):
         self.assertIn("# target wrapper update", (project / "scripts/lab.sh").read_text(encoding="utf-8"))
         self.assertTrue((project / ".harness-update-backups").exists())
 
+    def test_update_apply_removes_clean_harness_owned_deleted_source_file(self) -> None:
+        source = self.copy_source()
+        obsolete_source = source / "scripts/obsolete-helper"
+        obsolete_source.write_text("#!/usr/bin/env sh\n", encoding="utf-8")
+        self.init_git_source(source)
+        project = self.tmpdir / "generated-project"
+        run_cmd(["./scripts/project-harness", "new", str(project), "--no-git"], cwd=source)
+        obsolete_source.unlink()
+
+        dry_run = run_cmd(
+            ["./scripts/project-harness", "update", "--dry-run", "--source-path", str(source)],
+            cwd=project,
+        )
+
+        self.assertIn("removed: 1", dry_run.stdout)
+        self.assertIn("scripts/obsolete-helper", dry_run.stdout)
+
+        result = run_cmd(
+            ["./scripts/project-harness", "update", "--apply", "--source-path", str(source), "--yes"],
+            cwd=project,
+        )
+
+        self.assertIn("Applied harness update.", result.stdout)
+        self.assertIn("scripts/obsolete-helper", result.stdout)
+        self.assertFalse((project / "scripts/obsolete-helper").exists())
+        backup_files = list((project / ".harness-update-backups").glob("*/scripts/obsolete-helper"))
+        self.assertTrue(backup_files)
+
+    def test_update_dry_run_conflicts_removed_harness_file_with_local_edits(self) -> None:
+        source = self.copy_source()
+        obsolete_source = source / "scripts/obsolete-helper"
+        obsolete_source.write_text("#!/usr/bin/env sh\n", encoding="utf-8")
+        self.init_git_source(source)
+        project = self.tmpdir / "generated-project"
+        run_cmd(["./scripts/project-harness", "new", str(project), "--no-git"], cwd=source)
+        obsolete_source.unlink()
+        obsolete_project = project / "scripts/obsolete-helper"
+        obsolete_project.write_text("#!/usr/bin/env sh\n# local edit\n", encoding="utf-8")
+
+        result = run_cmd(
+            ["./scripts/project-harness", "update", "--dry-run", "--source-path", str(source)],
+            cwd=project,
+        )
+
+        self.assertIn("conflicted:", result.stdout)
+        self.assertIn("scripts/obsolete-helper", result.stdout)
+
     def test_update_apply_refuses_mixed_generated_update_by_default(self) -> None:
         source = self.copy_source()
         self.init_git_source(source)
