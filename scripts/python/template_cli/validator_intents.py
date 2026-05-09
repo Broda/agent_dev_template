@@ -6,10 +6,12 @@ import subprocess
 import sys
 from pathlib import Path
 
-from template_cli.intents import (
+from template_cli.intent_registry import (
     IntentRegistryError,
     load_intent_registry,
     registry_commands,
+)
+from template_cli.intents import (
     render_intent_docs_to_memory,
 )
 from template_cli.io_helpers import ValidationResult, read_text

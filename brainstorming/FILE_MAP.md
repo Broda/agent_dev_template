@@ -148,7 +148,8 @@ Lean file registry for the Project Harness Template.
 | `scripts/python/template_cli/validator_python_config.py` | Python tool configuration validation helpers |
 | `scripts/python/template_cli/validator_skills.py` | Repo-scoped skill and skill metadata validation helpers |
 | `scripts/python/template_cli/plugin_sync.py` | Plugin skill mirror sync command implementation |
-| `scripts/python/template_cli/intents.py` | Intent registry rendering and generated intent-doc sync helpers |
+| `scripts/python/template_cli/intent_registry.py` | Intent registry loading, schema validation, and command lookup helpers |
+| `scripts/python/template_cli/intents.py` | Intent registry rendering and compatibility exports for generated intent-doc sync helpers |
 | `scripts/python/template_cli/lab_cli.py` | Compatibility exports for lab parser and dispatch wiring |
 | `scripts/python/template_cli/lab_cli_dispatch.py` | Lab subcommand dispatch table for the top-level CLI |
 | `scripts/python/template_cli/lab_cli_parsers.py` | Declarative lab subcommand parser argument table |

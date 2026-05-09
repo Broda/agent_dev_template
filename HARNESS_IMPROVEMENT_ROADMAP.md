@@ -365,6 +365,8 @@ can stay small and reviewable.
       state-fill operations, implementation-contract fill, and summary rendering.
 - [x] Split `lab_cli.py` so parser construction and command dispatch are
       table-driven or otherwise easier to compare against the intent registry.
+- [x] Split intent registry loading, schema validation, and command lookup out
+      of `intents.py`.
 - [x] Split `render_governance_templates.py` into architecture, ADR, and roadmap
       renderer modules.
 - [x] Split `render_templates.py` into README and project-context renderer
