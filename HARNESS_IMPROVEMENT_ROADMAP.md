@@ -388,6 +388,8 @@ can stay small and reviewable.
       checking modules.
 - [ ] Lower the Python code-size validation threshold in stages after the large
       modules above are decomposed.
+- [x] Lower the Python code-size validation threshold from 500 to 475 lines
+      after the `finalize.py` decomposition.
 - [x] Add import-boundary validation for new workflow helper modules as they are
       split out.
 - [ ] Run Ruff formatting/linting in CI once local violations are either fixed

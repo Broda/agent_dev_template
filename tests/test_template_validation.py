@@ -339,12 +339,12 @@ class TemplateValidationTests(LabWorkflowTestCase):
 
     def test_validate_brainstorming_checks_python_file_size(self) -> None:
         oversized_path = self.repo / "tests/oversized_fixture.py"
-        oversized_path.write_text("\n".join("x = 1" for _ in range(501)) + "\n", encoding="utf-8")
+        oversized_path.write_text("\n".join("x = 1" for _ in range(476)) + "\n", encoding="utf-8")
 
         result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
 
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("Python code file exceeds 500 lines: tests/oversized_fixture.py (501)", result.stdout)
+        self.assertIn("Python code file exceeds 475 lines: tests/oversized_fixture.py (476)", result.stdout)
 
     def test_validate_brainstorming_checks_python_tool_config(self) -> None:
         pyproject_path = self.repo / "pyproject.toml"
