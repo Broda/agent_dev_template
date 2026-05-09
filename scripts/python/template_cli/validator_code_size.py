@@ -6,7 +6,7 @@ from template_cli.io_helpers import ValidationResult
 
 
 PYTHON_CODE_ROOTS = ["scripts/python", "tests"]
-MAX_CODE_LINES = 475
+MAX_CODE_LINES = 350
 
 
 def validate_python_file_sizes(root: Path, result: ValidationResult) -> None:

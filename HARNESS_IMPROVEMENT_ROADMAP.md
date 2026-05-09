@@ -393,6 +393,9 @@ can stay small and reviewable.
   - Target: lower the enforced Python file-size threshold to 350 lines as the
     normal template guardrail, then reevaluate whether a stricter 300-line cap
     improves agent reviewability enough to justify the added module splitting.
+- [x] Split oversized test modules so the Python file-size guardrail can drop
+      to the 350-line target.
+- [x] Lower the Python code-size validation threshold from 475 to 350 lines.
 - [x] Lower the Python code-size validation threshold from 500 to 475 lines
       after the `finalize.py` decomposition.
 - [x] Add import-boundary validation for new workflow helper modules as they are
