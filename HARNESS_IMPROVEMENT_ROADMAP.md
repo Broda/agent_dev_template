@@ -323,7 +323,7 @@ can stay small and reviewable.
       validation fail after file copies.
 - [x] Add tests for `--include-mixed` apply behavior and its review/backup
       output.
-- [ ] Add tests proving update hooks run when repo skills or the intent registry
+- [x] Add tests proving update hooks run when repo skills or the intent registry
       change.
 - [x] Add source-dirty provenance handling to update dry-run/apply output so
       users know when the target template checkout has uncommitted changes.

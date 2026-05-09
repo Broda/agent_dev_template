@@ -299,6 +299,53 @@ class ProjectHarnessUpdateTests(LabWorkflowTestCase):
         backup_files = list((project / ".harness-update-backups").glob("*/scripts/obsolete-helper"))
         self.assertTrue(backup_files)
 
+    def test_update_apply_syncs_plugin_skills_when_repo_skill_changes(self) -> None:
+        source = self.copy_source()
+        self.init_git_source(source)
+        project = self.tmpdir / "generated-project"
+        run_cmd(["./scripts/project-harness", "new", str(project), "--no-git"], cwd=source)
+        source_skill = source / ".agents/skills/brainstorming-lab/SKILL.md"
+        source_skill.write_text(
+            source_skill.read_text(encoding="utf-8") + "\nUpdate hook regression marker.\n",
+            encoding="utf-8",
+        )
+
+        result = run_cmd(
+            ["./scripts/project-harness", "update", "--apply", "--source-path", str(source), "--yes"],
+            cwd=project,
+        )
+
+        self.assertIn("Hooks:", result.stdout)
+        self.assertIn("sync-plugin-skills: 0", result.stdout)
+        canonical_skill = (project / ".agents/skills/brainstorming-lab/SKILL.md").read_text(encoding="utf-8")
+        plugin_skill = (project / "plugins/project-lifecycle-lab/skills/brainstorming-lab/SKILL.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("Update hook regression marker.", canonical_skill)
+        self.assertEqual(canonical_skill, plugin_skill)
+
+    def test_update_apply_renders_intent_docs_when_registry_changes(self) -> None:
+        source = self.copy_source()
+        self.init_git_source(source)
+        project = self.tmpdir / "generated-project"
+        run_cmd(["./scripts/project-harness", "new", str(project), "--no-git"], cwd=source)
+        registry_path = source / "harness_commands/intent_registry.json"
+        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+        registry["intents"][0]["phrases"].append("capture hook regression")
+        registry_path.write_text(json.dumps(registry, indent=2) + "\n", encoding="utf-8")
+
+        result = run_cmd(
+            ["./scripts/project-harness", "update", "--apply", "--source-path", str(source), "--yes"],
+            cwd=project,
+        )
+
+        self.assertIn("Hooks:", result.stdout)
+        self.assertIn("render-intent-docs: 0", result.stdout)
+        self.assertIn(
+            "capture hook regression",
+            (project / "harness_commands/CONVERSATIONAL_MODE.md").read_text(encoding="utf-8"),
+        )
+
     def test_update_dry_run_conflicts_removed_harness_file_with_local_edits(self) -> None:
         source = self.copy_source()
         obsolete_source = source / "scripts/obsolete-helper"
