@@ -132,6 +132,7 @@ Lean file registry for the Project Harness Template.
 | `scripts/python/template_cli/evidence.py` | Development roadmap evidence capture command implementation |
 | `scripts/python/template_cli/finalize_artifacts.py` | Finalization artifact directory setup, backup registration, existing-state load, and session-log writing helpers |
 | `scripts/python/template_cli/finalize_context.py` | Finalization target, owner, session, and hydration context resolution |
+| `scripts/python/template_cli/finalize_output.py` | Finalization user-facing success output helpers |
 | `scripts/python/template_cli/finalize.py` | In-place finalization orchestration |
 | `scripts/python/template_cli/finalize_state_builder.py` | Finalized canonical state assembly helpers |
 | `scripts/python/template_cli/finalize_validation.py` | Finalization required-value and noninteractive missing-field validation helpers |

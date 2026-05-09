@@ -30,6 +30,7 @@ from template_cli.finalize_state import (
     _write_summary_export,
     resolve_finalize_idea_id,
 )
+from template_cli.finalize_output import _print_finalization_result
 from template_cli.finalize_state_builder import _build_finalized_state
 from template_cli.finalize_validation import (
     _collect_missing_noninteractive_fields,
@@ -287,9 +288,5 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
 
         backups.commit()
 
-    print(f"Canonical state saved: {STATE_FILE}")
-    print(f"Finalization session log: {session_path}")
-    if write_export:
-        print(f"Optional project summary written: {export_path}")
-    print("The repository has been successfully finalized into development mode.")
+    _print_finalization_result(session_path, export_path, write_export=write_export)
     return 0
