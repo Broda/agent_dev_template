@@ -247,23 +247,23 @@ Exit criteria:
 Goal: prepare for a versioned installed runtime without hiding behavior from
 public template users.
 
-- [ ] Decide whether the first extracted runtime should stay Python or move to a
+- [x] Decide whether the first extracted runtime should stay Python or move to a
       compiled binary later.
-- [ ] Define how thin generated wrappers find the expected runtime.
-- [ ] Define compatibility checks between local wrappers, recorded provenance,
+- [x] Define how thin generated wrappers find the expected runtime.
+- [x] Define compatibility checks between local wrappers, recorded provenance,
       and installed runtime version.
-- [ ] Keep an inspectable source path for public trust.
-- [ ] Define how a release artifact would be installed through Cargo, Homebrew,
+- [x] Keep an inspectable source path for public trust.
+- [x] Define how a release artifact would be installed through Cargo, Homebrew,
       GitHub releases, or a plain source checkout.
-- [ ] Preserve local fallback behavior for users who do not install a global
+- [x] Preserve local fallback behavior for users who do not install a global
       runtime.
-- [ ] Identify which copied `scripts/python/template_cli` modules can stop being
+- [x] Identify which copied `scripts/python/template_cli` modules can stop being
       duplicated once the runtime boundary is stable.
-- [ ] Write an ADR before committing to binary/runtime extraction.
+- [x] Write an ADR before committing to binary/runtime extraction.
 
 Exit criteria:
 
-- [ ] Runtime extraction has an ADR-backed plan and does not break stable local
+- [x] Runtime extraction has an ADR-backed plan and does not break stable local
       command UX.
 
 ## Backlog

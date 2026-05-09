@@ -48,6 +48,8 @@ BRAINSTORMING_CORE_ARTIFACTS = [
     "brainstorming/templates/review_gate_template.md",
     "brainstorming/docs/adr/template.md",
     "brainstorming/docs/adr/ADR-0001-adopt-governance-structure-for-idea-lab.md",
+    "brainstorming/docs/adr/ADR-0002-plan-installed-runtime-boundary.md",
+    "docs/adr/ADR-0002-plan-installed-runtime-boundary.md",
     "scripts/lab",
     "scripts/lab.sh",
     "scripts/lab.ps1",

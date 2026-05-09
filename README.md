@@ -50,6 +50,11 @@ CI keeps Ubuntu as the full regression baseline and runs a Windows PowerShell
 launcher smoke job for `lab`, `finalize-project`, `validate-governance`, and
 `project-harness new --no-git`.
 
+Runtime extraction is planned but not active. ADR-0002 records the boundary:
+the first extracted runtime should remain Python, wrappers must verify manifest
+compatibility before using an installed runtime, and `scripts/python/cli.py`
+remains the local fallback for users without a global harness install.
+
 ## Harness Architecture
 
 | Layer | Purpose | Examples |

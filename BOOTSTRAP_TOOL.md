@@ -134,3 +134,19 @@ Expected behavior:
 ## Boundary
 
 The bootstrap helper is convenience tooling. It must not become the source of truth for project state, finalization behavior, validation rules, or agent instructions.
+
+## Installed Runtime Study
+
+ADR-0002 defines the long-term runtime extraction direction. The first
+extracted runtime should remain Python and should be installable from an
+explicit source checkout or GitHub release archive before any Cargo, Homebrew,
+or standalone binary path is considered. Thin wrappers may discover an installed
+runtime later, but they must validate the recorded harness manifest first and
+preserve `scripts/python/cli.py` as the repo-local fallback.
+
+Candidate extraction order:
+
+1. Read-only contract and validation helpers.
+2. Bootstrap/update planning after explicit source/version resolution is stable.
+3. Render, finalize, and workflow mutation commands only after rollback and
+   compatibility behavior are proven.
