@@ -7,7 +7,6 @@ from pathlib import Path
 from template_cli.finalize_context import load_finalize_context
 from template_cli.finalize_helpers import (
     STATE_FILE,
-    STATE_SCHEMA_VERSION,
     ask_non_empty,
     choose_from_list,
     choose_project_type,
@@ -18,7 +17,6 @@ from template_cli.finalize_helpers import (
     join_lines,
     latest_session_path,
     summarize_decisions,
-    unique_values,
 )
 from template_cli.finalize_state import (
     BackupManager,
@@ -27,6 +25,7 @@ from template_cli.finalize_state import (
     _write_summary_export,
     resolve_finalize_idea_id,
 )
+from template_cli.finalize_state_builder import _build_finalized_state
 from template_cli.finalize_validation import (
     _collect_missing_noninteractive_fields,
     _fail_noninteractive,
@@ -43,7 +42,6 @@ from template_cli.state_schema import validate_project_state_data
 from template_cli.validators import (
     run_validate_development,
 )
-from template_cli.wiki import default_wiki_config
 
 
 def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False, interactive: bool = False) -> int:
@@ -239,101 +237,50 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
         if write_export:
             backups.backup_path(export_path)
 
-        existing_artifacts = existing_state.get("artifacts", {}) if isinstance(existing_state, dict) else {}
-        preserved_note_references = str(existing_artifacts.get("noteReferences", "") or "").strip()
-        preserved_summary_export = str(existing_artifacts.get("summaryExport", "") or "").strip()
-        preserved_adr_references = existing_artifacts.get("adrReferences", [])
-        if not isinstance(preserved_adr_references, list):
-            preserved_adr_references = []
-        preserved_documentation = existing_state.get("documentation", {}) if isinstance(existing_state, dict) else {}
-        if not isinstance(preserved_documentation, dict):
-            preserved_documentation = {}
-        documentation = dict(preserved_documentation)
-        wiki_config = default_wiki_config(root)
-        existing_wiki_config = documentation.get("wiki", {})
-        if isinstance(existing_wiki_config, dict):
-            wiki_config.update(existing_wiki_config)
-        documentation["wiki"] = wiki_config
-        documentation.setdefault(
-            "ciPolicy",
-            "Generated GitHub Actions CI is included as a baseline guardrail; local build, "
-            "test, and manual verification remain authoritative.",
+        state = _build_finalized_state(
+            root,
+            existing_state=existing_state,
+            date_stamp=date_stamp,
+            idea_id=idea_id,
+            project_name=project_name,
+            owner=owner,
+            objective=objective,
+            project_type=project_type,
+            language=language,
+            runtime=runtime,
+            framework=framework,
+            package_tool=package_tool,
+            persistence=persistence,
+            authentication=authentication,
+            determinism=determinism,
+            packaging=packaging,
+            constraints=constraints,
+            build_command=build_command,
+            run_command=run_command,
+            test_command=test_command,
+            problem_statement=problem_statement,
+            target_users=target_users,
+            why_now=why_now,
+            expected_value=expected_value,
+            solution_summary=solution_summary,
+            mvp_scope=mvp_scope,
+            out_of_scope=out_of_scope,
+            assumptions=assumptions,
+            non_goals=non_goals,
+            key_decisions=key_decisions,
+            top_risks=top_risks,
+            mitigation_plans=mitigation_plans,
+            contingencies=contingencies,
+            remaining_risks=remaining_risks,
+            latest_review_outcome=latest_review_outcome,
+            latest_review_session=latest_review_session,
+            idea_files=idea_files,
+            session_paths=session_paths,
+            session_path=session_path,
+            notes_col=notes_col,
+            export_path=export_path,
+            write_export=write_export,
         )
-
-        adr_references = unique_values(
-            list(preserved_adr_references) + ["docs/adr/ADR-0001-record-architecture-decisions.md"]
-        )
-
-        effective_note_references = notes_col
-        if is_placeholder_value(effective_note_references) or effective_note_references.lower() in {
-            "none recorded",
-            "_none_",
-            "_n/a_",
-            "_none yet_",
-        }:
-            effective_note_references = preserved_note_references
-
-        state = {
-            "schemaVersion": STATE_SCHEMA_VERSION,
-            "status": "finalized",
-            "finalizedAt": date_stamp,
-            "ideaId": idea_id,
-            "projectName": project_name,
-            "owner": owner,
-            "purpose": objective,
-            "projectType": project_type,
-            "techStack": {
-                "language": language,
-                "runtime": runtime,
-                "framework": framework,
-                "packageTool": package_tool,
-            },
-            "persistence": persistence,
-            "authentication": authentication,
-            "determinism": determinism,
-            "packaging": packaging,
-            "constraints": constraints,
-            "commands": {
-                "build": build_command,
-                "run": run_command,
-                "test": test_command,
-            },
-            "documentation": documentation,
-            "product": {
-                "problemStatement": problem_statement or objective,
-                "targetUsers": target_users or "See related sessions",
-                "whyNow": why_now or "See related sessions",
-                "expectedValue": expected_value or objective,
-                "solutionSummary": solution_summary or f"Deliver the first implementation slice for {project_name}.",
-                "mvpScope": mvp_scope or "Milestone 0 implementation slice with working build, run, and test commands.",
-                "outOfScope": out_of_scope or "See roadmap and follow-up sessions.",
-                "assumptions": assumptions,
-                "nonGoals": non_goals,
-            },
-            "governance": {
-                "keyDecisions": key_decisions
-                or summarize_decisions(project_type, persistence, authentication, determinism, packaging),
-                "topRisks": top_risks or "Capture implementation risks during Milestone 0 execution.",
-                "mitigationPlans": mitigation_plans
-                or "Keep scope narrow, validate early, and update governance on change.",
-                "contingencies": contingencies or "Reduce scope and re-baseline roadmap if assumptions fail.",
-                "remainingAcceptedRisks": remaining_risks or "None recorded at finalization time.",
-                "latestReviewOutcome": latest_review_outcome or "conditional-pass",
-                "latestReviewSession": latest_review_session,
-            },
-            "artifacts": {
-                "ideaFiles": unique_values(idea_files),
-                "sessionFiles": unique_values(session_paths + [session_path]),
-                "noteReferences": effective_note_references or "None recorded",
-                "summaryExport": export_path if write_export else preserved_summary_export,
-                "finalizationSession": session_path,
-                "adrReferences": adr_references,
-            },
-        }
-        for detail_key in ["implementation", "mvpContract"]:
-            existing_detail = existing_state.get(detail_key) if isinstance(existing_state, dict) else None
-            if isinstance(existing_detail, dict) and existing_detail:
-                state[detail_key] = existing_detail
         schema_result = ValidationResult()
         validate_project_state_data(root, schema_result, state, variant="finalized")
         if schema_result.failures:
