@@ -143,6 +143,21 @@ class IntentRegistryContractTests(unittest.TestCase):
             result.stdout + result.stderr,
         )
 
+    def test_validate_governance_checks_non_lab_wrapper_backend_exposure(self) -> None:
+        cli_path = self.repo / "scripts/python/cli.py"
+        cli_text = cli_path.read_text(encoding="utf-8")
+        cli_text = cli_text.replace('    subparsers.add_parser("sync-plugin-skills")\n', "", 1)
+        cli_path.write_text(cli_text, encoding="utf-8")
+
+        result = run_cmd(["./scripts/validate-governance"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(
+            "Stable wrapper backend command is not registered in CLI: sync-plugin-skills "
+            "(from scripts/sync-plugin-skills)",
+            result.stdout + result.stderr,
+        )
+
     def test_render_intent_docs_fails_on_malformed_registry(self) -> None:
         registry_path = self.repo / "harness_commands/intent_registry.json"
         registry_path.write_text("{\n", encoding="utf-8")

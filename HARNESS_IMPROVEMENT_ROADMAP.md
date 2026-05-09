@@ -339,7 +339,7 @@ can stay small and reviewable.
 - [x] Decide whether broad manifest entries such as `scripts/` and
       `.agents/skills/` should be expanded into generated inventory snapshots
       for update planning.
-- [ ] Extend command/capability discovery beyond `/lab` intents to cover
+- [x] Extend command/capability discovery beyond `/lab` intents to cover
       `project-harness`, rendering, sync, and validation commands.
 - [ ] Validate parity between wrapper help text, CLI parser arguments, and the
       machine-readable command registry.

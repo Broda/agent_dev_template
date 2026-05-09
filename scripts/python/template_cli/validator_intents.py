@@ -12,6 +12,7 @@ from template_cli.intents import (
     render_intent_docs_to_memory,
 )
 from template_cli.io_helpers import ValidationResult, read_text
+from template_cli.validator_manifest import load_harness_manifest
 
 
 def documented_lab_commands(root: Path) -> set[str]:
@@ -42,6 +43,47 @@ def registered_lab_commands(root: Path) -> set[str]:
     return commands
 
 
+def registered_cli_backend_commands(root: Path) -> set[str]:
+    cli_path = root / "scripts/python/cli.py"
+    if not cli_path.exists():
+        return set()
+    result = subprocess.run(
+        [sys.executable, str(cli_path), "-h"],
+        cwd=root,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    output = (result.stdout or "") + "\n" + (result.stderr or "")
+    return {
+        match.strip()
+        for match in re.findall(r"\b[a-z][a-z0-9]*(?:-[a-z0-9]+)+\b", output)
+    }
+
+
+def manifest_stable_wrapper_backends(root: Path) -> dict[str, str]:
+    try:
+        manifest = load_harness_manifest(root)
+    except (FileNotFoundError, ValueError):
+        return {}
+
+    backends: dict[str, str] = {}
+    stable_wrappers = manifest.get("stableWrappers", [])
+    if not isinstance(stable_wrappers, list):
+        return backends
+    for wrapper in stable_wrappers:
+        if not isinstance(wrapper, dict):
+            continue
+        wrapper_path = str(wrapper.get("path", "")).strip()
+        backend_command = str(wrapper.get("backendCommand", "")).strip()
+        for raw_backend in backend_command.split("|"):
+            backend = raw_backend.strip()
+            if not backend or "<" in backend or " " in backend:
+                continue
+            backends[backend] = wrapper_path
+    return backends
+
+
 def validate_lab_command_parity(root: Path, result: ValidationResult) -> None:
     documented = documented_lab_commands(root)
     registered = registered_lab_commands(root)
@@ -50,6 +92,20 @@ def validate_lab_command_parity(root: Path, result: ValidationResult) -> None:
     missing = sorted(documented - registered)
     for command in missing:
         result.add_failure(f"Documented lab command is not registered in CLI: {command}")
+
+
+def validate_stable_wrapper_backend_exposure(root: Path, result: ValidationResult) -> None:
+    registered = registered_cli_backend_commands(root)
+    wrapper_backends = manifest_stable_wrapper_backends(root)
+    if not registered or not wrapper_backends:
+        return
+
+    for backend, wrapper_path in sorted(wrapper_backends.items()):
+        if backend not in registered:
+            result.add_failure(
+                f"Stable wrapper backend command is not registered in CLI: {backend} "
+                f"(from {wrapper_path})"
+            )
 
 
 def validate_intent_registry(root: Path, result: ValidationResult) -> None:
@@ -63,6 +119,7 @@ def validate_intent_registry(root: Path, result: ValidationResult) -> None:
 
     documented = documented_lab_commands(root)
     registered = registered_lab_commands(root)
+    validate_stable_wrapper_backend_exposure(root, result)
 
     missing_doc_sections = sorted(registry_command_names - documented)
     for command in missing_doc_sections:
