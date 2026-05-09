@@ -444,7 +444,7 @@ Next-task sequencing:
 
 ### Rendering And Finalization Hardening
 
-- [ ] Add an end-to-end golden fixture for `lab handoff` followed by noninteractive
+- [x] Add an end-to-end golden fixture for `lab handoff` followed by noninteractive
       finalization and development validation.
   - Build a temp-repo fixture that starts in brainstorming mode with one active
     idea, one or more sessions, and enough implementation-contract data for

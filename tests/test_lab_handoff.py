@@ -49,6 +49,55 @@ class LabHandoffTests(LabWorkflowTestCase):
         self.assertIn("CLI crate owns quoted command parsing like `run \"daily sync\"`.", architecture)
         self.assertIn("Preserve spaces, apostrophes, and quoted strings in task names.", roadmap)
 
+    def test_lab_handoff_to_noninteractive_finalize_golden_flow(self) -> None:
+        idea_id = "idea-lossless-handoff"
+        self.write_handoff_fixture()
+
+        handoff = run_cmd(["./scripts/lab", "handoff", "--idea-id", idea_id, "--no-sync"], cwd=self.repo)
+        self.assertIn("Handoff state updated: state/project-init.json", handoff.stdout)
+
+        finalize = run_cmd(["./scripts/finalize-project", "--idea-id", idea_id], cwd=self.repo)
+        self.assertIn("successfully finalized", finalize.stdout.lower())
+        run_cmd(["./scripts/validate-development"], cwd=self.repo)
+
+        self.assertIn("Current mode: development", (self.repo / "MODE.md").read_text(encoding="utf-8"))
+        state = json.loads((self.repo / "state/project-init.json").read_text(encoding="utf-8"))
+        self.assertEqual(state["status"], "finalized")
+        self.assertEqual(state["ideaId"], idea_id)
+        self.assertEqual(state["projectName"], "Finalize Smoke")
+        self.assertEqual(state["techStack"]["language"], "Rust")
+        self.assertEqual(state["techStack"]["runtime"], "Rust stable")
+        self.assertEqual(state["commands"]["build"], "cargo build --locked")
+        self.assertEqual(state["commands"]["run"], 'cargo run -- handoff --idea "daily sync"')
+        self.assertEqual(state["commands"]["test"], "cargo test --all -- --nocapture")
+        self.assertEqual(
+            state["product"]["problemStatement"],
+            "Prevent finalization from losing deeply brainstormed implementation details.",
+        )
+        self.assertEqual(state["governance"]["latestReviewOutcome"], "conditional-pass")
+        self.assertIn("workspaceLayout", state["implementation"])
+        self.assertIn("CLI crate owns quoted command parsing like `run \"daily sync\"`.", state["implementation"]["cliCommandSurface"])
+
+        finalization_sessions = [
+            path
+            for path in state["artifacts"]["sessionFiles"]
+            if path.endswith(f"FINALIZATION_SESSION_{idea_id}.md")
+        ]
+        self.assertEqual(len(finalization_sessions), 1)
+        self.assertTrue((self.repo / finalization_sessions[0]).exists())
+        self.assertIn("sessions/2026-04-04_idea-lossless-handoff.md", state["artifacts"]["sessionFiles"])
+
+        catalog = (self.repo / "IDEA_CATALOG.md").read_text(encoding="utf-8")
+        self.assertIn(f"| {idea_id} | Finalize Smoke | finalized | Test User |", catalog)
+        self.assertIn(f"`{finalization_sessions[0]}`", catalog)
+
+        project_context = (self.repo / "docs/PROJECT_CONTEXT.md").read_text(encoding="utf-8")
+        architecture = (self.repo / "docs/ARCHITECTURE.md").read_text(encoding="utf-8")
+        roadmap = (self.repo / "docs/ROADMAP.md").read_text(encoding="utf-8")
+        self.assertIn("Finalize Smoke", project_context)
+        self.assertIn("CLI crate owns quoted command parsing like `run \"daily sync\"`.", architecture)
+        self.assertIn("Preserve spaces, apostrophes, and quoted strings in task names.", roadmap)
+
     def test_lab_handoff_requires_explicit_target_when_multiple_ideas_active(self) -> None:
         self.write_handoff_fixture()
         catalog_path = self.repo / "IDEA_CATALOG.md"
