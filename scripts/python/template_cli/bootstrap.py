@@ -170,7 +170,12 @@ def _write_brainstorming_mode(root: Path) -> None:
     )
 
 
-def _build_update_plan(root: Path, source_root: Path, current_manifest: dict, target_manifest: dict) -> dict[str, list[str]]:
+def _build_update_plan(
+    root: Path,
+    source_root: Path,
+    current_manifest: dict,
+    target_manifest: dict,
+) -> tuple[dict[str, list[str]], bool]:
     inventory = current_manifest.get("artifactInventory", {})
     categories = {
         "harness-owned": [],
@@ -184,7 +189,10 @@ def _build_update_plan(root: Path, source_root: Path, current_manifest: dict, ta
     }
     current_files = _tracked_candidate_files(root)
     source_files = _tracked_candidate_files(source_root)
-    all_files = sorted(current_files | source_files)
+    baseline_commit = str(current_manifest.get("sourceCommit", "")).strip()
+    baseline_files = _baseline_candidate_files(source_root, baseline_commit)
+    baseline_available = baseline_files is not None
+    all_files = sorted(current_files | source_files | (baseline_files or set()))
     for relative_path in all_files:
         ownership = _ownership_class(relative_path, inventory)
         current_path = root / relative_path
@@ -210,6 +218,15 @@ def _build_update_plan(root: Path, source_root: Path, current_manifest: dict, ta
             categories["unchanged"].append(relative_path)
             continue
 
+        if baseline_available:
+            current_content = _file_content(current_path)
+            baseline_content = _baseline_file_content(source_root, baseline_commit, relative_path)
+            if current_content == baseline_content:
+                _add_update_category(categories, ownership, relative_path)
+            else:
+                categories["conflicted"].append(relative_path)
+            continue
+
         if _git_file_dirty(root, relative_path):
             categories["conflicted"].append(relative_path)
         elif ownership == "mixedGenerated":
@@ -218,7 +235,7 @@ def _build_update_plan(root: Path, source_root: Path, current_manifest: dict, ta
             categories["harness-owned"].append(relative_path)
         else:
             categories["mixed-generated"].append(relative_path)
-    return categories
+    return categories, baseline_available
 
 
 def _print_update_plan(
@@ -226,8 +243,9 @@ def _print_update_plan(
     source_root: Path,
     current_manifest: dict,
     target_manifest: dict,
-    plan: dict[str, list[str]],
+    plan_with_baseline: tuple[dict[str, list[str]], bool],
 ) -> None:
+    plan, baseline_available = plan_with_baseline
     print("Project harness update dry run")
     print(f"Current project: {root}")
     print(f"Target source: {source_root}")
@@ -241,6 +259,10 @@ def _print_update_plan(
         f"{target_manifest.get('harnessVersion', 'unknown')} "
         f"({target_manifest.get('sourceCommit', 'unknown')})"
     )
+    if baseline_available:
+        print("Recorded source baseline: resolved")
+    else:
+        print("Recorded source baseline: unavailable")
     print("Writes: none")
     for label in [
         "harness-owned",
@@ -259,6 +281,15 @@ def _print_update_plan(
     print("Next commands:")
     print("  apply updates: not implemented yet; Milestone 4 will add project-harness update --apply")
     print("  skip groups: rerun dry-run after adjusting the source or local files")
+
+
+def _add_update_category(categories: dict[str, list[str]], ownership: str, relative_path: str) -> None:
+    if ownership == "harnessOwned":
+        categories["harness-owned"].append(relative_path)
+    elif ownership == "mixedGenerated":
+        categories["mixed-generated"].append(relative_path)
+    else:
+        categories["mixed-generated"].append(relative_path)
 
 
 def _tracked_candidate_files(root: Path) -> set[str]:
@@ -302,6 +333,54 @@ def _same_file(left: Path, right: Path) -> bool:
         return left.read_bytes() == right.read_bytes()
     except OSError:
         return False
+
+
+def _file_content(path: Path) -> bytes | None:
+    if not path.exists():
+        return None
+    try:
+        return path.read_bytes()
+    except OSError:
+        return None
+
+
+def _baseline_candidate_files(source_root: Path, commit: str) -> set[str] | None:
+    if not _looks_like_commit(commit):
+        return None
+    result = subprocess.run(
+        ["git", "ls-tree", "-r", "--name-only", commit],
+        cwd=source_root,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return None
+    files = set()
+    for line in result.stdout.splitlines():
+        relative_parts = Path(line).parts
+        if any(part in DRY_RUN_EXCLUDE_DIRS for part in relative_parts):
+            continue
+        files.add(line.strip())
+    return files
+
+
+def _baseline_file_content(source_root: Path, commit: str, relative_path: str) -> bytes | None:
+    if not _looks_like_commit(commit):
+        return None
+    result = subprocess.run(
+        ["git", "show", f"{commit}:{relative_path}"],
+        cwd=source_root,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return None
+    return result.stdout
+
+
+def _looks_like_commit(value: str) -> bool:
+    return len(value) == 40 and all(char in "0123456789abcdef" for char in value)
 
 
 def _git_file_dirty(root: Path, relative_path: str) -> bool:

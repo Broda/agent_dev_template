@@ -115,7 +115,7 @@ Goal: let downstream projects inspect harness updates without changing files.
 - [x] Accept an explicit source template path, source commit, or release version.
 - [x] Refuse ambiguous update sources.
 - [x] Load the current project's recorded harness provenance.
-- [ ] Compare current project files against the recorded source version and the
+- [x] Compare current project files against the recorded source version and the
       target source version.
 - [x] Classify each candidate file as harness-owned, project-owned,
       mixed/generated, missing, added, removed, or conflicted.
