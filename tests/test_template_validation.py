@@ -354,6 +354,23 @@ class TemplateValidationTests(LabWorkflowTestCase):
             result.stdout,
         )
 
+    def test_validate_brainstorming_checks_update_source_helper_boundary(self) -> None:
+        helper_path = self.repo / "scripts/python/template_cli/bootstrap_update_source.py"
+        helper_path.write_text(
+            helper_path.read_text(encoding="utf-8")
+            + "\nif False:\n    from template_cli.bootstrap_update import _build_update_plan\n",
+            encoding="utf-8",
+        )
+
+        result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(
+            "Module boundary violation: scripts/python/template_cli/bootstrap_update_source.py "
+            "must not import template_cli.bootstrap_update.",
+            result.stdout,
+        )
+
     def test_validate_development_requires_repo_skills(self) -> None:
         self.write_render_fixture()
         run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
