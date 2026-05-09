@@ -158,7 +158,10 @@ Lean file registry for the Project Harness Template.
 | `scripts/python/template_cli/sync.py` | Git sync helpers for milestone commit and push flows |
 | `scripts/python/template_cli/validator_placeholders.py` | Precise unresolved-placeholder detection for generated development docs |
 | `scripts/python/template_cli/validators.py` | Brainstorming and development validation orchestration |
-| `scripts/python/template_cli/wiki.py` | Optional development GitHub Wiki render and sync-check command implementation |
+| `scripts/python/template_cli/wiki.py` | Optional development GitHub Wiki command orchestration |
+| `scripts/python/template_cli/wiki_config.py` | Wiki configuration and checkout-path resolution helpers |
+| `scripts/python/template_cli/wiki_git.py` | Wiki git execution, clone, and relevant-change detection helpers |
+| `scripts/python/template_cli/wiki_pages.py` | Curated GitHub Wiki page rendering helpers |
 | `scripts/python/template_cli/finalize_helpers.py` | Utility functions, interactive prompts, markdown extraction, and state helpers for finalization |
 | `scripts/python/template_cli/finalize_state.py` | BackupManager, catalog transition functions, and summary export writer for finalization |
 | `scripts/python/template_cli/workflow_catalog.py` | IDEA_CATALOG row parsing and upsert helpers for lab workflow state |
