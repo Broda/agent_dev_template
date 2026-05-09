@@ -32,6 +32,21 @@ class HarnessManifestTests(LabWorkflowTestCase):
             result.stdout,
         )
 
+    def test_validate_governance_checks_broad_inventory_policy_coverage(self) -> None:
+        manifest_path = self.repo / "harness_commands/harness_manifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["artifactInventorySnapshotPolicy"]["broadEntries"].remove("scripts/")
+        manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+        result = run_cmd(["./scripts/validate-governance"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(
+            "Harness manifest broad artifactInventory entry must be documented in "
+            "artifactInventorySnapshotPolicy.broadEntries: harnessOwned.scripts/",
+            result.stdout,
+        )
+
     def test_validate_governance_checks_manifest_versions(self) -> None:
         manifest_path = self.repo / "harness_commands/harness_manifest.json"
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -59,6 +74,11 @@ class HarnessManifestTests(LabWorkflowTestCase):
         self.assertIn("harness_commands/harness_manifest.json", inventory["mixedGenerated"])
         self.assertIn("docs/adr/", inventory["archival"])
         self.assertIn("pyproject.toml", manifest["artifactInventoryExclusions"])
+        self.assertEqual(
+            manifest["artifactInventorySnapshotPolicy"]["decision"],
+            "keep-broad-directory-entries",
+        )
+        self.assertIn("scripts/", manifest["artifactInventorySnapshotPolicy"]["broadEntries"])
 
     def test_harness_command_schema_files_are_valid_json_contracts(self) -> None:
         manifest_schema = json.loads(

@@ -15,7 +15,8 @@
     "supportedModes",
     "stableWrappers",
     "artifactInventory",
-    "artifactInventoryExclusions"
+    "artifactInventoryExclusions",
+    "artifactInventorySnapshotPolicy"
   ],
   "properties": {
     "schemaVersion": {
@@ -92,6 +93,28 @@
     },
     "artifactInventoryExclusions": {
       "$ref": "#/$defs/pathList"
+    },
+    "artifactInventorySnapshotPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision", "snapshotGeneration", "rationale", "broadEntries"],
+      "properties": {
+        "decision": {
+          "type": "string",
+          "enum": ["keep-broad-directory-entries"]
+        },
+        "snapshotGeneration": {
+          "type": "string",
+          "enum": ["deferred"]
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "broadEntries": {
+          "$ref": "#/$defs/pathList"
+        }
+      }
     }
   },
   "$defs": {

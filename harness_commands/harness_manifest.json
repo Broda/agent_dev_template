@@ -101,5 +101,24 @@
     "brainstorming/templates/review_gate_template.md",
     "brainstorming/templates/risk_template.md",
     "pyproject.toml"
-  ]
+  ],
+  "artifactInventorySnapshotPolicy": {
+    "decision": "keep-broad-directory-entries",
+    "snapshotGeneration": "deferred",
+    "rationale": "Broad directory entries keep the update manifest readable while the harness-owned/project-owned boundary is still evolving. Generated snapshots can be introduced later when update planning needs file-level release manifests.",
+    "broadEntries": [
+      ".agents/skills/",
+      "brainstorming/docs/adr/",
+      "docs/",
+      "docs/adr/",
+      "exports/",
+      "ideas/",
+      "notes/",
+      "plugins/project-lifecycle-lab/",
+      "scripts/",
+      "sessions/",
+      "src/",
+      "tests/"
+    ]
+  }
 }

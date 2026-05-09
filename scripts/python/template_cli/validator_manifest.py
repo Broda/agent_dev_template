@@ -70,6 +70,7 @@ def validate_harness_manifest(root: Path, result: ValidationResult) -> None:
     _validate_compatibility(manifest, result)
     _validate_wrappers(root, manifest, result)
     _validate_inventory(manifest, result)
+    _validate_snapshot_policy(manifest, result)
 
 
 def _validate_top_level(manifest: dict[str, Any], result: ValidationResult) -> None:
@@ -85,6 +86,7 @@ def _validate_top_level(manifest: dict[str, Any], result: ValidationResult) -> N
         "stableWrappers",
         "artifactInventory",
         "artifactInventoryExclusions",
+        "artifactInventorySnapshotPolicy",
     }
     missing = sorted(required - set(manifest.keys()))
     if missing:
@@ -217,6 +219,37 @@ def _matches_inventory_entry(relative_path: str, entry: str) -> bool:
     if entry.endswith("/"):
         return relative_path.startswith(entry)
     return relative_path == entry
+
+
+def _validate_snapshot_policy(manifest: dict[str, Any], result: ValidationResult) -> None:
+    policy = manifest.get("artifactInventorySnapshotPolicy")
+    if not isinstance(policy, dict):
+        result.add_failure("Harness manifest artifactInventorySnapshotPolicy must be an object.")
+        return
+    if policy.get("decision") != "keep-broad-directory-entries":
+        result.add_failure("Harness manifest artifactInventorySnapshotPolicy.decision must be keep-broad-directory-entries.")
+    if policy.get("snapshotGeneration") != "deferred":
+        result.add_failure("Harness manifest artifactInventorySnapshotPolicy.snapshotGeneration must be deferred.")
+    if not str(policy.get("rationale", "")).strip():
+        result.add_failure("Harness manifest artifactInventorySnapshotPolicy.rationale must be non-empty.")
+    broad_entries = policy.get("broadEntries")
+    if not isinstance(broad_entries, list) or not broad_entries:
+        result.add_failure("Harness manifest artifactInventorySnapshotPolicy.broadEntries must be a non-empty array.")
+        return
+
+    documented = {entry for entry in broad_entries if isinstance(entry, str)}
+    inventory = manifest.get("artifactInventory", {})
+    if not isinstance(inventory, dict):
+        return
+    for ownership_class, entries in inventory.items():
+        if not isinstance(entries, list):
+            continue
+        for entry in entries:
+            if isinstance(entry, str) and entry.endswith("/") and entry not in documented:
+                result.add_failure(
+                    "Harness manifest broad artifactInventory entry must be documented in "
+                    f"artifactInventorySnapshotPolicy.broadEntries: {ownership_class}.{entry}"
+                )
 
 
 def _source_commit(source_root: Path) -> str:

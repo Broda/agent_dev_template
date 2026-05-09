@@ -336,7 +336,7 @@ can stay small and reviewable.
       validation while preserving precise failure messages.
 - [x] Tighten artifact inventory validation so retained harness files are either
       covered by an ownership class or explicitly excluded.
-- [ ] Decide whether broad manifest entries such as `scripts/` and
+- [x] Decide whether broad manifest entries such as `scripts/` and
       `.agents/skills/` should be expanded into generated inventory snapshots
       for update planning.
 - [ ] Extend command/capability discovery beyond `/lab` intents to cover
