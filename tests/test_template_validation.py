@@ -119,6 +119,39 @@ class TemplateValidationTests(LabWorkflowTestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("CI workflow is missing Windows PowerShell launcher coverage: Windows runner", result.stdout)
 
+    def test_validate_brainstorming_requires_release_readiness_workflow(self) -> None:
+        workflow_path = self.repo / ".github/workflows/release-readiness.yml"
+        workflow_path.unlink()
+
+        result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Missing release-readiness workflow: .github/workflows/release-readiness.yml", result.stdout)
+
+    def test_validate_brainstorming_checks_release_readiness_workflow_coverage(self) -> None:
+        workflow_path = self.repo / ".github/workflows/release-readiness.yml"
+        workflow_path.write_text(
+            workflow_path.read_text(encoding="utf-8").replace("python3 -m unittest discover -s tests -v", "", 1),
+            encoding="utf-8",
+        )
+
+        result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Release-readiness workflow is missing checklist coverage: full unit suite", result.stdout)
+
+    def test_validate_brainstorming_keeps_release_readiness_manual_only(self) -> None:
+        workflow_path = self.repo / ".github/workflows/release-readiness.yml"
+        workflow_path.write_text(
+            workflow_path.read_text(encoding="utf-8").replace("  workflow_dispatch:\n", "  workflow_dispatch:\n  push:\n"),
+            encoding="utf-8",
+        )
+
+        result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Release-readiness workflow must stay manual-only until it proves stable.", result.stdout)
+
     def test_validate_brainstorming_checks_template_cli_file_map_rows(self) -> None:
         file_map_path = self.repo / "brainstorming/FILE_MAP.md"
         file_map_path.write_text(

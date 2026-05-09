@@ -88,6 +88,7 @@
     ".github/PULL_REQUEST_TEMPLATE.md",
     ".github/workflows/ci.yml",
     ".github/workflows/governance-audit.yml",
+    ".github/workflows/release-readiness.yml",
     ".agents/plugins/marketplace.json",
     "HARNESS_CHANGELOG.md",
     "HARNESS_RELEASE_CHECKLIST.md",

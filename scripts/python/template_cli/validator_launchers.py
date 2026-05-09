@@ -32,6 +32,7 @@ def validate_python_launchers(root: Path, result: ValidationResult) -> None:
     _validate_project_harness_update_launcher(root, result)
     _validate_shell_launchers_are_portable(root, result)
     _validate_windows_ci_launcher_job(root, result)
+    _validate_release_readiness_workflow(root, result)
 
 
 def _validate_bare_launcher(root: Path, result: ValidationResult, script_name: str) -> None:
@@ -224,3 +225,33 @@ def _validate_windows_ci_launcher_job(root: Path, result: ValidationResult) -> N
     for label, snippet in required_snippets.items():
         if snippet not in ci_text:
             result.add_failure(f"CI workflow is missing Windows PowerShell launcher coverage: {label}")
+
+
+def _validate_release_readiness_workflow(root: Path, result: ValidationResult) -> None:
+    if read_mode(root) != "brainstorming":
+        return
+    workflow_path = root / ".github/workflows/release-readiness.yml"
+    if not workflow_path.exists():
+        result.add_failure("Missing release-readiness workflow: .github/workflows/release-readiness.yml")
+        return
+    workflow_text = read_text(workflow_path)
+    if "\n  pull_request:" in workflow_text or "\n  push:" in workflow_text:
+        result.add_failure("Release-readiness workflow must stay manual-only until it proves stable.")
+    required_snippets = {
+        "manual dispatch": "workflow_dispatch:",
+        "governance validation": "./scripts/validate-governance",
+        "full unit suite": "python3 -m unittest discover -s tests -v",
+        "plugin package smoke": "python3 plugins/project-lifecycle-lab/smoke_package.py plugins/project-lifecycle-lab",
+        "fresh copy": './scripts/project-harness new "$tmpdir/harness-smoke" --no-git',
+        "fresh copy validation": '"$tmpdir/harness-smoke/scripts/validate-governance"',
+        "finalize/render fixture smoke": (
+            "python3 -m unittest tests.test_finalization_regression tests.test_development_rendering -v"
+        ),
+        "update dry run": './scripts/project-harness update --dry-run --source-path "$source/template"',
+        "update apply": './scripts/project-harness update --apply --source-path "$source/template" --yes',
+        "generated intent docs": "./scripts/render-intent-docs",
+        "plugin mirror sync": "./scripts/sync-plugin-skills",
+    }
+    for label, snippet in required_snippets.items():
+        if snippet not in workflow_text:
+            result.add_failure(f"Release-readiness workflow is missing checklist coverage: {label}")

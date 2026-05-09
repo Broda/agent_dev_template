@@ -121,6 +121,7 @@ Lean file registry for the Project Harness Template.
 | `state/project-init.schema.v2.json` | JSON Schema and variant contract for canonical state schemaVersion 2 |
 | `.github/workflows/ci.yml` | Blocking CI for tests and governance validation |
 | `.github/workflows/governance-audit.yml` | Warn-only CI audit |
+| `.github/workflows/release-readiness.yml` | Manual public-template release readiness smoke workflow |
 | `.github/PULL_REQUEST_TEMPLATE.md` | PR checklist |
 | `scripts/python/template_cli/io_helpers.py` | I/O primitives, regex constants, ValidationResult, and summary printers shared across the CLI |
 | `scripts/python/template_cli/adr.py` | Development ADR capture command implementation |

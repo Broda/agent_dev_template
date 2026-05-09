@@ -1,0 +1,74 @@
+name: Release Readiness
+
+on:
+  workflow_dispatch:
+
+jobs:
+  public-template-smoke:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Verify generated artifacts are in sync
+        shell: bash
+        run: |
+          ./scripts/render-intent-docs
+          ./scripts/sync-plugin-skills
+          git diff --exit-code -- \
+            harness_commands/CONVERSATIONAL_MODE.md \
+            harness_commands/COMMANDS.md \
+            harness_commands/harness_manifest.json \
+            .agents/plugins/marketplace.json \
+            .agents/skills/ \
+            plugins/project-lifecycle-lab/skills/ \
+            development/templates/docs/ \
+            tests/fixtures/finalized_state_v2.json \
+            tests/fixtures/finalized_state_web_app_v2.json \
+            tests/fixtures/finalized_state_with_persistence_v2.json
+
+      - name: Run governance validation
+        shell: bash
+        run: ./scripts/validate-governance
+
+      - name: Run full unit suite
+        shell: bash
+        run: python3 -m unittest discover -s tests -v
+
+      - name: Run plugin package smoke
+        shell: bash
+        run: python3 plugins/project-lifecycle-lab/smoke_package.py plugins/project-lifecycle-lab
+
+      - name: Run fresh copy smoke
+        shell: bash
+        run: |
+          tmpdir="$(mktemp -d)"
+          ./scripts/project-harness new "$tmpdir/harness-smoke" --no-git
+          "$tmpdir/harness-smoke/scripts/validate-governance"
+
+      - name: Run finalize and render fixture smoke
+        shell: bash
+        run: python3 -m unittest tests.test_finalization_regression tests.test_development_rendering -v
+
+      - name: Run update dry-run and apply smoke
+        shell: bash
+        run: |
+          source="$(mktemp -d)"
+          project="$(mktemp -d)"
+          cp -a . "$source/template"
+          "$source/template/scripts/project-harness" new "$project/harness-smoke" --no-git
+          cp "$source/template/MODE.md" "$project/harness-smoke/MODE.md"
+          printf '\n# release readiness update smoke\n' >> "$source/template/scripts/lab.sh"
+          (
+            cd "$project/harness-smoke"
+            ./scripts/project-harness update --dry-run --source-path "$source/template"
+            ./scripts/project-harness update --apply --source-path "$source/template" --yes
+            ./scripts/validate-governance
+          )

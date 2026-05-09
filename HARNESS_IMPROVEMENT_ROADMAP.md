@@ -537,7 +537,7 @@ Next-task sequencing:
     generated outputs.
   - Acceptance: the artifact is produced only on failure and is small enough for
     routine CI use.
-- [ ] Add a scheduled or manual release-readiness CI workflow that runs the full
+- [x] Add a scheduled or manual release-readiness CI workflow that runs the full
       public-template smoke checklist.
   - Expose a `workflow_dispatch` trigger first; add a schedule only if runtime
     cost stays reasonable.

@@ -105,6 +105,7 @@ BRAINSTORMING_CORE_ARTIFACTS = [
     "state/project-init.schema.v2.json",
     ".github/workflows/ci.yml",
     ".github/workflows/governance-audit.yml",
+    ".github/workflows/release-readiness.yml",
     ".github/PULL_REQUEST_TEMPLATE.md",
     "scripts/python/template_cli/render_governance_templates.py",
     "scripts/python/template_cli/render_adr.py",

@@ -5,6 +5,7 @@ release. It applies to this template repository, not to generated projects.
 
 ## Required Checks
 
+- [ ] Manual Release Readiness workflow passes in GitHub Actions.
 - [ ] `./scripts/validate-governance`
 - [ ] `python3 -m unittest discover -s tests -v`
 - [ ] Fresh copy validates:
