@@ -6,6 +6,7 @@ from pathlib import Path
 
 from template_cli.finalize_helpers import existing_state_value
 from template_cli.io_helpers import read_text
+from template_cli.wiki_config import wiki_config
 
 
 DEVELOPMENT_GOVERNANCE_DOCS = [
@@ -78,6 +79,7 @@ def run_development_status(root: Path) -> int:
     present_docs = [relpath for relpath in DEVELOPMENT_GOVERNANCE_DOCS if (root / relpath).exists()]
     missing_docs = [relpath for relpath in DEVELOPMENT_GOVERNANCE_DOCS if not (root / relpath).exists()]
     open_tasks, completed_tasks = _roadmap_task_counts(root)
+    wiki = wiki_config(root)
 
     print("Mode: development")
     print(f"Project: {project_name}")
@@ -93,6 +95,10 @@ def run_development_status(root: Path) -> int:
     if missing_docs:
         print("Missing governance docs: " + ", ".join(missing_docs))
     print(f"Roadmap tasks: {open_tasks} open, {completed_tasks} complete")
+    if wiki["enabled"]:
+        print(f"Wiki: enabled ({wiki['defaultCheckout']})")
+    else:
+        print("Wiki: disabled")
     if validation_command:
         print(f"Validation command: {validation_command}")
     else:

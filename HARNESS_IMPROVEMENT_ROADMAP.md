@@ -467,7 +467,7 @@ Next-task sequencing:
   - Normalize dates, owner names, temp paths, and command ordering where needed.
   - Acceptance: a renderer drift failure points to the exact generated document
     and preserves the existing semantic assertions.
-- [ ] Add coverage for finalized projects with generated wiki enabled and
+- [x] Add coverage for finalized projects with generated wiki enabled and
       disabled across render, validate, and status commands.
   - Add one finalized-state fixture with wiki disabled and one with wiki enabled.
   - Assert render no-ops cleanly when disabled and writes/validates expected

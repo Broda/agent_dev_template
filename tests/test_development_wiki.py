@@ -16,6 +16,34 @@ class DevelopmentWikiTests(LabWorkflowTestCase):
         self.assertIn("Wiki tooling is disabled", result.stdout)
         self.assertFalse((self.tmpdir / "repo.wiki").exists())
 
+    def test_finalized_project_reports_disabled_wiki_across_validate_render_and_status(self) -> None:
+        self.write_render_fixture()
+        run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
+
+        run_cmd(["./scripts/validate-development"], cwd=self.repo)
+        status = run_cmd(["./scripts/lab", "status"], cwd=self.repo)
+        render = run_cmd(["./scripts/lab", "wiki-render"], cwd=self.repo)
+
+        self.assertIn("Wiki: disabled", status.stdout)
+        self.assertIn("Wiki tooling is disabled", render.stdout)
+        self.assertFalse((self.tmpdir / "repo.wiki").exists())
+
+    def test_finalized_project_reports_enabled_wiki_across_validate_render_and_status(self) -> None:
+        self.write_render_fixture()
+        run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
+        self.enable_wiki()
+        wiki_dir = self.tmpdir / "repo.wiki"
+        wiki_dir.mkdir()
+        run_cmd(["git", "init"], cwd=wiki_dir)
+
+        run_cmd(["./scripts/validate-development"], cwd=self.repo)
+        status = run_cmd(["./scripts/lab", "status"], cwd=self.repo)
+        render = run_cmd(["./scripts/lab", "wiki-render"], cwd=self.repo)
+
+        self.assertIn("Wiki: enabled (../repo.wiki)", status.stdout)
+        self.assertIn("Rendered 8 wiki pages", render.stdout)
+        self.assertTrue((wiki_dir / "Home.md").exists())
+
     def test_lab_wiki_render_creates_curated_pages_in_existing_checkout(self) -> None:
         self.write_render_fixture()
         run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
