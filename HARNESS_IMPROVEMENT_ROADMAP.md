@@ -270,6 +270,7 @@ Exit criteria:
 
 - [x] Add a `pyproject.toml` for formatter/linter/import hygiene.
 - [x] Split generated CI workflow rendering out of `render.py`.
+- [x] Split brainstorming session helpers out of `workflow_data.py`.
 - [ ] Continue splitting orchestration-heavy modules when cohesive boundaries are clear:
       `finalize.py`, `handoff.py`, `render.py`,
       `render_governance_templates.py`, and `workflow_data.py`.

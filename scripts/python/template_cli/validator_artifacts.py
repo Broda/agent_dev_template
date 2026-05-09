@@ -105,6 +105,7 @@ BRAINSTORMING_CORE_ARTIFACTS = [
     "scripts/python/template_cli/render_ci.py",
     "scripts/python/template_cli/bootstrap.py",
     "scripts/python/template_cli/workflow_render.py",
+    "scripts/python/template_cli/workflow_sessions.py",
     "scripts/python/template_cli/validator_python_config.py",
 ]
 

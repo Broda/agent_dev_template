@@ -5,13 +5,10 @@ from pathlib import Path
 from template_cli.workflow_data import (
     BUCKET_FILES,
     _append_idea_to_bucket,
-    _append_under_section,
     _build_idea_fields,
     _collect_session_links,
     _default_owner,
-    _ensure_session_file,
     _extract_catalog_row,
-    _next_sequence_id,
     _remove_idea_from_buckets,
     _sync,
     _title_from_idea_id,
@@ -19,6 +16,7 @@ from template_cli.workflow_data import (
     _timestamp,
     _upsert_catalog_row,
 )
+from template_cli.workflow_sessions import _append_under_section, _ensure_session_file, _next_sequence_id
 from template_cli.workflow_idea_commands import (
     run_lab_activate,
     run_lab_capture,
@@ -195,4 +193,3 @@ def run_lab_review(
         raise SystemExit(sync_code)
     print(f"Review recorded for: {idea_id}")
     return 0
-

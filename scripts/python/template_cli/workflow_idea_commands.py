@@ -17,7 +17,6 @@ from template_cli.workflow_data import (
     _collect_session_links,
     _default_adr_references,
     _default_owner,
-    _ensure_session_file,
     _extract_catalog_row,
     _extract_label_from_text,
     _find_idea_block,
@@ -27,6 +26,7 @@ from template_cli.workflow_data import (
     _today,
     _upsert_catalog_row,
 )
+from template_cli.workflow_sessions import _ensure_session_file
 from template_cli.workflow_render import _render_idea_block
 
 
