@@ -274,6 +274,12 @@ Exit criteria:
 - [ ] Continue splitting orchestration-heavy modules when cohesive boundaries are clear:
       `finalize.py`, `handoff.py`, `render.py`,
       `render_governance_templates.py`, and `workflow_data.py`.
+  - Current named-module status is tracked in the Repo Survey Backlog module
+    decomposition section below; future work should use that detailed task
+    definition rather than adding broad, unsliced refactors here.
+  - Acceptance for any remaining split is the same as the survey backlog item:
+    compatibility exports or stable imports are preserved, retained inventory is
+    updated, and targeted plus full validation stay green.
 - [x] Make `HARNESS_IMPROVEMENT_ROADMAP.md` updates part of template-maintenance
       review when adding new public-template work.
 - [x] Promote durable conclusions from `note-0001` into ADR or bootstrap/update
@@ -286,6 +292,18 @@ Exit criteria:
 These tasks come from a fresh full-template survey after Milestone 9 and the
 first cleanup backlog pass. They are intentionally grouped so each future slice
 can stay small and reviewable.
+
+Next-task sequencing:
+
+1. Add the `lab handoff` -> noninteractive finalization golden fixture before
+   changing more finalization/render behavior.
+2. Add development-doc snapshot coverage and repeated render/finalize
+   preservation tests before tightening overwrite semantics.
+3. Add CI/platform coverage after the local test fixtures define the expected
+   behavior.
+4. Resolve plugin mirror and runtime extraction decisions only after the local
+   harness behavior is covered well enough to avoid packaging unstable
+   contracts.
 
 ### Release And Public Template Readiness
 
@@ -352,6 +370,12 @@ can stay small and reviewable.
       clear: `bootstrap_update.py`, `finalize.py`, `handoff.py`, `lab_cli.py`,
       `render_governance_templates.py`, `render_templates.py`, `intents.py`,
       `wiki.py`, and `workflow_idea_commands.py`.
+  - Next pass: review the largest modules under the 350-line guardrail and split
+    only when a cohesive boundary is obvious, such as export/report rendering,
+    validation rule families, or source-specific command handlers.
+  - Acceptance: every split preserves public imports or adds compatibility
+    exports where needed, updates `brainstorming/FILE_MAP.md`, updates retained
+    artifact validation if a new module is added, and keeps the full suite green.
 - [x] Split `bootstrap_update.py` into source resolution, plan classification,
       apply execution, backup/rollback, and output rendering modules.
 - [x] Split update apply execution, backup, rollback, hook, and validation
@@ -400,42 +424,134 @@ can stay small and reviewable.
       after the `finalize.py` decomposition.
 - [ ] Reevaluate whether a stricter 300-line Python code-size guardrail is worth
       the extra module splitting after maintainers have worked with the 350-line cap.
+  - Review after at least several nontrivial slices under the 350-line cap.
+  - Compare the largest remaining files, diff review friction, and import
+    navigation cost before changing the enforced threshold.
+  - If adopted, lower in one staged slice only after all current files are
+    already below 300 lines or after splitting the specific blockers.
 - [x] Add import-boundary validation for new workflow helper modules as they are
       split out.
 - [ ] Run Ruff formatting/linting in CI once local violations are either fixed
       or intentionally configured.
+  - First run `python3 -m ruff check .` and `python3 -m ruff format --check .`
+    locally to capture the current violation set.
+  - Decide per violation family whether to fix code, ignore via `pyproject.toml`,
+    or defer with a narrow documented TODO.
+  - Add CI steps only after local checks pass on a clean checkout.
+  - Acceptance: CI reports lint/format failures clearly, the local governance
+    validation still passes, and formatter/linter behavior is documented in the
+    contributor-facing release checklist.
 
 ### Rendering And Finalization Hardening
 
 - [ ] Add an end-to-end golden fixture for `lab handoff` followed by noninteractive
       finalization and development validation.
+  - Build a temp-repo fixture that starts in brainstorming mode with one active
+    idea, one or more sessions, and enough implementation-contract data for
+    `./scripts/lab handoff --idea-id <id>` to populate draft state.
+  - Run `./scripts/finalize-project --idea-id <id>` without interactive prompts,
+    then run `./scripts/validate-development`.
+  - Assert final mode, canonical state fields, generated docs, session/export
+    artifact references, and catalog transition.
+  - Keep the golden expected data small and deterministic; normalize dates or
+    derive expected paths from the test date helper instead of hard-coding
+    unstable values.
 - [ ] Add renderer snapshot tests for every generated development document that
       is currently checked by semantic assertions only.
+  - Cover `README.md`, `docs/PROJECT_CONTEXT.md`, `docs/ROADMAP.md`,
+    `docs/ARCHITECTURE.md`, `docs/GOVERNANCE_INDEX.md`, policy docs, ADR
+    template/initial ADR, `.github/workflows/ci.yml`, and generated
+    `CHANGELOG.md` content.
+  - Store compact expected snapshots under a test fixture directory or generate
+    expected strings through purpose-built helpers when full files are too noisy.
+  - Normalize dates, owner names, temp paths, and command ordering where needed.
+  - Acceptance: a renderer drift failure points to the exact generated document
+    and preserves the existing semantic assertions.
 - [ ] Add coverage for finalized projects with generated wiki enabled and
       disabled across render, validate, and status commands.
+  - Add one finalized-state fixture with wiki disabled and one with wiki enabled.
+  - Assert render no-ops cleanly when disabled and writes/validates expected
+    wiki config/status when enabled.
+  - Include `./scripts/lab status` expectations for both modes so user-facing
+    status output stays aligned with wiki configuration.
 - [ ] Add tests for preserving user-edited mixed/generated docs during repeated
       render/finalize flows.
+  - Start from a finalized fixture, hand-edit representative mixed/generated
+    docs, rerun render/finalize paths, and assert explicitly owned sections are
+    refreshed while user-owned sections survive.
+  - Cover at least README, project context, roadmap, architecture, ADR, and
+    generated CI or policy files if their ownership semantics differ.
+  - Acceptance: each preservation assertion maps to an ownership rule documented
+    in the finalization overwrite policy task below.
 - [ ] Document and validate which generated files are overwritten by finalization
       versus intended to become human-owned after first render.
+  - Add a concise ownership table for finalization/render outputs, including
+    canonical state, catalog/mode files, session/export artifacts, development
+    docs, policy docs, ADR files, generated CI, README, and changelog.
+  - Add validation that the table covers every finalization backup/write target
+    and every generated development document.
+  - Acceptance: future additions to finalization/render outputs fail validation
+    until their overwrite/human-owned policy is documented.
 - [ ] Add migration-path tests before any future `state/project-init.json`
       schemaVersion change.
+  - Define a fixture for the current schema version and a test harness for
+    applying future migrations without losing product, governance, command, or
+    artifact fields.
+  - For now, assert that unknown future versions fail clearly and current
+    version fixtures validate unchanged.
+  - Acceptance: before any schema bump, a migration test must cover old -> new,
+    idempotent re-run, and invalid input failure behavior.
 
 ### Cross-Platform And CI Coverage
 
 - [ ] Add Windows PowerShell smoke coverage for `project-harness update --dry-run`
       and `project-harness update --apply --yes`.
+  - Add a Windows CI job that creates a generated project from the template,
+    mutates a clean harness-owned file in the source checkout, runs dry-run, then
+    applies with `--yes`.
+  - Assert PowerShell launcher help reaches argparse and that update output
+    includes the changed file, validation summary, and backup location.
 - [ ] Add PowerShell smoke coverage for `render-intent-docs`,
       `sync-plugin-skills`, and `render-development-docs` launchers.
+  - Exercise each `.ps1` launcher on Windows with a clean repo checkout.
+  - Include at least one drift/repair scenario for `sync-plugin-skills` and one
+    idempotence check for generated intent/development docs.
+  - Acceptance: PowerShell launcher failures surface the underlying Python exit
+    code and do not hide stderr/stdout needed for diagnosis.
 - [ ] Add a macOS launcher smoke job if shell-path behavior diverges from Ubuntu.
+  - First audit whether current shell launchers depend on GNU-only behavior or
+    Linux-specific paths.
+  - Add macOS CI only if that audit or user reports identify divergence; keep it
+    launcher-focused rather than duplicating the full Ubuntu matrix.
 - [ ] Add CI artifact output for failed generated-doc drift so maintainers can
       inspect the exact changed files.
+  - On failure after generated-doc checks, upload a patch/diff artifact plus the
+    changed generated files.
+  - Include intent docs, development docs, plugin skill mirrors, and manifest
+    generated outputs.
+  - Acceptance: the artifact is produced only on failure and is small enough for
+    routine CI use.
 - [ ] Add a scheduled or manual release-readiness CI workflow that runs the full
       public-template smoke checklist.
+  - Expose a `workflow_dispatch` trigger first; add a schedule only if runtime
+    cost stays reasonable.
+  - Run governance validation, full unit suite, plugin package smoke,
+    `project-harness new --no-git`, render/finalize smoke fixtures, and update
+    dry-run/apply smoke coverage.
+  - Acceptance: the workflow is nonblocking for normal PRs until it proves stable
+    and documents exactly which release checklist items it covers.
 
 ### Plugin And Skill Packaging
 
 - [ ] Decide whether plugin mirrors should remain copied files or become
       generated release artifacts before the first public plugin release.
+  - Compare copied mirrors, generated-at-release mirrors, and generated-on-install
+    mirrors across reviewability, drift risk, marketplace packaging, and local
+    development ergonomics.
+  - Capture the decision in an ADR or dedicated release note before changing the
+    packaging flow.
+  - Acceptance: validation and `sync-plugin-skills` behavior match the chosen
+    mirror ownership model.
 - [x] Add a plugin package smoke script that verifies all four skills and UI
       metadata outside the repo context.
 - [x] Validate plugin README examples against the actual plugin manifest and
@@ -447,11 +563,39 @@ can stay small and reviewable.
 
 - [ ] Define the installed Python runtime package interface before extracting
       any local wrapper behavior.
+  - Specify the console entrypoint name, version reporting command, expected
+    Python package/module layout, supported Python versions, and compatibility
+    metadata read by generated wrappers.
+  - Define which commands remain repo-local versus callable through an installed
+    runtime in the first extraction slice.
+  - Acceptance: wrappers can be designed from the interface without referencing
+    private implementation details.
 - [ ] Add runtime discovery tests for environment override, compatible installed
       runtime, incompatible installed runtime, and local fallback.
+  - Cover explicit environment override, installed runtime on `PATH`, installed
+    runtime version mismatch, missing installed runtime, and local source
+    fallback.
+  - Assert read-only commands and mutating commands report compatibility problems
+    according to the policy task below.
 - [ ] Decide how installed runtime compatibility errors should behave for
       read-only commands versus mutating commands.
+  - Decide whether read-only commands may warn and fall back while mutating
+    commands fail closed on version mismatch.
+  - Document exact stderr/stdout wording and exit-code expectations.
+  - Acceptance: tests cover both command classes before wrapper behavior changes.
 - [ ] Identify the first read-only validation module to extract behind the
       installed-runtime boundary.
+  - Prefer a module with low write risk and stable inputs, such as manifest,
+    intent, artifact inventory, or launcher validation.
+  - Define an adapter that can run from both repo-local source and installed
+    runtime without changing user-facing command names.
+  - Acceptance: extraction can be reverted independently and does not change
+    generated project behavior.
 - [ ] Add an ADR before introducing any compiled binary, Homebrew formula, Cargo
       package, or GitHub release artifact as an official install path.
+  - ADR must compare Python package, compiled binary, Homebrew, Cargo, GitHub
+    releases, and source checkout installation.
+  - Include trust/auditability, upgrade, rollback, compatibility, and public
+    template support implications.
+  - Acceptance: no official install path is advertised until the ADR is accepted
+    and reflected in README/release docs.
