@@ -321,7 +321,7 @@ can stay small and reviewable.
       dry-run visibility and tests.
 - [ ] Add an update rollback command or automatic rollback path when hooks or
       validation fail after file copies.
-- [ ] Add tests for `--include-mixed` apply behavior and its review/backup
+- [x] Add tests for `--include-mixed` apply behavior and its review/backup
       output.
 - [ ] Add tests proving update hooks run when repo skills or the intent registry
       change.

@@ -224,3 +224,34 @@ class ProjectHarnessUpdateTests(LabWorkflowTestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("Refusing to apply mixed/generated updates without --include-mixed", result.stdout)
         self.assertNotIn("target readme update", (project / "README.md").read_text(encoding="utf-8"))
+
+    def test_update_apply_can_include_reviewed_mixed_generated_update(self) -> None:
+        source = self.copy_source()
+        self.init_git_source(source)
+        project = self.tmpdir / "generated-project"
+        run_cmd(["./scripts/project-harness", "new", str(project), "--no-git"], cwd=source)
+        source_readme = source / "README.md"
+        source_readme.write_text(
+            source_readme.read_text(encoding="utf-8") + "\ntarget readme update\n",
+            encoding="utf-8",
+        )
+
+        result = run_cmd(
+            [
+                "./scripts/project-harness",
+                "update",
+                "--apply",
+                "--source-path",
+                str(source),
+                "--yes",
+                "--include-mixed",
+            ],
+            cwd=project,
+        )
+
+        self.assertIn("Applied harness update.", result.stdout)
+        self.assertIn("README.md", result.stdout)
+        self.assertIn("validate-governance: 0", result.stdout)
+        self.assertIn("target readme update", (project / "README.md").read_text(encoding="utf-8"))
+        backup_files = list((project / ".harness-update-backups").glob("*/README.md"))
+        self.assertTrue(backup_files)
