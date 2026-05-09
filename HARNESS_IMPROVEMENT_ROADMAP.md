@@ -360,7 +360,7 @@ can stay small and reviewable.
       state-fill operations, implementation-contract fill, and summary rendering.
 - [ ] Split `lab_cli.py` so parser construction and command dispatch are
       table-driven or otherwise easier to compare against the intent registry.
-- [ ] Split `render_governance_templates.py` into architecture, ADR, and roadmap
+- [x] Split `render_governance_templates.py` into architecture, ADR, and roadmap
       renderer modules.
 - [ ] Split `wiki.py` into wiki config, git execution, page rendering, and status
       checking modules.

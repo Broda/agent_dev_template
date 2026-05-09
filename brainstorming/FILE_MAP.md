@@ -147,7 +147,10 @@ Lean file registry for the Project Harness Template.
 | `scripts/python/template_cli/render_ci.py` | Pure renderer for generated development CI workflow |
 | `scripts/python/template_cli/render_contract.py` | Implementation contract extraction and formatting for finalized development docs |
 | `scripts/python/template_cli/render_helpers.py` | State-extraction, file-manipulation, and hydration helpers for development doc rendering |
-| `scripts/python/template_cli/render_governance_templates.py` | Pure templates for rendered architecture and roadmap governance docs |
+| `scripts/python/template_cli/render_governance_templates.py` | Compatibility exports for governance document renderers |
+| `scripts/python/template_cli/render_adr.py` | Pure renderer for the generated initial architecture ADR |
+| `scripts/python/template_cli/render_architecture.py` | Pure renderer for generated architecture governance docs |
+| `scripts/python/template_cli/render_roadmap.py` | Pure renderer for generated roadmap governance docs |
 | `scripts/python/template_cli/render_templates.py` | Pure template functions for development document generation |
 | `scripts/python/template_cli/state_schema.py` | Shared schema-backed validator for draft and finalized canonical state |
 | `scripts/python/template_cli/sync.py` | Git sync helpers for milestone commit and push flows |
