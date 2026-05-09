@@ -305,6 +305,98 @@ Next-task sequencing:
    harness behavior is covered well enough to avoid packaging unstable
    contracts.
 
+### Full Repo Survey Follow-ups
+
+These tasks come from the 2026-05-09 full harness template repo survey after
+Ruff CI and runtime-discovery preparation landed.
+
+- [ ] Fix stale maintainer-facing policy and bootstrap docs.
+  - Update `BOOTSTRAP_TOOL.md` so the top-level command status no longer says
+    release/version update source resolution remains deferred now that
+    `--source-commit` and `--release-version` are implemented.
+  - Update `CLAUDE.md` and the development-governance skill so the documented
+    code-size guidance matches the enforced 350-line Python guardrail instead
+    of the old 500-line limit.
+  - Run `./scripts/sync-plugin-skills` after changing repo-scoped skills.
+  - Acceptance: docs and skill mirrors agree with current validation behavior,
+    `./scripts/validate-governance` passes, and no generated mirror drift
+    remains.
+- [ ] Tighten wrapper-help drift validation for stable command launchers.
+  - Extend validation so `./scripts/lab --help` and `./scripts/lab.ps1` help
+    include every registered/intent-registry lab command, including `park`,
+    `kill`, `path-note`, `export`, `wiki-render`, `wiki-check`, `adr`, and
+    `evidence`.
+  - Extend `project-harness` shell and PowerShell help so `update --apply`
+    advertises `--source-path`, `--source-commit`, and `--release-version`
+    consistently with argparse.
+  - Add regression tests that compare wrapper help against the parser/registry
+    surface rather than only checking fixed snippets.
+  - Acceptance: wrapper help cannot silently drift from supported commands or
+    update-source selector variants.
+- [ ] Consolidate duplicate decomposition roadmap entries.
+  - Collapse the older broad backlog item into the detailed module
+    decomposition section, or mark it as a pointer-only completed cleanup if the
+    detailed item remains open.
+  - Preserve the separate 300-line guardrail reevaluation as its own decision.
+  - Acceptance: `rg "^- \\[ \\]" HARNESS_IMPROVEMENT_ROADMAP.md` no longer
+    reports duplicate wording for the same decomposition lane.
+- [ ] Add machine-readable output for read-only status and validation commands.
+  - Start with `./scripts/lab status --json`, `./scripts/lab doctor --json`,
+    `./scripts/project-harness update --dry-run --json`, and
+    `./scripts/validate-governance --json`.
+  - Keep existing human-readable output as the default and document JSON
+    schemas or stable fields for external adapters.
+  - Acceptance: JSON outputs are covered by tests, avoid parsing human text, and
+    remain read-only unless the underlying command is already mutating.
+- [ ] Add a local release-check wrapper for maintainers.
+  - Add a `./scripts/harness-release-check` launcher that runs the local portion
+    of `HARNESS_RELEASE_CHECKLIST.md`: generated-artifact maintenance,
+    governance validation, Ruff checks, full unit suite, fresh copy validation,
+    plugin package smoke, and finalize/render fixture smoke.
+  - Keep the manual GitHub Release Readiness workflow as the release gate.
+  - Acceptance: maintainers can run one local command before dispatching the
+    manual GitHub workflow, and the checklist references that command.
+- [ ] Add dependency/update monitoring for public-template maintenance.
+  - Add Dependabot or an equivalent update-tracking workflow for GitHub Actions
+    versions and `requirements-dev.txt`.
+  - Keep update PRs low-noise and compatible with the existing CI validation
+    surface.
+  - Acceptance: action and Ruff version drift is visible without manual repo
+    survey work.
+- [ ] Decide whether release-readiness should include a macOS launcher smoke job.
+  - Current validation blocks known GNU/Linux-only shell patterns, and Ubuntu
+    remains the full regression baseline.
+  - Add a manual release-readiness macOS job only if public release confidence
+    is worth the added runtime cost or if shell-path behavior diverges from
+    Ubuntu.
+  - Acceptance: the decision is documented either as no-op rationale or a
+    launcher-focused macOS smoke job.
+- [ ] Add future state migration command scaffolding before schemaVersion 3.
+  - Define `project-harness migrate-state --check` and `--apply` or an
+    equivalent migration entrypoint before writing a new state schema version.
+  - Keep schemaVersion 2 as a no-op baseline and test future-version failure,
+    idempotent migration, backup behavior, and invalid-input handling.
+  - Acceptance: a future schema bump has an obvious command path and tests
+    before finalization/rendering starts writing the new version.
+- [ ] Promote runtime discovery into the first real read-only extraction slice.
+  - Add an internal `validate-python-config` backend with JSON
+    failures/warnings, backed by `validator_python_config.py`.
+  - Wire optional installed-runtime discovery for that read-only backend while
+    preserving repo-local fallback and current user-facing command names.
+  - Acceptance: the extraction can be reverted independently, wrapper behavior
+    remains compatible with ADR-0002/ADR-0004, and tests cover installed,
+    incompatible, missing, and source-override runtime paths.
+- [ ] If pursuing the 300-line cap, split the remaining largest test/helper
+      modules first.
+  - Candidate files from the survey: `tests/test_finalization_regression.py`,
+    `tests/test_development_rendering.py`,
+    `tests/test_intent_registry_contract.py`, `tests/workflow_test_helpers.py`,
+    and `tests/test_template_validation.py`.
+  - Keep each split behavior-preserving and grouped by fixture family or command
+    contract.
+  - Acceptance: every file is under 300 lines before lowering the enforced
+    threshold, and the full suite stays green.
+
 ### Release And Public Template Readiness
 
 - [x] Add a public template release checklist that runs `./scripts/validate-governance`,
