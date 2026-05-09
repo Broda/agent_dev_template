@@ -113,6 +113,7 @@ BRAINSTORMING_CORE_ARTIFACTS = [
     "scripts/python/template_cli/render_readme.py",
     "scripts/python/template_cli/render_roadmap.py",
     "scripts/python/template_cli/bootstrap.py",
+    "scripts/python/template_cli/bootstrap_update_output.py",
     "scripts/python/template_cli/bootstrap_update_plan.py",
     "scripts/python/template_cli/bootstrap_update_source.py",
     "scripts/python/template_cli/handoff_contract.py",

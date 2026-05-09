@@ -354,6 +354,7 @@ can stay small and reviewable.
       `wiki.py`, and `workflow_idea_commands.py`.
 - [ ] Split `bootstrap_update.py` into source resolution, plan classification,
       apply execution, backup/rollback, and output rendering modules.
+- [x] Split update dry-run output rendering out of `bootstrap_update.py`.
 - [x] Split update plan classification and baseline comparison out of
       `bootstrap_update.py`.
 - [ ] Split `finalize.py` into value collection, state assembly, artifact

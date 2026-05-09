@@ -125,6 +125,7 @@ Lean file registry for the Project Harness Template.
 | `scripts/python/template_cli/adr.py` | Development ADR capture command implementation |
 | `scripts/python/template_cli/bootstrap.py` | Project harness bootstrap command implementation |
 | `scripts/python/template_cli/bootstrap_update.py` | Project harness update dry-run and apply orchestration |
+| `scripts/python/template_cli/bootstrap_update_output.py` | Project harness update dry-run output rendering helpers |
 | `scripts/python/template_cli/bootstrap_update_plan.py` | Project harness update plan classification and baseline comparison helpers |
 | `scripts/python/template_cli/bootstrap_update_source.py` | Project harness update source resolution helpers |
 | `scripts/python/template_cli/evidence.py` | Development roadmap evidence capture command implementation |
