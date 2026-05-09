@@ -49,7 +49,7 @@ python3 -m unittest discover -s .harness/tests -v
 - Before meaningful development work, read `docs/GOVERNANCE_INDEX.md`, every listed governance document, recent ADRs, and `CHANGELOG.md`.
 - Run the build, run, and test commands recorded in `docs/PROJECT_CONTEXT.md`.
 - Record evidence under completed tasks in `docs/ROADMAP.md`.
-- Keep code files at or under 500 lines.
+- Keep Python code files at or under the enforced 350-line guardrail.
 - Public contract changes require ADR and version alignment.
 
 ## Template Maintenance

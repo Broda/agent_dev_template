@@ -5,6 +5,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+from template_cli.intent_registry import IntentRegistryError, load_intent_registry
 from template_cli.io_helpers import ValidationResult, read_mode, read_text
 from template_cli.validator_manifest import load_harness_manifest
 
@@ -89,6 +90,7 @@ def _validate_lab_launcher(root: Path, result: ValidationResult) -> None:
         ]:
             if snippet not in text:
                 result.add_failure(f"Shell launcher scripts/lab.sh is missing expected snippet: {snippet}")
+        _validate_lab_help_registry_parity(root, result, "scripts/lab.sh", text)
 
     powershell_path = root / "scripts/lab.ps1"
     if powershell_path.exists():
@@ -102,6 +104,18 @@ def _validate_lab_launcher(root: Path, result: ValidationResult) -> None:
         ]:
             if snippet not in text:
                 result.add_failure(f"PowerShell launcher scripts/lab.ps1 is missing expected snippet: {snippet}")
+        _validate_lab_help_registry_parity(root, result, "scripts/lab.ps1", text)
+
+
+def _validate_lab_help_registry_parity(root: Path, result: ValidationResult, relative_path: str, text: str) -> None:
+    try:
+        registry = load_intent_registry(root)
+    except (FileNotFoundError, IntentRegistryError):
+        return
+    for intent in registry["intents"]:
+        command = str(intent["command"]).strip()
+        if not re.search(rf"^\s+{re.escape(command)}\b", text, flags=re.MULTILINE):
+            result.add_failure(f"Launcher {relative_path} help is missing lab command from registry: {command}")
 
 
 def _validate_project_harness_update_launcher(root: Path, result: ValidationResult) -> None:
@@ -143,6 +157,12 @@ def _validate_project_harness_help(
                     f"Launcher {relative_path} help for project-harness {subcommand} "
                     f"is missing CLI parser option: {option}"
                 )
+    for selector in ["--source-path", "--source-commit", "--release-version"]:
+        if not re.search(rf"update --apply .*{re.escape(selector)}", text):
+            result.add_failure(
+                f"Launcher {relative_path} help for project-harness update --apply "
+                f"is missing source selector: {selector}"
+            )
 
 
 def _project_harness_manifest_subcommands(root: Path) -> set[str]:

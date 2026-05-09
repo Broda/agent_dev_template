@@ -271,7 +271,13 @@ Exit criteria:
 - [x] Add a `pyproject.toml` for formatter/linter/import hygiene.
 - [x] Split generated CI workflow rendering out of `render.py`.
 - [x] Split brainstorming session helpers out of `workflow_data.py`.
-- [ ] Continue splitting orchestration-heavy modules when cohesive boundaries are clear:
+- [x] Consolidate broad module-decomposition planning into the detailed repo
+      survey backlog item.
+  - Detailed future decomposition work now lives under the Repo Survey Backlog
+    module decomposition section below, so this older broad entry is no longer
+    tracked as a second open lane.
+  - Preserve the separate 300-line guardrail reevaluation as its own decision.
+- [x] Continue splitting orchestration-heavy modules when cohesive boundaries are clear:
       `finalize.py`, `handoff.py`, `render.py`,
       `render_governance_templates.py`, and `workflow_data.py`.
   - Current named-module status is tracked in the Repo Survey Backlog module
@@ -321,7 +327,7 @@ Ruff CI and runtime-discovery preparation landed.
     before development validation, and development note capture writes there.
   - Acceptance: `./scripts/validate-governance`, Ruff checks, and
     `python3 -m unittest discover -s .harness/tests -v` pass.
-- [ ] Fix stale maintainer-facing policy and bootstrap docs.
+- [x] Fix stale maintainer-facing policy and bootstrap docs.
   - Update `.harness/docs/BOOTSTRAP_TOOL.md` so the top-level command status no longer says
     release/version update source resolution remains deferred now that
     `--source-commit` and `--release-version` are implemented.
@@ -332,7 +338,7 @@ Ruff CI and runtime-discovery preparation landed.
   - Acceptance: docs and skill mirrors agree with current validation behavior,
     `./scripts/validate-governance` passes, and no generated mirror drift
     remains.
-- [ ] Tighten wrapper-help drift validation for stable command launchers.
+- [x] Tighten wrapper-help drift validation for stable command launchers.
   - Extend validation so `./scripts/lab --help` and `./scripts/lab.ps1` help
     include every registered/intent-registry lab command, including `park`,
     `kill`, `path-note`, `export`, `wiki-render`, `wiki-check`, `adr`, and
@@ -344,7 +350,7 @@ Ruff CI and runtime-discovery preparation landed.
     surface rather than only checking fixed snippets.
   - Acceptance: wrapper help cannot silently drift from supported commands or
     update-source selector variants.
-- [ ] Consolidate duplicate decomposition roadmap entries.
+- [x] Consolidate duplicate decomposition roadmap entries.
   - Collapse the older broad backlog item into the detailed module
     decomposition section, or mark it as a pointer-only completed cleanup if the
     detailed item remains open.

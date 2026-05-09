@@ -95,6 +95,38 @@ class TemplateValidationTests(LabWorkflowTestCase):
             result.stdout,
         )
 
+    def test_validate_brainstorming_checks_project_harness_apply_help_selectors(self) -> None:
+        launcher_path = self.repo / "scripts/project-harness.sh"
+        launcher_path.write_text(
+            launcher_path.read_text(encoding="utf-8").replace(
+                "  update --apply --source-commit <sha> --yes [--include-mixed]\n",
+                "",
+                1,
+            ),
+            encoding="utf-8",
+        )
+
+        result = run_cmd(["./scripts/validate-governance"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(
+            "Launcher scripts/project-harness.sh help for project-harness update --apply "
+            "is missing source selector: --source-commit",
+            result.stdout,
+        )
+
+    def test_validate_brainstorming_checks_lab_help_registry_parity(self) -> None:
+        launcher_path = self.repo / "scripts/lab.sh"
+        launcher_path.write_text(
+            launcher_path.read_text(encoding="utf-8").replace('  path-note --idea-id <id> --title "Title"\n', ""),
+            encoding="utf-8",
+        )
+
+        result = run_cmd(["./scripts/validate-governance"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Launcher scripts/lab.sh help is missing lab command from registry: path-note", result.stdout)
+
     def test_validate_brainstorming_checks_powershell_launcher_delegation(self) -> None:
         launcher_path = self.repo / "scripts/lab.ps1"
         launcher_path.write_text(

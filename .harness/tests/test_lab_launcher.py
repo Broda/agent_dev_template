@@ -16,6 +16,9 @@ class LabLauncherTests(LabWorkflowTestCase):
                 self.assertIn("Commands:", result.stdout)
                 self.assertIn("status", result.stdout)
                 self.assertIn("capture --idea-id <id>", result.stdout)
+                self.assertIn("path-note --idea-id <id>", result.stdout)
+                self.assertIn("evidence --task <task>", result.stdout)
+                self.assertIn("wiki-render", result.stdout)
                 self.assertIn("Run ./scripts/lab <command> --help", result.stdout)
 
     def test_lab_command_help_still_reaches_argparse(self) -> None:

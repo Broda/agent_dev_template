@@ -21,7 +21,7 @@ Before meaningful changes:
 
 - Identify the active milestone in `docs/ROADMAP.md`.
 - Classify work as feature, bug fix, refactor, migration, security fix, or docs-only.
-- Keep code files at or under 500 lines, splitting by cohesive responsibility.
+- Keep Python code files at or under the enforced 350-line guardrail, splitting by cohesive responsibility.
 - Public contract changes require ADR and version alignment.
 
 A task is done only when relevant tests pass, the project builds/runs as applicable, docs are updated when needed, and evidence is recorded under the completed roadmap task.

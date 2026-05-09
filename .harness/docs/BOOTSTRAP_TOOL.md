@@ -13,7 +13,9 @@ project-harness update
 ```
 
 The local `new`, `validate`, and explicit-source `update --dry-run`/`update --apply`
-commands are implemented. Release/version source resolution remains deferred.
+commands are implemented. Update sources can be local template checkouts,
+40-character Git commits, or release tags resolved from the recorded template
+repository.
 
 ## `new`
 

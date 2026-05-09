@@ -15,11 +15,19 @@ Commands:
   activate --idea-id <id>
   decide --idea-id <id> --chosen-option "Decision" --rationale "Reason"
   risk --idea-id <id> --statement "Risk"
+  path-note --idea-id <id> --title "Title"
+  note --topic "Topic" --summary "Summary"
   review --idea-id <id> --result <result>
+  export --idea-id <id>
   handoff [--idea-id <id>] [--check]
   finalize [--idea-id <id>] [--write-export]
-  note --topic "Topic" --summary "Summary"
+  park --idea-id <id> [--reason "Reason"]
+  kill --idea-id <id> [--reason "Reason"]
   audit
+  evidence --task <task> --command "Command" --result <result>
+  adr --title "Title" --decision "Decision"
+  wiki-render
+  wiki-check
   commit [--message "Message"]
   push
   sync [args]
