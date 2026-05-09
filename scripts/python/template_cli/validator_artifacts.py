@@ -19,6 +19,8 @@ BRAINSTORMING_CORE_ARTIFACTS = [
     "README.md",
     "pyproject.toml",
     "BOOTSTRAP_TOOL.md",
+    "HARNESS_RELEASE_CHECKLIST.md",
+    "HARNESS_CHANGELOG.md",
     "HARNESS_IMPROVEMENT_ROADMAP.md",
     "AGENTS.md",
     "MODE.md",

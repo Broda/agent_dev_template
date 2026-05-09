@@ -289,10 +289,10 @@ can stay small and reviewable.
 
 ### Release And Public Template Readiness
 
-- [ ] Add a public template release checklist that runs `./scripts/validate-governance`,
+- [x] Add a public template release checklist that runs `./scripts/validate-governance`,
       the full unit suite, a fresh `project-harness new --no-git` validation,
       and at least one finalize/render smoke fixture.
-- [ ] Add a top-level template `CHANGELOG.md` or release notes file for harness
+- [x] Add a top-level template `CHANGELOG.md` or release notes file for harness
       releases, distinct from generated project `CHANGELOG.md` files.
 - [ ] Define the release process for bumping `harnessVersion`, plugin version,
       compatibility versions, docs, and tags in one reviewable slice.

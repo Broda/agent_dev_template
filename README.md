@@ -64,9 +64,11 @@ remains the local fallback for users without a global harness install.
 | Deterministic tooling | Repeatable local behavior that should remain inspectable in each project | `./scripts/lab`, `./scripts/finalize-project`, `./scripts/validate-governance`, `scripts/python/template_cli/` |
 | Repo-scoped skills | Canonical agent instructions for operating this harness in the current repo | `.agents/skills/` |
 | Plugin package | Optional portable distribution of reusable agent behavior | `plugins/project-lifecycle-lab/` |
-| Future bootstrap helper | Optional convenience for creating/updating harness instances | `BOOTSTRAP_TOOL.md` |
+| Bootstrap/update helper | Optional convenience for creating/updating harness instances | `BOOTSTRAP_TOOL.md` |
 
 `HARNESS_IMPROVEMENT_ROADMAP.md` tracks public-template improvement milestones.
+`HARNESS_RELEASE_CHECKLIST.md` and `HARNESS_CHANGELOG.md` track template release
+readiness and release notes separately from generated project changelogs.
 
 ## Harness Manifest
 
