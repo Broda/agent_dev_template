@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from template_cli.io_helpers import ValidationResult, read_text
+from template_cli.io_helpers import ValidationResult, read_mode, read_text
 
 
 PYTHON_COMMAND_LAUNCHERS = {
@@ -26,6 +26,7 @@ def validate_python_launchers(root: Path, result: ValidationResult) -> None:
         _validate_powershell_launcher(root, result, script_name, cli_command)
     _validate_lab_launcher(root, result)
     _validate_project_harness_update_launcher(root, result)
+    _validate_windows_ci_launcher_job(root, result)
 
 
 def _validate_bare_launcher(root: Path, result: ValidationResult, script_name: str) -> None:
@@ -106,3 +107,21 @@ def _validate_project_harness_update_launcher(root: Path, result: ValidationResu
         text = read_text(path)
         if "project-harness-update" not in text:
             result.add_failure(f"Launcher {relative_path} is missing project-harness update delegation.")
+
+
+def _validate_windows_ci_launcher_job(root: Path, result: ValidationResult) -> None:
+    if read_mode(root) != "brainstorming":
+        return
+    ci_path = root / ".github/workflows/ci.yml"
+    if not ci_path.exists():
+        return
+    ci_text = read_text(ci_path)
+    required_snippets = {
+        "Windows runner": "runs-on: windows-latest",
+        "PowerShell shell": "shell: pwsh",
+        "launcher smoke tests": "python -m unittest tests.test_lab_launcher tests.test_project_harness_bootstrap -v",
+        "PowerShell governance launcher": "./scripts/validate-governance.ps1",
+    }
+    for label, snippet in required_snippets.items():
+        if snippet not in ci_text:
+            result.add_failure(f"CI workflow is missing Windows PowerShell launcher coverage: {label}")

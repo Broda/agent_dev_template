@@ -74,6 +74,18 @@ class TemplateValidationTests(LabWorkflowTestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("PowerShell launcher scripts/lab.ps1 is missing expected snippet", result.stdout)
 
+    def test_validate_brainstorming_checks_windows_ci_launcher_coverage(self) -> None:
+        ci_path = self.repo / ".github/workflows/ci.yml"
+        ci_path.write_text(
+            ci_path.read_text(encoding="utf-8").replace("runs-on: windows-latest", "runs-on: ubuntu-latest", 1),
+            encoding="utf-8",
+        )
+
+        result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("CI workflow is missing Windows PowerShell launcher coverage: Windows runner", result.stdout)
+
     def test_validate_brainstorming_checks_plugin_marketplace_entry(self) -> None:
         marketplace_path = self.repo / ".agents/plugins/marketplace.json"
         marketplace_path.write_text(

@@ -207,18 +207,18 @@ Exit criteria:
 Goal: prove public wrappers work on the platforms the template claims to
 support.
 
-- [ ] Add a Windows CI job for PowerShell launchers.
-- [ ] Run the PowerShell `project-harness new --no-git` regression on Windows.
-- [ ] Add PowerShell smoke tests for `lab status --help`, `finalize-project
+- [x] Add a Windows CI job for PowerShell launchers.
+- [x] Run the PowerShell `project-harness new --no-git` regression on Windows.
+- [x] Add PowerShell smoke tests for `lab status --help`, `finalize-project
       --help`, and `validate-governance`.
-- [ ] Add a macOS CI job only if platform-specific shell behavior appears.
-- [ ] Keep Ubuntu as the full regression and governance baseline.
-- [ ] Document any platform requirements, such as `py -3` versus `python`.
+- [x] Add a macOS CI job only if platform-specific shell behavior appears.
+- [x] Keep Ubuntu as the full regression and governance baseline.
+- [x] Document any platform requirements, such as `py -3` versus `python`.
 
 Exit criteria:
 
-- [ ] POSIX and PowerShell launchers have automated coverage.
-- [ ] Cross-platform failures are caught before template release.
+- [x] POSIX and PowerShell launchers have automated coverage.
+- [x] Cross-platform failures are caught before template release.
 
 ## Milestone 8 - Plugin And Skill Packaging Maturity
 

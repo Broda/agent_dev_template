@@ -44,6 +44,12 @@ validation fails if the generated views drift.
 - The public template is MIT licensed. See `LICENSE`.
 - Text files are normalized through `.gitattributes` and `.editorconfig` so generated docs and wrappers avoid accidental BOM or line-ending churn.
 
+On Windows, PowerShell launchers prefer `py -3` and fall back to `python`.
+On macOS/Linux, shell launchers prefer `python3` and fall back to `python`.
+CI keeps Ubuntu as the full regression baseline and runs a Windows PowerShell
+launcher smoke job for `lab`, `finalize-project`, `validate-governance`, and
+`project-harness new --no-git`.
+
 ## Harness Architecture
 
 | Layer | Purpose | Examples |

@@ -38,3 +38,24 @@ jobs:
       - name: Run governance validation
         shell: bash
         run: ./scripts/validate-governance
+
+  windows-powershell-launchers:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Run PowerShell launcher smoke tests
+        shell: pwsh
+        run: python -m unittest tests.test_lab_launcher tests.test_project_harness_bootstrap -v
+
+      - name: Run governance through PowerShell launcher
+        shell: pwsh
+        run: ./scripts/validate-governance.ps1

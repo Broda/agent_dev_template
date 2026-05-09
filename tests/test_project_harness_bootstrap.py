@@ -54,8 +54,11 @@ class ProjectHarnessBootstrapTests(LabWorkflowTestCase):
         self.assertFalse((target / ".git").exists())
         run_cmd(["./scripts/validate-governance"], cwd=target)
 
-    @unittest.skipUnless(os.name == "nt", "PowerShell launcher regression is Windows-specific")
-    def test_project_harness_new_ps1_validates_copy_on_windows(self) -> None:
+    @unittest.skipUnless(
+        os.name == "nt" or shutil.which("pwsh") or shutil.which("powershell"),
+        "PowerShell is not available",
+    )
+    def test_project_harness_new_ps1_no_git_validates_copy(self) -> None:
         powershell = shutil.which("pwsh") or shutil.which("powershell")
         if not powershell:
             self.skipTest("PowerShell is not available")
