@@ -158,6 +158,20 @@ class IntentRegistryContractTests(unittest.TestCase):
             result.stdout + result.stderr,
         )
 
+    def test_validate_governance_checks_lab_cli_parser_dispatch_table_parity(self) -> None:
+        dispatch_path = self.repo / "scripts/python/template_cli/lab_cli_dispatch.py"
+        dispatch_text = dispatch_path.read_text(encoding="utf-8").replace(
+            '    "lab-status": _dispatch_status,\n',
+            "",
+            1,
+        )
+        dispatch_path.write_text(dispatch_text, encoding="utf-8")
+
+        result = run_cmd(["./scripts/validate-governance"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Lab command parser has no dispatch handler: lab-status", result.stdout + result.stderr)
+
     def test_render_intent_docs_fails_on_malformed_registry(self) -> None:
         registry_path = self.repo / "harness_commands/intent_registry.json"
         registry_path.write_text("{\n", encoding="utf-8")

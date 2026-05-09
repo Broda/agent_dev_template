@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import re
 import subprocess
 import sys
@@ -12,6 +13,7 @@ from template_cli.intents import (
     render_intent_docs_to_memory,
 )
 from template_cli.io_helpers import ValidationResult, read_text
+from template_cli.lab_cli_parsers import LAB_COMMAND_ARGUMENTS
 from template_cli.validator_manifest import load_harness_manifest
 
 
@@ -108,6 +110,45 @@ def validate_stable_wrapper_backend_exposure(root: Path, result: ValidationResul
             )
 
 
+def lab_cli_dispatch_commands(root: Path) -> set[str]:
+    dispatch_path = root / "scripts/python/template_cli/lab_cli_dispatch.py"
+    if not dispatch_path.exists():
+        return set()
+    try:
+        tree = ast.parse(read_text(dispatch_path), filename=str(dispatch_path))
+    except SyntaxError:
+        return set()
+    for node in tree.body:
+        if isinstance(node, ast.Assign):
+            is_dispatch_table = any(
+                isinstance(target, ast.Name) and target.id == "LAB_COMMAND_DISPATCHERS"
+                for target in node.targets
+            )
+            value = node.value
+        elif isinstance(node, ast.AnnAssign):
+            is_dispatch_table = isinstance(node.target, ast.Name) and node.target.id == "LAB_COMMAND_DISPATCHERS"
+            value = node.value
+        else:
+            continue
+        if not is_dispatch_table:
+            continue
+        if not isinstance(value, ast.Dict):
+            return set()
+        return {key.value for key in value.keys if isinstance(key, ast.Constant) and isinstance(key.value, str)}
+    return set()
+
+
+def validate_lab_cli_table_parity(root: Path, result: ValidationResult) -> None:
+    dispatch_commands = lab_cli_dispatch_commands(root)
+    parser_only = sorted(set(LAB_COMMAND_ARGUMENTS) - dispatch_commands)
+    for command in parser_only:
+        result.add_failure(f"Lab command parser has no dispatch handler: {command}")
+
+    dispatch_only = sorted(dispatch_commands - set(LAB_COMMAND_ARGUMENTS))
+    for command in dispatch_only:
+        result.add_failure(f"Lab command dispatch handler has no parser registration: {command}")
+
+
 def validate_intent_registry(root: Path, result: ValidationResult) -> None:
     try:
         registry = load_intent_registry(root)
@@ -120,6 +161,7 @@ def validate_intent_registry(root: Path, result: ValidationResult) -> None:
     documented = documented_lab_commands(root)
     registered = registered_lab_commands(root)
     validate_stable_wrapper_backend_exposure(root, result)
+    validate_lab_cli_table_parity(root, result)
 
     missing_doc_sections = sorted(registry_command_names - documented)
     for command in missing_doc_sections:
