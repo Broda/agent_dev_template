@@ -61,6 +61,43 @@ If an installed runtime is present but incompatible, wrappers must print a clear
 compatibility error and either fall back to the local runtime or explain why
 fallback is unsafe for that command.
 
+## Compatibility Error Policy
+
+Runtime compatibility problems must be reported on stderr so stdout remains
+machine-readable for commands that emit structured output. Messages should use
+stable prefixes:
+
+- `harness-runtime warning:` for recoverable read-only fallback.
+- `harness-runtime error:` for non-recoverable compatibility failure.
+
+For read-only commands, an incompatible installed runtime may fall back to the
+repo-local runtime when `scripts/python/cli.py` is present and the wrapper can
+prove that the backend command is read-only in `harness_commands/intent_registry.json`
+or `harness_commands/harness_manifest.json`. The warning format is:
+
+```text
+harness-runtime warning: installed runtime is incompatible; using repo-local fallback at scripts/python/cli.py
+```
+
+After fallback, the wrapper must exit with the repo-local command's exit code.
+If no repo-local fallback is available, the wrapper must fail with exit code 78
+and this stderr format:
+
+```text
+harness-runtime error: installed runtime is incompatible and repo-local fallback is unavailable
+```
+
+For mutating commands, incompatible installed runtimes must fail closed without
+running the installed runtime or repo-local fallback. The stderr format is:
+
+```text
+harness-runtime error: installed runtime is incompatible for mutating command; refusing to continue
+```
+
+The exit code must be 78. A mutating command may run through the repo-local
+runtime only when no installed runtime is selected or when an explicit
+environment override points directly at the repo-local runtime.
+
 ## Installed Python Runtime Interface
 
 The first installed runtime interface should be a Python package named

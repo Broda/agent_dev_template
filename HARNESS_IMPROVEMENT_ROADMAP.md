@@ -583,7 +583,7 @@ Next-task sequencing:
     fallback.
   - Assert read-only commands and mutating commands report compatibility problems
     according to the policy task below.
-- [ ] Decide how installed runtime compatibility errors should behave for
+- [x] Decide how installed runtime compatibility errors should behave for
       read-only commands versus mutating commands.
   - Decide whether read-only commands may warn and fall back while mutating
     commands fail closed on version mismatch.

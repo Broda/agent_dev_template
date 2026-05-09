@@ -164,6 +164,13 @@ installed-runtime slice. Commands that write project state, generated docs,
 plugin mirrors, update backups, or Git history remain repo-local until
 compatibility, rollback, and fallback behavior are tested.
 
+Compatibility failures follow ADR-0002's fail-open/fail-closed split. Read-only
+commands may write `harness-runtime warning: installed runtime is incompatible;
+using repo-local fallback at scripts/python/cli.py` to stderr and then exit with
+the repo-local command's exit code. Mutating commands must write
+`harness-runtime error: installed runtime is incompatible for mutating command;
+refusing to continue` to stderr and exit 78 without running either runtime.
+
 Candidate extraction order:
 
 1. Read-only contract and validation helpers.
