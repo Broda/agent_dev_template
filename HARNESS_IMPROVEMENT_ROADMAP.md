@@ -356,7 +356,7 @@ can stay small and reviewable.
       apply execution, backup/rollback, and output rendering modules.
 - [ ] Split `finalize.py` into value collection, state assembly, artifact
       writing, validation, and user-facing output modules.
-- [ ] Split `handoff.py` into state-defaults/constants, label extraction,
+- [x] Split `handoff.py` into state-defaults/constants, label extraction,
       state-fill operations, implementation-contract fill, and summary rendering.
 - [x] Split `lab_cli.py` so parser construction and command dispatch are
       table-driven or otherwise easier to compare against the intent registry.

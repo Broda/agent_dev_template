@@ -129,7 +129,12 @@ Lean file registry for the Project Harness Template.
 | `scripts/python/template_cli/evidence.py` | Development roadmap evidence capture command implementation |
 | `scripts/python/template_cli/finalize_context.py` | Finalization target, owner, session, and hydration context resolution |
 | `scripts/python/template_cli/finalize.py` | In-place finalization orchestration |
-| `scripts/python/template_cli/handoff.py` | Brainstorming handoff compiler for draft canonical finalization state |
+| `scripts/python/template_cli/handoff.py` | Brainstorming handoff compiler orchestration for draft canonical finalization state |
+| `scripts/python/template_cli/handoff_contract.py` | Handoff default-state, label, required-field, and implementation-contract constants |
+| `scripts/python/template_cli/handoff_implementation.py` | Handoff implementation-contract extraction and state fill helpers |
+| `scripts/python/template_cli/handoff_labels.py` | Handoff source-file ordering and label extraction helpers |
+| `scripts/python/template_cli/handoff_state.py` | Handoff state-default merge and nested field fill helpers |
+| `scripts/python/template_cli/handoff_summary.py` | Handoff summary output and session-log rendering helpers |
 | `scripts/python/template_cli/validator_artifacts.py` | Retained artifact lists for brainstorming and development validation |
 | `scripts/python/template_cli/validator_code_size.py` | Python file-size validation for template tooling and tests |
 | `scripts/python/template_cli/validator_intents.py` | Intent registry, generated command docs, and CI sync validation helpers |
