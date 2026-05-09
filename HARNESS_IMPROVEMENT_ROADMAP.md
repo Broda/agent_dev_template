@@ -269,7 +269,8 @@ Exit criteria:
 ## Backlog
 
 - [x] Add a `pyproject.toml` for formatter/linter/import hygiene.
-- [ ] Split orchestration-heavy modules when cohesive boundaries are clear:
+- [x] Split generated CI workflow rendering out of `render.py`.
+- [ ] Continue splitting orchestration-heavy modules when cohesive boundaries are clear:
       `finalize.py`, `handoff.py`, `render.py`,
       `render_governance_templates.py`, and `workflow_data.py`.
 - [ ] Make `HARNESS_IMPROVEMENT_ROADMAP.md` updates part of template-maintenance

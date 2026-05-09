@@ -138,6 +138,7 @@ Lean file registry for the Project Harness Template.
 | `scripts/python/template_cli/lab_cli.py` | Lab subcommand parser and dispatch wiring for the top-level CLI |
 | `scripts/python/template_cli/notes.py` | Durable research note capture command implementation |
 | `scripts/python/template_cli/render.py` | Development document render orchestration |
+| `scripts/python/template_cli/render_ci.py` | Pure renderer for generated development CI workflow |
 | `scripts/python/template_cli/render_contract.py` | Implementation contract extraction and formatting for finalized development docs |
 | `scripts/python/template_cli/render_helpers.py` | State-extraction, file-manipulation, and hydration helpers for development doc rendering |
 | `scripts/python/template_cli/render_governance_templates.py` | Pure templates for rendered architecture and roadmap governance docs |
