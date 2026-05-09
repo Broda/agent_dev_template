@@ -273,7 +273,7 @@ Exit criteria:
 - [ ] Continue splitting orchestration-heavy modules when cohesive boundaries are clear:
       `finalize.py`, `handoff.py`, `render.py`,
       `render_governance_templates.py`, and `workflow_data.py`.
-- [ ] Make `HARNESS_IMPROVEMENT_ROADMAP.md` updates part of template-maintenance
+- [x] Make `HARNESS_IMPROVEMENT_ROADMAP.md` updates part of template-maintenance
       review when adding new public-template work.
 - [ ] Promote durable conclusions from `note-0001` into ADR or bootstrap/update
       docs after the manifest/update direction is finalized.

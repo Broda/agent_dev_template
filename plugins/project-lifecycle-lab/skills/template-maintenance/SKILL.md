@@ -18,6 +18,7 @@ Use this skill when maintaining the harness template rather than brainstorming a
 
 - Keep command names and entrypoint paths stable unless the user explicitly asks for a breaking change.
 - Update `brainstorming/FILE_MAP.md` when the retained harness template inventory changes.
+- Review `HARNESS_IMPROVEMENT_ROADMAP.md` for public-template behavior, inventory, workflow, or packaging changes; update or check off the relevant roadmap/backlog item in the same slice.
 - Update tests or fixtures when behavior changes.
 - Do not hand-edit generated intent tables in `harness_commands/CONVERSATIONAL_MODE.md` or `harness_commands/COMMANDS.md`.
 - To change natural-language mappings, edit `harness_commands/intent_registry.json`, run `./scripts/render-intent-docs`, then validate.
