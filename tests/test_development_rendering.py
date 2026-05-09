@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import textwrap
 
@@ -24,6 +25,23 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
         "docs/adr/ADR-0001-record-architecture-decisions.md",
         "docs/adr/ADR-TEMPLATE.md",
     ]
+    RENDERED_ARTIFACT_HASHES_WITH_PERSISTENCE = {
+        "README.md": "c65ccff8afabadfa4c1fb9d7b3946c13fc73b1173a25d2ff2749868f3bedcc07",
+        "CHANGELOG.md": "6b0e43176413e4e809d46f89b5da23c3976050f6c2dc22a774852399963f09a3",
+        ".gitignore": "8ed32c34caaa326b71d25ce9835819a720ec3c2a91585b53bf22c75d0bbea2fe",
+        ".github/workflows/ci.yml": "cf7cf615d4a49a3dfcddf858e0fa6223f8281db09f74544023b9491928ffd796",
+        "docs/PROJECT_CONTEXT.md": "3ba68f53212197c03270eecd70ab69ebaedf1fa7b02e469c67407b5934cbfc70",
+        "docs/ROADMAP.md": "26b8f629b2921ff14a2899b4956d0dcabfece74d1925a04a53417cf72f35422b",
+        "docs/ARCHITECTURE.md": "a6b49978352cefcdff1c9ece45b705bc557bf3d12b6a1edc551e04af97bd254d",
+        "docs/FILE_MAP.md": "a2c91be5176cf0780dc62cb3cda123ec3e685f5f44b1a086fd8defeca20407e6",
+        "docs/GOVERNANCE_INDEX.md": "2e100a02f942ca90cdc4a0cb04060c0a073347ce2f807f9adc29419529653b83",
+        "docs/VERSIONING_AND_RELEASE_POLICY.md": "450156f75707fa11d04f78743a91ceec5e9864daad5115bcba4a41734767c1ec",
+        "docs/SECURITY_POLICY.md": "62e4fa364aff311b643edb7e9b95143665cb9ed1f8fb993793393e6b78f91de8",
+        "docs/RUNTIME_VERIFICATION_REPORT.md": "fd8973be60e2cb8e012fb8e1e39b5d03b60bcbf6344aa668768250a1ef8cb0cc",
+        "docs/MIGRATION_POLICY.md": "814a50f3e97822b55759d7ae31d9635b1f0a3d055c9e5ea1b09833fba9abcd87",
+        "docs/adr/ADR-0001-record-architecture-decisions.md": "5b938adf368c83dc157c3b1b875fa567f445be1979637b0c32317141822e1f58",
+        "docs/adr/ADR-TEMPLATE.md": "774f25a2fe377a86b588870ee31e54322568c90707242164ec9075da92472d52",
+    }
 
     def test_render_and_validate_development_from_checked_in_fixture(self) -> None:
         self.write_render_fixture()
@@ -130,6 +148,18 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
         run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
         second_snapshot = self._rendered_artifact_snapshot()
         self.assertEqual(first_snapshot, second_snapshot)
+        run_cmd(["./scripts/validate-development"], cwd=self.repo)
+
+    def test_rendered_development_documents_match_snapshots(self) -> None:
+        self.write_render_fixture("finalized_state_with_persistence_v2.json")
+        run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
+
+        actual_hashes = {
+            relative_path: hashlib.sha256(content.encode()).hexdigest()
+            for relative_path, content in self._rendered_artifact_snapshot().items()
+        }
+
+        self.assertEqual(self.RENDERED_ARTIFACT_HASHES_WITH_PERSISTENCE, actual_hashes)
         run_cmd(["./scripts/validate-development"], cwd=self.repo)
 
     def test_render_uses_state_ci_policy_when_present(self) -> None:

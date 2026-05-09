@@ -456,7 +456,7 @@ Next-task sequencing:
   - Keep the golden expected data small and deterministic; normalize dates or
     derive expected paths from the test date helper instead of hard-coding
     unstable values.
-- [ ] Add renderer snapshot tests for every generated development document that
+- [x] Add renderer snapshot tests for every generated development document that
       is currently checked by semantic assertions only.
   - Cover `README.md`, `docs/PROJECT_CONTEXT.md`, `docs/ROADMAP.md`,
     `docs/ARCHITECTURE.md`, `docs/GOVERNANCE_INDEX.md`, policy docs, ADR
