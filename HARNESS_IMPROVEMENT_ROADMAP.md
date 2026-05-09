@@ -361,6 +361,8 @@ can stay small and reviewable.
       `bootstrap_update.py`.
 - [ ] Split `finalize.py` into value collection, state assembly, artifact
       writing, validation, and user-facing output modules.
+- [x] Split finalization artifact setup, backup registration, existing-state
+      loading, and session-log writing out of `finalize.py`.
 - [x] Split finalized canonical state assembly out of `finalize.py`.
 - [x] Split finalization required-value and noninteractive missing-field
       validation out of `finalize.py`.

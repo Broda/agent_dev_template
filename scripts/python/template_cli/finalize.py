@@ -5,6 +5,12 @@ from datetime import date
 from pathlib import Path
 
 from template_cli.finalize_context import load_finalize_context
+from template_cli.finalize_artifacts import (
+    _backup_finalization_outputs,
+    _ensure_finalization_dirs,
+    _load_existing_state,
+    _write_finalization_session_log,
+)
 from template_cli.finalize_helpers import (
     STATE_FILE,
     ask_non_empty,
@@ -14,7 +20,6 @@ from template_cli.finalize_helpers import (
     first_value_for_label,
     infer_project_type,
     is_placeholder_value,
-    join_lines,
     latest_session_path,
     summarize_decisions,
 )
@@ -34,7 +39,6 @@ from template_cli.finalize_validation import (
 )
 from template_cli.io_helpers import (
     ValidationResult,
-    read_text,
     write_text,
 )
 from template_cli.render import run_render_development_docs
@@ -197,45 +201,16 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
     export_path = f"exports/{date_stamp}_PROJECT_SUMMARY_{idea_id}.md"
     session_path = f"sessions/{date_stamp}_FINALIZATION_SESSION_{idea_id}.md"
 
-    (root / "sessions").mkdir(parents=True, exist_ok=True)
-    if write_export:
-        (root / "exports").mkdir(parents=True, exist_ok=True)
-    (root / "state").mkdir(parents=True, exist_ok=True)
-    (root / "docs/adr").mkdir(parents=True, exist_ok=True)
-
-    existing_state: dict = {}
-    state_path = root / STATE_FILE
-    if state_path.exists():
-        try:
-            existing_state = json.loads(read_text(state_path))
-        except json.JSONDecodeError:
-            existing_state = {}
+    _ensure_finalization_dirs(root, write_export=write_export)
+    existing_state = _load_existing_state(root)
 
     with BackupManager(root) as backups:
-        for relative_path in [
-            STATE_FILE,
-            "README.md",
-            "CHANGELOG.md",
-            ".gitignore",
-            "docs/PROJECT_CONTEXT.md",
-            "docs/ROADMAP.md",
-            "docs/ARCHITECTURE.md",
-            "docs/FILE_MAP.md",
-            "docs/GOVERNANCE_INDEX.md",
-            "docs/VERSIONING_AND_RELEASE_POLICY.md",
-            "docs/SECURITY_POLICY.md",
-            "docs/RUNTIME_VERIFICATION_REPORT.md",
-            "docs/MIGRATION_POLICY.md",
-            "docs/adr/ADR-0001-record-architecture-decisions.md",
-            "docs/adr/ADR-TEMPLATE.md",
-            ".github/workflows/ci.yml",
-            "IDEA_CATALOG.md",
-            "MODE.md",
-            session_path,
-        ]:
-            backups.backup_path(relative_path)
-        if write_export:
-            backups.backup_path(export_path)
+        _backup_finalization_outputs(
+            backups,
+            session_path=session_path,
+            export_path=export_path,
+            write_export=write_export,
+        )
 
         state = _build_finalized_state(
             root,
@@ -296,23 +271,15 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
         _update_catalog_transition(root, idea_id, session_path, export_path if write_export else "")
         _write_mode_development(root)
 
-        session_lines = [
-            "# Finalization Session",
-            "",
-            f"- Date: {date_stamp}",
-            f"- Owner: {owner}",
-            f"- Idea ID: {idea_id}",
-            f"- Session: {session_path}",
-            f"- Canonical state: `{STATE_FILE}`",
-        ]
-        if write_export:
-            session_lines.append(f"- Summary export: `{export_path}`")
-        session_content = join_lines(session_lines) + "\n\n"
-        session_content += (
-            "- Result: in-place mode switch completed\n\n"
-            "The repository has been successfully finalized into development mode.\n"
+        _write_finalization_session_log(
+            root,
+            session_path=session_path,
+            date_stamp=date_stamp,
+            owner=owner,
+            idea_id=idea_id,
+            export_path=export_path,
+            write_export=write_export,
         )
-        write_text(root / session_path, session_content)
 
         validation_code = run_validate_development(root)
         if validation_code != 0:
