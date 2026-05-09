@@ -492,7 +492,7 @@ Next-task sequencing:
     and every generated development document.
   - Acceptance: future additions to finalization/render outputs fail validation
     until their overwrite/human-owned policy is documented.
-- [ ] Add migration-path tests before any future `state/project-init.json`
+- [x] Add migration-path tests before any future `state/project-init.json`
       schemaVersion change.
   - Define a fixture for the current schema version and a test harness for
     applying future migrations without losing product, governance, command, or

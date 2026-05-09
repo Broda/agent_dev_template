@@ -36,6 +36,17 @@ class StateSchemaTests(LabWorkflowTestCase):
 
         self.assertEqual([], result.failures)
 
+    def test_current_schema_fixture_validates_without_mutating_state_file(self) -> None:
+        self.write_render_fixture()
+        state_before = (self.repo / "state/project-init.json").read_text(encoding="utf-8")
+        result = ValidationResult()
+
+        state = validate_project_state_file(self.repo, result, variant="finalized")
+
+        self.assertEqual([], result.failures)
+        self.assertEqual(2, state["schemaVersion"])
+        self.assertEqual(state_before, (self.repo / "state/project-init.json").read_text(encoding="utf-8"))
+
     def test_finalized_state_reports_missing_required_field(self) -> None:
         self.write_render_fixture()
         state = self._read_state()
@@ -65,6 +76,17 @@ class StateSchemaTests(LabWorkflowTestCase):
         result = ValidationResult()
 
         validate_project_state_file(self.repo, result, variant="draft")
+
+        self.assertIn("state/project-init.json schemaVersion must be 2.", result.failures)
+
+    def test_future_finalized_schema_version_fails_before_migration_exists(self) -> None:
+        self.write_render_fixture()
+        state = self._read_state()
+        state["schemaVersion"] = 3
+        self._write_state(state)
+        result = ValidationResult()
+
+        validate_project_state_file(self.repo, result, variant="finalized")
 
         self.assertIn("state/project-init.json schemaVersion must be 2.", result.failures)
 
