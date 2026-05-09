@@ -26,6 +26,7 @@ Lean file registry for the Project Harness Template.
 | `.agents/skills/template-maintenance/agents/openai.yaml` | UI metadata for the template maintenance skill |
 | `.agents/plugins/marketplace.json` | Local plugin marketplace entry for agent-behavior distribution |
 | `plugins/project-lifecycle-lab/README.md` | Plugin packaging decision and external use check |
+| `plugins/project-lifecycle-lab/smoke_package.py` | Standalone plugin package smoke check |
 | `plugins/project-lifecycle-lab/.codex-plugin/plugin.json` | Local plugin manifest for the lifecycle agent-behavior package |
 | `plugins/project-lifecycle-lab/skills/brainstorming-lab/SKILL.md` | Plugin mirror of the brainstorming lifecycle skill |
 | `plugins/project-lifecycle-lab/skills/brainstorming-lab/agents/openai.yaml` | Plugin mirror of brainstorming skill UI metadata |

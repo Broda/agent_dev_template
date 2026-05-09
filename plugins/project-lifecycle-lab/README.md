@@ -33,6 +33,10 @@ If repo-scoped skills change, run `./scripts/sync-plugin-skills` and then
 
 To smoke-check the package outside the repo context, install or expose `plugins/project-lifecycle-lab` as a local Codex plugin and confirm the four skills are visible:
 
+```sh
+python3 smoke_package.py
+```
+
 - `brainstorming-lab`
 - `development-governance`
 - `project-finalizer`

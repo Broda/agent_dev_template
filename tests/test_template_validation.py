@@ -213,6 +213,13 @@ class TemplateValidationTests(LabWorkflowTestCase):
             result.stdout,
         )
 
+    def test_plugin_package_smoke_script_checks_skills_and_metadata(self) -> None:
+        result = run_cmd(["python3", "smoke_package.py"], cwd=self.repo / "plugins/project-lifecycle-lab")
+
+        self.assertIn("Plugin package smoke check passed.", result.stdout)
+        self.assertIn("brainstorming-lab", result.stdout)
+        self.assertIn("template-maintenance", result.stdout)
+
     def test_validate_brainstorming_checks_plugin_skills_path(self) -> None:
         manifest_path = self.repo / "plugins/project-lifecycle-lab/.codex-plugin/plugin.json"
         manifest_path.write_text(

@@ -10,6 +10,7 @@ from template_cli.validator_skills import REPO_SKILLS, REPO_SKILL_METADATA
 
 PLUGIN_NAME = "project-lifecycle-lab"
 PLUGIN_README = "plugins/project-lifecycle-lab/README.md"
+PLUGIN_SMOKE_SCRIPT = "plugins/project-lifecycle-lab/smoke_package.py"
 PLUGIN_MANIFEST = "plugins/project-lifecycle-lab/.codex-plugin/plugin.json"
 PLUGIN_MARKETPLACE = ".agents/plugins/marketplace.json"
 PLUGIN_SKILLS_DIR = "plugins/project-lifecycle-lab/skills"
@@ -26,7 +27,7 @@ PLUGIN_SKILL_ARTIFACTS = [
     for skill_path, metadata_path in zip(PLUGIN_SKILLS.values(), PLUGIN_SKILL_METADATA.values())
     for artifact in (skill_path, metadata_path)
 ]
-PLUGIN_ARTIFACTS = [PLUGIN_MARKETPLACE, PLUGIN_README, PLUGIN_MANIFEST, *PLUGIN_SKILL_ARTIFACTS]
+PLUGIN_ARTIFACTS = [PLUGIN_MARKETPLACE, PLUGIN_README, PLUGIN_SMOKE_SCRIPT, PLUGIN_MANIFEST, *PLUGIN_SKILL_ARTIFACTS]
 EXPECTED_PLUGIN_AUTHOR_NAME = "Project Harness Template Maintainers"
 EXPECTED_PLUGIN_AUTHOR_EMAIL = "maintainers@example.invalid"
 
@@ -112,6 +113,7 @@ def _validate_plugin_readme(root: Path, result: ValidationResult) -> None:
         "Copied mirrors remain checked in",
         "./scripts/sync-plugin-skills",
         "./scripts/validate-governance",
+        "smoke_package.py",
         "External Use Check",
         "Repo-scoped skills",
         "Portable plugin skills",

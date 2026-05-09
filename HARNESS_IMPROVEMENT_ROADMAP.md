@@ -402,7 +402,7 @@ can stay small and reviewable.
 
 - [ ] Decide whether plugin mirrors should remain copied files or become
       generated release artifacts before the first public plugin release.
-- [ ] Add a plugin package smoke script that verifies all four skills and UI
+- [x] Add a plugin package smoke script that verifies all four skills and UI
       metadata outside the repo context.
 - [x] Validate plugin README examples against the actual plugin manifest and
       marketplace entry.
