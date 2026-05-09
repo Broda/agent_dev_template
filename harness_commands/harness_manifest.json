@@ -30,7 +30,7 @@
     },
     {
       "path": "scripts/project-harness",
-      "backendCommand": "project-harness-new | project-harness-validate"
+      "backendCommand": "project-harness-new | project-harness-update | project-harness-validate"
     },
     {
       "path": "scripts/render-intent-docs",

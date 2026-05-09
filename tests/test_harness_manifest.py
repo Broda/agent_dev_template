@@ -43,6 +43,23 @@ class HarnessManifestTests(LabWorkflowTestCase):
         self.assertIn("harness_commands/harness_manifest.json", inventory["mixedGenerated"])
         self.assertIn("docs/adr/", inventory["archival"])
 
+    def test_validate_governance_checks_stable_wrapper_backend_commands(self) -> None:
+        manifest_path = self.repo / "harness_commands/harness_manifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        for wrapper in manifest["stableWrappers"]:
+            if wrapper["path"] == "scripts/project-harness":
+                wrapper["backendCommand"] = "project-harness-new | project-harness-validate"
+        manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+        result = run_cmd(["./scripts/validate-governance"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(
+            "Harness manifest stable wrapper backendCommand for scripts/project-harness must be "
+            "project-harness-new | project-harness-update | project-harness-validate.",
+            result.stdout,
+        )
+
     def test_project_harness_new_stamps_git_source_commit(self) -> None:
         self.init_git_repo()
         source_commit = run_cmd(["git", "rev-parse", "HEAD"], cwd=self.repo).stdout.strip()

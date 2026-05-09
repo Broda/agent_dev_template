@@ -20,6 +20,14 @@ EXPECTED_COMPATIBILITY = {
     "stateSchemaPath": "state/project-init.schema.v2.json",
 }
 EXPECTED_MODES = ["brainstorming", "development"]
+EXPECTED_STABLE_WRAPPER_BACKENDS = {
+    "scripts/lab": "lab-<command>",
+    "scripts/finalize-project": "finalize-project",
+    "scripts/validate-governance": "validate-governance",
+    "scripts/project-harness": "project-harness-new | project-harness-update | project-harness-validate",
+    "scripts/render-intent-docs": "render-intent-docs",
+    "scripts/sync-plugin-skills": "sync-plugin-skills",
+}
 COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
 
 
@@ -143,6 +151,14 @@ def _validate_wrappers(root: Path, manifest: dict[str, Any], result: ValidationR
         seen_paths.add(path)
         if not (root / path).exists():
             result.add_failure(f"Harness manifest stable wrapper path is missing: {path}")
+        expected_backend = EXPECTED_STABLE_WRAPPER_BACKENDS.get(path)
+        if expected_backend and backend != expected_backend:
+            result.add_failure(
+                f"Harness manifest stable wrapper backendCommand for {path} must be {expected_backend}."
+            )
+    missing_expected_paths = sorted(set(EXPECTED_STABLE_WRAPPER_BACKENDS) - seen_paths)
+    for path in missing_expected_paths:
+        result.add_failure(f"Harness manifest missing stable wrapper entry: {path}")
 
 
 def _validate_inventory(manifest: dict[str, Any], result: ValidationResult) -> None:

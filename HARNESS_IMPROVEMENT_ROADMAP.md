@@ -309,9 +309,9 @@ can stay small and reviewable.
 
 - [x] Fix the `project-harness update --dry-run` "Next commands" text that still
       says apply mode is not implemented.
-- [ ] Update `harness_commands/harness_manifest.json` stable wrapper metadata so
+- [x] Update `harness_commands/harness_manifest.json` stable wrapper metadata so
       `scripts/project-harness` includes `project-harness-update`.
-- [ ] Add validation that manifest stable wrapper backend commands match real
+- [x] Add validation that manifest stable wrapper backend commands match real
       CLI parser subcommands.
 - [ ] Implement or intentionally remove the advertised `--source-commit` update
       source selector.
