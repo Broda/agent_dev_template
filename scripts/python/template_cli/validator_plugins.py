@@ -4,10 +4,12 @@ import json
 from pathlib import Path
 
 from template_cli.io_helpers import ValidationResult, read_text
+from template_cli.validator_manifest import EXPECTED_HARNESS_VERSION
 from template_cli.validator_skills import REPO_SKILLS, REPO_SKILL_METADATA
 
 
 PLUGIN_NAME = "project-lifecycle-lab"
+PLUGIN_README = "plugins/project-lifecycle-lab/README.md"
 PLUGIN_MANIFEST = "plugins/project-lifecycle-lab/.codex-plugin/plugin.json"
 PLUGIN_MARKETPLACE = ".agents/plugins/marketplace.json"
 PLUGIN_SKILLS_DIR = "plugins/project-lifecycle-lab/skills"
@@ -24,7 +26,7 @@ PLUGIN_SKILL_ARTIFACTS = [
     for skill_path, metadata_path in zip(PLUGIN_SKILLS.values(), PLUGIN_SKILL_METADATA.values())
     for artifact in (skill_path, metadata_path)
 ]
-PLUGIN_ARTIFACTS = [PLUGIN_MARKETPLACE, PLUGIN_MANIFEST, *PLUGIN_SKILL_ARTIFACTS]
+PLUGIN_ARTIFACTS = [PLUGIN_MARKETPLACE, PLUGIN_README, PLUGIN_MANIFEST, *PLUGIN_SKILL_ARTIFACTS]
 
 
 def validate_repo_plugins(root: Path, result: ValidationResult) -> None:
@@ -36,11 +38,16 @@ def validate_repo_plugins(root: Path, result: ValidationResult) -> None:
 
     if manifest.get("name") != PLUGIN_NAME:
         result.add_failure(f"Plugin manifest name must be {PLUGIN_NAME}: {PLUGIN_MANIFEST}")
+    if manifest.get("version") != EXPECTED_HARNESS_VERSION:
+        result.add_failure(
+            f"Plugin manifest version must match harnessVersion {EXPECTED_HARNESS_VERSION}: {PLUGIN_MANIFEST}"
+        )
     if manifest.get("skills") != "./skills/":
         result.add_failure(f"Plugin manifest skills path must be ./skills/: {PLUGIN_MANIFEST}")
     if not manifest.get("interface", {}).get("displayName"):
         result.add_failure(f"Plugin manifest must include interface.displayName: {PLUGIN_MANIFEST}")
     _validate_plugin_boundary(manifest, result)
+    _validate_plugin_readme(root, result)
     _validate_plugin_skill_mirrors(root, result)
 
     entries = marketplace.get("plugins", [])
@@ -65,6 +72,27 @@ def _validate_plugin_boundary(manifest: dict, result: ValidationResult) -> None:
     for phrase in ["harness runtime stays in the repo", "Repo-scoped skills", ".agents/skills"]:
         if phrase not in long_description:
             result.add_failure(f"Plugin longDescription must preserve harness/plugin boundary phrase: {phrase}")
+
+
+def _validate_plugin_readme(root: Path, result: ValidationResult) -> None:
+    readme_path = root / PLUGIN_README
+    if not readme_path.exists():
+        result.add_failure(f"Missing plugin README: {PLUGIN_README}")
+        return
+    readme = read_text(readme_path)
+    required_phrases = [
+        "remains the canonical skill source",
+        "Copied mirrors remain checked in",
+        "./scripts/sync-plugin-skills",
+        "./scripts/validate-governance",
+        "External Use Check",
+        "Repo-scoped skills",
+        "Portable plugin skills",
+        "must not replace repo-local scripts",
+    ]
+    for phrase in required_phrases:
+        if phrase not in readme:
+            result.add_failure(f"Plugin README must document packaging boundary phrase: {phrase}")
 
 
 def _validate_plugin_file_map(root: Path, result: ValidationResult) -> None:

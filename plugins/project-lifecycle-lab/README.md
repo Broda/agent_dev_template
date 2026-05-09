@@ -8,10 +8,23 @@ The plugin is intentionally not the project runtime. Canonical project state, de
 
 - `.agents/skills/` remains the canonical skill source for this template.
 - `plugins/project-lifecycle-lab/skills/` contains copied mirrors for distribution.
+- Copied mirrors remain checked in until plugin packaging needs release-time generation.
 - `./scripts/sync-plugin-skills` is the maintenance path for refreshing plugin mirrors.
 - `./scripts/validate-governance` validates manifest shape, marketplace registration, mirror drift, and the harness/plugin boundary wording.
+- The plugin `version` stays aligned with `harness_commands/harness_manifest.json` `harnessVersion`.
 
 Generated plugin mirrors are deliberately deferred. Copied mirrors are simpler to inspect in a public template, and drift validation keeps the package honest until there is a stronger reason to generate plugin artifacts.
+
+## Workflow Boundary
+
+Repo-scoped skills under `.agents/skills/` are the source of truth for operating
+this repository. They can reference local state, validators, wrappers, generated
+docs, and template-maintenance rules directly.
+
+Portable plugin skills under `plugins/project-lifecycle-lab/skills/` are
+distribution mirrors. They may teach the same lifecycle workflow, but they must not replace repo-local scripts, validators, state files, or governance docs.
+If repo-scoped skills change, run `./scripts/sync-plugin-skills` and then
+`./scripts/validate-governance`.
 
 ## External Use Check
 

@@ -225,22 +225,22 @@ Exit criteria:
 Goal: keep repo-scoped skills and plugin mirrors useful without making plugins
 the project runtime.
 
-- [ ] Decide when copied plugin mirrors should become generated artifacts.
-- [ ] If generation is adopted, make `.agents/skills/` the single source of
+- [x] Decide when copied plugin mirrors should become generated artifacts.
+- [x] If generation is adopted, make `.agents/skills/` the single source of
       truth and regenerate plugin skills deterministically.
-- [ ] Keep validation for plugin manifest, marketplace entry, mirror drift, and
+- [x] Keep validation for plugin manifest, marketplace entry, mirror drift, and
       harness/plugin boundary wording.
-- [ ] Add a plugin smoke-check script or documented manual check for external
+- [x] Add a plugin smoke-check script or documented manual check for external
       installation.
-- [ ] Version the plugin in step with harness capability changes.
-- [ ] Document which workflows belong in repo skills versus portable plugin
+- [x] Version the plugin in step with harness capability changes.
+- [x] Document which workflows belong in repo skills versus portable plugin
       skills.
 
 Exit criteria:
 
-- [ ] Plugin packaging remains optional and never replaces repo-local runtime
+- [x] Plugin packaging remains optional and never replaces repo-local runtime
       state or validators.
-- [ ] Skill drift is either impossible by generation or caught by validation.
+- [x] Skill drift is either impossible by generation or caught by validation.
 
 ## Milestone 9 - Long-Term Runtime Extraction Study
 

@@ -117,6 +117,33 @@ class TemplateValidationTests(LabWorkflowTestCase):
             result.stdout,
         )
 
+    def test_validate_brainstorming_checks_plugin_version_matches_harness(self) -> None:
+        manifest_path = self.repo / "plugins/project-lifecycle-lab/.codex-plugin/plugin.json"
+        manifest_path.write_text(
+            manifest_path.read_text(encoding="utf-8").replace('"version": "0.1.0"', '"version": "9.9.9"', 1),
+            encoding="utf-8",
+        )
+
+        result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Plugin manifest version must match harnessVersion 0.1.0", result.stdout)
+
+    def test_validate_brainstorming_checks_plugin_readme_boundary(self) -> None:
+        readme_path = self.repo / "plugins/project-lifecycle-lab/README.md"
+        readme_path.write_text(
+            readme_path.read_text(encoding="utf-8").replace("must not replace repo-local scripts", "may replace scripts", 1),
+            encoding="utf-8",
+        )
+
+        result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(
+            "Plugin README must document packaging boundary phrase: must not replace repo-local scripts",
+            result.stdout,
+        )
+
     def test_validate_brainstorming_checks_plugin_skills_path(self) -> None:
         manifest_path = self.repo / "plugins/project-lifecycle-lab/.codex-plugin/plugin.json"
         manifest_path.write_text(

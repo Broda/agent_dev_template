@@ -247,6 +247,13 @@ When repo-scoped skills change, sync their plugin mirrors before validating:
 ./scripts/sync-plugin-skills
 ```
 
+Repo-scoped skills are canonical for this template because they can reference
+local state, scripts, validators, and governance docs directly. The
+`plugins/project-lifecycle-lab/` package is an optional distribution mirror for
+portable agent behavior; it must not replace repo-local runtime state or
+validation. Keep the plugin version aligned with the harness version and use
+`plugins/project-lifecycle-lab/README.md` for the external smoke-check steps.
+
 ## Notes Policy
 
 Research notes are retained across both phases in `notes/` and indexed in `NOTES_CATALOG.md`.

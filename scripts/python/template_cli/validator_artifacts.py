@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from template_cli.validator_plugins import PLUGIN_MANIFEST, PLUGIN_MARKETPLACE, PLUGIN_SKILL_ARTIFACTS
+from template_cli.validator_plugins import PLUGIN_ARTIFACTS
 from template_cli.validator_skills import REPO_SKILLS, REPO_SKILL_METADATA
 
 
@@ -9,7 +9,7 @@ REPO_SKILL_ARTIFACTS = [
     for skill_path, metadata_path in zip(REPO_SKILLS.values(), REPO_SKILL_METADATA.values())
     for artifact in (skill_path, metadata_path)
 ]
-REPO_PLUGIN_ARTIFACTS = [PLUGIN_MARKETPLACE, PLUGIN_MANIFEST, *PLUGIN_SKILL_ARTIFACTS]
+REPO_PLUGIN_ARTIFACTS = PLUGIN_ARTIFACTS
 
 BRAINSTORMING_CORE_ARTIFACTS = [
     ".editorconfig",
