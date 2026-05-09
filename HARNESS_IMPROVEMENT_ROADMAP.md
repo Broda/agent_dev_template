@@ -307,7 +307,7 @@ can stay small and reviewable.
 
 ### Update Tooling And Provenance
 
-- [ ] Fix the `project-harness update --dry-run` "Next commands" text that still
+- [x] Fix the `project-harness update --dry-run` "Next commands" text that still
       says apply mode is not implemented.
 - [ ] Update `harness_commands/harness_manifest.json` stable wrapper metadata so
       `scripts/project-harness` includes `project-harness-update`.

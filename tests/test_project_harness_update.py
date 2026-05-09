@@ -36,6 +36,9 @@ class ProjectHarnessUpdateTests(LabWorkflowTestCase):
         self.assertIn("Project harness update dry run", result.stdout)
         self.assertIn("Writes: none", result.stdout)
         self.assertIn("unchanged:", result.stdout)
+        self.assertIn("apply clean harness-owned updates:", result.stdout)
+        self.assertIn("--include-mixed", result.stdout)
+        self.assertNotIn("not implemented yet", result.stdout)
         self.assertEqual(before, (self.repo / "scripts/lab.sh").read_text(encoding="utf-8"))
 
     def test_update_dry_run_refuses_ambiguous_sources(self) -> None:

@@ -287,7 +287,8 @@ def _print_update_plan(
         for path in paths:
             print(f"  - {path}")
     print("Next commands:")
-    print("  apply updates: not implemented yet; Milestone 4 will add project-harness update --apply")
+    print("  apply clean harness-owned updates: ./scripts/project-harness update --apply --source-path <template-checkout> --yes")
+    print("  include mixed/generated updates after review: add --include-mixed")
     print("  skip groups: rerun dry-run after adjusting the source or local files")
 
 
