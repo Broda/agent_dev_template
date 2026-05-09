@@ -362,6 +362,8 @@ can stay small and reviewable.
       table-driven or otherwise easier to compare against the intent registry.
 - [x] Split `render_governance_templates.py` into architecture, ADR, and roadmap
       renderer modules.
+- [x] Split `render_templates.py` into README and project-context renderer
+      modules with compatibility exports preserved.
 - [x] Split `wiki.py` into wiki config, git execution, page rendering, and status
       checking modules.
 - [ ] Lower the Python code-size validation threshold in stages after the large
