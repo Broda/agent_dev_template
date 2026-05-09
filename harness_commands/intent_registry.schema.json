@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Broda/agent_dev_template/harness_commands/intent_registry.schema.json",
+  "title": "Project Harness Intent Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "modes", "intents"],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "modes": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/mode"},
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "intents": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/intent"},
+      "minItems": 1
+    }
+  },
+  "$defs": {
+    "mode": {
+      "type": "string",
+      "enum": ["brainstorming", "development"]
+    },
+    "intent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "command",
+        "backendIntent",
+        "modes",
+        "phrases",
+        "description",
+        "filesTouched",
+        "writeBehavior",
+        "requiredArgs",
+        "optionalArgs",
+        "wrapperPath",
+        "readOnlySafe",
+        "mutationScope",
+        "output",
+        "exitCodes"
+      ],
+      "properties": {
+        "command": {"type": "string", "minLength": 1},
+        "backendIntent": {"type": "string", "minLength": 1},
+        "modes": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/mode"},
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "phrases": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1},
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "description": {"type": "string", "minLength": 1},
+        "filesTouched": {"type": "string", "minLength": 1},
+        "writeBehavior": {
+          "type": "string",
+          "enum": ["read", "write", "git"]
+        },
+        "requiredArgs": {
+          "type": "array",
+          "items": {"type": "string"},
+          "uniqueItems": true
+        },
+        "optionalArgs": {
+          "type": "array",
+          "items": {"type": "string"},
+          "uniqueItems": true
+        },
+        "wrapperPath": {"type": "string", "minLength": 1},
+        "readOnlySafe": {"type": "boolean"},
+        "mutationScope": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["project-files", "docs", "git", "none"]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "output": {"type": "string", "minLength": 1},
+        "exitCodes": {
+          "type": "object",
+          "additionalProperties": {"type": "string", "minLength": 1},
+          "required": ["0", "1", "2"]
+        }
+      }
+    }
+  }
+}

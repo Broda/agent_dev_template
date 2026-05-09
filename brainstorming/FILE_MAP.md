@@ -38,7 +38,9 @@ Lean file registry for the Project Harness Template.
 | `harness_commands/CONVERSATIONAL_MODE.md` | Agent-facing plain-language intent map across harness modes |
 | `harness_commands/COMMANDS.md` | Backend command contract for human-agent workflow intents |
 | `harness_commands/harness_manifest.json` | Harness provenance, compatibility, wrapper, and artifact ownership manifest |
+| `harness_commands/harness_manifest.schema.json` | JSON Schema contract for the harness manifest |
 | `harness_commands/intent_registry.json` | Canonical harness command intent registry for generated NL mapping tables |
+| `harness_commands/intent_registry.schema.json` | JSON Schema contract for the intent registry |
 | `brainstorming/AGENTS.brainstorming.md` | Brainstorming-mode contract |
 | `brainstorming/QUICKSTART.md` | Fast start workflow |
 | `brainstorming/EXAMPLE_LIFECYCLE.md` | End-to-end example from capture through finalize |

@@ -37,11 +37,26 @@ class HarnessManifestTests(LabWorkflowTestCase):
         inventory = manifest["artifactInventory"]
 
         self.assertIn("scripts/", inventory["harnessOwned"])
+        self.assertIn("harness_commands/harness_manifest.schema.json", inventory["harnessOwned"])
         self.assertIn("harness_commands/intent_registry.json", inventory["harnessOwned"])
+        self.assertIn("harness_commands/intent_registry.schema.json", inventory["harnessOwned"])
         self.assertIn("state/project-init.json", inventory["projectOwned"])
         self.assertIn("README.md", inventory["mixedGenerated"])
         self.assertIn("harness_commands/harness_manifest.json", inventory["mixedGenerated"])
         self.assertIn("docs/adr/", inventory["archival"])
+
+    def test_harness_command_schema_files_are_valid_json_contracts(self) -> None:
+        manifest_schema = json.loads(
+            (self.repo / "harness_commands/harness_manifest.schema.json").read_text(encoding="utf-8")
+        )
+        intent_schema = json.loads(
+            (self.repo / "harness_commands/intent_registry.schema.json").read_text(encoding="utf-8")
+        )
+
+        self.assertEqual(manifest_schema["properties"]["schemaVersion"]["const"], 1)
+        self.assertIn("artifactInventory", manifest_schema["required"])
+        self.assertEqual(intent_schema["properties"]["schemaVersion"]["const"], 1)
+        self.assertIn("intents", intent_schema["required"])
 
     def test_validate_governance_checks_stable_wrapper_backend_commands(self) -> None:
         manifest_path = self.repo / "harness_commands/harness_manifest.json"

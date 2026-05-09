@@ -330,7 +330,7 @@ can stay small and reviewable.
 
 ### Manifest, Registry, And Schema Contracts
 
-- [ ] Add JSON Schema files for `harness_commands/harness_manifest.json` and
+- [x] Add JSON Schema files for `harness_commands/harness_manifest.json` and
       `harness_commands/intent_registry.json`.
 - [ ] Replace hand-written manifest/intent shape checks with schema-backed
       validation while preserving precise failure messages.
