@@ -18,6 +18,20 @@ class HarnessManifestTests(LabWorkflowTestCase):
         self.assertIn("Harness manifest missing required fields: compatibility", result.stdout)
         self.assertIn("Harness manifest compatibility must be an object.", result.stdout)
 
+    def test_validate_governance_checks_inventory_retained_artifact_coverage(self) -> None:
+        manifest_path = self.repo / "harness_commands/harness_manifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["artifactInventoryExclusions"].remove("pyproject.toml")
+        manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+        result = run_cmd(["./scripts/validate-governance"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(
+            "Harness manifest artifact inventory does not classify retained artifact: pyproject.toml",
+            result.stdout,
+        )
+
     def test_validate_governance_checks_manifest_versions(self) -> None:
         manifest_path = self.repo / "harness_commands/harness_manifest.json"
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -44,6 +58,7 @@ class HarnessManifestTests(LabWorkflowTestCase):
         self.assertIn("README.md", inventory["mixedGenerated"])
         self.assertIn("harness_commands/harness_manifest.json", inventory["mixedGenerated"])
         self.assertIn("docs/adr/", inventory["archival"])
+        self.assertIn("pyproject.toml", manifest["artifactInventoryExclusions"])
 
     def test_harness_command_schema_files_are_valid_json_contracts(self) -> None:
         manifest_schema = json.loads(

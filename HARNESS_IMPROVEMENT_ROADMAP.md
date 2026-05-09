@@ -334,7 +334,7 @@ can stay small and reviewable.
       `harness_commands/intent_registry.json`.
 - [ ] Replace hand-written manifest/intent shape checks with schema-backed
       validation while preserving precise failure messages.
-- [ ] Tighten artifact inventory validation so retained harness files are either
+- [x] Tighten artifact inventory validation so retained harness files are either
       covered by an ownership class or explicitly excluded.
 - [ ] Decide whether broad manifest entries such as `scripts/` and
       `.agents/skills/` should be expanded into generated inventory snapshots

@@ -80,5 +80,26 @@
       "NOTES_CATALOG.md",
       "IDEA_CATALOG.md"
     ]
-  }
+  },
+  "artifactInventoryExclusions": [
+    ".editorconfig",
+    ".gitattributes",
+    ".github/PULL_REQUEST_TEMPLATE.md",
+    ".github/workflows/ci.yml",
+    ".github/workflows/governance-audit.yml",
+    ".agents/plugins/marketplace.json",
+    "HARNESS_CHANGELOG.md",
+    "HARNESS_RELEASE_CHECKLIST.md",
+    "LICENSE",
+    "brainstorming/AGENTS.brainstorming.md",
+    "brainstorming/EXAMPLE_LIFECYCLE.md",
+    "brainstorming/QUICKSTART.md",
+    "brainstorming/templates/decision_template.md",
+    "brainstorming/templates/idea_template.md",
+    "brainstorming/templates/note_template.md",
+    "brainstorming/templates/project_plan_packet_template.md",
+    "brainstorming/templates/review_gate_template.md",
+    "brainstorming/templates/risk_template.md",
+    "pyproject.toml"
+  ]
 }

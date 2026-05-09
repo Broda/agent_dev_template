@@ -14,7 +14,8 @@
     "compatibility",
     "supportedModes",
     "stableWrappers",
-    "artifactInventory"
+    "artifactInventory",
+    "artifactInventoryExclusions"
   ],
   "properties": {
     "schemaVersion": {
@@ -88,6 +89,9 @@
         "mixedGenerated": {"$ref": "#/$defs/pathList"},
         "archival": {"$ref": "#/$defs/pathList"}
       }
+    },
+    "artifactInventoryExclusions": {
+      "$ref": "#/$defs/pathList"
     }
   },
   "$defs": {

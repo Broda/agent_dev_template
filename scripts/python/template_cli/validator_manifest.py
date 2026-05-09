@@ -84,6 +84,7 @@ def _validate_top_level(manifest: dict[str, Any], result: ValidationResult) -> N
         "supportedModes",
         "stableWrappers",
         "artifactInventory",
+        "artifactInventoryExclusions",
     }
     missing = sorted(required - set(manifest.keys()))
     if missing:
@@ -179,6 +180,43 @@ def _validate_inventory(manifest: dict[str, Any], result: ValidationResult) -> N
                 result.add_failure(
                     f"Harness manifest artifactInventory.{ownership_class} contains an empty path."
                 )
+    exclusions = manifest.get("artifactInventoryExclusions")
+    if not isinstance(exclusions, list) or not exclusions:
+        result.add_failure("Harness manifest artifactInventoryExclusions must be a non-empty array.")
+        return
+    for entry in exclusions:
+        if not isinstance(entry, str) or not entry.strip():
+            result.add_failure("Harness manifest artifactInventoryExclusions contains an empty path.")
+    _validate_retained_artifact_coverage(inventory, exclusions, result)
+
+
+def _validate_retained_artifact_coverage(inventory: dict[str, Any], exclusions: list[Any], result: ValidationResult) -> None:
+    from template_cli.validator_artifacts import BRAINSTORMING_CORE_ARTIFACTS
+
+    inventory_entries = [
+        entry
+        for entries in inventory.values()
+        if isinstance(entries, list)
+        for entry in entries
+        if isinstance(entry, str)
+    ]
+    excluded_entries = [entry for entry in exclusions if isinstance(entry, str)]
+    for artifact in BRAINSTORMING_CORE_ARTIFACTS:
+        if not _matches_manifest_entry(artifact, inventory_entries) and not _matches_manifest_entry(artifact, excluded_entries):
+            result.add_failure(f"Harness manifest artifact inventory does not classify retained artifact: {artifact}")
+
+
+def _matches_manifest_entry(relative_path: str, entries: list[str]) -> bool:
+    return any(_matches_inventory_entry(relative_path, entry) for entry in entries)
+
+
+def _matches_inventory_entry(relative_path: str, entry: str) -> bool:
+    entry = entry.strip()
+    if not entry:
+        return False
+    if entry.endswith("/"):
+        return relative_path.startswith(entry)
+    return relative_path == entry
 
 
 def _source_commit(source_root: Path) -> str:
