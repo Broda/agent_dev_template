@@ -352,8 +352,10 @@ can stay small and reviewable.
       clear: `bootstrap_update.py`, `finalize.py`, `handoff.py`, `lab_cli.py`,
       `render_governance_templates.py`, `render_templates.py`, `intents.py`,
       `wiki.py`, and `workflow_idea_commands.py`.
-- [ ] Split `bootstrap_update.py` into source resolution, plan classification,
+- [x] Split `bootstrap_update.py` into source resolution, plan classification,
       apply execution, backup/rollback, and output rendering modules.
+- [x] Split update apply execution, backup, rollback, hook, and validation
+      helpers out of `bootstrap_update.py`.
 - [x] Split update dry-run output rendering out of `bootstrap_update.py`.
 - [x] Split update plan classification and baseline comparison out of
       `bootstrap_update.py`.
