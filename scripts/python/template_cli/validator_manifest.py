@@ -7,9 +7,11 @@ from pathlib import Path
 from typing import Any
 
 from template_cli.io_helpers import ValidationResult, read_text, write_text
+from template_cli.json_schema import validate_json_schema_file
 
 
 MANIFEST_PATH = "harness_commands/harness_manifest.json"
+MANIFEST_SCHEMA_PATH = "harness_commands/harness_manifest.schema.json"
 EXPECTED_SCHEMA_VERSION = 1
 EXPECTED_HARNESS_VERSION = "0.1.0"
 EXPECTED_TEMPLATE_REPOSITORY = "https://github.com/Broda/agent_dev_template"
@@ -65,6 +67,14 @@ def validate_harness_manifest(root: Path, result: ValidationResult) -> None:
     if not isinstance(manifest, dict):
         result.add_failure("Harness manifest root must be an object.")
         return
+
+    try:
+        schema_errors = validate_json_schema_file(root, manifest, MANIFEST_SCHEMA_PATH)
+    except (FileNotFoundError, json.JSONDecodeError) as exc:
+        result.add_failure(f"Harness manifest schema could not be loaded: {exc}")
+    else:
+        for error in schema_errors:
+            result.add_failure(f"Harness manifest schema validation failed: {error}")
 
     _validate_top_level(manifest, result)
     _validate_compatibility(manifest, result)

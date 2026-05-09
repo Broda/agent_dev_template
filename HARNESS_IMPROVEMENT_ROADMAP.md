@@ -332,7 +332,7 @@ can stay small and reviewable.
 
 - [x] Add JSON Schema files for `harness_commands/harness_manifest.json` and
       `harness_commands/intent_registry.json`.
-- [ ] Replace hand-written manifest/intent shape checks with schema-backed
+- [x] Replace hand-written manifest/intent shape checks with schema-backed
       validation while preserving precise failure messages.
 - [x] Tighten artifact inventory validation so retained harness files are either
       covered by an ownership class or explicitly excluded.

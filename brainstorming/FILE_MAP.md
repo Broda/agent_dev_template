@@ -166,3 +166,4 @@ Lean file registry for the Project Harness Template.
 | `scripts/python/template_cli/workflow_sessions.py` | Brainstorming session file creation, sequence IDs, and section appends |
 | `scripts/python/template_cli/workflow_status.py` | Lab status and finalize-doctor reporting helpers |
 | `scripts/python/template_cli/workflow.py` | Lab status, doctor, audit, and finalize command orchestration |
+| `scripts/python/template_cli/json_schema.py` | Dependency-free JSON Schema subset validator for harness-owned contracts |

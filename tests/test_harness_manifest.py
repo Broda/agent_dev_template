@@ -93,6 +93,18 @@ class HarnessManifestTests(LabWorkflowTestCase):
         self.assertEqual(intent_schema["properties"]["schemaVersion"]["const"], 1)
         self.assertIn("intents", intent_schema["required"])
 
+    def test_validate_governance_applies_harness_manifest_schema(self) -> None:
+        schema_path = self.repo / "harness_commands/harness_manifest.schema.json"
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+        schema["required"].append("schemaOnlyField")
+        schema_path.write_text(json.dumps(schema, indent=2) + "\n", encoding="utf-8")
+
+        result = run_cmd(["./scripts/validate-governance"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Harness manifest schema validation failed", result.stdout)
+        self.assertIn("schemaOnlyField", result.stdout)
+
     def test_validate_governance_checks_stable_wrapper_backend_commands(self) -> None:
         manifest_path = self.repo / "harness_commands/harness_manifest.json"
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))

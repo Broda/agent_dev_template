@@ -65,7 +65,7 @@
         "filesTouched": {"type": "string", "minLength": 1},
         "writeBehavior": {
           "type": "string",
-          "enum": ["read", "write", "git"]
+          "enum": ["no-write", "write", "git"]
         },
         "requiredArgs": {
           "type": "array",
@@ -83,7 +83,7 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["project-files", "docs", "git", "none"]
+            "enum": ["project-files", "external-wiki", "git", "none"]
           },
           "minItems": 1,
           "uniqueItems": true

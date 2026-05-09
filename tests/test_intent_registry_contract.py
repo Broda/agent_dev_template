@@ -197,6 +197,19 @@ class IntentRegistryContractTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("missing required keys: readOnlySafe", result.stdout + result.stderr)
 
+    def test_render_intent_docs_applies_registry_schema(self) -> None:
+        schema_path = self.repo / "harness_commands/intent_registry.schema.json"
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+        schema["required"].append("schemaOnlyField")
+        schema_path.write_text(json.dumps(schema, indent=2) + "\n", encoding="utf-8")
+
+        result = run_cmd(["./scripts/render-intent-docs"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        output = result.stdout + result.stderr
+        self.assertIn("Intent registry schema validation failed", output)
+        self.assertIn("schemaOnlyField", output)
+
     def test_render_intent_docs_fails_on_read_only_capability_drift(self) -> None:
         registry_path = self.repo / "harness_commands/intent_registry.json"
         registry = json.loads(registry_path.read_text(encoding="utf-8"))

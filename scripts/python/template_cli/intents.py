@@ -3,8 +3,11 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from template_cli.json_schema import validate_json_schema_file
+
 
 INTENT_REGISTRY_FILE = "harness_commands/intent_registry.json"
+INTENT_REGISTRY_SCHEMA_FILE = "harness_commands/intent_registry.schema.json"
 CONVERSATIONAL_DOC = "harness_commands/CONVERSATIONAL_MODE.md"
 COMMANDS_DOC = "harness_commands/COMMANDS.md"
 CONVERSATIONAL_MARKER_START = "<!-- BEGIN GENERATED INTENT MAP -->"
@@ -41,6 +44,12 @@ def load_intent_registry(root: Path) -> dict:
     except json.JSONDecodeError as exc:
         raise IntentRegistryError(f"Invalid JSON in {INTENT_REGISTRY_FILE}: {exc}") from exc
     validate_intent_registry(data)
+    try:
+        schema_errors = validate_json_schema_file(root, data, INTENT_REGISTRY_SCHEMA_FILE)
+    except (FileNotFoundError, json.JSONDecodeError) as exc:
+        raise IntentRegistryError(f"Intent registry schema could not be loaded: {exc}") from exc
+    if schema_errors:
+        raise IntentRegistryError(f"Intent registry schema validation failed: {schema_errors[0]}")
     return data
 
 
