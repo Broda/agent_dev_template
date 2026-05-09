@@ -589,7 +589,7 @@ Next-task sequencing:
     commands fail closed on version mismatch.
   - Document exact stderr/stdout wording and exit-code expectations.
   - Acceptance: tests cover both command classes before wrapper behavior changes.
-- [ ] Identify the first read-only validation module to extract behind the
+- [x] Identify the first read-only validation module to extract behind the
       installed-runtime boundary.
   - Prefer a module with low write risk and stable inputs, such as manifest,
     intent, artifact inventory, or launcher validation.

@@ -177,6 +177,43 @@ Runtime modules can be considered for extraction in this order:
 Modules that mutate project history, state, or generated docs must remain
 repo-local until rollback and compatibility behavior are proven by tests.
 
+## First Extraction Target
+
+The first read-only validation target should be
+`scripts/python/template_cli/validator_python_config.py`.
+
+Rationale:
+
+- It reads only `pyproject.toml`.
+- It has no subprocess, mode, manifest, plugin, skill, state, or generated-doc
+  dependencies.
+- Its current contract is deterministic: report missing required sections and
+  snippets through a validation result.
+- A failed extraction can be reverted without changing project state,
+  finalization, rendering, update planning, or wrapper command names.
+
+The installed runtime adapter should expose an internal backend named
+`validate-python-config`. Repo-local `./scripts/validate-governance` remains
+the user-facing command. During extraction, the local validation orchestrator
+may resolve `validate-python-config` through runtime discovery and then merge
+the adapter's findings into the normal governance validation summary. If no
+compatible installed runtime is available, the existing repo-local validator
+continues to run.
+
+The adapter should accept a repository root path and return machine-readable
+JSON:
+
+```json
+{
+  "failures": [],
+  "warnings": []
+}
+```
+
+It must not write files, mutate environment, inspect Git state, or import
+private wrapper modules. The repo-local and installed-runtime implementations
+must produce identical failure strings for the same `pyproject.toml`.
+
 ## Consequences
 
 ### Positive

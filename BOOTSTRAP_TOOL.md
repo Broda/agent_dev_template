@@ -173,9 +173,12 @@ refusing to continue` to stderr and exit 78 without running either runtime.
 
 Candidate extraction order:
 
-1. Read-only contract and validation helpers.
-2. Bootstrap/update planning after explicit source/version resolution is stable.
-3. Render, finalize, and workflow mutation commands only after rollback and
+1. `validator_python_config.py`, exposed behind an internal
+   `validate-python-config` backend that returns JSON failures/warnings while
+   `./scripts/validate-governance` remains the user-facing command.
+2. Other read-only contract and validation helpers.
+3. Bootstrap/update planning after explicit source/version resolution is stable.
+4. Render, finalize, and workflow mutation commands only after rollback and
    compatibility behavior are proven.
 
 This section promotes the durable conclusions from `note-0001`: keep project
