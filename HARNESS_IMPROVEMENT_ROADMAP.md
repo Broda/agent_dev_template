@@ -529,7 +529,7 @@ Next-task sequencing:
   - Added validation that shell launchers do not introduce known GNU/Linux-only
     patterns such as `readlink -f`, `sed -i`, `grep -P`, `xargs -r`, `/proc`,
     or Ubuntu package-manager calls.
-- [ ] Add CI artifact output for failed generated-doc drift so maintainers can
+- [x] Add CI artifact output for failed generated-doc drift so maintainers can
       inspect the exact changed files.
   - On failure after generated-doc checks, upload a patch/diff artifact plus the
     changed generated files.

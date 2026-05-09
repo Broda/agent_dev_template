@@ -113,10 +113,21 @@ class IntentRegistryContractTests(unittest.TestCase):
             result.stdout + result.stderr,
         )
 
+    def test_validate_governance_fails_when_ci_plugin_sync_step_is_removed(self) -> None:
+        ci_path = self.repo / ".github/workflows/ci.yml"
+        ci_text = ci_path.read_text(encoding="utf-8").replace("          ./scripts/sync-plugin-skills\n", "", 1)
+        ci_path.write_text(ci_text, encoding="utf-8")
+        result = run_cmd(["./scripts/validate-governance"], cwd=self.repo, check=False)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(
+            "CI workflow is missing the generated intent sync contract: plugin mirror sync step",
+            result.stdout + result.stderr,
+        )
+
     def test_validate_governance_fails_when_ci_focused_diff_is_removed(self) -> None:
         ci_path = self.repo / ".github/workflows/ci.yml"
         ci_text = ci_path.read_text(encoding="utf-8").replace(
-            "            git diff -- harness_commands/CONVERSATIONAL_MODE.md harness_commands/COMMANDS.md\n",
+            "            git diff --binary -- \"${generated_paths[@]}\" > .ci/generated-drift/generated-artifacts.patch\n",
             "",
             1,
         )
@@ -131,7 +142,7 @@ class IntentRegistryContractTests(unittest.TestCase):
     def test_validate_governance_fails_when_ci_drift_warning_is_removed(self) -> None:
         ci_path = self.repo / ".github/workflows/ci.yml"
         ci_text = ci_path.read_text(encoding="utf-8").replace(
-            '            echo "Generated intent docs are out of sync. Run ./scripts/render-intent-docs and commit the result."\n',
+            '            echo "Generated artifacts are out of sync. Run ./scripts/render-intent-docs and ./scripts/sync-plugin-skills, then commit the result."\n',
             "",
             1,
         )
@@ -140,6 +151,17 @@ class IntentRegistryContractTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn(
             "CI workflow is missing the generated intent sync contract: drift warning",
+            result.stdout + result.stderr,
+        )
+
+    def test_validate_governance_fails_when_ci_drift_artifact_upload_is_removed(self) -> None:
+        ci_path = self.repo / ".github/workflows/ci.yml"
+        ci_text = ci_path.read_text(encoding="utf-8").replace("        uses: actions/upload-artifact@v4\n", "", 1)
+        ci_path.write_text(ci_text, encoding="utf-8")
+        result = run_cmd(["./scripts/validate-governance"], cwd=self.repo, check=False)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(
+            "CI workflow is missing the generated intent sync contract: drift artifact upload",
             result.stdout + result.stderr,
         )
 

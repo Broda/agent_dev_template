@@ -21,15 +21,47 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Verify generated intent docs are in sync
+      - name: Verify generated artifacts are in sync
         shell: bash
         run: |
+          mkdir -p .ci/generated-drift/files
           ./scripts/render-intent-docs
-          git diff --stat --exit-code || {
-            echo "Generated intent docs are out of sync. Run ./scripts/render-intent-docs and commit the result."
-            git diff -- harness_commands/CONVERSATIONAL_MODE.md harness_commands/COMMANDS.md
+          ./scripts/sync-plugin-skills
+
+          generated_paths=(
+            harness_commands/CONVERSATIONAL_MODE.md
+            harness_commands/COMMANDS.md
+            harness_commands/harness_manifest.json
+            .agents/plugins/marketplace.json
+            .agents/skills/
+            plugins/project-lifecycle-lab/skills/
+            development/templates/docs/
+            tests/fixtures/finalized_state_v2.json
+            tests/fixtures/finalized_state_web_app_v2.json
+            tests/fixtures/finalized_state_with_persistence_v2.json
+          )
+
+          if ! git diff --quiet -- "${generated_paths[@]}"; then
+            echo "Generated artifacts are out of sync. Run ./scripts/render-intent-docs and ./scripts/sync-plugin-skills, then commit the result."
+            git diff --stat -- "${generated_paths[@]}" | tee .ci/generated-drift/summary.txt
+            git diff --binary -- "${generated_paths[@]}" > .ci/generated-drift/generated-artifacts.patch
+            git diff --name-only -- "${generated_paths[@]}" > .ci/generated-drift/changed-files.txt
+            while IFS= read -r path; do
+              if [ -f "$path" ]; then
+                mkdir -p ".ci/generated-drift/files/$(dirname "$path")"
+                cp "$path" ".ci/generated-drift/files/$path"
+              fi
+            done < .ci/generated-drift/changed-files.txt
             exit 1
-          }
+          fi
+
+      - name: Upload generated artifact drift
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-artifact-drift
+          path: .ci/generated-drift
+          if-no-files-found: ignore
 
       - name: Run regression suite
         shell: bash

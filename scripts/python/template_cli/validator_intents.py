@@ -217,13 +217,22 @@ def validate_intent_sync_ci(root: Path, result: ValidationResult) -> None:
     ci_text = read_text(ci_path)
     required_checks = [
         ("render step", "\n          ./scripts/render-intent-docs\n"),
+        ("plugin mirror sync step", "\n          ./scripts/sync-plugin-skills\n"),
         (
             "drift warning",
-            "Generated intent docs are out of sync. Run ./scripts/render-intent-docs and commit the result.",
+            "Generated artifacts are out of sync. Run ./scripts/render-intent-docs and ./scripts/sync-plugin-skills, then commit the result.",
         ),
         (
             "focused generated-doc diff",
-            "git diff -- harness_commands/CONVERSATIONAL_MODE.md harness_commands/COMMANDS.md",
+            "git diff --binary -- \"${generated_paths[@]}\" > .ci/generated-drift/generated-artifacts.patch",
+        ),
+        (
+            "changed generated-file capture",
+            "cp \"$path\" \".ci/generated-drift/files/$path\"",
+        ),
+        (
+            "drift artifact upload",
+            "uses: actions/upload-artifact@v4",
         ),
     ]
     for label, snippet in required_checks:
