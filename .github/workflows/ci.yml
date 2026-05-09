@@ -66,8 +66,8 @@ jobs:
             )
             $output = & $Command 2>&1 | Out-String
             $exitCode = $LASTEXITCODE
-            Write-Output "----- $Label -----"
-            Write-Output $output
+            Write-Host "----- $Label -----"
+            Write-Host $output
             if ($exitCode -ne 0) { throw "$Label failed with exit code $exitCode." }
             return $output
           }
