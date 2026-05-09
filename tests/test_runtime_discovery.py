@@ -9,7 +9,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "scripts/python"))
 
-from template_cli.runtime_discovery import (
+from template_cli.runtime_discovery import (  # noqa: E402
     CONFIG_ERROR_EXIT,
     FALLBACK_UNAVAILABLE_ERROR,
     MUTATING_INCOMPATIBLE_ERROR,
@@ -17,7 +17,7 @@ from template_cli.runtime_discovery import (
     RUNTIME_ENV,
     resolve_runtime,
 )
-from tests.workflow_test_helpers import LabWorkflowTestCase
+from tests.workflow_test_helpers import LabWorkflowTestCase  # noqa: E402
 
 
 class RuntimeDiscoveryTests(LabWorkflowTestCase):

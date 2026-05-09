@@ -70,7 +70,9 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
         file_map = (self.repo / "docs/FILE_MAP.md").read_text(encoding="utf-8")
         self.assertIn("# Rendered Source Of Truth", file_map)
         self.assertIn("| `README.md` | Python renderer | Regenerate from state |", file_map)
-        self.assertIn("| `docs/FILE_MAP.md` | Base template | Human-editable as implementation files are added |", file_map)
+        self.assertIn(
+            "| `docs/FILE_MAP.md` | Base template | Human-editable as implementation files are added |", file_map
+        )
 
         version_policy = (self.repo / "docs/VERSIONING_AND_RELEASE_POLICY.md").read_text(encoding="utf-8")
         runtime_report = (self.repo / "docs/RUNTIME_VERIFICATION_REPORT.md").read_text(encoding="utf-8")
@@ -114,10 +116,18 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
         state = json.loads(state_path.read_text(encoding="utf-8"))
         state["projectType"] = "Game"
         state["purpose"] = "Build a playable tactical game prototype."
-        state["product"]["problemStatement"] = "Players need a short battle loop that teaches movement and resource economy."
-        state["product"]["solutionSummary"] = "Render a gameplay-first prototype with onboarding and starter progression."
-        state["product"]["mvpScope"] = "Ship one playable loop with player actions, battle feedback, and a small market."
-        state["governance"]["keyDecisions"] = "Treat gameplay, player, battle, economy, market, and onboarding as valid game-domain language."
+        state["product"]["problemStatement"] = (
+            "Players need a short battle loop that teaches movement and resource economy."
+        )
+        state["product"]["solutionSummary"] = (
+            "Render a gameplay-first prototype with onboarding and starter progression."
+        )
+        state["product"]["mvpScope"] = (
+            "Ship one playable loop with player actions, battle feedback, and a small market."
+        )
+        state["governance"]["keyDecisions"] = (
+            "Treat gameplay, player, battle, economy, market, and onboarding as valid game-domain language."
+        )
         state_path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
 
         run_cmd(["./scripts/render-development-docs"], cwd=self.repo)

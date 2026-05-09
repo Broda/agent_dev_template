@@ -6,7 +6,6 @@ from pathlib import Path
 from template_cli.io_helpers import read_text, write_text
 from template_cli.workflow_data import _collect_session_links, _extract_catalog_row, _today
 
-
 SECTION_HEADING_RE = re.compile(r"^##\s+(.+?)\s*$")
 
 
@@ -81,7 +80,7 @@ def _append_under_section(path: Path, section_title: str, block: str) -> None:
                 section_end = index
                 break
 
-        body = list(lines[section_start + 1: section_end])
+        body = list(lines[section_start + 1 : section_end])
         while body and not body[-1].strip():
             body.pop()
         if not body:

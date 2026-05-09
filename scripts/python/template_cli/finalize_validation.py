@@ -27,7 +27,9 @@ def _fail_noninteractive(missing: list[str], idea_id: str) -> None:
         "Missing fields:",
     ]
     lines.extend(f"- {field}" for field in unique_missing)
-    lines.append("Next step: update state/project-init.json or the active idea/session, then rerun ./scripts/lab doctor.")
+    lines.append(
+        "Next step: update state/project-init.json or the active idea/session, then rerun ./scripts/lab doctor."
+    )
     lines.append("Use --interactive to fill missing values with prompts.")
     raise SystemExit("\n".join(lines))
 

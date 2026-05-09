@@ -8,7 +8,6 @@ from template_cli.finalize_helpers import existing_state_value
 from template_cli.io_helpers import read_text
 from template_cli.wiki_config import wiki_config
 
-
 DEVELOPMENT_GOVERNANCE_DOCS = [
     "docs/GOVERNANCE_INDEX.md",
     "docs/PROJECT_CONTEXT.md",

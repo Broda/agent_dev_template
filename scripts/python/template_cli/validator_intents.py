@@ -59,10 +59,7 @@ def registered_cli_backend_commands(root: Path) -> set[str]:
         check=False,
     )
     output = (result.stdout or "") + "\n" + (result.stderr or "")
-    return {
-        match.strip()
-        for match in re.findall(r"\b[a-z][a-z0-9]*(?:-[a-z0-9]+)+\b", output)
-    }
+    return {match.strip() for match in re.findall(r"\b[a-z][a-z0-9]*(?:-[a-z0-9]+)+\b", output)}
 
 
 def manifest_stable_wrapper_backends(root: Path) -> dict[str, str]:
@@ -107,8 +104,7 @@ def validate_stable_wrapper_backend_exposure(root: Path, result: ValidationResul
     for backend, wrapper_path in sorted(wrapper_backends.items()):
         if backend not in registered:
             result.add_failure(
-                f"Stable wrapper backend command is not registered in CLI: {backend} "
-                f"(from {wrapper_path})"
+                f"Stable wrapper backend command is not registered in CLI: {backend} (from {wrapper_path})"
             )
 
 
@@ -123,8 +119,7 @@ def lab_cli_dispatch_commands(root: Path) -> set[str]:
     for node in tree.body:
         if isinstance(node, ast.Assign):
             is_dispatch_table = any(
-                isinstance(target, ast.Name) and target.id == "LAB_COMMAND_DISPATCHERS"
-                for target in node.targets
+                isinstance(target, ast.Name) and target.id == "LAB_COMMAND_DISPATCHERS" for target in node.targets
             )
             value = node.value
         elif isinstance(node, ast.AnnAssign):
@@ -167,7 +162,9 @@ def validate_intent_registry(root: Path, result: ValidationResult) -> None:
 
     missing_doc_sections = sorted(registry_command_names - documented)
     for command in missing_doc_sections:
-        result.add_failure(f"Intent registry command is missing a command section in harness_commands/COMMANDS.md: {command}")
+        result.add_failure(
+            f"Intent registry command is missing a command section in harness_commands/COMMANDS.md: {command}"
+        )
 
     unknown_registry_commands = sorted(registry_command_names - registered)
     for command in unknown_registry_commands:
@@ -194,9 +191,7 @@ def validate_intent_registry(root: Path, result: ValidationResult) -> None:
                 f"Intent '{command}' backendIntent command mismatch: expected /lab {command}, found {backend_intent}"
             )
         if backend_command not in registered:
-            result.add_failure(
-                f"Intent '{command}' backendIntent maps to unsupported lab command: {backend_command}"
-            )
+            result.add_failure(f"Intent '{command}' backendIntent maps to unsupported lab command: {backend_command}")
 
     for relative_path, expected_content in rendered_docs.items():
         path = root / relative_path
@@ -224,11 +219,11 @@ def validate_intent_sync_ci(root: Path, result: ValidationResult) -> None:
         ),
         (
             "focused generated-doc diff",
-            "git diff --binary -- \"${generated_paths[@]}\" > .ci/generated-drift/generated-artifacts.patch",
+            'git diff --binary -- "${generated_paths[@]}" > .ci/generated-drift/generated-artifacts.patch',
         ),
         (
             "changed generated-file capture",
-            "cp \"$path\" \".ci/generated-drift/files/$path\"",
+            'cp "$path" ".ci/generated-drift/files/$path"',
         ),
         (
             "drift artifact upload",

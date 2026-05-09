@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from template_cli.finalize_helpers import STATE_SCHEMA_VERSION
 
-
 STATE_DEFAULTS = {
     "schemaVersion": STATE_SCHEMA_VERSION,
     "status": "draft",
@@ -49,7 +48,13 @@ STATE_DEFAULTS = {
     },
 }
 SCALAR_LABELS = {
-    "purpose": ["One-sentence objective", "Problem statement", "Value hypothesis", "Summary rationale", "Situation summary"],
+    "purpose": [
+        "One-sentence objective",
+        "Problem statement",
+        "Value hypothesis",
+        "Summary rationale",
+        "Situation summary",
+    ],
     "projectType": ["Project type"],
     "techStack.language": ["Language"],
     "techStack.runtime": ["Runtime"],

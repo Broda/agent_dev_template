@@ -106,7 +106,9 @@ def _resolve_source_commit_update_source(root: Path, source_commit: str) -> Upda
         return 1
 
     checkout_dir = Path(tempfile.mkdtemp(prefix="project-harness-source-"))
-    clone_result = _run_quiet(["git", "clone", "--quiet", "--no-checkout", template_repository, str(checkout_dir)], root)
+    clone_result = _run_quiet(
+        ["git", "clone", "--quiet", "--no-checkout", template_repository, str(checkout_dir)], root
+    )
     if clone_result != 0:
         shutil.rmtree(checkout_dir, ignore_errors=True)
         print(f"Cannot clone templateRepository for --source-commit: {template_repository}")
@@ -146,7 +148,9 @@ def _resolve_release_version_update_source(root: Path, release_version: str) -> 
         return 1
 
     checkout_dir = Path(tempfile.mkdtemp(prefix="project-harness-release-"))
-    clone_result = _run_quiet(["git", "clone", "--quiet", "--no-checkout", template_repository, str(checkout_dir)], root)
+    clone_result = _run_quiet(
+        ["git", "clone", "--quiet", "--no-checkout", template_repository, str(checkout_dir)], root
+    )
     if clone_result != 0:
         shutil.rmtree(checkout_dir, ignore_errors=True)
         print(f"Cannot clone templateRepository for --release-version: {template_repository}")

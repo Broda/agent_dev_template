@@ -6,7 +6,6 @@ from pathlib import Path
 
 from template_cli.io_helpers import write_text
 
-
 ADR_RE = re.compile(r"^ADR-(\d{4})-.+\.md$")
 CHECKBOX_FIELDS = {
     "version_impact": [

@@ -30,13 +30,23 @@ class LabHandoffTests(LabWorkflowTestCase):
         self.assertEqual(state["techStack"]["language"], "Rust")
         self.assertEqual(state["commands"]["build"], "cargo build --locked")
         self.assertEqual(state["commands"]["test"], "cargo test --all -- --nocapture")
-        self.assertEqual(state["product"]["problemStatement"], "Prevent finalization from losing deeply brainstormed implementation details.")
+        self.assertEqual(
+            state["product"]["problemStatement"],
+            "Prevent finalization from losing deeply brainstormed implementation details.",
+        )
         self.assertEqual(state["product"]["targetUsers"], "Human-agent project owners")
-        self.assertEqual(state["governance"]["mitigationPlans"], "Compile source sessions into canonical state before finalize.")
+        self.assertEqual(
+            state["governance"]["mitigationPlans"], "Compile source sessions into canonical state before finalize."
+        )
         self.assertIn("sessions/2026-04-04_idea-lossless-handoff.md", state["artifacts"]["sessionFiles"])
-        self.assertTrue(any("HANDOFF_SESSION_idea-lossless-handoff" in path for path in state["artifacts"]["sessionFiles"]))
+        self.assertTrue(
+            any("HANDOFF_SESSION_idea-lossless-handoff" in path for path in state["artifacts"]["sessionFiles"])
+        )
         self.assertIn("workspaceLayout", state["implementation"])
-        self.assertIn("CLI crate owns quoted command parsing like `run \"daily sync\"`.", state["implementation"]["cliCommandSurface"])
+        self.assertIn(
+            'CLI crate owns quoted command parsing like `run "daily sync"`.',
+            state["implementation"]["cliCommandSurface"],
+        )
 
     def test_lab_handoff_details_survive_finalize_and_render(self) -> None:
         self.write_handoff_fixture()
@@ -46,7 +56,7 @@ class LabHandoffTests(LabWorkflowTestCase):
 
         architecture = (self.repo / "docs/ARCHITECTURE.md").read_text(encoding="utf-8")
         roadmap = (self.repo / "docs/ROADMAP.md").read_text(encoding="utf-8")
-        self.assertIn("CLI crate owns quoted command parsing like `run \"daily sync\"`.", architecture)
+        self.assertIn('CLI crate owns quoted command parsing like `run "daily sync"`.', architecture)
         self.assertIn("Preserve spaces, apostrophes, and quoted strings in task names.", roadmap)
 
     def test_lab_handoff_to_noninteractive_finalize_golden_flow(self) -> None:
@@ -76,12 +86,13 @@ class LabHandoffTests(LabWorkflowTestCase):
         )
         self.assertEqual(state["governance"]["latestReviewOutcome"], "conditional-pass")
         self.assertIn("workspaceLayout", state["implementation"])
-        self.assertIn("CLI crate owns quoted command parsing like `run \"daily sync\"`.", state["implementation"]["cliCommandSurface"])
+        self.assertIn(
+            'CLI crate owns quoted command parsing like `run "daily sync"`.',
+            state["implementation"]["cliCommandSurface"],
+        )
 
         finalization_sessions = [
-            path
-            for path in state["artifacts"]["sessionFiles"]
-            if path.endswith(f"FINALIZATION_SESSION_{idea_id}.md")
+            path for path in state["artifacts"]["sessionFiles"] if path.endswith(f"FINALIZATION_SESSION_{idea_id}.md")
         ]
         self.assertEqual(len(finalization_sessions), 1)
         self.assertTrue((self.repo / finalization_sessions[0]).exists())
@@ -95,7 +106,7 @@ class LabHandoffTests(LabWorkflowTestCase):
         architecture = (self.repo / "docs/ARCHITECTURE.md").read_text(encoding="utf-8")
         roadmap = (self.repo / "docs/ROADMAP.md").read_text(encoding="utf-8")
         self.assertIn("Finalize Smoke", project_context)
-        self.assertIn("CLI crate owns quoted command parsing like `run \"daily sync\"`.", architecture)
+        self.assertIn('CLI crate owns quoted command parsing like `run "daily sync"`.', architecture)
         self.assertIn("Preserve spaces, apostrophes, and quoted strings in task names.", roadmap)
 
     def test_lab_handoff_requires_explicit_target_when_multiple_ideas_active(self) -> None:

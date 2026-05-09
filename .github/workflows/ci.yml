@@ -21,6 +21,16 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install development checks
+        shell: bash
+        run: python3 -m pip install -r requirements-dev.txt
+
+      - name: Run Ruff lint and format checks
+        shell: bash
+        run: |
+          python3 -m ruff check .
+          python3 -m ruff format --check .
+
       - name: Verify generated artifacts are in sync
         shell: bash
         run: |

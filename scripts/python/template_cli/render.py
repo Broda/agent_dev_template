@@ -3,29 +3,26 @@ from __future__ import annotations
 import shutil
 from pathlib import Path
 
+from template_cli.io_helpers import read_text, write_text
+from template_cli.render_ci import render_development_ci
+from template_cli.render_contract import collect_implementation_contract
+from template_cli.render_governance_templates import _render_architecture, _render_decision_adr, _render_roadmap
 from template_cli.render_helpers import (
-    MILESTONE_NAME,
     DEFAULT_CI_POLICY,
-    STATE_FILE,
-    RenderError,
+    MILESTONE_NAME,
     _append_unique_lines,
-    _copy_base,
     _copy_base_if_missing,
     _extract_value,
     _first_value_for_label,
     _infer_domain_concepts,
     _load_state,
-    _render_artifact_source_table,
     _related_hydration_files_from_state,
+    _render_artifact_source_table,
     _replace_file_literals,
     _state_value,
     _write_rendered_text,
 )
-from template_cli.render_contract import collect_implementation_contract
-from template_cli.render_ci import render_development_ci
-from template_cli.render_governance_templates import _render_architecture, _render_decision_adr, _render_roadmap
 from template_cli.render_templates import _render_project_context, _render_readme
-from template_cli.io_helpers import read_text, write_text
 
 
 def run_render_development_docs(root: Path) -> int:
@@ -47,27 +44,43 @@ def run_render_development_docs(root: Path) -> int:
     run_command = _extract_value(state, "commands.run")
     test_command = _extract_value(state, "commands.test")
     hydration_files = _related_hydration_files_from_state(root, state, idea_id)
-    problem_statement = _state_value(state, "product.problemStatement") or _first_value_for_label(
-        hydration_files, ["Problem statement"]
-    ) or purpose
-    target_users = _state_value(state, "product.targetUsers") or _first_value_for_label(
-        hydration_files, ["Target users", "Affected users/personas"]
-    ) or "Users validated during brainstorming"
-    solution_summary = _state_value(state, "product.solutionSummary") or _first_value_for_label(
-        hydration_files, ["Solution summary"]
-    ) or purpose
-    mvp_scope = _state_value(state, "product.mvpScope") or _first_value_for_label(
-        hydration_files, ["MVP scope"]
-    ) or "Capture milestone scope in ROADMAP.md."
-    out_of_scope = _state_value(state, "product.outOfScope") or _first_value_for_label(
-        hydration_files, ["Out of scope"]
-    ) or "Track non-goals explicitly."
+    problem_statement = (
+        _state_value(state, "product.problemStatement")
+        or _first_value_for_label(hydration_files, ["Problem statement"])
+        or purpose
+    )
+    target_users = (
+        _state_value(state, "product.targetUsers")
+        or _first_value_for_label(hydration_files, ["Target users", "Affected users/personas"])
+        or "Users validated during brainstorming"
+    )
+    solution_summary = (
+        _state_value(state, "product.solutionSummary")
+        or _first_value_for_label(hydration_files, ["Solution summary"])
+        or purpose
+    )
+    mvp_scope = (
+        _state_value(state, "product.mvpScope")
+        or _first_value_for_label(hydration_files, ["MVP scope"])
+        or "Capture milestone scope in ROADMAP.md."
+    )
+    out_of_scope = (
+        _state_value(state, "product.outOfScope")
+        or _first_value_for_label(hydration_files, ["Out of scope"])
+        or "Track non-goals explicitly."
+    )
     key_decisions = _state_value(state, "governance.keyDecisions") or "See canonical state and related sessions."
-    top_risks = _state_value(state, "governance.topRisks") or _first_value_for_label(
-        hydration_files, ["Top risks", "Top risks (link to risk entries)"]
-    ) or "Capture implementation risks during the first milestone."
-    mitigation_plans = _state_value(state, "governance.mitigationPlans") or "Validate early and keep milestone scope narrow."
-    contingencies = _state_value(state, "governance.contingencies") or "Reduce scope and re-baseline roadmap if assumptions fail."
+    top_risks = (
+        _state_value(state, "governance.topRisks")
+        or _first_value_for_label(hydration_files, ["Top risks", "Top risks (link to risk entries)"])
+        or "Capture implementation risks during the first milestone."
+    )
+    mitigation_plans = (
+        _state_value(state, "governance.mitigationPlans") or "Validate early and keep milestone scope narrow."
+    )
+    contingencies = (
+        _state_value(state, "governance.contingencies") or "Reduce scope and re-baseline roadmap if assumptions fail."
+    )
     latest_review_outcome = _state_value(state, "governance.latestReviewOutcome") or "conditional-pass"
     ci_policy = _state_value(state, "documentation.ciPolicy") or DEFAULT_CI_POLICY
     session_files = [str(item) for item in state.get("artifacts", {}).get("sessionFiles", []) if str(item).strip()]
@@ -123,7 +136,10 @@ def run_render_development_docs(root: Path) -> int:
         ("<Build command>", build_command),
         ("<Run command>", run_command),
         ("<Test command>", test_command),
-        ("<Rendered artifact source table>", _render_artifact_source_table(bool(persistence and persistence != "None"))),
+        (
+            "<Rendered artifact source table>",
+            _render_artifact_source_table(bool(persistence and persistence != "None")),
+        ),
     ]
 
     for relative_path in [

@@ -6,7 +6,6 @@ from typing import Any
 
 from template_cli.io_helpers import ValidationResult, path_exists, read_text
 
-
 STATE_FILE = "state/project-init.json"
 STATE_SCHEMA_FILE = "state/project-init.schema.v2.json"
 STATE_SCHEMA_VERSION = 2
@@ -116,9 +115,7 @@ def _validate_required_and_types(
         if child_schema.get("type") == "object":
             _validate_required_and_types(child, child_schema, result, child_path)
         elif child_schema.get("type") and not _matches_type(child, child_schema["type"]):
-            result.add_failure(
-                f"state/project-init.json {child_path} must be a {_type_name(child_schema['type'])}."
-            )
+            result.add_failure(f"state/project-init.json {child_path} must be a {_type_name(child_schema['type'])}.")
 
 
 def _validate_array_items(

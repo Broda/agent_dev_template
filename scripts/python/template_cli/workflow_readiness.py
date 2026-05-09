@@ -99,9 +99,7 @@ def status_readiness(root: Path, row: dict[str, str]) -> tuple[str, list[str], l
     idea_block = idea_lookup[1] if idea_lookup else ""
     session_files = _collect_session_links(root, idea_id, row)
     hydration_files = [
-        root / rel
-        for rel in files_containing(root, "ideas", idea_id) + session_files
-        if path_exists(root, rel)
+        root / rel for rel in files_containing(root, "ideas", idea_id) + session_files if path_exists(root, rel)
     ]
 
     required_missing: list[str] = []
@@ -111,11 +109,15 @@ def status_readiness(root: Path, row: dict[str, str]) -> tuple[str, list[str], l
         required_missing.append("session history")
 
     for display_name, state_keys, label in FINALIZE_REQUIRED_FIELDS:
-        if not status_signal(root, state_keys=state_keys, idea_block=idea_block, hydration_files=hydration_files, label=label):
+        if not status_signal(
+            root, state_keys=state_keys, idea_block=idea_block, hydration_files=hydration_files, label=label
+        ):
             required_missing.append(display_name)
 
     for display_name, state_keys, label in FINALIZE_ADVISORY_FIELDS:
-        if not status_signal(root, state_keys=state_keys, idea_block=idea_block, hydration_files=hydration_files, label=label):
+        if not status_signal(
+            root, state_keys=state_keys, idea_block=idea_block, hydration_files=hydration_files, label=label
+        ):
             advisory_missing.append(display_name)
 
     summary_export = clean_backticks(row.get("summary_export", ""))

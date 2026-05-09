@@ -55,7 +55,7 @@ class TemplateValidationTests(LabWorkflowTestCase):
     def test_validate_brainstorming_checks_python_launcher_delegation(self) -> None:
         launcher_path = self.repo / "scripts/render-intent-docs.sh"
         launcher_path.write_text(
-            launcher_path.read_text(encoding="utf-8").replace('python/cli.py" render-intent-docs', 'legacy-render'),
+            launcher_path.read_text(encoding="utf-8").replace('python/cli.py" render-intent-docs', "legacy-render"),
             encoding="utf-8",
         )
 
@@ -67,7 +67,7 @@ class TemplateValidationTests(LabWorkflowTestCase):
     def test_validate_brainstorming_checks_shell_launcher_macos_portability(self) -> None:
         launcher_path = self.repo / "scripts/render-intent-docs.sh"
         launcher_path.write_text(
-            launcher_path.read_text(encoding="utf-8") + "\nreadlink -f \"$0\" >/dev/null\n",
+            launcher_path.read_text(encoding="utf-8") + '\nreadlink -f "$0" >/dev/null\n',
             encoding="utf-8",
         )
 
@@ -143,7 +143,9 @@ class TemplateValidationTests(LabWorkflowTestCase):
     def test_validate_brainstorming_keeps_release_readiness_manual_only(self) -> None:
         workflow_path = self.repo / ".github/workflows/release-readiness.yml"
         workflow_path.write_text(
-            workflow_path.read_text(encoding="utf-8").replace("  workflow_dispatch:\n", "  workflow_dispatch:\n  push:\n"),
+            workflow_path.read_text(encoding="utf-8").replace(
+                "  workflow_dispatch:\n", "  workflow_dispatch:\n  push:\n"
+            ),
             encoding="utf-8",
         )
 

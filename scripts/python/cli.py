@@ -5,27 +5,30 @@ import argparse
 import sys
 from pathlib import Path
 
-
 SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
+from template_cli.bootstrap import (  # noqa: E402
+    run_project_harness_new,
+    run_project_harness_validate,
+)
+from template_cli.bootstrap_update import (  # noqa: E402
+    run_project_harness_update_apply,
+    run_project_harness_update_dry_run,
+)
+from template_cli.finalize import run_finalize_project  # noqa: E402
+from template_cli.intent_registry import modes_for_command  # noqa: E402
+from template_cli.intents import IntentRegistryError, run_render_intent_docs  # noqa: E402
+from template_cli.io_helpers import read_mode  # noqa: E402
+from template_cli.lab_cli import add_lab_subparsers, dispatch_lab_command  # noqa: E402
+from template_cli.plugin_sync import run_sync_plugin_skills  # noqa: E402
+from template_cli.render import run_render_development_docs  # noqa: E402
 from template_cli.validators import (  # noqa: E402
     run_validate_brainstorming,
     run_validate_development,
     run_validate_governance,
 )
-from template_cli.bootstrap import (  # noqa: E402
-    run_project_harness_new,
-    run_project_harness_validate,
-)
-from template_cli.bootstrap_update import run_project_harness_update_apply, run_project_harness_update_dry_run  # noqa: E402
-from template_cli.io_helpers import read_mode  # noqa: E402
-from template_cli.lab_cli import add_lab_subparsers, dispatch_lab_command  # noqa: E402
-from template_cli.plugin_sync import run_sync_plugin_skills  # noqa: E402
-from template_cli.render import run_render_development_docs  # noqa: E402
-from template_cli.intents import IntentRegistryError, modes_for_command, run_render_intent_docs  # noqa: E402
-from template_cli.finalize import run_finalize_project  # noqa: E402
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -84,8 +87,7 @@ def _enforce_lab_mode(root: Path, command: str) -> int:
     else:
         allowed_display = "no registered modes"
     print(
-        f"/lab {lab_command} is not available in {mode} mode "
-        f"(allowed: {allowed_display}).",
+        f"/lab {lab_command} is not available in {mode} mode (allowed: {allowed_display}).",
         file=sys.stderr,
     )
     print(

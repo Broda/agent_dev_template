@@ -9,7 +9,6 @@ from typing import Any
 from template_cli.io_helpers import ValidationResult, read_text, write_text
 from template_cli.json_schema import validate_json_schema_file
 
-
 MANIFEST_PATH = "harness_commands/harness_manifest.json"
 MANIFEST_SCHEMA_PATH = "harness_commands/harness_manifest.schema.json"
 EXPECTED_SCHEMA_VERSION = 1
@@ -107,10 +106,7 @@ def _validate_top_level(manifest: dict[str, Any], result: ValidationResult) -> N
     if manifest.get("harnessVersion") != EXPECTED_HARNESS_VERSION:
         result.add_failure("Harness manifest harnessVersion must be 0.1.0.")
     if manifest.get("templateRepository") != EXPECTED_TEMPLATE_REPOSITORY:
-        result.add_failure(
-            "Harness manifest templateRepository must be "
-            f"{EXPECTED_TEMPLATE_REPOSITORY}."
-        )
+        result.add_failure(f"Harness manifest templateRepository must be {EXPECTED_TEMPLATE_REPOSITORY}.")
     if manifest.get("supportedModes") != EXPECTED_MODES:
         result.add_failure("Harness manifest supportedModes must be brainstorming, development.")
     _validate_source_commit(manifest, result)
@@ -166,9 +162,7 @@ def _validate_wrappers(root: Path, manifest: dict[str, Any], result: ValidationR
             result.add_failure(f"Harness manifest stable wrapper path is missing: {path}")
         expected_backend = EXPECTED_STABLE_WRAPPER_BACKENDS.get(path)
         if expected_backend and backend != expected_backend:
-            result.add_failure(
-                f"Harness manifest stable wrapper backendCommand for {path} must be {expected_backend}."
-            )
+            result.add_failure(f"Harness manifest stable wrapper backendCommand for {path} must be {expected_backend}.")
     missing_expected_paths = sorted(set(EXPECTED_STABLE_WRAPPER_BACKENDS) - seen_paths)
     for path in missing_expected_paths:
         result.add_failure(f"Harness manifest missing stable wrapper entry: {path}")
@@ -183,15 +177,11 @@ def _validate_inventory(manifest: dict[str, Any], result: ValidationResult) -> N
     for ownership_class in required_classes:
         paths = inventory.get(ownership_class)
         if not isinstance(paths, list) or not paths:
-            result.add_failure(
-                f"Harness manifest artifactInventory.{ownership_class} must be a non-empty array."
-            )
+            result.add_failure(f"Harness manifest artifactInventory.{ownership_class} must be a non-empty array.")
             continue
         for entry in paths:
             if not isinstance(entry, str) or not entry.strip():
-                result.add_failure(
-                    f"Harness manifest artifactInventory.{ownership_class} contains an empty path."
-                )
+                result.add_failure(f"Harness manifest artifactInventory.{ownership_class} contains an empty path.")
     exclusions = manifest.get("artifactInventoryExclusions")
     if not isinstance(exclusions, list) or not exclusions:
         result.add_failure("Harness manifest artifactInventoryExclusions must be a non-empty array.")
@@ -202,7 +192,9 @@ def _validate_inventory(manifest: dict[str, Any], result: ValidationResult) -> N
     _validate_retained_artifact_coverage(inventory, exclusions, result)
 
 
-def _validate_retained_artifact_coverage(inventory: dict[str, Any], exclusions: list[Any], result: ValidationResult) -> None:
+def _validate_retained_artifact_coverage(
+    inventory: dict[str, Any], exclusions: list[Any], result: ValidationResult
+) -> None:
     from template_cli.validator_artifacts import BRAINSTORMING_CORE_ARTIFACTS
 
     inventory_entries = [
@@ -214,7 +206,9 @@ def _validate_retained_artifact_coverage(inventory: dict[str, Any], exclusions: 
     ]
     excluded_entries = [entry for entry in exclusions if isinstance(entry, str)]
     for artifact in BRAINSTORMING_CORE_ARTIFACTS:
-        if not _matches_manifest_entry(artifact, inventory_entries) and not _matches_manifest_entry(artifact, excluded_entries):
+        if not _matches_manifest_entry(artifact, inventory_entries) and not _matches_manifest_entry(
+            artifact, excluded_entries
+        ):
             result.add_failure(f"Harness manifest artifact inventory does not classify retained artifact: {artifact}")
 
 
@@ -237,7 +231,9 @@ def _validate_snapshot_policy(manifest: dict[str, Any], result: ValidationResult
         result.add_failure("Harness manifest artifactInventorySnapshotPolicy must be an object.")
         return
     if policy.get("decision") != "keep-broad-directory-entries":
-        result.add_failure("Harness manifest artifactInventorySnapshotPolicy.decision must be keep-broad-directory-entries.")
+        result.add_failure(
+            "Harness manifest artifactInventorySnapshotPolicy.decision must be keep-broad-directory-entries."
+        )
     if policy.get("snapshotGeneration") != "deferred":
         result.add_failure("Harness manifest artifactInventorySnapshotPolicy.snapshotGeneration must be deferred.")
     if not str(policy.get("rationale", "")).strip():

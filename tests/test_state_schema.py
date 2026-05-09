@@ -3,8 +3,7 @@ from __future__ import annotations
 import json
 import sys
 
-from tests.workflow_test_helpers import LabWorkflowTestCase, REPO_ROOT, run_cmd
-
+from tests.workflow_test_helpers import REPO_ROOT, LabWorkflowTestCase, run_cmd
 
 SCRIPT_ROOT = REPO_ROOT / "scripts/python"
 if str(SCRIPT_ROOT) not in sys.path:

@@ -8,7 +8,6 @@ from template_cli.finalize_artifacts import FINALIZATION_BACKUP_PATHS
 from template_cli.io_helpers import ValidationResult, read_text
 from template_cli.render_helpers import RENDERED_ARTIFACTS
 
-
 POLICY_PATH = "harness_commands/finalization_overwrite_policy.json"
 EXPECTED_SCHEMA_VERSION = 1
 EXPECTED_PATTERNS = [

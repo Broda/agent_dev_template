@@ -5,7 +5,6 @@ from pathlib import Path
 
 from template_cli.io_helpers import ValidationResult, read_text
 
-
 ALLOWED_FINALIZE_IMPORTS = {"run_finalize_project"}
 WORKFLOW_MODULES = [
     "scripts/python/template_cli/workflow.py",

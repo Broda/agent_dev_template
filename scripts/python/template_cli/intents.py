@@ -9,20 +9,11 @@ from template_cli.intent_registry import (
     CONVERSATIONAL_DOC,
     CONVERSATIONAL_MARKER_END,
     CONVERSATIONAL_MARKER_START,
-    INTENT_REGISTRY_FILE,
-    INTENT_REGISTRY_SCHEMA_FILE,
-    ALLOWED_MODES,
-    ALLOWED_MUTATION_SCOPES,
-    ALLOWED_WRITE_BEHAVIORS,
     IntentRegistryError,
     _read_text,
     _trim,
     _write_text,
     load_intent_registry,
-    modes_for_command,
-    registry_command_modes,
-    registry_commands,
-    validate_intent_registry,
 )
 
 
@@ -70,8 +61,7 @@ def render_commands_intent_table(root: Path) -> str:
     ]
     for intent in data["intents"]:
         exit_codes = ", ".join(
-            f"`{_trim(str(code))}` { _trim(str(meaning)) }"
-            for code, meaning in intent["exitCodes"].items()
+            f"`{_trim(str(code))}` {_trim(str(meaning))}" for code, meaning in intent["exitCodes"].items()
         )
         lines.append(
             f"| `/lab {_trim(str(intent['command']))}` | "
@@ -91,7 +81,6 @@ def _replace_generated_section(content: str, start_marker: str, end_marker: str,
     end_index = content.find(end_marker)
     if start_index < 0 or end_index < 0 or end_index < start_index:
         raise IntentRegistryError(f"Missing or invalid generated section markers: {start_marker} / {end_marker}")
-    body_start = start_index + len(start_marker)
     replacement_block = f"{start_marker}\n{replacement}\n{end_marker}"
     return content[:start_index] + replacement_block + content[end_index + len(end_marker) :]
 

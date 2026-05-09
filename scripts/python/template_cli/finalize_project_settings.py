@@ -56,9 +56,7 @@ def _collect_finalize_project_settings(
         authentication = choose_from_list(
             "Authentication", existing.authentication, ["None", "Local users", "External auth provider"]
         )
-        determinism = choose_from_list(
-            "Determinism/correctness sensitivity", existing.determinism, ["Normal", "High"]
-        )
+        determinism = choose_from_list("Determinism/correctness sensitivity", existing.determinism, ["Normal", "High"])
         packaging = choose_from_list(
             "Packaging/distribution planned",
             existing.packaging,
@@ -80,7 +78,9 @@ def _collect_finalize_project_settings(
         package_tool = _required_value(existing.package_tool or "None", "package manager/build tool", missing_fields)
         persistence = _pick_noninteractive_choice(existing.persistence, "persistence", missing_fields)
         authentication = _pick_noninteractive_choice(existing.authentication, "authentication", missing_fields)
-        determinism = _pick_noninteractive_choice(existing.determinism, "determinism/correctness sensitivity", missing_fields)
+        determinism = _pick_noninteractive_choice(
+            existing.determinism, "determinism/correctness sensitivity", missing_fields
+        )
         packaging = _pick_noninteractive_choice(existing.packaging, "packaging/distribution planned", missing_fields)
         constraints = _required_value(constraints_source or "None", "constraints", missing_fields)
         build_command = _required_value(existing.build_command, "build command", missing_fields)

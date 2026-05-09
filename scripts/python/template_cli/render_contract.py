@@ -3,9 +3,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from template_cli.render_helpers import _state_list, _state_value
 from template_cli.io_helpers import read_text
-
+from template_cli.render_helpers import _state_list, _state_value
 
 CONTRACT_SECTIONS = [
     (
@@ -83,7 +82,7 @@ def _line_label_values(files: list[Path], labels: list[str]) -> list[str]:
             stripped = line.strip()
             for _, prefix in prefixes:
                 if stripped.startswith(prefix):
-                    values.extend(_split_detail_value(stripped[len(prefix):]))
+                    values.extend(_split_detail_value(stripped[len(prefix) :]))
     return values
 
 

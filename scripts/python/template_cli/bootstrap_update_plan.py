@@ -5,7 +5,6 @@ from pathlib import Path
 
 from template_cli.validator_manifest import MANIFEST_PATH
 
-
 DRY_RUN_EXCLUDE_DIRS = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", ".venv", "node_modules"}
 
 

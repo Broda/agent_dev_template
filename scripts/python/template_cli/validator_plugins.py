@@ -5,8 +5,7 @@ from pathlib import Path
 
 from template_cli.io_helpers import ValidationResult, read_text
 from template_cli.validator_manifest import EXPECTED_HARNESS_VERSION
-from template_cli.validator_skills import REPO_SKILLS, REPO_SKILL_METADATA
-
+from template_cli.validator_skills import REPO_SKILL_METADATA, REPO_SKILLS
 
 PLUGIN_NAME = "project-lifecycle-lab"
 PLUGIN_README = "plugins/project-lifecycle-lab/README.md"
@@ -14,17 +13,13 @@ PLUGIN_SMOKE_SCRIPT = "plugins/project-lifecycle-lab/smoke_package.py"
 PLUGIN_MANIFEST = "plugins/project-lifecycle-lab/.codex-plugin/plugin.json"
 PLUGIN_MARKETPLACE = ".agents/plugins/marketplace.json"
 PLUGIN_SKILLS_DIR = "plugins/project-lifecycle-lab/skills"
-PLUGIN_SKILLS = {
-    skill_name: f"{PLUGIN_SKILLS_DIR}/{skill_name}/SKILL.md"
-    for skill_name in REPO_SKILLS
-}
+PLUGIN_SKILLS = {skill_name: f"{PLUGIN_SKILLS_DIR}/{skill_name}/SKILL.md" for skill_name in REPO_SKILLS}
 PLUGIN_SKILL_METADATA = {
-    skill_name: f"{PLUGIN_SKILLS_DIR}/{skill_name}/agents/openai.yaml"
-    for skill_name in REPO_SKILLS
+    skill_name: f"{PLUGIN_SKILLS_DIR}/{skill_name}/agents/openai.yaml" for skill_name in REPO_SKILLS
 }
 PLUGIN_SKILL_ARTIFACTS = [
     artifact
-    for skill_path, metadata_path in zip(PLUGIN_SKILLS.values(), PLUGIN_SKILL_METADATA.values())
+    for skill_path, metadata_path in zip(PLUGIN_SKILLS.values(), PLUGIN_SKILL_METADATA.values(), strict=True)
     for artifact in (skill_path, metadata_path)
 ]
 PLUGIN_ARTIFACTS = [PLUGIN_MARKETPLACE, PLUGIN_README, PLUGIN_SMOKE_SCRIPT, PLUGIN_MANIFEST, *PLUGIN_SKILL_ARTIFACTS]
@@ -79,13 +74,9 @@ def _validate_plugin_public_metadata(manifest: dict, result: ValidationResult) -
         result.add_failure(f"Plugin manifest author must be an object: {PLUGIN_MANIFEST}")
         return
     if author.get("name") != EXPECTED_PLUGIN_AUTHOR_NAME:
-        result.add_failure(
-            f"Plugin manifest author.name must be {EXPECTED_PLUGIN_AUTHOR_NAME}: {PLUGIN_MANIFEST}"
-        )
+        result.add_failure(f"Plugin manifest author.name must be {EXPECTED_PLUGIN_AUTHOR_NAME}: {PLUGIN_MANIFEST}")
     if author.get("email") != EXPECTED_PLUGIN_AUTHOR_EMAIL:
-        result.add_failure(
-            f"Plugin manifest author.email must be {EXPECTED_PLUGIN_AUTHOR_EMAIL}: {PLUGIN_MANIFEST}"
-        )
+        result.add_failure(f"Plugin manifest author.email must be {EXPECTED_PLUGIN_AUTHOR_EMAIL}: {PLUGIN_MANIFEST}")
     if manifest.get("interface", {}).get("developerName") != EXPECTED_PLUGIN_AUTHOR_NAME:
         result.add_failure(
             f"Plugin manifest interface.developerName must be {EXPECTED_PLUGIN_AUTHOR_NAME}: {PLUGIN_MANIFEST}"

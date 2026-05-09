@@ -6,7 +6,6 @@ from pathlib import Path
 
 from template_cli.io_helpers import read_text
 
-
 STATE_FILE = "state/project-init.json"
 WIKI_ENV_DEFAULT = "PROJECT_HARNESS_WIKI_DIR"
 

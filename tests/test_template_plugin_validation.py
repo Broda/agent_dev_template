@@ -23,7 +23,9 @@ class TemplatePluginValidationTests(LabWorkflowTestCase):
         self.assertIn("Plugin marketplace path is incorrect for project-lifecycle-lab", result.stdout)
 
     def test_version_alignment_covers_harness_plugin_marketplace_and_docs(self) -> None:
-        harness_manifest = json.loads((self.repo / "harness_commands/harness_manifest.json").read_text(encoding="utf-8"))
+        harness_manifest = json.loads(
+            (self.repo / "harness_commands/harness_manifest.json").read_text(encoding="utf-8")
+        )
         plugin_manifest = json.loads(
             (self.repo / "plugins/project-lifecycle-lab/.codex-plugin/plugin.json").read_text(encoding="utf-8")
         )
@@ -43,7 +45,9 @@ class TemplatePluginValidationTests(LabWorkflowTestCase):
     def test_validate_brainstorming_checks_plugin_harness_boundary(self) -> None:
         manifest_path = self.repo / "plugins/project-lifecycle-lab/.codex-plugin/plugin.json"
         manifest_path.write_text(
-            manifest_path.read_text(encoding="utf-8").replace("harness runtime stays in the repo", "plugin owns runtime", 1),
+            manifest_path.read_text(encoding="utf-8").replace(
+                "harness runtime stays in the repo", "plugin owns runtime", 1
+            ),
             encoding="utf-8",
         )
 
@@ -98,7 +102,9 @@ class TemplatePluginValidationTests(LabWorkflowTestCase):
     def test_validate_brainstorming_checks_plugin_readme_boundary(self) -> None:
         readme_path = self.repo / "plugins/project-lifecycle-lab/README.md"
         readme_path.write_text(
-            readme_path.read_text(encoding="utf-8").replace("must not replace repo-local scripts", "may replace scripts", 1),
+            readme_path.read_text(encoding="utf-8").replace(
+                "must not replace repo-local scripts", "may replace scripts", 1
+            ),
             encoding="utf-8",
         )
 
@@ -141,7 +147,9 @@ class TemplatePluginValidationTests(LabWorkflowTestCase):
     def test_validate_brainstorming_checks_plugin_skills_path(self) -> None:
         manifest_path = self.repo / "plugins/project-lifecycle-lab/.codex-plugin/plugin.json"
         manifest_path.write_text(
-            manifest_path.read_text(encoding="utf-8").replace('"skills": "./skills/"', '"skills": "./wrong-skills/"', 1),
+            manifest_path.read_text(encoding="utf-8").replace(
+                '"skills": "./skills/"', '"skills": "./wrong-skills/"', 1
+            ),
             encoding="utf-8",
         )
 
@@ -153,7 +161,9 @@ class TemplatePluginValidationTests(LabWorkflowTestCase):
     def test_validate_brainstorming_checks_plugin_skill_mirror_drift(self) -> None:
         plugin_skill_path = self.repo / "plugins/project-lifecycle-lab/skills/brainstorming-lab/SKILL.md"
         plugin_skill_path.write_text(
-            plugin_skill_path.read_text(encoding="utf-8").replace("Keep conversation natural", "Keep conversation scripted", 1),
+            plugin_skill_path.read_text(encoding="utf-8").replace(
+                "Keep conversation natural", "Keep conversation scripted", 1
+            ),
             encoding="utf-8",
         )
 
@@ -190,4 +200,6 @@ class TemplatePluginValidationTests(LabWorkflowTestCase):
         result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
 
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("FILE_MAP.md missing registry row for plugin artifact: .agents/plugins/marketplace.json", result.stdout)
+        self.assertIn(
+            "FILE_MAP.md missing registry row for plugin artifact: .agents/plugins/marketplace.json", result.stdout
+        )

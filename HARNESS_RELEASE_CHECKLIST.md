@@ -7,6 +7,9 @@ release. It applies to this template repository, not to generated projects.
 
 - [ ] Manual Release Readiness workflow passes in GitHub Actions.
 - [ ] `./scripts/validate-governance`
+- [ ] `python3 -m pip install -r requirements-dev.txt`
+- [ ] `python3 -m ruff check .`
+- [ ] `python3 -m ruff format --check .`
 - [ ] `python3 -m unittest discover -s tests -v`
 - [ ] Fresh copy validates:
 

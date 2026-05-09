@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 from template_cli.validator_plugins import PLUGIN_ARTIFACTS
-from template_cli.validator_skills import REPO_SKILLS, REPO_SKILL_METADATA
-
+from template_cli.validator_skills import REPO_SKILL_METADATA, REPO_SKILLS
 
 REPO_SKILL_ARTIFACTS = [
     artifact
-    for skill_path, metadata_path in zip(REPO_SKILLS.values(), REPO_SKILL_METADATA.values())
+    for skill_path, metadata_path in zip(REPO_SKILLS.values(), REPO_SKILL_METADATA.values(), strict=True)
     for artifact in (skill_path, metadata_path)
 ]
 REPO_PLUGIN_ARTIFACTS = PLUGIN_ARTIFACTS
@@ -18,6 +17,7 @@ BRAINSTORMING_CORE_ARTIFACTS = [
     "LICENSE",
     "README.md",
     "pyproject.toml",
+    "requirements-dev.txt",
     "BOOTSTRAP_TOOL.md",
     "HARNESS_RELEASE_CHECKLIST.md",
     "HARNESS_CHANGELOG.md",

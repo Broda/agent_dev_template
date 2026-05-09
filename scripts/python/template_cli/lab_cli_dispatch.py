@@ -1,32 +1,20 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from template_cli.adr import run_lab_adr
 from template_cli.evidence import run_lab_evidence
+from template_cli.handoff import run_lab_handoff
 from template_cli.notes import run_lab_note
 from template_cli.sync import run_lab_sync_from_argv
 from template_cli.wiki import run_lab_wiki_check, run_lab_wiki_render
-from template_cli.workflow import (
-    run_lab_activate,
-    run_lab_audit,
-    run_lab_capture,
-    run_lab_commit_command,
-    run_lab_decide,
-    run_lab_doctor,
-    run_lab_export,
-    run_lab_finalize,
-    run_lab_handoff,
-    run_lab_kill,
-    run_lab_park,
-    run_lab_path_note,
-    run_lab_push_command,
-    run_lab_review,
-    run_lab_risk,
-    run_lab_status,
-)
-
+from template_cli.workflow import run_lab_audit, run_lab_commit_command, run_lab_finalize, run_lab_push_command
+from template_cli.workflow_commands import run_lab_decide, run_lab_path_note, run_lab_review, run_lab_risk
+from template_cli.workflow_export import run_lab_export
+from template_cli.workflow_idea_commands import run_lab_activate, run_lab_capture, run_lab_kill, run_lab_park
+from template_cli.workflow_status import run_lab_doctor, run_lab_status
 
 Dispatcher = Callable[[Path, Any, list[str]], int]
 

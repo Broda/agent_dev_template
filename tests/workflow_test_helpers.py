@@ -9,7 +9,6 @@ import textwrap
 import unittest
 from pathlib import Path
 
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -81,10 +80,7 @@ class LabWorkflowTestCase(unittest.TestCase):
         project_name = fixture_state["projectName"]
         (self.repo / "sessions").mkdir(parents=True, exist_ok=True)
         session_template = (fixture_dir / "finalized_session.md").read_text(encoding="utf-8")
-        session_text = (
-            session_template.replace("idea-render-fixture", idea_id)
-            .replace("Render Fixture", project_name)
-        )
+        session_text = session_template.replace("idea-render-fixture", idea_id).replace("Render Fixture", project_name)
         (self.repo / f"sessions/2026-04-03_{idea_id}.md").write_text(session_text, encoding="utf-8")
         (self.repo / f"sessions/2026-04-03_FINALIZATION_SESSION_{idea_id}.md").write_text(
             session_text,

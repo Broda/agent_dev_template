@@ -3,8 +3,8 @@ from __future__ import annotations
 import shutil
 from pathlib import Path
 
-from template_cli.validator_plugins import PLUGIN_SKILLS, PLUGIN_SKILL_METADATA
-from template_cli.validator_skills import REPO_SKILLS, REPO_SKILL_METADATA
+from template_cli.validator_plugins import PLUGIN_SKILL_METADATA, PLUGIN_SKILLS
+from template_cli.validator_skills import REPO_SKILL_METADATA, REPO_SKILLS
 from template_cli.validators import run_validate_governance
 
 

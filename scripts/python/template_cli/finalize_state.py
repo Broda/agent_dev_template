@@ -8,7 +8,6 @@ from pathlib import Path
 from template_cli.finalize_helpers import (
     STATE_FILE,
     choose_idea_to_finalize,
-    clean_backticks,
     existing_state_value,
     join_by,
     replace_line_prefix,
@@ -17,7 +16,7 @@ from template_cli.finalize_helpers import (
     trim,
     unique_values,
 )
-from template_cli.io_helpers import IDEA_ROW_RE, parse_markdown_table_rows, read_text, write_text
+from template_cli.io_helpers import IDEA_ROW_RE, clean_backticks, parse_markdown_table_rows, read_text, write_text
 
 
 class BackupManager(AbstractContextManager["BackupManager"]):

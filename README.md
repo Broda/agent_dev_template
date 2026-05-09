@@ -43,7 +43,8 @@ validation fails if the generated views drift.
 - The shell and PowerShell entrypoints are launchers; the canonical implementation lives in Python.
 - The public template is MIT licensed. See `LICENSE`.
 - Text files are normalized through `.gitattributes` and `.editorconfig` so generated docs and wrappers avoid accidental BOM or line-ending churn.
-- `pyproject.toml` records optional Ruff, Black, and isort defaults for maintainers.
+- `pyproject.toml` records Ruff, Black, and isort defaults for maintainers.
+- `requirements-dev.txt` pins Ruff for local and CI lint/format checks.
 
 On Windows, PowerShell launchers prefer `py -3` and fall back to `python`.
 On macOS/Linux, shell launchers prefer `python3` and fall back to `python`.

@@ -4,7 +4,6 @@ from pathlib import Path
 
 from template_cli.io_helpers import ValidationResult, read_text
 
-
 PYPROJECT_PATH = "pyproject.toml"
 REQUIRED_SECTIONS = [
     "[tool.black]",
@@ -14,7 +13,7 @@ REQUIRED_SECTIONS = [
     "[tool.ruff.lint.isort]",
 ]
 REQUIRED_SNIPPETS = [
-    'line-length = 120',
+    "line-length = 120",
     'target-version = ["py312"]',
     'target-version = "py312"',
     'profile = "black"',

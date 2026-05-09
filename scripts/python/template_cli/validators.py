@@ -4,21 +4,6 @@ import re
 import sys
 from pathlib import Path
 
-from template_cli.state_schema import validate_project_state_file
-from template_cli.validator_artifacts import BRAINSTORMING_CORE_ARTIFACTS, DEVELOPMENT_REQUIRED_ARTIFACTS
-from template_cli.validator_code_size import validate_python_file_sizes
-from template_cli.validator_intents import (
-    validate_intent_registry,
-    validate_intent_sync_ci,
-    validate_lab_command_parity,
-)
-from template_cli.validator_launchers import validate_python_launchers
-from template_cli.validator_manifest import validate_harness_manifest
-from template_cli.validator_module_boundaries import validate_module_boundaries
-from template_cli.validator_overwrite_policy import validate_finalization_overwrite_policy
-from template_cli.validator_plugins import validate_repo_plugins
-from template_cli.validator_python_config import validate_python_tool_config
-from template_cli.validator_skills import validate_repo_skills
 from template_cli.io_helpers import (
     ADR_LINK_RE,
     DEVELOPMENT_SEMANTIC_DOCS,
@@ -37,7 +22,23 @@ from template_cli.io_helpers import (
     read_mode,
     read_text,
 )
+from template_cli.state_schema import validate_project_state_file
+from template_cli.validator_artifacts import BRAINSTORMING_CORE_ARTIFACTS, DEVELOPMENT_REQUIRED_ARTIFACTS
+from template_cli.validator_code_size import validate_python_file_sizes
+from template_cli.validator_intents import (
+    validate_intent_registry,
+    validate_intent_sync_ci,
+    validate_lab_command_parity,
+)
+from template_cli.validator_launchers import validate_python_launchers
+from template_cli.validator_manifest import validate_harness_manifest
+from template_cli.validator_module_boundaries import validate_module_boundaries
+from template_cli.validator_overwrite_policy import validate_finalization_overwrite_policy
 from template_cli.validator_placeholders import find_unresolved_placeholders
+from template_cli.validator_plugins import validate_repo_plugins
+from template_cli.validator_python_config import validate_python_tool_config
+from template_cli.validator_skills import validate_repo_skills
+
 
 def validate_notes_catalog(root: Path, result: ValidationResult) -> None:
     notes_catalog_path = root / "NOTES_CATALOG.md"
@@ -185,9 +186,7 @@ def run_validate_brainstorming(root: Path) -> int:
     validate_repo_skills(root, result)
 
     if read_mode(root) != "brainstorming":
-        result.add_failure(
-            "MODE.md must remain in brainstorming mode while using brainstorming validation."
-        )
+        result.add_failure("MODE.md must remain in brainstorming mode while using brainstorming validation.")
 
     file_map_path = root / "brainstorming/FILE_MAP.md"
     if file_map_path.exists():

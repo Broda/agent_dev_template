@@ -8,7 +8,6 @@ from pathlib import Path
 from template_cli.io_helpers import ValidationResult, read_text, replace_literal, write_text
 from template_cli.state_schema import validate_project_state_data
 
-
 MILESTONE_NAME = "Milestone 0 — Foundation"
 STATE_FILE = "state/project-init.json"
 DEFAULT_CI_POLICY = (
@@ -29,7 +28,11 @@ RENDERED_ARTIFACTS = [
     ("docs/SECURITY_POLICY.md", "Base template", "Human-editable by policy decision"),
     ("docs/RUNTIME_VERIFICATION_REPORT.md", "Base template plus command replacement", "Human-editable evidence log"),
     ("docs/MIGRATION_POLICY.md", "Base template when persistence is enabled", "Human-editable by policy decision"),
-    ("docs/adr/ADR-0001-record-architecture-decisions.md", "Python renderer", "Regenerate from state or supersede with a later ADR"),
+    (
+        "docs/adr/ADR-0001-record-architecture-decisions.md",
+        "Python renderer",
+        "Regenerate from state or supersede with a later ADR",
+    ),
     ("docs/adr/ADR-TEMPLATE.md", "Base template", "Human-editable template for future ADRs"),
 ]
 
@@ -167,7 +170,7 @@ def _extract_label_value(path: Path, label: str) -> str:
         return ""
     for line in read_text(path).splitlines():
         if line.startswith(prefix):
-            return _trim(line[len(prefix):])
+            return _trim(line[len(prefix) :])
     return ""
 
 

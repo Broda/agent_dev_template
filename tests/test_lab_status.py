@@ -109,4 +109,6 @@ class LabStatusTests(LabWorkflowTestCase):
         self.assertIn("- problem statement: OK via state.product.problemStatement", result.stdout)
         self.assertIn("- build command: OK via state.commands.build", result.stdout)
         self.assertIn("- top risks: OK via state.governance.topRisks", result.stdout)
-        self.assertIn("Next step: finalize can run now with ./scripts/finalize-project --idea-id idea-doctor-ready", result.stdout)
+        self.assertIn(
+            "Next step: finalize can run now with ./scripts/finalize-project --idea-id idea-doctor-ready", result.stdout
+        )

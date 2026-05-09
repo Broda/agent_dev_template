@@ -8,15 +8,14 @@ from pathlib import Path
 from template_cli.finalize_helpers import (
     files_containing,
 )
-from template_cli.workflow_catalog import _extract_catalog_row, _upsert_catalog_row
-from template_cli.sync import run_lab_sync
 from template_cli.io_helpers import (
     path_exists,
     read_mode,
     read_text,
     write_text,
 )
-
+from template_cli.sync import run_lab_sync
+from template_cli.workflow_catalog import _extract_catalog_row
 
 BUCKET_FILES = {
     "inbox": "ideas/_inbox.md",

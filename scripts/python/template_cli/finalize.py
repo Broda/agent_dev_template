@@ -3,21 +3,21 @@ from __future__ import annotations
 from datetime import date
 from pathlib import Path
 
-from template_cli.finalize_context import load_finalize_context
 from template_cli.finalize_artifacts import (
     _ensure_finalization_dirs,
     _load_existing_state,
 )
+from template_cli.finalize_context import load_finalize_context
+from template_cli.finalize_execution import _write_and_validate_finalized_project
+from template_cli.finalize_existing import _load_existing_finalize_values
 from template_cli.finalize_helpers import (
     ask_non_empty,
 )
-from template_cli.finalize_existing import _load_existing_finalize_values
-from template_cli.finalize_execution import _write_and_validate_finalized_project
+from template_cli.finalize_output import _print_finalization_result
 from template_cli.finalize_project_settings import _collect_finalize_project_settings
 from template_cli.finalize_state import (
     resolve_finalize_idea_id,
 )
-from template_cli.finalize_output import _print_finalization_result
 from template_cli.finalize_validation import (
     _collect_missing_noninteractive_fields,
     _fail_noninteractive,

@@ -4,7 +4,6 @@ from pathlib import Path
 
 from template_cli.io_helpers import ValidationResult, read_text
 
-
 REPO_SKILLS = {
     "brainstorming-lab": ".agents/skills/brainstorming-lab/SKILL.md",
     "project-finalizer": ".agents/skills/project-finalizer/SKILL.md",
@@ -12,14 +11,15 @@ REPO_SKILLS = {
     "template-maintenance": ".agents/skills/template-maintenance/SKILL.md",
 }
 REPO_SKILL_METADATA = {
-    skill_name: skill_path.replace("/SKILL.md", "/agents/openai.yaml")
-    for skill_name, skill_path in REPO_SKILLS.items()
+    skill_name: skill_path.replace("/SKILL.md", "/agents/openai.yaml") for skill_name, skill_path in REPO_SKILLS.items()
 }
 
 
 def validate_repo_skills(root: Path, result: ValidationResult) -> None:
     agents_text = read_text(root / "AGENTS.md") if (root / "AGENTS.md").exists() else ""
-    file_map_text = read_text(root / "brainstorming/FILE_MAP.md") if (root / "brainstorming/FILE_MAP.md").exists() else ""
+    file_map_text = (
+        read_text(root / "brainstorming/FILE_MAP.md") if (root / "brainstorming/FILE_MAP.md").exists() else ""
+    )
 
     for skill_name, relative_path in REPO_SKILLS.items():
         skill_path = root / relative_path
@@ -45,7 +45,9 @@ def validate_repo_skills(root: Path, result: ValidationResult) -> None:
             continue
         metadata_text = read_text(metadata_file)
         if "default_prompt:" not in metadata_text or f"${skill_name}" not in metadata_text:
-            result.add_failure(f"Repo skill UI metadata must include default_prompt with ${skill_name}: {metadata_path}")
+            result.add_failure(
+                f"Repo skill UI metadata must include default_prompt with ${skill_name}: {metadata_path}"
+            )
         if f"`{metadata_path}`" not in file_map_text:
             result.add_failure(f"FILE_MAP.md missing registry row for repo skill metadata: {metadata_path}")
 

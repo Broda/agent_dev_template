@@ -37,7 +37,7 @@ def first_value_for_label(files: list[Path], label: str) -> str:
         for line in read_text(file_path).splitlines():
             stripped = line.strip()
             if stripped.startswith(prefix):
-                value = trim(stripped[len(prefix):])
+                value = trim(stripped[len(prefix) :])
                 if not is_empty_handoff_value(value):
                     return value
     return ""

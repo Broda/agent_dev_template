@@ -40,10 +40,7 @@ def _render_catalog_row(
 ) -> str:
     sessions_cell = ", ".join(f"`{value}`" for value in sessions) if sessions else "_none_"
     export_cell = f"`{summary_export}`" if _trim(summary_export) else "_n/a_"
-    return (
-        f"| {idea_id} | {title} | {status} | {owner} | {sessions_cell} | {export_cell} |"
-        f" {notes or '_none_'} |"
-    )
+    return f"| {idea_id} | {title} | {status} | {owner} | {sessions_cell} | {export_cell} | {notes or '_none_'} |"
 
 
 def _upsert_catalog_row(

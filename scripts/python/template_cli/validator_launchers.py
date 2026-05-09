@@ -8,7 +8,6 @@ from pathlib import Path
 from template_cli.io_helpers import ValidationResult, read_mode, read_text
 from template_cli.validator_manifest import load_harness_manifest
 
-
 PYTHON_COMMAND_LAUNCHERS = {
     "finalize-project": "finalize-project",
     "lab-note": "lab-note",

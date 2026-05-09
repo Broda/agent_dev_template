@@ -3,21 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 
 from template_cli.finalize import run_finalize_project
-from template_cli.handoff import run_lab_handoff
 from template_cli.sync import run_lab_commit, run_lab_push
 from template_cli.validators import run_validate_governance
-from template_cli.workflow_commands import (
-    run_lab_activate,
-    run_lab_capture,
-    run_lab_decide,
-    run_lab_export,
-    run_lab_kill,
-    run_lab_park,
-    run_lab_path_note,
-    run_lab_review,
-    run_lab_risk,
-)
-from template_cli.workflow_status import run_lab_doctor, run_lab_status
 
 
 def run_lab_audit(root: Path) -> int:

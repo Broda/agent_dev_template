@@ -243,6 +243,7 @@ class LabLifecycleTests(LabWorkflowTestCase):
         self.assertIn("- Non-goals: Enforce one exact bullet style.", updated_idea)
         self.assertIn("- Latest review outcome: pass", updated_idea)
 
+
 if __name__ == "__main__":
     import unittest
 

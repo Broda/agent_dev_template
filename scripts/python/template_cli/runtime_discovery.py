@@ -5,19 +5,17 @@ import os
 import shutil
 import subprocess
 import sys
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Mapping
 
 from template_cli.validator_manifest import load_harness_manifest
-
 
 RUNTIME_ENV = "PROJECT_HARNESS_RUNTIME"
 RUNTIME_COMMAND = "project-harness-runtime"
 CONFIG_ERROR_EXIT = 78
 READ_ONLY_FALLBACK_WARNING = (
-    "harness-runtime warning: installed runtime is incompatible; "
-    "using repo-local fallback at scripts/python/cli.py"
+    "harness-runtime warning: installed runtime is incompatible; using repo-local fallback at scripts/python/cli.py"
 )
 FALLBACK_UNAVAILABLE_ERROR = (
     "harness-runtime error: installed runtime is incompatible and repo-local fallback is unavailable"

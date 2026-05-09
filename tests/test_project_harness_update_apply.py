@@ -144,8 +144,12 @@ class ProjectHarnessUpdateApplyTests(ProjectHarnessUpdateTestCase):
 
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("Post-update hook failed. Rolled back copied files from backup:", result.stdout)
-        self.assertEqual(original_registry, (project / "harness_commands/intent_registry.json").read_text(encoding="utf-8"))
-        self.assertEqual(original_commands, (project / "harness_commands/CONVERSATIONAL_MODE.md").read_text(encoding="utf-8"))
+        self.assertEqual(
+            original_registry, (project / "harness_commands/intent_registry.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            original_commands, (project / "harness_commands/CONVERSATIONAL_MODE.md").read_text(encoding="utf-8")
+        )
 
     def test_update_apply_rolls_back_when_validation_fails(self) -> None:
         source = self.copy_source()

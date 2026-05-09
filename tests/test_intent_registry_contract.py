@@ -7,7 +7,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -77,7 +76,9 @@ class IntentRegistryContractTests(unittest.TestCase):
         registry_path.write_text(json.dumps(registry, indent=2) + "\n", encoding="utf-8")
         result = run_cmd(["./scripts/validate-governance"], cwd=self.repo, check=False)
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("Intent registry command is not registered in CLI: unknown-command", result.stdout + result.stderr)
+        self.assertIn(
+            "Intent registry command is not registered in CLI: unknown-command", result.stdout + result.stderr
+        )
 
     def test_validate_governance_fails_on_backend_intent_command_drift(self) -> None:
         registry_path = self.repo / "harness_commands/intent_registry.json"
@@ -127,7 +128,7 @@ class IntentRegistryContractTests(unittest.TestCase):
     def test_validate_governance_fails_when_ci_focused_diff_is_removed(self) -> None:
         ci_path = self.repo / ".github/workflows/ci.yml"
         ci_text = ci_path.read_text(encoding="utf-8").replace(
-            "            git diff --binary -- \"${generated_paths[@]}\" > .ci/generated-drift/generated-artifacts.patch\n",
+            '            git diff --binary -- "${generated_paths[@]}" > .ci/generated-drift/generated-artifacts.patch\n',
             "",
             1,
         )

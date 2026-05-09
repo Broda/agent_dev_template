@@ -52,7 +52,12 @@ def run_lab_handoff(root: Path, *, idea_id: str = "", check: bool = False, no_sy
     )
     fill(state, "governance.keyDecisions", decision_summary, filled)
     fill(state, "governance.latestReviewSession", latest_session_path(context.session_paths), filled)
-    fill(state, "artifacts.noteReferences", context.notes_col if not is_placeholder_value(context.notes_col) else "None recorded", filled)
+    fill(
+        state,
+        "artifacts.noteReferences",
+        context.notes_col if not is_placeholder_value(context.notes_col) else "None recorded",
+        filled,
+    )
     fill(state, "artifacts.summaryExport", context.existing_export_path, filled)
     fill_list(state, "artifacts.ideaFiles", context.idea_files, filled)
     fill_list(state, "artifacts.sessionFiles", context.session_paths, filled)
@@ -61,24 +66,32 @@ def run_lab_handoff(root: Path, *, idea_id: str = "", check: bool = False, no_sy
     contract_sections = fill_implementation_contract(state, source_files, filled)
     missing = [path for path in REQUIRED_PATHS if not value_at(state, path)]
 
-    print_summary(context.idea_id, context.idea_files, context.session_paths, filled, missing, contract_sections, check=check)
+    print_summary(
+        context.idea_id, context.idea_files, context.session_paths, filled, missing, contract_sections, check=check
+    )
     if check:
         return 0
 
-    session_path = write_handoff_session(root, context.idea_id, context.idea_files, context.session_paths, filled, missing, contract_sections)
+    session_path = write_handoff_session(
+        root, context.idea_id, context.idea_files, context.session_paths, filled, missing, contract_sections
+    )
     fill_list(state, "artifacts.sessionFiles", context.session_paths + [session_path], filled)
     schema_result = ValidationResult()
     validate_project_state_data(root, schema_result, state, variant="draft")
     if schema_result.failures:
         raise SystemExit("\n".join(schema_result.failures))
     write_text(root / STATE_FILE, json.dumps(state, indent=2) + "\n")
-    sync_code = run_lab_sync(
-        root,
-        message=f"handoff {context.idea_id}",
-        quiet=True,
-        no_warn_push_failure=True,
-        files=[STATE_FILE, session_path],
-    ) if not no_sync else 0
+    sync_code = (
+        run_lab_sync(
+            root,
+            message=f"handoff {context.idea_id}",
+            quiet=True,
+            no_warn_push_failure=True,
+            files=[STATE_FILE, session_path],
+        )
+        if not no_sync
+        else 0
+    )
     if sync_code not in {0, 2}:
         raise SystemExit(sync_code)
     print(f"Handoff state updated: {STATE_FILE}")

@@ -8,7 +8,6 @@ from pathlib import Path
 from template_cli.io_helpers import read_mode, write_text
 from template_cli.validator_manifest import stamp_harness_manifest
 
-
 COPY_IGNORE = shutil.ignore_patterns(
     ".git",
     "__pycache__",

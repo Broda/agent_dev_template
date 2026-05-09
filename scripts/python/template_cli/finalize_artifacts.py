@@ -7,7 +7,6 @@ from template_cli.finalize_helpers import STATE_FILE, join_lines
 from template_cli.finalize_state import BackupManager
 from template_cli.io_helpers import read_text, write_text
 
-
 FINALIZATION_BACKUP_PATHS = [
     STATE_FILE,
     "README.md",

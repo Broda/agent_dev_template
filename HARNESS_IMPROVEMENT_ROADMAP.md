@@ -431,7 +431,7 @@ Next-task sequencing:
     already below 300 lines or after splitting the specific blockers.
 - [x] Add import-boundary validation for new workflow helper modules as they are
       split out.
-- [ ] Run Ruff formatting/linting in CI once local violations are either fixed
+- [x] Run Ruff formatting/linting in CI once local violations are either fixed
       or intentionally configured.
   - First run `python3 -m ruff check .` and `python3 -m ruff format --check .`
     locally to capture the current violation set.

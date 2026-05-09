@@ -5,9 +5,8 @@ import sys
 from datetime import date
 from pathlib import Path
 
-from template_cli.sync import run_lab_sync
 from template_cli.io_helpers import read_mode, read_text, write_text
-
+from template_cli.sync import run_lab_sync
 
 NOTE_ROW_RE = re.compile(r"^\|\s*note-(\d{4})\s*\|")
 

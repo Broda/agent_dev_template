@@ -6,7 +6,6 @@ from pathlib import Path
 from template_cli.io_helpers import read_text
 from template_cli.wiki_config import STATE_FILE
 
-
 WIKI_PAGES = {
     "Home.md": "Home",
     "Getting-Started.md": "Getting Started",

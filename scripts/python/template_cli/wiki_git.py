@@ -5,7 +5,6 @@ from pathlib import Path
 
 from template_cli.wiki_config import STATE_FILE, wiki_dir
 
-
 WIKI_RELEVANT_PREFIXES = (
     "docs/",
     "harness_commands/",

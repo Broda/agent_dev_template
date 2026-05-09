@@ -18,7 +18,9 @@ class FinalizationRegressionTests(LabWorkflowTestCase):
             'Adopt "state-first" finalization; split Review Queue UI from Commitment Engine; '
             'store "client docs/final plan.md" source paths literally.'
         )
-        top_risks = 'Quoted commands or paths with spaces may break render/finalize, especially "tests/integration cases".'
+        top_risks = (
+            'Quoted commands or paths with spaces may break render/finalize, especially "tests/integration cases".'
+        )
         mitigation = "Use structured JSON, deterministic renderers, and smoke assertions across multiple sessions."
         contingency = "Keep literal command blocks in generated docs if parser support regresses."
 
@@ -341,8 +343,6 @@ class FinalizationRegressionTests(LabWorkflowTestCase):
             },
             "implementation": {
                 "workspaceLayout": ["quote-scheduler-core", "quote-scheduler-web"],
-                "storageImplementation": [
-                    "Initial implementation must preserve structured MVP contract details."
-                ],
+                "storageImplementation": ["Initial implementation must preserve structured MVP contract details."],
             },
         }

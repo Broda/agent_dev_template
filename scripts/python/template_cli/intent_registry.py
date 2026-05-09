@@ -5,7 +5,6 @@ from pathlib import Path
 
 from template_cli.json_schema import validate_json_schema_file
 
-
 INTENT_REGISTRY_FILE = "harness_commands/intent_registry.json"
 INTENT_REGISTRY_SCHEMA_FILE = "harness_commands/intent_registry.schema.json"
 CONVERSATIONAL_DOC = "harness_commands/CONVERSATIONAL_MODE.md"
@@ -109,9 +108,7 @@ def validate_intent_registry(data: dict) -> None:
         cleaned_modes = [_trim(str(mode)) for mode in intent_modes]
         invalid_intent_modes = sorted(set(cleaned_modes) - ALLOWED_MODES)
         if invalid_intent_modes:
-            raise IntentRegistryError(
-                f"Intent '{command}' contains invalid modes: {', '.join(invalid_intent_modes)}"
-            )
+            raise IntentRegistryError(f"Intent '{command}' contains invalid modes: {', '.join(invalid_intent_modes)}")
 
         phrases = intent.get("phrases")
         if not isinstance(phrases, list) or not phrases:
@@ -183,10 +180,7 @@ def registry_commands(root: Path) -> set[str]:
 
 def registry_command_modes(root: Path) -> dict[str, set[str]]:
     data = load_intent_registry(root)
-    return {
-        _trim(str(intent["command"])): {_trim(str(mode)) for mode in intent["modes"]}
-        for intent in data["intents"]
-    }
+    return {_trim(str(intent["command"])): {_trim(str(mode)) for mode in intent["modes"]} for intent in data["intents"]}
 
 
 def modes_for_command(root: Path, command: str) -> set[str]:

@@ -5,8 +5,7 @@ import re
 import sys
 from pathlib import Path
 
-from template_cli.io_helpers import clean_backticks, parse_markdown_table_rows, path_exists, read_text, write_text
-
+from template_cli.io_helpers import read_text, write_text
 
 STATE_FILE = "state/project-init.json"
 STATE_SCHEMA_VERSION = 2
@@ -110,9 +109,7 @@ def choose_project_type(current: str) -> str:
 
     while True:
         try:
-            response = input(
-                f"Select project type [1-{len(options)}]{f' (current: {current})' if current else ''}: "
-            )
+            response = input(f"Select project type [1-{len(options)}]{f' (current: {current})' if current else ''}: ")
         except EOFError:
             if current:
                 return current
@@ -132,9 +129,7 @@ def choose_from_list(prompt: str, current: str, options: list[str]) -> str:
 
     while True:
         try:
-            response = input(
-                f"{prompt} [1-{len(options)}]{f' (current: {current})' if current else ''}: "
-            )
+            response = input(f"{prompt} [1-{len(options)}]{f' (current: {current})' if current else ''}: ")
         except EOFError:
             if current:
                 return current
@@ -161,7 +156,7 @@ def choose_idea_to_finalize(candidates: list[tuple[str, str, str]]) -> str:
             raise SystemExit(
                 "Cannot infer which idea to finalize non-interactively.\n"
                 "Rerun with stdin/TTY answers or pass --idea-id explicitly."
-            )
+            ) from None
         response = trim(response)
         if response.isdigit():
             idx = int(response)
@@ -175,7 +170,7 @@ def extract_label_value(path: Path, label: str) -> str:
         return ""
     for line in read_text(path).splitlines():
         if line.startswith(prefix):
-            return trim(line[len(prefix):])
+            return trim(line[len(prefix) :])
     return ""
 
 
@@ -215,7 +210,9 @@ def split_linkish_values(value: str, prefixes: tuple[str, ...]) -> list[str]:
     return unique_values(matches)
 
 
-def summarize_decisions(project_type: str, persistence: str, authentication: str, determinism: str, packaging: str) -> str:
+def summarize_decisions(
+    project_type: str, persistence: str, authentication: str, determinism: str, packaging: str
+) -> str:
     parts = []
     if project_type:
         parts.append(f"Project type: {project_type}.")
@@ -231,7 +228,9 @@ def summarize_decisions(project_type: str, persistence: str, authentication: str
 
 
 def summarize_dependencies(language: str, runtime: str, framework: str, package_tool: str) -> str:
-    return f"Language: {language}; Runtime: {runtime}; Framework: {framework or 'None'}; Tooling: {package_tool or 'None'}"
+    return (
+        f"Language: {language}; Runtime: {runtime}; Framework: {framework or 'None'}; Tooling: {package_tool or 'None'}"
+    )
 
 
 def files_containing(root: Path, subdir: str, needle: str) -> list[str]:

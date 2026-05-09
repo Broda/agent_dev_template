@@ -4,7 +4,6 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
-
 NOTE_ID_RE = re.compile(r"^note-\d{4}$")
 NOTE_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 IDEA_ROW_RE = re.compile(r"^\|\s*idea-[a-z0-9-]+")

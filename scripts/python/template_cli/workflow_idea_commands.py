@@ -2,20 +2,19 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from template_cli.workflow_catalog import _extract_catalog_row, _upsert_catalog_row
 from template_cli.workflow_data import (
     BUCKET_FILES,
     _append_idea_to_bucket,
     _build_idea_fields,
     _collect_session_links,
     _default_owner,
-    _extract_catalog_row,
     _remove_idea_from_buckets,
     _sync,
     _title_from_idea_id,
-    _upsert_catalog_row,
 )
-from template_cli.workflow_sessions import _ensure_session_file
 from template_cli.workflow_render import _render_idea_block
+from template_cli.workflow_sessions import _ensure_session_file
 
 
 def run_lab_capture(
