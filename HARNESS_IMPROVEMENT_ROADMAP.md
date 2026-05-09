@@ -576,7 +576,7 @@ Next-task sequencing:
     runtime in the first extraction slice.
   - Acceptance: wrappers can be designed from the interface without referencing
     private implementation details.
-- [ ] Add runtime discovery tests for environment override, compatible installed
+- [x] Add runtime discovery tests for environment override, compatible installed
       runtime, incompatible installed runtime, and local fallback.
   - Cover explicit environment override, installed runtime on `PATH`, installed
     runtime version mismatch, missing installed runtime, and local source

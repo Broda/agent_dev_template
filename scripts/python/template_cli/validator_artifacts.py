@@ -98,6 +98,7 @@ BRAINSTORMING_CORE_ARTIFACTS = [
     "tests/test_template_validation.py",
     "tests/test_project_harness_bootstrap.py",
     "tests/test_project_harness_update.py",
+    "tests/test_runtime_discovery.py",
     "tests/test_state_schema.py",
     "tests/fixtures/finalized_state_v2.json",
     "tests/fixtures/finalized_state_web_app_v2.json",
@@ -144,6 +145,7 @@ BRAINSTORMING_CORE_ARTIFACTS = [
     "scripts/python/template_cli/wiki_pages.py",
     "scripts/python/template_cli/intent_registry.py",
     "scripts/python/template_cli/json_schema.py",
+    "scripts/python/template_cli/runtime_discovery.py",
     "scripts/python/template_cli/validator_python_config.py",
 ]
 

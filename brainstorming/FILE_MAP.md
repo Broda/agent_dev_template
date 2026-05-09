@@ -72,6 +72,7 @@ Lean file registry for the Project Harness Template.
 | `tests/test_template_validation.py` | Template governance, skill, plugin, and launcher validation tests |
 | `tests/test_project_harness_bootstrap.py` | Project harness bootstrap command regression tests |
 | `tests/test_project_harness_update.py` | Project harness update dry-run regression tests |
+| `tests/test_runtime_discovery.py` | Installed runtime discovery contract tests |
 | `tests/test_state_schema.py` | Project state schema contract regression tests |
 | `tests/fixtures/finalized_state_v2.json` | Canonical finalized-state fixture for development render/validate regression |
 | `tests/fixtures/finalized_state_web_app_v2.json` | Non-game finalized-state fixture for product-neutral development rendering regression |
@@ -178,6 +179,7 @@ Lean file registry for the Project Harness Template.
 | `scripts/python/template_cli/render_templates.py` | Compatibility exports for development document renderers |
 | `scripts/python/template_cli/render_project_context.py` | Pure renderer for generated project context docs |
 | `scripts/python/template_cli/render_readme.py` | Pure renderer for generated README docs |
+| `scripts/python/template_cli/runtime_discovery.py` | Installed runtime discovery and compatibility resolution helpers |
 | `scripts/python/template_cli/state_schema.py` | Shared schema-backed validator for draft and finalized canonical state |
 | `scripts/python/template_cli/sync.py` | Git sync helpers for milestone commit and push flows |
 | `scripts/python/template_cli/validator_placeholders.py` | Precise unresolved-placeholder detection for generated development docs |
