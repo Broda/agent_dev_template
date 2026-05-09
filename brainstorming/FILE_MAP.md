@@ -135,6 +135,7 @@ Lean file registry for the Project Harness Template.
 | `scripts/python/template_cli/finalize_existing.py` | Existing finalized-state value collection helpers |
 | `scripts/python/template_cli/finalize_output.py` | Finalization user-facing success output helpers |
 | `scripts/python/template_cli/finalize.py` | In-place finalization orchestration |
+| `scripts/python/template_cli/finalize_project_settings.py` | Finalization project setting prompt and noninteractive choice collection |
 | `scripts/python/template_cli/finalize_state_builder.py` | Finalized canonical state assembly helpers |
 | `scripts/python/template_cli/finalize_validation.py` | Finalization required-value and noninteractive missing-field validation helpers |
 | `scripts/python/template_cli/finalize_value_collection.py` | Finalization hydrated value collection from existing state and source files |

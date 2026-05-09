@@ -14,12 +14,9 @@ from template_cli.finalize_artifacts import (
 from template_cli.finalize_helpers import (
     STATE_FILE,
     ask_non_empty,
-    choose_from_list,
-    choose_project_type,
-    infer_project_type,
-    summarize_decisions,
 )
 from template_cli.finalize_existing import _load_existing_finalize_values
+from template_cli.finalize_project_settings import _collect_finalize_project_settings
 from template_cli.finalize_state import (
     BackupManager,
     _update_catalog_transition,
@@ -32,7 +29,6 @@ from template_cli.finalize_state_builder import _build_finalized_state
 from template_cli.finalize_validation import (
     _collect_missing_noninteractive_fields,
     _fail_noninteractive,
-    _pick_noninteractive_choice,
     _required_value,
 )
 from template_cli.finalize_value_collection import _hydrate_finalize_values
@@ -70,61 +66,18 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
     else:
         objective = _required_value(objective, "purpose / one-sentence objective", missing_fields)
 
-    if interactive:
-        project_type = choose_project_type(existing.project_type or infer_project_type(project_name, objective))
-        language = ask_non_empty("Language", existing.language)
-        runtime = ask_non_empty("Runtime", existing.runtime)
-        framework = ask_non_empty("Framework (if any, else 'None')", existing.framework or "None")
-        package_tool = ask_non_empty(
-            "Package manager/build tool (if any, else 'None')", existing.package_tool or "None"
-        )
-        persistence = choose_from_list(
-            "Persistence",
-            existing.persistence,
-            ["None", "File-based (JSON/YAML/etc.)", "SQLite", "Postgres/MySQL/Other RDBMS"],
-        )
-        authentication = choose_from_list(
-            "Authentication", existing.authentication, ["None", "Local users", "External auth provider"]
-        )
-        determinism = choose_from_list(
-            "Determinism/correctness sensitivity", existing.determinism, ["Normal", "High"]
-        )
-        packaging = choose_from_list(
-            "Packaging/distribution planned",
-            existing.packaging,
-            ["None", "Yes (desktop installers / containers / artifacts)"],
-        )
-        constraints = ask_non_empty(
-            "Constraints (comma-separated; use 'None' if none)", hydrated.constraints_source or "None"
-        )
-        build_command = ask_non_empty("Build command", existing.build_command)
-        run_command = ask_non_empty("Run command", existing.run_command)
-        test_command = ask_non_empty("Test command", existing.test_command)
-    else:
-        project_type = _pick_noninteractive_choice(
-            existing.project_type or infer_project_type(project_name, objective),
-            "project type",
-            missing_fields,
-        )
-        language = _required_value(existing.language, "language", missing_fields)
-        runtime = _required_value(existing.runtime, "runtime", missing_fields)
-        framework = _required_value(existing.framework or "None", "framework", missing_fields)
-        package_tool = _required_value(existing.package_tool or "None", "package manager/build tool", missing_fields)
-        persistence = _pick_noninteractive_choice(existing.persistence, "persistence", missing_fields)
-        authentication = _pick_noninteractive_choice(existing.authentication, "authentication", missing_fields)
-        determinism = _pick_noninteractive_choice(existing.determinism, "determinism/correctness sensitivity", missing_fields)
-        packaging = _pick_noninteractive_choice(existing.packaging, "packaging/distribution planned", missing_fields)
-        constraints = _required_value(hydrated.constraints_source or "None", "constraints", missing_fields)
-        build_command = _required_value(existing.build_command, "build command", missing_fields)
-        run_command = _required_value(existing.run_command, "run command", missing_fields)
-        test_command = _required_value(existing.test_command, "test command", missing_fields)
-
+    settings = _collect_finalize_project_settings(
+        existing,
+        project_name=project_name,
+        objective=objective,
+        constraints_source=hydrated.constraints_source,
+        interactive=interactive,
+        missing_fields=missing_fields,
+    )
+    if not interactive:
         _collect_missing_noninteractive_fields(root, hydrate_files, session_paths, missing_fields)
         if missing_fields:
             _fail_noninteractive(missing_fields, idea_id)
-    key_decisions = existing.key_decisions or summarize_decisions(
-        project_type, persistence, authentication, determinism, packaging
-    )
 
     date_stamp = date.today().isoformat()
     export_path = f"exports/{date_stamp}_PROJECT_SUMMARY_{idea_id}.md"
@@ -149,19 +102,19 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
             project_name=project_name,
             owner=owner,
             objective=objective,
-            project_type=project_type,
-            language=language,
-            runtime=runtime,
-            framework=framework,
-            package_tool=package_tool,
-            persistence=persistence,
-            authentication=authentication,
-            determinism=determinism,
-            packaging=packaging,
-            constraints=constraints,
-            build_command=build_command,
-            run_command=run_command,
-            test_command=test_command,
+            project_type=settings.project_type,
+            language=settings.language,
+            runtime=settings.runtime,
+            framework=settings.framework,
+            package_tool=settings.package_tool,
+            persistence=settings.persistence,
+            authentication=settings.authentication,
+            determinism=settings.determinism,
+            packaging=settings.packaging,
+            constraints=settings.constraints,
+            build_command=settings.build_command,
+            run_command=settings.run_command,
+            test_command=settings.test_command,
             problem_statement=hydrated.problem_statement,
             target_users=hydrated.target_users,
             why_now=hydrated.why_now,
@@ -171,7 +124,7 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
             out_of_scope=hydrated.out_of_scope,
             assumptions=hydrated.assumptions,
             non_goals=hydrated.non_goals,
-            key_decisions=key_decisions,
+            key_decisions=settings.key_decisions,
             top_risks=hydrated.top_risks,
             mitigation_plans=hydrated.mitigation_plans,
             contingencies=hydrated.contingencies,
