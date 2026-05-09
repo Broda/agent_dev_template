@@ -280,3 +280,144 @@ Exit criteria:
       docs after the manifest/update direction is finalized.
 - [x] Review public-template notes for generic wording before publishing a
       release.
+
+## Repo Survey Backlog
+
+These tasks come from a fresh full-template survey after Milestone 9 and the
+first cleanup backlog pass. They are intentionally grouped so each future slice
+can stay small and reviewable.
+
+### Release And Public Template Readiness
+
+- [ ] Add a public template release checklist that runs `./scripts/validate-governance`,
+      the full unit suite, a fresh `project-harness new --no-git` validation,
+      and at least one finalize/render smoke fixture.
+- [ ] Add a top-level template `CHANGELOG.md` or release notes file for harness
+      releases, distinct from generated project `CHANGELOG.md` files.
+- [ ] Define the release process for bumping `harnessVersion`, plugin version,
+      compatibility versions, docs, and tags in one reviewable slice.
+- [ ] Replace remaining public-template wording that says update tooling is
+      "future" where dry-run/apply now exist, including README and file-map
+      descriptions.
+- [ ] Generalize remaining public examples that mention project-specific names
+      such as DevOS or personal owner placeholders.
+- [ ] Align `NOTES_CATALOG.md` tags and metadata with generalized retained note
+      wording.
+- [ ] Review plugin author/contact metadata for public release suitability.
+
+### Update Tooling And Provenance
+
+- [ ] Fix the `project-harness update --dry-run` "Next commands" text that still
+      says apply mode is not implemented.
+- [ ] Update `harness_commands/harness_manifest.json` stable wrapper metadata so
+      `scripts/project-harness` includes `project-harness-update`.
+- [ ] Add validation that manifest stable wrapper backend commands match real
+      CLI parser subcommands.
+- [ ] Implement or intentionally remove the advertised `--source-commit` update
+      source selector.
+- [ ] Implement or intentionally remove the advertised `--release-version`
+      update source selector.
+- [ ] Add update apply support for clean harness-owned removals, with explicit
+      dry-run visibility and tests.
+- [ ] Add an update rollback command or automatic rollback path when hooks or
+      validation fail after file copies.
+- [ ] Add tests for `--include-mixed` apply behavior and its review/backup
+      output.
+- [ ] Add tests proving update hooks run when repo skills or the intent registry
+      change.
+- [ ] Add source-dirty provenance handling to update dry-run/apply output so
+      users know when the target template checkout has uncommitted changes.
+
+### Manifest, Registry, And Schema Contracts
+
+- [ ] Add JSON Schema files for `harness_commands/harness_manifest.json` and
+      `harness_commands/intent_registry.json`.
+- [ ] Replace hand-written manifest/intent shape checks with schema-backed
+      validation while preserving precise failure messages.
+- [ ] Tighten artifact inventory validation so retained harness files are either
+      covered by an ownership class or explicitly excluded.
+- [ ] Decide whether broad manifest entries such as `scripts/` and
+      `.agents/skills/` should be expanded into generated inventory snapshots
+      for update planning.
+- [ ] Extend command/capability discovery beyond `/lab` intents to cover
+      `project-harness`, rendering, sync, and validation commands.
+- [ ] Validate parity between wrapper help text, CLI parser arguments, and the
+      machine-readable command registry.
+- [ ] Add note-catalog validation that checks note file metadata tags, title,
+      date, and ID against `NOTES_CATALOG.md`.
+
+### Module Decomposition And Code Quality
+
+- [ ] Continue splitting orchestration-heavy modules when cohesive boundaries are
+      clear: `bootstrap_update.py`, `finalize.py`, `handoff.py`, `lab_cli.py`,
+      `render_governance_templates.py`, `render_templates.py`, `intents.py`,
+      `wiki.py`, and `workflow_idea_commands.py`.
+- [ ] Split `bootstrap_update.py` into source resolution, plan classification,
+      apply execution, backup/rollback, and output rendering modules.
+- [ ] Split `finalize.py` into value collection, state assembly, artifact
+      writing, validation, and user-facing output modules.
+- [ ] Split `handoff.py` into state-defaults/constants, label extraction,
+      state-fill operations, implementation-contract fill, and summary rendering.
+- [ ] Split `lab_cli.py` so parser construction and command dispatch are
+      table-driven or otherwise easier to compare against the intent registry.
+- [ ] Split `render_governance_templates.py` into architecture, ADR, and roadmap
+      renderer modules.
+- [ ] Split `wiki.py` into wiki config, git execution, page rendering, and status
+      checking modules.
+- [ ] Lower the Python code-size validation threshold in stages after the large
+      modules above are decomposed.
+- [ ] Add import-boundary validation for new workflow helper modules as they are
+      split out.
+- [ ] Run Ruff formatting/linting in CI once local violations are either fixed
+      or intentionally configured.
+
+### Rendering And Finalization Hardening
+
+- [ ] Add an end-to-end golden fixture for `lab handoff` followed by noninteractive
+      finalization and development validation.
+- [ ] Add renderer snapshot tests for every generated development document that
+      is currently checked by semantic assertions only.
+- [ ] Add coverage for finalized projects with generated wiki enabled and
+      disabled across render, validate, and status commands.
+- [ ] Add tests for preserving user-edited mixed/generated docs during repeated
+      render/finalize flows.
+- [ ] Document and validate which generated files are overwritten by finalization
+      versus intended to become human-owned after first render.
+- [ ] Add migration-path tests before any future `state/project-init.json`
+      schemaVersion change.
+
+### Cross-Platform And CI Coverage
+
+- [ ] Add Windows PowerShell smoke coverage for `project-harness update --dry-run`
+      and `project-harness update --apply --yes`.
+- [ ] Add PowerShell smoke coverage for `render-intent-docs`,
+      `sync-plugin-skills`, and `render-development-docs` launchers.
+- [ ] Add a macOS launcher smoke job if shell-path behavior diverges from Ubuntu.
+- [ ] Add CI artifact output for failed generated-doc drift so maintainers can
+      inspect the exact changed files.
+- [ ] Add a scheduled or manual release-readiness CI workflow that runs the full
+      public-template smoke checklist.
+
+### Plugin And Skill Packaging
+
+- [ ] Decide whether plugin mirrors should remain copied files or become
+      generated release artifacts before the first public plugin release.
+- [ ] Add a plugin package smoke script that verifies all four skills and UI
+      metadata outside the repo context.
+- [ ] Validate plugin README examples against the actual plugin manifest and
+      marketplace entry.
+- [ ] Add a version-alignment test covering harness manifest, plugin manifest,
+      marketplace metadata, README, and release notes.
+
+### Runtime Extraction Preparation
+
+- [ ] Define the installed Python runtime package interface before extracting
+      any local wrapper behavior.
+- [ ] Add runtime discovery tests for environment override, compatible installed
+      runtime, incompatible installed runtime, and local fallback.
+- [ ] Decide how installed runtime compatibility errors should behave for
+      read-only commands versus mutating commands.
+- [ ] Identify the first read-only validation module to extract behind the
+      installed-runtime boundary.
+- [ ] Add an ADR before introducing any compiled binary, Homebrew formula, Cargo
+      package, or GitHub release artifact as an official install path.
