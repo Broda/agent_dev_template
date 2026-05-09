@@ -275,7 +275,7 @@ Exit criteria:
       `render_governance_templates.py`, and `workflow_data.py`.
 - [x] Make `HARNESS_IMPROVEMENT_ROADMAP.md` updates part of template-maintenance
       review when adding new public-template work.
-- [ ] Promote durable conclusions from `note-0001` into ADR or bootstrap/update
+- [x] Promote durable conclusions from `note-0001` into ADR or bootstrap/update
       docs after the manifest/update direction is finalized.
 - [ ] Review public-template notes for generic wording before publishing a
       release.

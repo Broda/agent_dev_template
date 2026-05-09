@@ -12,7 +12,8 @@ project-harness update
 ./scripts/project-harness validate
 ```
 
-The local `new` and `validate` commands are implemented. `update` remains deferred until the safe refresh boundary is designed in more detail.
+The local `new`, `validate`, and explicit-source `update --dry-run`/`update --apply`
+commands are implemented. Release/version source resolution remains deferred.
 
 ## `new`
 
@@ -150,3 +151,8 @@ Candidate extraction order:
 2. Bootstrap/update planning after explicit source/version resolution is stable.
 3. Render, finalize, and workflow mutation commands only after rollback and
    compatibility behavior are proven.
+
+This section promotes the durable conclusions from `note-0001`: keep project
+state and stable local wrappers in generated repositories, remove duplicated
+mutable implementation only behind manifest-backed compatibility checks, and
+avoid any global "latest" runtime dependency.
