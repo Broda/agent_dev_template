@@ -140,24 +140,24 @@ Exit criteria:
 
 Goal: apply low-risk harness-owned changes while protecting project history.
 
-- [ ] Add `project-harness update --apply` after dry-run classification is
+- [x] Add `project-harness update --apply` after dry-run classification is
       trusted.
-- [ ] Require an explicit source version or source path.
-- [ ] Require confirmation unless a `--yes` flag is supplied.
-- [ ] Apply only harness-owned clean updates by default.
-- [ ] Require explicit flags for mixed/generated updates.
-- [ ] Create backups or a pre-update commit before changing files.
-- [ ] Re-run `./scripts/sync-plugin-skills` when repo-scoped skills change.
-- [ ] Re-run `./scripts/render-intent-docs` when the intent registry changes.
-- [ ] Re-run `./scripts/validate-governance`.
-- [ ] In development mode, also run `./scripts/validate-development`.
-- [ ] Update recorded harness provenance only after validation passes.
-- [ ] Print a rollback/review summary with changed paths and validation output.
+- [x] Require an explicit source version or source path.
+- [x] Require confirmation unless a `--yes` flag is supplied.
+- [x] Apply only harness-owned clean updates by default.
+- [x] Require explicit flags for mixed/generated updates.
+- [x] Create backups or a pre-update commit before changing files.
+- [x] Re-run `./scripts/sync-plugin-skills` when repo-scoped skills change.
+- [x] Re-run `./scripts/render-intent-docs` when the intent registry changes.
+- [x] Re-run `./scripts/validate-governance`.
+- [x] In development mode, also run `./scripts/validate-development`.
+- [x] Update recorded harness provenance only after validation passes.
+- [x] Print a rollback/review summary with changed paths and validation output.
 
 Exit criteria:
 
-- [ ] Clean downstream projects can receive harness-owned updates.
-- [ ] Locally modified project-owned or mixed files are never overwritten
+- [x] Clean downstream projects can receive harness-owned updates.
+- [x] Locally modified project-owned or mixed files are never overwritten
       silently.
 
 ## Milestone 5 - State Schema Contract

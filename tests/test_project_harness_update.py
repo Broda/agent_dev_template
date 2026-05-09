@@ -157,3 +157,67 @@ class ProjectHarnessUpdateTests(LabWorkflowTestCase):
         self.assertIn("Recorded source baseline: resolved", result.stdout)
         self.assertIn("conflicted:", result.stdout)
         self.assertIn("scripts/lab.sh", result.stdout)
+
+    def test_update_apply_requires_yes_confirmation(self) -> None:
+        source = self.copy_source()
+        self.init_git_source(source)
+        project = self.tmpdir / "generated-project"
+        run_cmd(["./scripts/project-harness", "new", str(project), "--no-git"], cwd=source)
+        source_wrapper = source / "scripts/lab.sh"
+        source_wrapper.write_text(
+            source_wrapper.read_text(encoding="utf-8") + "\n# target wrapper update\n",
+            encoding="utf-8",
+        )
+
+        result = run_cmd(
+            ["./scripts/project-harness", "update", "--apply", "--source-path", str(source)],
+            cwd=project,
+            check=False,
+        )
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Refusing to apply without --yes confirmation.", result.stdout)
+        self.assertNotIn("# target wrapper update", (project / "scripts/lab.sh").read_text(encoding="utf-8"))
+
+    def test_update_apply_applies_clean_harness_owned_update_and_validates(self) -> None:
+        source = self.copy_source()
+        self.init_git_source(source)
+        project = self.tmpdir / "generated-project"
+        run_cmd(["./scripts/project-harness", "new", str(project), "--no-git"], cwd=source)
+        source_wrapper = source / "scripts/lab.sh"
+        source_wrapper.write_text(
+            source_wrapper.read_text(encoding="utf-8") + "\n# target wrapper update\n",
+            encoding="utf-8",
+        )
+
+        result = run_cmd(
+            ["./scripts/project-harness", "update", "--apply", "--source-path", str(source), "--yes"],
+            cwd=project,
+        )
+
+        self.assertIn("Applied harness update.", result.stdout)
+        self.assertIn("scripts/lab.sh", result.stdout)
+        self.assertIn("validate-governance: 0", result.stdout)
+        self.assertIn("# target wrapper update", (project / "scripts/lab.sh").read_text(encoding="utf-8"))
+        self.assertTrue((project / ".harness-update-backups").exists())
+
+    def test_update_apply_refuses_mixed_generated_update_by_default(self) -> None:
+        source = self.copy_source()
+        self.init_git_source(source)
+        project = self.tmpdir / "generated-project"
+        run_cmd(["./scripts/project-harness", "new", str(project), "--no-git"], cwd=source)
+        source_readme = source / "README.md"
+        source_readme.write_text(
+            source_readme.read_text(encoding="utf-8") + "\ntarget readme update\n",
+            encoding="utf-8",
+        )
+
+        result = run_cmd(
+            ["./scripts/project-harness", "update", "--apply", "--source-path", str(source), "--yes"],
+            cwd=project,
+            check=False,
+        )
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Refusing to apply mixed/generated updates without --include-mixed", result.stdout)
+        self.assertNotIn("target readme update", (project / "README.md").read_text(encoding="utf-8"))

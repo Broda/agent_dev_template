@@ -15,7 +15,11 @@ from template_cli.validators import (  # noqa: E402
     run_validate_development,
     run_validate_governance,
 )
-from template_cli.bootstrap import run_project_harness_new, run_project_harness_update_dry_run, run_project_harness_validate  # noqa: E402
+from template_cli.bootstrap import (  # noqa: E402
+    run_project_harness_new,
+    run_project_harness_validate,
+)
+from template_cli.bootstrap_update import run_project_harness_update_apply, run_project_harness_update_dry_run  # noqa: E402
 from template_cli.io_helpers import read_mode  # noqa: E402
 from template_cli.lab_cli import add_lab_subparsers, dispatch_lab_command  # noqa: E402
 from template_cli.plugin_sync import run_sync_plugin_skills  # noqa: E402
@@ -39,10 +43,13 @@ def build_parser() -> argparse.ArgumentParser:
     harness_new_parser.add_argument("--origin", default="")
     harness_new_parser.add_argument("--no-git", action="store_true")
     harness_update_parser = subparsers.add_parser("project-harness-update")
-    harness_update_parser.add_argument("--dry-run", action="store_true", required=True)
+    harness_update_parser.add_argument("--dry-run", action="store_true")
     harness_update_parser.add_argument("--source-path", default="")
     harness_update_parser.add_argument("--source-commit", default="")
     harness_update_parser.add_argument("--release-version", default="")
+    harness_update_parser.add_argument("--apply", action="store_true")
+    harness_update_parser.add_argument("--yes", action="store_true")
+    harness_update_parser.add_argument("--include-mixed", action="store_true")
     subparsers.add_parser("project-harness-validate")
     finalize_parser = subparsers.add_parser("finalize-project")
     finalize_parser.add_argument("--idea-id", default="")
@@ -117,6 +124,18 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "project-harness-validate":
         return run_project_harness_validate(Path.cwd())
     if args.command == "project-harness-update":
+        if args.apply == args.dry_run:
+            print("project-harness update requires exactly one mode: --dry-run or --apply.", file=sys.stderr)
+            return 2
+        if args.apply:
+            return run_project_harness_update_apply(
+                Path.cwd(),
+                source_path=args.source_path,
+                source_commit=args.source_commit,
+                release_version=args.release_version,
+                yes=args.yes,
+                include_mixed=args.include_mixed,
+            )
         return run_project_harness_update_dry_run(
             Path.cwd(),
             source_path=args.source_path,

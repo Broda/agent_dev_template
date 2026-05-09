@@ -80,12 +80,14 @@ registry for human review.
 
 Bring harness-maintained files in an existing project up to date from a selected template version.
 
-Status: deferred.
+Status: dry-run and conservative apply are implemented for explicit local source
+checkouts. Release/source resolution remains deferred.
 
 Current local interface:
 
 ```sh
 ./scripts/project-harness update --dry-run --source-path <template-checkout>
+./scripts/project-harness update --apply --source-path <template-checkout> --yes
 ```
 
 The dry-run command is implemented for an explicit local source checkout. It
@@ -94,6 +96,12 @@ manifest, classifies candidate files by manifest ownership class, and prints a
 deterministic no-write plan. `--source-commit` and `--release-version` are
 reserved explicit source selectors; until release/source resolution exists, the
 local helper refuses them with guidance to use `--source-path`.
+
+Apply mode is conservative. It applies only clean `harnessOwned` paths by
+default, refuses conflicts, refuses mixed/generated paths unless
+`--include-mixed` is supplied, writes backups under `.harness-update-backups/`,
+runs generated-file hooks when relevant, validates before provenance stamping,
+then validates the stamped manifest. Review changed paths with `git diff`.
 
 Expected behavior:
 
