@@ -296,12 +296,12 @@ can stay small and reviewable.
       releases, distinct from generated project `CHANGELOG.md` files.
 - [ ] Define the release process for bumping `harnessVersion`, plugin version,
       compatibility versions, docs, and tags in one reviewable slice.
-- [ ] Replace remaining public-template wording that says update tooling is
+- [x] Replace remaining public-template wording that says update tooling is
       "future" where dry-run/apply now exist, including README and file-map
       descriptions.
-- [ ] Generalize remaining public examples that mention project-specific names
+- [x] Generalize remaining public examples that mention project-specific names
       such as DevOS or personal owner placeholders.
-- [ ] Align `NOTES_CATALOG.md` tags and metadata with generalized retained note
+- [x] Align `NOTES_CATALOG.md` tags and metadata with generalized retained note
       wording.
 - [ ] Review plugin author/contact metadata for public release suitability.
 

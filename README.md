@@ -75,7 +75,7 @@ compatibility contract a generated project expects. It includes the manifest
 schema version, harness release version, template repository URL, source commit
 provenance, supported modes, stable wrapper entrypoints, the expected
 `state/project-init.json` schema version and schema file path, and artifact
-ownership classes for future conservative update tooling.
+ownership classes for conservative update dry-run and apply tooling.
 
 In the template repository, `sourceCommitType` is `template`. When
 `./scripts/project-harness new` creates a project from a Git checkout, it stamps
@@ -276,7 +276,7 @@ manual cleanup:
 ```sh
 ./scripts/lab-note \
   --topic "Service identity boundary" \
-  --summary "DevOS may eventually need dedicated integration identities." \
+  --summary "External integrations may eventually need dedicated service identities." \
   --detail "A GitHub App is preferred over a broad bot account for most repo workflows." \
   --fact "Secrets must stay outside git." \
   --question "Should inbound email be read-only at first?"

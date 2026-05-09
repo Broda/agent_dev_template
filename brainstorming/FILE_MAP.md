@@ -10,7 +10,7 @@ Lean file registry for the Project Harness Template.
 | `.gitignore` | Local/derived file exclusions |
 | `README.md` | Lightweight overview and usage |
 | `pyproject.toml` | Python formatter, linter, and import-order tool configuration |
-| `BOOTSTRAP_TOOL.md` | Planning contract for a future harness bootstrap helper |
+| `BOOTSTRAP_TOOL.md` | Planning and implementation contract for the harness bootstrap/update helper |
 | `HARNESS_IMPROVEMENT_ROADMAP.md` | Public-template improvement roadmap and milestone backlog |
 | `AGENTS.md` | Agent behavior contract |
 | `MODE.md` | Active repository phase selector |
