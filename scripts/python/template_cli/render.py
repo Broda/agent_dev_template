@@ -10,6 +10,7 @@ from template_cli.render_helpers import (
     RenderError,
     _append_unique_lines,
     _copy_base,
+    _copy_base_if_missing,
     _extract_value,
     _first_value_for_label,
     _infer_domain_concepts,
@@ -75,25 +76,25 @@ def run_render_development_docs(root: Path) -> int:
     )
     implementation_contract = collect_implementation_contract(state, hydration_files)
 
-    _copy_base(root, "development/templates/docs/FILE_MAP.base.md", "docs/FILE_MAP.md")
-    _copy_base(root, "development/templates/docs/GOVERNANCE_INDEX.base.md", "docs/GOVERNANCE_INDEX.md")
-    _copy_base(
+    _copy_base_if_missing(root, "development/templates/docs/FILE_MAP.base.md", "docs/FILE_MAP.md")
+    _copy_base_if_missing(root, "development/templates/docs/GOVERNANCE_INDEX.base.md", "docs/GOVERNANCE_INDEX.md")
+    _copy_base_if_missing(
         root,
         "development/templates/docs/VERSIONING_AND_RELEASE_POLICY.base.md",
         "docs/VERSIONING_AND_RELEASE_POLICY.md",
     )
-    _copy_base(root, "development/templates/docs/SECURITY_POLICY.base.md", "docs/SECURITY_POLICY.md")
-    _copy_base(
+    _copy_base_if_missing(root, "development/templates/docs/SECURITY_POLICY.base.md", "docs/SECURITY_POLICY.md")
+    _copy_base_if_missing(
         root,
         "development/templates/docs/RUNTIME_VERIFICATION_REPORT.base.md",
         "docs/RUNTIME_VERIFICATION_REPORT.md",
     )
-    _copy_base(root, "development/templates/docs/adr/ADR-TEMPLATE.md", "docs/adr/ADR-TEMPLATE.md")
-    _copy_base(root, "development/templates/docs/CHANGELOG.base.md", "CHANGELOG.md")
+    _copy_base_if_missing(root, "development/templates/docs/adr/ADR-TEMPLATE.md", "docs/adr/ADR-TEMPLATE.md")
+    _copy_base_if_missing(root, "development/templates/docs/CHANGELOG.base.md", "CHANGELOG.md")
 
     migration_policy_path = root / "docs/MIGRATION_POLICY.md"
     if persistence and persistence != "None":
-        _copy_base(root, "development/templates/docs/MIGRATION_POLICY.base.md", "docs/MIGRATION_POLICY.md")
+        _copy_base_if_missing(root, "development/templates/docs/MIGRATION_POLICY.base.md", "docs/MIGRATION_POLICY.md")
     elif migration_policy_path.exists():
         migration_policy_path.unlink()
 
@@ -243,11 +244,11 @@ def run_render_development_docs(root: Path) -> int:
     changelog_path = root / "CHANGELOG.md"
     changelog_content = read_text(changelog_path)
     marker = "## [Unreleased]"
-    if marker in changelog_content:
+    initial_entry = "- Initialized Structured Mode governance baseline from brainstorming finalization."
+    if marker in changelog_content and initial_entry not in changelog_content:
         changelog_content = changelog_content.replace(
             marker,
-            marker
-            + "\n\n### Added\n- Initialized Structured Mode governance baseline from brainstorming finalization.",
+            marker + f"\n\n### Added\n{initial_entry}",
             1,
         )
     write_text(changelog_path, changelog_content)

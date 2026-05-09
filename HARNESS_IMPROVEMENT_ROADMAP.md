@@ -474,7 +474,7 @@ Next-task sequencing:
     wiki config/status when enabled.
   - Include `./scripts/lab status` expectations for both modes so user-facing
     status output stays aligned with wiki configuration.
-- [ ] Add tests for preserving user-edited mixed/generated docs during repeated
+- [x] Add tests for preserving user-edited mixed/generated docs during repeated
       render/finalize flows.
   - Start from a finalized fixture, hand-edit representative mixed/generated
     docs, rerun render/finalize paths, and assert explicitly owned sections are

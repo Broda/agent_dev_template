@@ -162,6 +162,48 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
         self.assertEqual(self.RENDERED_ARTIFACT_HASHES_WITH_PERSISTENCE, actual_hashes)
         run_cmd(["./scripts/validate-development"], cwd=self.repo)
 
+    def test_rerender_preserves_human_owned_docs_and_refreshes_generated_docs(self) -> None:
+        self.write_render_fixture("finalized_state_with_persistence_v2.json")
+        run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
+
+        human_markers = {
+            "CHANGELOG.md": "\n\n### Changed\n- Human release note survives rerender.\n",
+            "docs/FILE_MAP.md": "\n| `src/manual.py` | Human-maintained implementation note |\n",
+            "docs/SECURITY_POLICY.md": "\n\n## Project Exception\nHuman security note survives rerender.\n",
+            "docs/adr/ADR-TEMPLATE.md": "\n\n## Human Template Note\nKeep this local ADR guidance.\n",
+        }
+        for relative_path, marker in human_markers.items():
+            path = self.repo / relative_path
+            path.write_text(path.read_text(encoding="utf-8") + marker, encoding="utf-8")
+
+        state_path = self.repo / "state/project-init.json"
+        state = json.loads(state_path.read_text(encoding="utf-8"))
+        state["projectName"] = "Updated Render Fixture"
+        state["purpose"] = "Refresh generated documents while preserving human-owned policy docs."
+        state["commands"]["build"] = "make updated-build"
+        state["commands"]["test"] = "make updated-test"
+        state["governance"]["keyDecisions"] = "Generated ADR content must refresh from changed canonical state."
+        state_path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+
+        run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
+        run_cmd(["./scripts/validate-development"], cwd=self.repo)
+
+        for relative_path, marker in human_markers.items():
+            self.assertIn(marker.strip(), (self.repo / relative_path).read_text(encoding="utf-8"))
+
+        readme = (self.repo / "README.md").read_text(encoding="utf-8")
+        project_context = (self.repo / "docs/PROJECT_CONTEXT.md").read_text(encoding="utf-8")
+        roadmap = (self.repo / "docs/ROADMAP.md").read_text(encoding="utf-8")
+        architecture = (self.repo / "docs/ARCHITECTURE.md").read_text(encoding="utf-8")
+        adr = (self.repo / "docs/adr/ADR-0001-record-architecture-decisions.md").read_text(encoding="utf-8")
+        ci = (self.repo / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+        self.assertIn("# Updated Render Fixture", readme)
+        self.assertIn("preserving human-owned policy docs", project_context)
+        self.assertIn("make updated-build", roadmap)
+        self.assertIn("Updated Render Fixture", architecture)
+        self.assertIn("Generated ADR content must refresh", adr)
+        self.assertIn("make updated-test", ci)
+
     def test_render_uses_state_ci_policy_when_present(self) -> None:
         self.write_render_fixture()
         state_path = self.repo / "state/project-init.json"

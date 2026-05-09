@@ -108,6 +108,13 @@ def _copy_base(root: Path, src: str, dst: str) -> None:
     shutil.copyfile(src_path, dst_path)
 
 
+def _copy_base_if_missing(root: Path, src: str, dst: str) -> None:
+    dst_path = root / dst
+    if dst_path.exists():
+        return
+    _copy_base(root, src, dst)
+
+
 def _write_rendered_text(root: Path, relative_path: str, content: str) -> None:
     path = root / relative_path
     path.parent.mkdir(parents=True, exist_ok=True)
