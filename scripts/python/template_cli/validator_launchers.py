@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+import re
+import subprocess
+import sys
 from pathlib import Path
 
 from template_cli.io_helpers import ValidationResult, read_mode, read_text
+from template_cli.validator_manifest import load_harness_manifest
 
 
 PYTHON_COMMAND_LAUNCHERS = {
@@ -107,6 +111,70 @@ def _validate_project_harness_update_launcher(root: Path, result: ValidationResu
         text = read_text(path)
         if "project-harness-update" not in text:
             result.add_failure(f"Launcher {relative_path} is missing project-harness update delegation.")
+        _validate_project_harness_help(root, result, relative_path, text)
+
+
+def _validate_project_harness_help(
+    root: Path,
+    result: ValidationResult,
+    relative_path: str,
+    text: str,
+) -> None:
+    if "Usage: ./scripts/project-harness <command> [args]" not in text:
+        result.add_failure(f"Launcher {relative_path} is missing project-harness usage help.")
+        return
+
+    for subcommand in _project_harness_manifest_subcommands(root):
+        if not re.search(rf"^\s+{re.escape(subcommand)}\b", text, flags=re.MULTILINE):
+            result.add_failure(
+                f"Launcher {relative_path} help is missing project-harness subcommand from manifest: {subcommand}"
+            )
+
+    for backend_command, subcommand in [
+        ("project-harness-new", "new"),
+        ("project-harness-update", "update"),
+    ]:
+        for option in _cli_help_options(root, backend_command):
+            if option == "--help":
+                continue
+            if option not in text:
+                result.add_failure(
+                    f"Launcher {relative_path} help for project-harness {subcommand} "
+                    f"is missing CLI parser option: {option}"
+                )
+
+
+def _project_harness_manifest_subcommands(root: Path) -> set[str]:
+    try:
+        manifest = load_harness_manifest(root)
+    except (FileNotFoundError, ValueError):
+        return set()
+    for wrapper in manifest.get("stableWrappers", []):
+        if not isinstance(wrapper, dict) or wrapper.get("path") != "scripts/project-harness":
+            continue
+        subcommands: set[str] = set()
+        backend_command = str(wrapper.get("backendCommand", ""))
+        for raw_backend in backend_command.split("|"):
+            backend = raw_backend.strip()
+            if backend.startswith("project-harness-"):
+                subcommands.add(backend.removeprefix("project-harness-"))
+        return subcommands
+    return set()
+
+
+def _cli_help_options(root: Path, backend_command: str) -> set[str]:
+    cli_path = root / "scripts/python/cli.py"
+    if not cli_path.exists():
+        return set()
+    completed = subprocess.run(
+        [sys.executable, str(cli_path), backend_command, "--help"],
+        cwd=root,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    output = (completed.stdout or "") + "\n" + (completed.stderr or "")
+    return set(re.findall(r"--[a-z][a-z0-9-]*", output))
 
 
 def _validate_windows_ci_launcher_job(root: Path, result: ValidationResult) -> None:

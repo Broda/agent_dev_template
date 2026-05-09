@@ -341,7 +341,7 @@ can stay small and reviewable.
       for update planning.
 - [x] Extend command/capability discovery beyond `/lab` intents to cover
       `project-harness`, rendering, sync, and validation commands.
-- [ ] Validate parity between wrapper help text, CLI parser arguments, and the
+- [x] Validate parity between wrapper help text, CLI parser arguments, and the
       machine-readable command registry.
 - [x] Add note-catalog validation that checks note file metadata tags, title,
       date, and ID against `NOTES_CATALOG.md`.

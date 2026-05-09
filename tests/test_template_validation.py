@@ -64,6 +64,22 @@ class TemplateValidationTests(LabWorkflowTestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("Shell launcher scripts/render-intent-docs.sh is missing expected snippet", result.stdout)
 
+    def test_validate_brainstorming_checks_project_harness_help_parser_parity(self) -> None:
+        launcher_path = self.repo / "scripts/project-harness.sh"
+        launcher_path.write_text(
+            launcher_path.read_text(encoding="utf-8").replace(" [--include-mixed]", ""),
+            encoding="utf-8",
+        )
+
+        result = run_cmd(["./scripts/validate-governance"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(
+            "Launcher scripts/project-harness.sh help for project-harness update "
+            "is missing CLI parser option: --include-mixed",
+            result.stdout,
+        )
+
     def test_validate_brainstorming_checks_powershell_launcher_delegation(self) -> None:
         launcher_path = self.repo / "scripts/lab.ps1"
         launcher_path.write_text(

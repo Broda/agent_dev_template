@@ -10,8 +10,8 @@ Usage: ./scripts/project-harness <command> [args]
 
 Commands:
   new <path> [--origin <url>] [--no-git]
-  update --dry-run --source-path <template-checkout>
-  update --apply --source-path <template-checkout> --yes
+  update --dry-run [--source-path <template-checkout> | --source-commit <sha> | --release-version <version>]
+  update --apply --source-path <template-checkout> --yes [--include-mixed]
   validate
 USAGE
   exit 0
