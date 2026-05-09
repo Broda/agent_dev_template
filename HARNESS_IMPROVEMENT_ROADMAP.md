@@ -518,11 +518,17 @@ Next-task sequencing:
     idempotence check for generated intent/development docs.
   - Acceptance: PowerShell launcher failures surface the underlying Python exit
     code and do not hide stderr/stdout needed for diagnosis.
-- [ ] Add a macOS launcher smoke job if shell-path behavior diverges from Ubuntu.
+- [x] Add a macOS launcher smoke job if shell-path behavior diverges from Ubuntu.
   - First audit whether current shell launchers depend on GNU-only behavior or
     Linux-specific paths.
   - Add macOS CI only if that audit or user reports identify divergence; keep it
     launcher-focused rather than duplicating the full Ubuntu matrix.
+  - Audit result: current Bash launchers use only Bash-compatible wrapper
+    constructs already available on macOS (`dirname`, `pwd`, `command -v`,
+    `exec`, and Python delegation), so no macOS CI job is warranted yet.
+  - Added validation that shell launchers do not introduce known GNU/Linux-only
+    patterns such as `readlink -f`, `sed -i`, `grep -P`, `xargs -r`, `/proc`,
+    or Ubuntu package-manager calls.
 - [ ] Add CI artifact output for failed generated-doc drift so maintainers can
       inspect the exact changed files.
   - On failure after generated-doc checks, upload a patch/diff artifact plus the

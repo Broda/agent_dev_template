@@ -30,6 +30,7 @@ def validate_python_launchers(root: Path, result: ValidationResult) -> None:
         _validate_powershell_launcher(root, result, script_name, cli_command)
     _validate_lab_launcher(root, result)
     _validate_project_harness_update_launcher(root, result)
+    _validate_shell_launchers_are_portable(root, result)
     _validate_windows_ci_launcher_job(root, result)
 
 
@@ -175,6 +176,24 @@ def _cli_help_options(root: Path, backend_command: str) -> set[str]:
     )
     output = (completed.stdout or "") + "\n" + (completed.stderr or "")
     return set(re.findall(r"--[a-z][a-z0-9-]*", output))
+
+
+def _validate_shell_launchers_are_portable(root: Path, result: ValidationResult) -> None:
+    forbidden_patterns = {
+        r"\breadlink\s+-f\b": "GNU readlink -f",
+        r"\brealpath\b": "realpath availability differs across macOS versions",
+        r"\bsed\s+-i\b": "sed -i semantics differ on macOS",
+        r"\bgrep\s+-P\b": "GNU grep -P",
+        r"\bxargs\s+-r\b": "GNU xargs -r",
+        r"/proc/": "Linux /proc filesystem",
+        r"\bapt(?:-get)?\b": "Ubuntu package manager",
+    }
+    for path in sorted((root / "scripts").glob("*.sh")):
+        text = read_text(path)
+        relative_path = path.relative_to(root).as_posix()
+        for pattern, label in forbidden_patterns.items():
+            if re.search(pattern, text):
+                result.add_failure(f"Shell launcher {relative_path} uses non-portable macOS pattern: {label}")
 
 
 def _validate_windows_ci_launcher_job(root: Path, result: ValidationResult) -> None:

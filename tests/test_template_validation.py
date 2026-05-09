@@ -64,6 +64,21 @@ class TemplateValidationTests(LabWorkflowTestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("Shell launcher scripts/render-intent-docs.sh is missing expected snippet", result.stdout)
 
+    def test_validate_brainstorming_checks_shell_launcher_macos_portability(self) -> None:
+        launcher_path = self.repo / "scripts/render-intent-docs.sh"
+        launcher_path.write_text(
+            launcher_path.read_text(encoding="utf-8") + "\nreadlink -f \"$0\" >/dev/null\n",
+            encoding="utf-8",
+        )
+
+        result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(
+            "Shell launcher scripts/render-intent-docs.sh uses non-portable macOS pattern: GNU readlink -f",
+            result.stdout,
+        )
+
     def test_validate_brainstorming_checks_project_harness_help_parser_parity(self) -> None:
         launcher_path = self.repo / "scripts/project-harness.sh"
         launcher_path.write_text(
