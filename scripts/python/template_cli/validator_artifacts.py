@@ -119,6 +119,7 @@ BRAINSTORMING_CORE_ARTIFACTS = [
     "scripts/python/template_cli/bootstrap_update_source.py",
     "scripts/python/template_cli/finalize_artifacts.py",
     "scripts/python/template_cli/finalize_existing.py",
+    "scripts/python/template_cli/finalize_execution.py",
     "scripts/python/template_cli/finalize_output.py",
     "scripts/python/template_cli/finalize_project_settings.py",
     "scripts/python/template_cli/finalize_state_builder.py",

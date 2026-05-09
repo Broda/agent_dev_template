@@ -133,6 +133,7 @@ Lean file registry for the Project Harness Template.
 | `scripts/python/template_cli/finalize_artifacts.py` | Finalization artifact directory setup, backup registration, existing-state load, and session-log writing helpers |
 | `scripts/python/template_cli/finalize_context.py` | Finalization target, owner, session, and hydration context resolution |
 | `scripts/python/template_cli/finalize_existing.py` | Existing finalized-state value collection helpers |
+| `scripts/python/template_cli/finalize_execution.py` | Transactional finalization state writing, rendering, and validation execution |
 | `scripts/python/template_cli/finalize_output.py` | Finalization user-facing success output helpers |
 | `scripts/python/template_cli/finalize.py` | In-place finalization orchestration |
 | `scripts/python/template_cli/finalize_project_settings.py` | Finalization project setting prompt and noninteractive choice collection |

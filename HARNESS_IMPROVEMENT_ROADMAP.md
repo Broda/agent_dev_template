@@ -359,13 +359,15 @@ can stay small and reviewable.
 - [x] Split update dry-run output rendering out of `bootstrap_update.py`.
 - [x] Split update plan classification and baseline comparison out of
       `bootstrap_update.py`.
-- [ ] Split `finalize.py` into value collection, state assembly, artifact
+- [x] Split `finalize.py` into value collection, state assembly, artifact
       writing, validation, and user-facing output modules.
 - [x] Split existing finalized-state value collection out of `finalize.py`.
 - [x] Split hydrated finalization value collection from existing state and
       source files out of `finalize.py`.
 - [x] Split finalization project setting prompts and noninteractive choice
       collection out of `finalize.py`.
+- [x] Split transactional finalization state writing, rendering, catalog/mode
+      updates, session logging, and development validation out of `finalize.py`.
 - [x] Split finalization user-facing success output out of `finalize.py`.
 - [x] Split finalization artifact setup, backup registration, existing-state
       loading, and session-log writing out of `finalize.py`.
