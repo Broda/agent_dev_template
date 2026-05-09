@@ -343,7 +343,7 @@ can stay small and reviewable.
       `project-harness`, rendering, sync, and validation commands.
 - [ ] Validate parity between wrapper help text, CLI parser arguments, and the
       machine-readable command registry.
-- [ ] Add note-catalog validation that checks note file metadata tags, title,
+- [x] Add note-catalog validation that checks note file metadata tags, title,
       date, and ID against `NOTES_CATALOG.md`.
 
 ### Module Decomposition And Code Quality

@@ -67,6 +67,39 @@ def validate_notes_catalog(root: Path, result: ValidationResult) -> None:
             result.add_failure(f"Note path for '{note_id}' must be under notes/: {clean_note_path}")
         elif not path_exists(root, clean_note_path):
             result.add_failure(f"Missing note file for '{note_id}': {clean_note_path}")
+        else:
+            note_metadata = _read_note_metadata(root / clean_note_path)
+            expected_metadata = {
+                "Note ID": note_id,
+                "Title": cells[1].strip() if len(cells) > 1 else "",
+                "Date": note_date,
+                "Tags": cells[6].strip() if len(cells) > 6 else "",
+            }
+            for key, expected_value in expected_metadata.items():
+                actual_value = note_metadata.get(key, "")
+                if actual_value != expected_value:
+                    result.add_failure(
+                        f"Note metadata mismatch for '{note_id}' in {clean_note_path}: "
+                        f"{key} is '{actual_value or '<missing>'}', expected '{expected_value}'"
+                    )
+
+
+def _read_note_metadata(note_path: Path) -> dict[str, str]:
+    metadata: dict[str, str] = {}
+    in_metadata = False
+    for line in read_text(note_path).splitlines():
+        stripped = line.strip()
+        if stripped == "## Metadata":
+            in_metadata = True
+            continue
+        if in_metadata and stripped.startswith("## "):
+            break
+        if not in_metadata:
+            continue
+        match = re.match(r"^-\s*([^:]+):\s*(.*)$", stripped)
+        if match:
+            metadata[match.group(1).strip()] = match.group(2).strip()
+    return metadata
 
 
 def validate_template_cli_file_map(root: Path, result: ValidationResult) -> None:
