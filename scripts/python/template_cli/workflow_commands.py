@@ -20,10 +20,10 @@ from template_cli.workflow_sessions import _append_under_section, _ensure_sessio
 from template_cli.workflow_idea_commands import (
     run_lab_activate,
     run_lab_capture,
-    run_lab_export,
     run_lab_kill,
     run_lab_park,
 )
+from template_cli.workflow_export import run_lab_export
 from template_cli.workflow_render import _render_idea_block
 
 

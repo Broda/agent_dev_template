@@ -132,6 +132,7 @@ BRAINSTORMING_CORE_ARTIFACTS = [
     "scripts/python/template_cli/handoff_summary.py",
     "scripts/python/template_cli/lab_cli_dispatch.py",
     "scripts/python/template_cli/lab_cli_parsers.py",
+    "scripts/python/template_cli/workflow_export.py",
     "scripts/python/template_cli/workflow_render.py",
     "scripts/python/template_cli/workflow_sessions.py",
     "scripts/python/template_cli/wiki_config.py",

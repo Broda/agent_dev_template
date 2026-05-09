@@ -386,6 +386,8 @@ can stay small and reviewable.
       modules with compatibility exports preserved.
 - [x] Split `wiki.py` into wiki config, git execution, page rendering, and status
       checking modules.
+- [x] Split lab idea summary export handling out of
+      `workflow_idea_commands.py`.
 - [ ] Lower the Python code-size validation threshold in stages after the large
       modules above are decomposed.
 - [x] Lower the Python code-size validation threshold from 500 to 475 lines
