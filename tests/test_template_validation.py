@@ -160,6 +160,27 @@ class TemplateValidationTests(LabWorkflowTestCase):
             result.stdout,
         )
 
+    def test_validate_brainstorming_checks_plugin_readme_examples(self) -> None:
+        readme_path = self.repo / "plugins/project-lifecycle-lab/README.md"
+        readme_path.write_text(
+            readme_path.read_text(encoding="utf-8")
+            .replace("`./plugins/project-lifecycle-lab`", "`./plugins/wrong-plugin`", 1)
+            .replace("- `template-maintenance`", "- `wrong-skill`", 1),
+            encoding="utf-8",
+        )
+
+        result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn(
+            "Plugin README must document marketplace source path: ./plugins/project-lifecycle-lab",
+            result.stdout,
+        )
+        self.assertIn(
+            "Plugin README external-use skill list is missing: template-maintenance",
+            result.stdout,
+        )
+
     def test_validate_brainstorming_checks_plugin_skills_path(self) -> None:
         manifest_path = self.repo / "plugins/project-lifecycle-lab/.codex-plugin/plugin.json"
         manifest_path.write_text(

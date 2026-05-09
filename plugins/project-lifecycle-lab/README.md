@@ -8,6 +8,8 @@ The plugin is intentionally not the project runtime. Canonical project state, de
 
 - `.agents/skills/` remains the canonical skill source for this template.
 - `plugins/project-lifecycle-lab/skills/` contains copied mirrors for distribution.
+- The plugin manifest exposes those mirrors through `./skills/`.
+- The local plugin marketplace points at `./plugins/project-lifecycle-lab`.
 - Copied mirrors remain checked in until plugin packaging needs release-time generation.
 - `./scripts/sync-plugin-skills` is the maintenance path for refreshing plugin mirrors.
 - `./scripts/validate-governance` validates manifest shape, marketplace registration, mirror drift, and the harness/plugin boundary wording.
@@ -31,8 +33,8 @@ If repo-scoped skills change, run `./scripts/sync-plugin-skills` and then
 To smoke-check the package outside the repo context, install or expose `plugins/project-lifecycle-lab` as a local Codex plugin and confirm the four skills are visible:
 
 - `brainstorming-lab`
-- `project-finalizer`
 - `development-governance`
+- `project-finalizer`
 - `template-maintenance`
 
 Each skill should describe the harness workflow and should treat repo scripts and state as canonical.

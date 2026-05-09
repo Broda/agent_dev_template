@@ -65,6 +65,7 @@ def validate_repo_plugins(root: Path, result: ValidationResult) -> None:
     policy = entry.get("policy", {})
     if policy.get("installation") != "AVAILABLE" or policy.get("authentication") != "ON_INSTALL":
         result.add_failure(f"Plugin marketplace policy is incorrect for {PLUGIN_NAME}.")
+    _validate_plugin_readme_examples(root, manifest, entry, result)
 
 
 def _validate_plugin_public_metadata(manifest: dict, result: ValidationResult) -> None:
@@ -115,6 +116,30 @@ def _validate_plugin_readme(root: Path, result: ValidationResult) -> None:
     for phrase in required_phrases:
         if phrase not in readme:
             result.add_failure(f"Plugin README must document packaging boundary phrase: {phrase}")
+
+
+def _validate_plugin_readme_examples(
+    root: Path,
+    manifest: dict,
+    marketplace_entry: dict,
+    result: ValidationResult,
+) -> None:
+    readme_path = root / PLUGIN_README
+    if not readme_path.exists():
+        return
+    readme = read_text(readme_path)
+    display_name = manifest.get("interface", {}).get("displayName", "")
+    if display_name and f"# {display_name} Plugin" not in readme:
+        result.add_failure(f"Plugin README title must match manifest displayName: {display_name}")
+    skills_path = manifest.get("skills", "")
+    if skills_path and f"`{skills_path}`" not in readme:
+        result.add_failure(f"Plugin README must document manifest skills path: {skills_path}")
+    marketplace_path = marketplace_entry.get("source", {}).get("path", "")
+    if marketplace_path and f"`{marketplace_path}`" not in readme:
+        result.add_failure(f"Plugin README must document marketplace source path: {marketplace_path}")
+    for skill_name in sorted(PLUGIN_SKILLS):
+        if f"- `{skill_name}`" not in readme:
+            result.add_failure(f"Plugin README external-use skill list is missing: {skill_name}")
 
 
 def _validate_plugin_file_map(root: Path, result: ValidationResult) -> None:

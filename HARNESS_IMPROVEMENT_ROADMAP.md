@@ -404,7 +404,7 @@ can stay small and reviewable.
       generated release artifacts before the first public plugin release.
 - [ ] Add a plugin package smoke script that verifies all four skills and UI
       metadata outside the repo context.
-- [ ] Validate plugin README examples against the actual plugin manifest and
+- [x] Validate plugin README examples against the actual plugin manifest and
       marketplace entry.
 - [ ] Add a version-alignment test covering harness manifest, plugin manifest,
       marketplace metadata, README, and release notes.
