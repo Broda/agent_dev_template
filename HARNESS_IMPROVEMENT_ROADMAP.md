@@ -277,5 +277,5 @@ Exit criteria:
       review when adding new public-template work.
 - [x] Promote durable conclusions from `note-0001` into ADR or bootstrap/update
       docs after the manifest/update direction is finalized.
-- [ ] Review public-template notes for generic wording before publishing a
+- [x] Review public-template notes for generic wording before publishing a
       release.
