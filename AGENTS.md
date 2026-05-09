@@ -10,9 +10,9 @@ This repository is a two-phase project harness template. It starts in **brainsto
 
 | Situation | Skill | Legacy contract |
 |---|---|---|
-| `MODE.md` says `brainstorming` | `$brainstorming-lab` | `brainstorming/AGENTS.brainstorming.md` |
-| Preparing or running finalization | `$project-finalizer` | `brainstorming/AGENTS.brainstorming.md` |
-| `MODE.md` says `development` | `$development-governance` | `development/AGENTS.development.md` |
+| `MODE.md` says `brainstorming` | `$brainstorming-lab` | `.harness/brainstorming/AGENTS.brainstorming.md` |
+| Preparing or running finalization | `$project-finalizer` | `.harness/brainstorming/AGENTS.brainstorming.md` |
+| `MODE.md` says `development` | `$development-governance` | `.harness/development/AGENTS.development.md` |
 | Maintaining this harness template itself | `$template-maintenance` | this file plus current mode contract |
 
 The legacy contracts remain available for agents that do not support skills.

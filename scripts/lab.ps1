@@ -43,12 +43,12 @@ if ($Args.Count -gt 1) {
 }
 
 if (Get-Command py -ErrorAction SilentlyContinue) {
-    & py -3 "$scriptDir/python/cli.py" ("lab-" + $subcommand) @remaining
+    & py -3 "$scriptDir/../.harness/runtime/python/cli.py" ("lab-" + $subcommand) @remaining
     exit $LASTEXITCODE
 }
 
 if (Get-Command python -ErrorAction SilentlyContinue) {
-    & python "$scriptDir/python/cli.py" ("lab-" + $subcommand) @remaining
+    & python "$scriptDir/../.harness/runtime/python/cli.py" ("lab-" + $subcommand) @remaining
     exit $LASTEXITCODE
 }
 

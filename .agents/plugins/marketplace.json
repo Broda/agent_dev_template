@@ -9,7 +9,7 @@
       "version": "0.1.0",
       "source": {
         "source": "local",
-        "path": "./plugins/project-lifecycle-lab"
+        "path": "./.harness/plugins/project-lifecycle-lab"
       },
       "policy": {
         "installation": "AVAILABLE",

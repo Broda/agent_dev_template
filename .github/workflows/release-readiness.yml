@@ -33,16 +33,16 @@ jobs:
           ./scripts/render-intent-docs
           ./scripts/sync-plugin-skills
           git diff --exit-code -- \
-            harness_commands/CONVERSATIONAL_MODE.md \
-            harness_commands/COMMANDS.md \
-            harness_commands/harness_manifest.json \
+            .harness/commands/CONVERSATIONAL_MODE.md \
+            .harness/commands/COMMANDS.md \
+            .harness/commands/harness_manifest.json \
             .agents/plugins/marketplace.json \
             .agents/skills/ \
-            plugins/project-lifecycle-lab/skills/ \
-            development/templates/docs/ \
-            tests/fixtures/finalized_state_v2.json \
-            tests/fixtures/finalized_state_web_app_v2.json \
-            tests/fixtures/finalized_state_with_persistence_v2.json
+            .harness/plugins/project-lifecycle-lab/skills/ \
+            .harness/development/templates/docs/ \
+            .harness/tests/fixtures/finalized_state_v2.json \
+            .harness/tests/fixtures/finalized_state_web_app_v2.json \
+            .harness/tests/fixtures/finalized_state_with_persistence_v2.json
 
       - name: Run governance validation
         shell: bash
@@ -50,11 +50,11 @@ jobs:
 
       - name: Run full unit suite
         shell: bash
-        run: python3 -m unittest discover -s tests -v
+        run: python3 -m unittest discover -s .harness/tests -v
 
       - name: Run plugin package smoke
         shell: bash
-        run: python3 plugins/project-lifecycle-lab/smoke_package.py plugins/project-lifecycle-lab
+        run: python3 .harness/plugins/project-lifecycle-lab/smoke_package.py .harness/plugins/project-lifecycle-lab
 
       - name: Run fresh copy smoke
         shell: bash
@@ -65,7 +65,9 @@ jobs:
 
       - name: Run finalize and render fixture smoke
         shell: bash
-        run: python3 -m unittest tests.test_finalization_regression tests.test_development_rendering -v
+        run: |
+          python3 -m unittest discover -s .harness/tests -p "test_finalization_regression.py" -v
+          python3 -m unittest discover -s .harness/tests -p "test_development_rendering.py" -v
 
       - name: Run update dry-run and apply smoke
         shell: bash

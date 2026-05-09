@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "harnessVersion": "0.1.0",
+  "templateRepository": "https://github.com/Broda/agent_dev_template",
+  "sourceCommit": "template-source",
+  "sourceCommitType": "template",
+  "sourceWorktreeDirty": false,
+  "compatibility": {
+    "wrapperRuntimeVersion": 1,
+    "capabilityVersion": 1,
+    "stateSchemaVersion": 2,
+    "stateSchemaPath": "state/project-init.schema.v2.json"
+  },
+  "supportedModes": [
+    "brainstorming",
+    "development"
+  ],
+  "stableWrappers": [
+    {
+      "path": "scripts/lab",
+      "backendCommand": "lab-<command>"
+    },
+    {
+      "path": "scripts/finalize-project",
+      "backendCommand": "finalize-project"
+    },
+    {
+      "path": "scripts/validate-governance",
+      "backendCommand": "validate-governance"
+    },
+    {
+      "path": "scripts/project-harness",
+      "backendCommand": "project-harness-new | project-harness-update | project-harness-validate"
+    },
+    {
+      "path": "scripts/render-intent-docs",
+      "backendCommand": "render-intent-docs"
+    },
+    {
+      "path": "scripts/sync-plugin-skills",
+      "backendCommand": "sync-plugin-skills"
+    }
+  ],
+  "artifactInventory": {
+    "harnessOwned": [
+      "AGENTS.md",
+      ".harness/docs/BOOTSTRAP_TOOL.md",
+      ".harness/docs/HARNESS_IMPROVEMENT_ROADMAP.md",
+      ".harness/commands/finalization_overwrite_policy.json",
+      ".harness/commands/harness_manifest.schema.json",
+      ".harness/commands/intent_registry.schema.json",
+      ".harness/commands/intent_registry.json",
+      ".harness/brainstorming/",
+      ".harness/development/",
+      ".harness/docs/",
+      ".harness/runtime/python/template_cli/",
+      ".harness/tests/",
+      "scripts/",
+      ".agents/skills/",
+      ".harness/plugins/project-lifecycle-lab/"
+    ],
+    "projectOwned": [
+      "ideas/",
+      "sessions/",
+      "notes/",
+      "exports/",
+      "state/project-init.json",
+      "state/project-init.schema.v2.json",
+      "docs/",
+      "src/",
+      "tests/"
+    ],
+    "mixedGenerated": [
+      "README.md",
+      "CHANGELOG.md",
+      ".gitignore",
+      "MODE.md",
+      ".harness/commands/harness_manifest.json",
+      ".harness/commands/COMMANDS.md",
+      ".harness/commands/CONVERSATIONAL_MODE.md"
+    ],
+    "archival": [
+      "NOTES_CATALOG.md",
+      "IDEA_CATALOG.md"
+    ]
+  },
+  "artifactInventoryExclusions": [
+    ".editorconfig",
+    ".gitattributes",
+    ".github/PULL_REQUEST_TEMPLATE.md",
+    ".github/workflows/ci.yml",
+    ".github/workflows/governance-audit.yml",
+    ".github/workflows/release-readiness.yml",
+    ".agents/plugins/marketplace.json",
+    "LICENSE",
+    "pyproject.toml",
+    "requirements-dev.txt"
+  ],
+  "artifactInventorySnapshotPolicy": {
+    "decision": "keep-broad-directory-entries",
+    "snapshotGeneration": "deferred",
+    "rationale": "Broad directory entries keep the update manifest readable while the harness-owned/project-owned boundary is still evolving. Generated snapshots can be introduced later when update planning needs file-level release manifests.",
+    "broadEntries": [
+      ".agents/skills/",
+      ".harness/brainstorming/",
+      ".harness/development/",
+      ".harness/docs/",
+      "docs/",
+      "docs/adr/",
+      "exports/",
+      "ideas/",
+      "notes/",
+      ".harness/runtime/python/template_cli/",
+      ".harness/plugins/project-lifecycle-lab/",
+      ".harness/tests/",
+      "scripts/",
+      "sessions/",
+      "src/",
+      "tests/"
+    ]
+  }
+}

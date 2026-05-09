@@ -7,8 +7,8 @@ Guidance for Claude Code when working in this project harness template.
 1. Read `AGENTS.md`.
 2. Read `MODE.md`.
 3. Follow the matching mode contract:
-   - `brainstorming`: `brainstorming/AGENTS.brainstorming.md`
-   - `development`: `development/AGENTS.development.md`
+   - `brainstorming`: `.harness/brainstorming/AGENTS.brainstorming.md`
+   - `development`: `.harness/development/AGENTS.development.md`
 
 This repo also provides Codex-style skills under `.agents/skills/`. Claude Code may not load them automatically, but they are concise workflow references worth reading when the task matches:
 
@@ -19,7 +19,7 @@ This repo also provides Codex-style skills under `.agents/skills/`. Claude Code 
 
 ## Stable Commands
 
-Python 3 is required. The shell and PowerShell entrypoints are wrappers; canonical logic lives under `scripts/python/template_cli/`.
+Python 3 is required. The shell and PowerShell entrypoints are wrappers; canonical logic lives under `.harness/runtime/python/template_cli/`.
 
 ```sh
 ./scripts/lab status
@@ -34,7 +34,7 @@ Python 3 is required. The shell and PowerShell entrypoints are wrappers; canonic
 ./scripts/render-intent-docs
 ./scripts/sync-plugin-skills
 ./scripts/validate-governance
-python3 -m unittest discover -s tests -v
+python3 -m unittest discover -s .harness/tests -v
 ```
 
 ## Brainstorming Notes
@@ -57,7 +57,7 @@ python3 -m unittest discover -s tests -v
 For changes to this harness template itself:
 
 - Keep command paths stable.
-- Edit `harness_commands/intent_registry.json` before regenerating generated intent docs.
+- Edit `.harness/commands/intent_registry.json` before regenerating generated intent docs.
 - Run `./scripts/sync-plugin-skills` after changing repo-scoped skills.
-- Update `brainstorming/FILE_MAP.md` when retained template inventory changes.
+- Update `.harness/brainstorming/FILE_MAP.md` when retained template inventory changes.
 - Run `./scripts/validate-governance` and the regression suite before finishing.

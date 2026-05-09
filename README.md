@@ -17,7 +17,7 @@ This harness is optimized for human-agent development, not for humans memorizing
 
 1. The human describes what should happen in normal language.
 2. The agent reads `MODE.md` and follows the active repo-scoped skill.
-3. The agent maps natural-language requests through `harness_commands/intent_registry.json` and the generated command docs.
+3. The agent maps natural-language requests through `.harness/commands/intent_registry.json` and the generated command docs.
 4. The agent runs deterministic `./scripts/lab ...` or validation commands to persist state and evidence.
 5. The agent reports the outcome, validation evidence, and the next decision point.
 
@@ -26,14 +26,14 @@ Examples: "capture this idea", "what's missing before finalize?", "finalize this
 ## Command Discovery
 
 External tools should discover supported workflow commands by reading
-`harness_commands/intent_registry.json`, not by scraping Markdown or executing
+`.harness/commands/intent_registry.json`, not by scraping Markdown or executing
 repository scripts. The registry is the machine-readable command and capability
 surface: command names, modes, backend intents, required and optional arguments,
 stable wrapper paths, write behavior, read-only safety, mutation scope, output
 expectations, and exit-code meanings.
 
-`harness_commands/COMMANDS.md` and
-`harness_commands/CONVERSATIONAL_MODE.md` are generated views of that registry.
+`.harness/commands/COMMANDS.md` and
+`.harness/commands/CONVERSATIONAL_MODE.md` are generated views of that registry.
 Run `./scripts/render-intent-docs` after changing the registry; governance
 validation fails if the generated views drift.
 
@@ -54,26 +54,26 @@ launcher smoke job for `lab`, `finalize-project`, `validate-governance`, and
 
 Runtime extraction is planned but not active. ADR-0002 records the boundary:
 the first extracted runtime should remain Python, wrappers must verify manifest
-compatibility before using an installed runtime, and `scripts/python/cli.py`
+compatibility before using an installed runtime, and `.harness/runtime/python/cli.py`
 remains the local fallback for users without a global harness install.
 
 ## Harness Architecture
 
 | Layer | Purpose | Examples |
 |---|---|---|
-| Project substrate | Durable project lifecycle state and retained docs | `MODE.md`, `ideas/`, `sessions/`, `state/`, `brainstorming/`, `development/` |
-| Deterministic tooling | Repeatable local behavior that should remain inspectable in each project | `./scripts/lab`, `./scripts/finalize-project`, `./scripts/validate-governance`, `scripts/python/template_cli/` |
+| Project substrate | Durable project lifecycle state and retained docs | `MODE.md`, `ideas/`, `sessions/`, `notes/`, `exports/`, `state/` |
+| Deterministic tooling | Repeatable local behavior that should remain inspectable in each project | `./scripts/lab`, `./scripts/finalize-project`, `./scripts/validate-governance`, `.harness/runtime/python/template_cli/` |
 | Repo-scoped skills | Canonical agent instructions for operating this harness in the current repo | `.agents/skills/` |
-| Plugin package | Optional portable distribution of reusable agent behavior | `plugins/project-lifecycle-lab/` |
-| Bootstrap/update helper | Optional convenience for creating/updating harness instances | `BOOTSTRAP_TOOL.md` |
+| Plugin package | Optional portable distribution of reusable agent behavior | `.harness/plugins/project-lifecycle-lab/` |
+| Bootstrap/update helper | Optional convenience for creating/updating harness instances | `.harness/docs/BOOTSTRAP_TOOL.md` |
 
-`HARNESS_IMPROVEMENT_ROADMAP.md` tracks public-template improvement milestones.
-`HARNESS_RELEASE_CHECKLIST.md` and `HARNESS_CHANGELOG.md` track template release
+`.harness/docs/HARNESS_IMPROVEMENT_ROADMAP.md` tracks public-template improvement milestones.
+`.harness/docs/HARNESS_RELEASE_CHECKLIST.md` and `.harness/docs/HARNESS_CHANGELOG.md` track template release
 readiness and release notes separately from generated project changelogs.
 
 ## Harness Manifest
 
-`harness_commands/harness_manifest.json` records the template provenance and
+`.harness/commands/harness_manifest.json` records the template provenance and
 compatibility contract a generated project expects. It includes the manifest
 schema version, harness release version, template repository URL, source commit
 provenance, supported modes, stable wrapper entrypoints, the expected
@@ -97,7 +97,7 @@ After creating a project repo:
 1. Point `origin` at the new project remote.
 2. Keep `MODE.md` as `brainstorming` until finalization.
 3. Use `./scripts/lab status` and `./scripts/lab doctor` to check readiness.
-4. Treat `ideas/`, `sessions/`, `notes/`, `exports/`, and `state/project-init.json` as project-local history.
+4. Treat `ideas/`, `sessions/`, `notes/`, `exports/`, and `state/project-init.json` as project-local brainstorming history.
 5. Run `./scripts/finalize-project` only when the project definition is ready to become development governance.
 
 The public template should stay generic. Project-specific product decisions belong in idea records, sessions, notes, and finalized development docs, not in the reusable harness scripts or template-maintenance skills.
@@ -121,22 +121,22 @@ To inspect available lab commands:
 
 - Read `AGENTS.md`
 - Confirm `MODE.md` is `brainstorming`
-- Use the brainstorming workflow in `brainstorming/`
+- Use the brainstorming workflow in `.harness/brainstorming/`
 
 ## Mode Guide
 
 | Mode | Read First | Main Runtime | Main Goal |
 |---|---|---|---|
-| `brainstorming` | `.agents/skills/brainstorming-lab/SKILL.md` or `brainstorming/AGENTS.brainstorming.md` | `./scripts/lab <command> ...` | Capture ideas, decisions, risks, and canonical project intent |
-| `development` | `.agents/skills/development-governance/SKILL.md` or `development/AGENTS.development.md` | governance docs under `docs/` | Execute delivery work against the finalized project definition |
+| `brainstorming` | `.agents/skills/brainstorming-lab/SKILL.md` or `.harness/brainstorming/AGENTS.brainstorming.md` | `./scripts/lab <command> ...` | Capture ideas, decisions, risks, and canonical project intent |
+| `development` | `.agents/skills/development-governance/SKILL.md` or `.harness/development/AGENTS.development.md` | governance docs under `docs/` | Execute delivery work against the finalized project definition |
 
 ## Brainstorming Phase
 
 - Repo-scoped skill: `.agents/skills/brainstorming-lab/SKILL.md`
-- Conversational rules: `harness_commands/CONVERSATIONAL_MODE.md`
-- Backend contract: `harness_commands/COMMANDS.md`
-- Quickstart: `brainstorming/QUICKSTART.md`
-- Example walkthrough: `brainstorming/EXAMPLE_LIFECYCLE.md`
+- Conversational rules: `.harness/commands/CONVERSATIONAL_MODE.md`
+- Backend contract: `.harness/commands/COMMANDS.md`
+- Quickstart: `.harness/brainstorming/QUICKSTART.md`
+- Example walkthrough: `.harness/brainstorming/EXAMPLE_LIFECYCLE.md`
 - Shell runtime: `./scripts/lab <command> ...`
 - Examples:
   - `./scripts/lab status`
@@ -220,6 +220,7 @@ This will:
 1. Capture canonical project decisions in `state/project-init.json`.
 2. Append a finalization session entry under `sessions/`.
 3. Optionally generate a summary snapshot under `exports/`.
+4. Move brainstorming history into `.harness/history/` before development validation.
 4. Render the development governance docs into `docs/`, `README.md`, `CHANGELOG.md`, and `.gitignore`.
 5. Switch `MODE.md` to `development`.
 
@@ -234,7 +235,7 @@ Generated development docs include a GitHub Actions baseline by default. Set
 project needs different CI versus local verification wording.
 
 Future state schema changes should add a new schema file, update
-`harness_commands/harness_manifest.json` compatibility metadata, keep fixture
+`.harness/commands/harness_manifest.json` compatibility metadata, keep fixture
 coverage for old and new valid states, and include an explicit migration path
 before changing finalization or rendering behavior.
 
@@ -242,7 +243,7 @@ before changing finalization or rendering behavior.
 
 Repo-scoped skill: `.agents/skills/development-governance/SKILL.md`
 
-After finalization, the active runtime rules come from `development/AGENTS.development.md` and the live governance docs under `docs/`.
+After finalization, the active runtime rules come from `.harness/development/AGENTS.development.md` and the live governance docs under `docs/`.
 
 ## Template Maintenance
 
@@ -258,15 +259,15 @@ When repo-scoped skills change, sync their plugin mirrors before validating:
 
 Repo-scoped skills are canonical for this template because they can reference
 local state, scripts, validators, and governance docs directly. The
-`plugins/project-lifecycle-lab/` package is an optional distribution mirror for
+`.harness/plugins/project-lifecycle-lab/` package is an optional distribution mirror for
 portable agent behavior; it must not replace repo-local runtime state or
 validation. The current harness and plugin version is `0.1.0`; keep the plugin
 version aligned with the harness version and use
-`plugins/project-lifecycle-lab/README.md` for the external smoke-check steps.
+`.harness/plugins/project-lifecycle-lab/README.md` for the external smoke-check steps.
 
 ## Notes Policy
 
-Research notes are retained across both phases in `notes/` and indexed in `NOTES_CATALOG.md`.
+Research notes start in `notes/` during brainstorming and move to `.harness/history/notes/` during finalization.
 
 They are archival by default:
 

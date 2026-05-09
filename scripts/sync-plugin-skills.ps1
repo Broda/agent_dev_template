@@ -9,12 +9,12 @@ $ErrorActionPreference = 'Stop'
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 if (Get-Command py -ErrorAction SilentlyContinue) {
-    & py -3 "$scriptDir/python/cli.py" sync-plugin-skills @Args
+    & py -3 "$scriptDir/../.harness/runtime/python/cli.py" sync-plugin-skills @Args
     exit $LASTEXITCODE
 }
 
 if (Get-Command python -ErrorAction SilentlyContinue) {
-    & python "$scriptDir/python/cli.py" sync-plugin-skills @Args
+    & python "$scriptDir/../.harness/runtime/python/cli.py" sync-plugin-skills @Args
     exit $LASTEXITCODE
 }
 

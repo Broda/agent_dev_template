@@ -39,16 +39,16 @@ jobs:
           ./scripts/sync-plugin-skills
 
           generated_paths=(
-            harness_commands/CONVERSATIONAL_MODE.md
-            harness_commands/COMMANDS.md
-            harness_commands/harness_manifest.json
+            .harness/commands/CONVERSATIONAL_MODE.md
+            .harness/commands/COMMANDS.md
+            .harness/commands/harness_manifest.json
             .agents/plugins/marketplace.json
             .agents/skills/
-            plugins/project-lifecycle-lab/skills/
-            development/templates/docs/
-            tests/fixtures/finalized_state_v2.json
-            tests/fixtures/finalized_state_web_app_v2.json
-            tests/fixtures/finalized_state_with_persistence_v2.json
+            .harness/plugins/project-lifecycle-lab/skills/
+            .harness/development/templates/docs/
+            .harness/tests/fixtures/finalized_state_v2.json
+            .harness/tests/fixtures/finalized_state_web_app_v2.json
+            .harness/tests/fixtures/finalized_state_with_persistence_v2.json
           )
 
           if ! git diff --quiet -- "${generated_paths[@]}"; then
@@ -75,7 +75,7 @@ jobs:
 
       - name: Run regression suite
         shell: bash
-        run: python3 -m unittest discover -s tests -v
+        run: python3 -m unittest discover -s .harness/tests -v
 
       - name: Run governance validation
         shell: bash
@@ -96,7 +96,9 @@ jobs:
 
       - name: Run PowerShell launcher smoke tests
         shell: pwsh
-        run: python -m unittest tests.test_lab_launcher tests.test_project_harness_bootstrap -v
+        run: |
+          python -m unittest discover -s .harness/tests -p "test_lab_launcher.py" -v
+          python -m unittest discover -s .harness/tests -p "test_project_harness_bootstrap.py" -v
 
       - name: Run PowerShell project-harness update smoke
         shell: pwsh
@@ -190,8 +192,8 @@ jobs:
             ./scripts/render-intent-docs.ps1
           }
           $intentPaths = @(
-            "harness_commands/CONVERSATIONAL_MODE.md",
-            "harness_commands/COMMANDS.md"
+            ".harness/commands/CONVERSATIONAL_MODE.md",
+            ".harness/commands/COMMANDS.md"
           )
           $intentHashes = @{}
           foreach ($path in $intentPaths) {
@@ -202,16 +204,16 @@ jobs:
           }
           Assert-UnchangedHashes $intentHashes $intentPaths
 
-          Set-Content -Path "plugins/project-lifecycle-lab/skills/brainstorming-lab/SKILL.md" -Value "stale plugin copy"
+          Set-Content -Path ".harness/plugins/project-lifecycle-lab/skills/brainstorming-lab/SKILL.md" -Value "stale plugin copy"
           Invoke-SmokeCommand "sync-plugin-skills repair" {
             ./scripts/sync-plugin-skills.ps1
           }
           Assert-SameFile `
             ".agents/skills/brainstorming-lab/SKILL.md" `
-            "plugins/project-lifecycle-lab/skills/brainstorming-lab/SKILL.md" `
+            ".harness/plugins/project-lifecycle-lab/skills/brainstorming-lab/SKILL.md" `
             "Plugin skill mirror"
 
-          Copy-Item -Path "tests/fixtures/finalized_state_with_persistence_v2.json" -Destination "state/project-init.json" -Force
+          Copy-Item -Path ".harness/tests/fixtures/finalized_state_with_persistence_v2.json" -Destination "state/project-init.json" -Force
           Invoke-SmokeCommand "render-development-docs first run" {
             ./scripts/render-development-docs.ps1
           }

@@ -14,7 +14,7 @@
 
 - [ ] Preserved non-destructive history
 - [ ] Updated `IDEA_CATALOG.md` when idea state changed
-- [ ] Ran `python3 -m unittest discover -s tests -v`
+- [ ] Ran `python3 -m unittest discover -s .harness/tests -v`
 - [ ] Ran `./scripts/render-intent-docs` if intent registry or generated intent tables changed
 - [ ] Ran `scripts/validate-governance`
 - [ ] Updated docs if conversational contract changed
