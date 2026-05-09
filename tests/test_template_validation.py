@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 from tests.workflow_test_helpers import LabWorkflowTestCase, run_cmd
 
 
@@ -102,6 +104,24 @@ class TemplateValidationTests(LabWorkflowTestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("Plugin marketplace path is incorrect for project-lifecycle-lab", result.stdout)
 
+    def test_version_alignment_covers_harness_plugin_marketplace_and_docs(self) -> None:
+        harness_manifest = json.loads((self.repo / "harness_commands/harness_manifest.json").read_text(encoding="utf-8"))
+        plugin_manifest = json.loads(
+            (self.repo / "plugins/project-lifecycle-lab/.codex-plugin/plugin.json").read_text(encoding="utf-8")
+        )
+        marketplace = json.loads((self.repo / ".agents/plugins/marketplace.json").read_text(encoding="utf-8"))
+        plugin_entry = next(entry for entry in marketplace["plugins"] if entry["name"] == "project-lifecycle-lab")
+        expected_version = harness_manifest["harnessVersion"]
+
+        self.assertEqual(plugin_manifest["version"], expected_version)
+        self.assertEqual(plugin_entry["version"], expected_version)
+        for relative_path in [
+            "README.md",
+            "plugins/project-lifecycle-lab/README.md",
+            "HARNESS_CHANGELOG.md",
+        ]:
+            self.assertIn(f"`{expected_version}`", (self.repo / relative_path).read_text(encoding="utf-8"))
+
     def test_validate_brainstorming_checks_plugin_harness_boundary(self) -> None:
         manifest_path = self.repo / "plugins/project-lifecycle-lab/.codex-plugin/plugin.json"
         manifest_path.write_text(
@@ -128,6 +148,18 @@ class TemplateValidationTests(LabWorkflowTestCase):
 
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("Plugin manifest version must match harnessVersion 0.1.0", result.stdout)
+
+    def test_validate_brainstorming_checks_plugin_marketplace_version(self) -> None:
+        marketplace_path = self.repo / ".agents/plugins/marketplace.json"
+        marketplace_path.write_text(
+            marketplace_path.read_text(encoding="utf-8").replace('"version": "0.1.0"', '"version": "9.9.9"', 1),
+            encoding="utf-8",
+        )
+
+        result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Plugin marketplace version must match harnessVersion 0.1.0", result.stdout)
 
     def test_validate_brainstorming_checks_plugin_public_author_metadata(self) -> None:
         manifest_path = self.repo / "plugins/project-lifecycle-lab/.codex-plugin/plugin.json"

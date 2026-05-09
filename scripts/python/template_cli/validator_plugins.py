@@ -60,6 +60,10 @@ def validate_repo_plugins(root: Path, result: ValidationResult) -> None:
         return
 
     entry = matching_entries[0]
+    if entry.get("version") != EXPECTED_HARNESS_VERSION:
+        result.add_failure(
+            f"Plugin marketplace version must match harnessVersion {EXPECTED_HARNESS_VERSION}: {PLUGIN_MARKETPLACE}"
+        )
     if entry.get("source", {}).get("path") != "./plugins/project-lifecycle-lab":
         result.add_failure(f"Plugin marketplace path is incorrect for {PLUGIN_NAME}.")
     policy = entry.get("policy", {})

@@ -3,6 +3,7 @@
 This plugin packages reusable Codex operating knowledge for project harness templates.
 
 The plugin is intentionally not the project runtime. Canonical project state, deterministic scripts, validators, generated development docs, and local workflow history stay in the harness repository.
+Current plugin version: `0.1.0`.
 
 ## Packaging Decision
 

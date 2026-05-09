@@ -406,7 +406,7 @@ can stay small and reviewable.
       metadata outside the repo context.
 - [x] Validate plugin README examples against the actual plugin manifest and
       marketplace entry.
-- [ ] Add a version-alignment test covering harness manifest, plugin manifest,
+- [x] Add a version-alignment test covering harness manifest, plugin manifest,
       marketplace metadata, README, and release notes.
 
 ### Runtime Extraction Preparation
