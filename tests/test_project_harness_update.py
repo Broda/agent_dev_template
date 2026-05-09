@@ -132,6 +132,7 @@ class ProjectHarnessUpdateTests(LabWorkflowTestCase):
         )
 
         self.assertIn("Recorded source baseline: resolved", result.stdout)
+        self.assertIn("Target source worktree: dirty", result.stdout)
         self.assertIn("harness-owned:", result.stdout)
         self.assertIn("scripts/lab.sh", result.stdout)
         self.assertNotIn("conflicted: 1\n  - scripts/lab.sh", result.stdout)
@@ -199,6 +200,7 @@ class ProjectHarnessUpdateTests(LabWorkflowTestCase):
         )
 
         self.assertIn("Applied harness update.", result.stdout)
+        self.assertIn("Target source worktree: dirty", result.stdout)
         self.assertIn("scripts/lab.sh", result.stdout)
         self.assertIn("validate-governance: 0", result.stdout)
         self.assertIn("# target wrapper update", (project / "scripts/lab.sh").read_text(encoding="utf-8"))

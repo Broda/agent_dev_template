@@ -325,7 +325,7 @@ can stay small and reviewable.
       output.
 - [ ] Add tests proving update hooks run when repo skills or the intent registry
       change.
-- [ ] Add source-dirty provenance handling to update dry-run/apply output so
+- [x] Add source-dirty provenance handling to update dry-run/apply output so
       users know when the target template checkout has uncommitted changes.
 
 ### Manifest, Registry, And Schema Contracts

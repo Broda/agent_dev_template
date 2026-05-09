@@ -109,6 +109,7 @@ def run_project_harness_update_apply(
 
     print("Applied harness update.")
     print(f"Backup directory: {backup_dir}")
+    print(f"Target source worktree: {_source_worktree_state(source_root)}")
     print("Changed paths:")
     for path in update_paths:
         print(f"  - {path}")
@@ -267,6 +268,7 @@ def _print_update_plan(
         f"{target_manifest.get('harnessVersion', 'unknown')} "
         f"({target_manifest.get('sourceCommit', 'unknown')})"
     )
+    print(f"Target source worktree: {_source_worktree_state(source_root)}")
     if baseline_available:
         print("Recorded source baseline: resolved")
     else:
@@ -420,6 +422,19 @@ def _git_file_dirty(root: Path, relative_path: str) -> bool:
     if result.returncode != 0:
         return False
     return bool(result.stdout.strip())
+
+
+def _source_worktree_state(source_root: Path) -> str:
+    result = subprocess.run(
+        ["git", "status", "--porcelain"],
+        cwd=source_root,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return "unavailable"
+    return "dirty" if result.stdout.strip() else "clean"
 
 
 def _run(command: list[str], cwd: Path) -> int:
