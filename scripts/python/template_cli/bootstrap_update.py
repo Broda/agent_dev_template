@@ -101,7 +101,8 @@ def _apply_update_source(root: Path, source: UpdateSource, *, yes: bool, include
         hook_results.append(("render-intent-docs", _run(_template_cli_command("render-intent-docs"), root)))
     failed_hooks = [(label, result) for label, result in hook_results if result != 0]
     if failed_hooks:
-        print("Post-update hook failed. Restore from backup if needed:")
+        _rollback_update(root, backup_dir, update_paths)
+        print("Post-update hook failed. Rolled back copied files from backup:")
         print(f"  {backup_dir}")
         return failed_hooks[0][1]
 
@@ -113,7 +114,8 @@ def _apply_update_source(root: Path, source: UpdateSource, *, yes: bool, include
         result = _run(_template_cli_command(cli_command), root)
         validation_results.append((label, result))
         if result != 0:
-            print("Validation failed after update apply. Restore from backup if needed:")
+            _rollback_update(root, backup_dir, update_paths)
+            print("Validation failed after update apply. Rolled back copied files from backup:")
             print(f"  {backup_dir}")
             return result
 
@@ -121,7 +123,8 @@ def _apply_update_source(root: Path, source: UpdateSource, *, yes: bool, include
     final_validation = _run(_template_cli_command("validate-governance"), root)
     validation_results.append(("validate-governance-after-provenance", final_validation))
     if final_validation != 0:
-        print("Provenance validation failed after update apply. Restore from backup if needed:")
+        _rollback_update(root, backup_dir, update_paths)
+        print("Provenance validation failed after update apply. Rolled back copied files from backup:")
         print(f"  {backup_dir}")
         return final_validation
 
@@ -380,6 +383,19 @@ def _looks_like_commit(value: str) -> bool:
 def _copy_source_file(source_path: Path, target_path: Path) -> None:
     target_path.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(source_path, target_path)
+
+
+def _rollback_update(root: Path, backup_dir: Path, update_paths: list[str]) -> None:
+    for relative_path in update_paths:
+        current_path = root / relative_path
+        backup_path = backup_dir / relative_path
+        if backup_path.exists():
+            current_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(backup_path, current_path)
+        elif current_path.exists():
+            current_path.unlink()
+    _run(_template_cli_command("sync-plugin-skills"), root)
+    _run(_template_cli_command("render-intent-docs"), root)
 
 
 def _timestamp_label() -> str:

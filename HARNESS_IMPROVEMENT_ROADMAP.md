@@ -319,7 +319,7 @@ can stay small and reviewable.
       update source selector.
 - [x] Add update apply support for clean harness-owned removals, with explicit
       dry-run visibility and tests.
-- [ ] Add an update rollback command or automatic rollback path when hooks or
+- [x] Add an update rollback command or automatic rollback path when hooks or
       validation fail after file copies.
 - [x] Add tests for `--include-mixed` apply behavior and its review/backup
       output.

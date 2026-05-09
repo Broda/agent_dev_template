@@ -346,6 +346,50 @@ class ProjectHarnessUpdateTests(LabWorkflowTestCase):
             (project / "harness_commands/CONVERSATIONAL_MODE.md").read_text(encoding="utf-8"),
         )
 
+    def test_update_apply_rolls_back_when_intent_hook_fails(self) -> None:
+        source = self.copy_source()
+        self.init_git_source(source)
+        project = self.tmpdir / "generated-project"
+        run_cmd(["./scripts/project-harness", "new", str(project), "--no-git"], cwd=source)
+        registry_path = source / "harness_commands/intent_registry.json"
+        registry_path.write_text("{ invalid json\n", encoding="utf-8")
+        original_registry = (project / "harness_commands/intent_registry.json").read_text(encoding="utf-8")
+        original_commands = (project / "harness_commands/CONVERSATIONAL_MODE.md").read_text(encoding="utf-8")
+
+        result = run_cmd(
+            ["./scripts/project-harness", "update", "--apply", "--source-path", str(source), "--yes"],
+            cwd=project,
+            check=False,
+        )
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Post-update hook failed. Rolled back copied files from backup:", result.stdout)
+        self.assertEqual(original_registry, (project / "harness_commands/intent_registry.json").read_text(encoding="utf-8"))
+        self.assertEqual(original_commands, (project / "harness_commands/CONVERSATIONAL_MODE.md").read_text(encoding="utf-8"))
+
+    def test_update_apply_rolls_back_when_validation_fails(self) -> None:
+        source = self.copy_source()
+        self.init_git_source(source)
+        project = self.tmpdir / "generated-project"
+        run_cmd(["./scripts/project-harness", "new", str(project), "--no-git"], cwd=source)
+        launcher_path = source / "scripts/render-intent-docs.sh"
+        launcher_path.write_text(
+            launcher_path.read_text(encoding="utf-8").replace("set -euo pipefail", "set -eo pipefail", 1),
+            encoding="utf-8",
+        )
+        project_launcher_path = project / "scripts/render-intent-docs.sh"
+        original_launcher = project_launcher_path.read_text(encoding="utf-8")
+
+        result = run_cmd(
+            ["./scripts/project-harness", "update", "--apply", "--source-path", str(source), "--yes"],
+            cwd=project,
+            check=False,
+        )
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Validation failed after update apply. Rolled back copied files from backup:", result.stdout)
+        self.assertEqual(original_launcher, project_launcher_path.read_text(encoding="utf-8"))
+
     def test_update_dry_run_conflicts_removed_harness_file_with_local_edits(self) -> None:
         source = self.copy_source()
         obsolete_source = source / "scripts/obsolete-helper"
