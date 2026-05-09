@@ -194,6 +194,12 @@ def _validate_windows_ci_launcher_job(root: Path, result: ValidationResult) -> N
         "PowerShell update dry run": "./scripts/project-harness.ps1 update --dry-run --source-path $source",
         "PowerShell update apply": "./scripts/project-harness.ps1 update --apply --source-path $source --yes",
         "PowerShell update backup assertion": "Backup directory:",
+        "PowerShell generated artifact smoke": "Run PowerShell generated artifact launcher smoke",
+        "PowerShell render intent launcher": "./scripts/render-intent-docs.ps1",
+        "PowerShell sync plugin launcher": "./scripts/sync-plugin-skills.ps1",
+        "PowerShell render development launcher": "./scripts/render-development-docs.ps1",
+        "PowerShell sync plugin drift repair": "stale plugin copy",
+        "PowerShell generated artifact idempotence": "Assert-UnchangedHashes",
         "PowerShell governance launcher": "./scripts/validate-governance.ps1",
     }
     for label, snippet in required_snippets.items():

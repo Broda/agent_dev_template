@@ -102,6 +102,93 @@ jobs:
           if ($apply -notmatch "Backup directory:") { throw "Apply output did not include backup location." }
           Pop-Location
 
+      - name: Run PowerShell generated artifact launcher smoke
+        shell: pwsh
+        run: |
+          function Invoke-SmokeCommand {
+            param(
+              [string]$Label,
+              [scriptblock]$Command
+            )
+            $output = & $Command 2>&1 | Out-String
+            $exitCode = $LASTEXITCODE
+            Write-Host "----- $Label -----"
+            Write-Host $output
+            if ($exitCode -ne 0) { throw "$Label failed with exit code $exitCode." }
+            return $output
+          }
+
+          function Assert-SameFile {
+            param(
+              [string]$Expected,
+              [string]$Actual,
+              [string]$Label
+            )
+            $expectedText = Get-Content -Path $Expected -Raw
+            $actualText = Get-Content -Path $Actual -Raw
+            if ($expectedText -ne $actualText) { throw "$Label did not match." }
+          }
+
+          function Assert-UnchangedHashes {
+            param(
+              [hashtable]$Before,
+              [string[]]$Paths
+            )
+            foreach ($path in $Paths) {
+              $after = (Get-FileHash -Path $path -Algorithm SHA256).Hash
+              if ($Before[$path] -ne $after) { throw "Generated artifact changed on idempotence check: $path" }
+            }
+          }
+
+          $work = Join-Path $env:RUNNER_TEMP "generated-launcher-smoke"
+          Copy-Item -Path . -Destination $work -Recurse -Force
+          Push-Location $work
+
+          Invoke-SmokeCommand "render-intent-docs first run" {
+            ./scripts/render-intent-docs.ps1
+          }
+          $intentPaths = @(
+            "harness_commands/CONVERSATIONAL_MODE.md",
+            "harness_commands/COMMANDS.md"
+          )
+          $intentHashes = @{}
+          foreach ($path in $intentPaths) {
+            $intentHashes[$path] = (Get-FileHash -Path $path -Algorithm SHA256).Hash
+          }
+          Invoke-SmokeCommand "render-intent-docs idempotence run" {
+            ./scripts/render-intent-docs.ps1
+          }
+          Assert-UnchangedHashes $intentHashes $intentPaths
+
+          Set-Content -Path "plugins/project-lifecycle-lab/skills/brainstorming-lab/SKILL.md" -Value "stale plugin copy"
+          Invoke-SmokeCommand "sync-plugin-skills repair" {
+            ./scripts/sync-plugin-skills.ps1
+          }
+          Assert-SameFile `
+            ".agents/skills/brainstorming-lab/SKILL.md" `
+            "plugins/project-lifecycle-lab/skills/brainstorming-lab/SKILL.md" `
+            "Plugin skill mirror"
+
+          Copy-Item -Path "tests/fixtures/finalized_state_with_persistence_v2.json" -Destination "state/project-init.json" -Force
+          Invoke-SmokeCommand "render-development-docs first run" {
+            ./scripts/render-development-docs.ps1
+          }
+          $developmentPaths = @(
+            "README.md",
+            "docs/PROJECT_CONTEXT.md",
+            "docs/ROADMAP.md",
+            ".github/workflows/ci.yml"
+          )
+          $developmentHashes = @{}
+          foreach ($path in $developmentPaths) {
+            $developmentHashes[$path] = (Get-FileHash -Path $path -Algorithm SHA256).Hash
+          }
+          Invoke-SmokeCommand "render-development-docs idempotence run" {
+            ./scripts/render-development-docs.ps1
+          }
+          Assert-UnchangedHashes $developmentHashes $developmentPaths
+          Pop-Location
+
       - name: Run governance through PowerShell launcher
         shell: pwsh
         run: ./scripts/validate-governance.ps1

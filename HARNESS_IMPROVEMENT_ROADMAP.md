@@ -511,7 +511,7 @@ Next-task sequencing:
     applies with `--yes`.
   - Assert PowerShell launcher help reaches argparse and that update output
     includes the changed file, validation summary, and backup location.
-- [ ] Add PowerShell smoke coverage for `render-intent-docs`,
+- [x] Add PowerShell smoke coverage for `render-intent-docs`,
       `sync-plugin-skills`, and `render-development-docs` launchers.
   - Exercise each `.ps1` launcher on Windows with a clean repo checkout.
   - Include at least one drift/repair scenario for `sync-plugin-skills` and one
