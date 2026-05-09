@@ -86,7 +86,9 @@ Lean file registry for the Project Harness Template.
 | `brainstorming/docs/adr/template.md` | Optional ADR template |
 | `brainstorming/docs/adr/ADR-0001-adopt-governance-structure-for-idea-lab.md` | Foundational ADR |
 | `brainstorming/docs/adr/ADR-0002-plan-installed-runtime-boundary.md` | Runtime extraction boundary ADR |
+| `brainstorming/docs/adr/ADR-0003-keep-plugin-skill-mirrors-copied.md` | Plugin mirror ownership ADR |
 | `docs/adr/ADR-0002-plan-installed-runtime-boundary.md` | Root copy of runtime extraction boundary ADR |
+| `docs/adr/ADR-0003-keep-plugin-skill-mirrors-copied.md` | Root copy of plugin mirror ownership ADR |
 | `scripts/validate-governance` | Cross-platform launcher for Python governance validation |
 | `scripts/lab` | Cross-platform launcher for brainstorming lifecycle commands |
 | `scripts/lab-sync` | Cross-platform launcher for Python commit+push sync |

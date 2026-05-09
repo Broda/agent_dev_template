@@ -30,11 +30,11 @@ class DevelopmentAdrTests(LabWorkflowTestCase):
             cwd=self.repo,
         )
 
-        expected_path = self.repo / "docs/adr/ADR-0003-adopt-agent-harness-command-routing-defaults.md"
+        expected_path = self.repo / "docs/adr/ADR-0004-adopt-agent-harness-command-routing-defaults.md"
         self.assertTrue(expected_path.exists())
         adr = expected_path.read_text(encoding="utf-8")
-        self.assertIn("Created docs/adr/ADR-0003-adopt-agent-harness-command-routing-defaults.md", result.stdout)
-        self.assertIn('# ADR-0003: Adopt "Agent Harness" command routing / defaults', adr)
+        self.assertIn("Created docs/adr/ADR-0004-adopt-agent-harness-command-routing-defaults.md", result.stdout)
+        self.assertIn('# ADR-0004: Adopt "Agent Harness" command routing / defaults', adr)
         self.assertIn("- Date: 2026-05-05", adr)
         self.assertIn("- Deciders: Template maintainer", adr)
         self.assertIn("- Use deterministic development-mode ADR capture.", adr)

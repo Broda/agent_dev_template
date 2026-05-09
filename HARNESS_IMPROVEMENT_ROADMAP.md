@@ -549,7 +549,7 @@ Next-task sequencing:
 
 ### Plugin And Skill Packaging
 
-- [ ] Decide whether plugin mirrors should remain copied files or become
+- [x] Decide whether plugin mirrors should remain copied files or become
       generated release artifacts before the first public plugin release.
   - Compare copied mirrors, generated-at-release mirrors, and generated-on-install
     mirrors across reviewability, drift risk, marketplace packaging, and local

@@ -115,6 +115,7 @@ def _validate_plugin_readme(root: Path, result: ValidationResult) -> None:
         "./scripts/validate-governance",
         "smoke_package.py",
         "External Use Check",
+        "ADR-0003",
         "Repo-scoped skills",
         "Portable plugin skills",
         "must not replace repo-local scripts",

@@ -16,7 +16,7 @@ Current plugin version: `0.1.0`.
 - `./scripts/validate-governance` validates manifest shape, marketplace registration, mirror drift, and the harness/plugin boundary wording.
 - The plugin `version` stays aligned with `harness_commands/harness_manifest.json` `harnessVersion`.
 
-Generated plugin mirrors are deliberately deferred. Copied mirrors are simpler to inspect in a public template, and drift validation keeps the package honest until there is a stronger reason to generate plugin artifacts.
+ADR-0003 records the plugin mirror ownership decision. Generated plugin mirrors are deliberately deferred. Copied mirrors are simpler to inspect in a public template, and drift validation keeps the package honest until there is a stronger reason to generate plugin artifacts.
 
 ## Workflow Boundary
 
