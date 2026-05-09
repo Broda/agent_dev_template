@@ -59,6 +59,19 @@ jobs:
       - name: Run PowerShell project-harness update smoke
         shell: pwsh
         run: |
+          function Invoke-SmokeCommand {
+            param(
+              [string]$Label,
+              [scriptblock]$Command
+            )
+            $output = & $Command 2>&1 | Out-String
+            $exitCode = $LASTEXITCODE
+            Write-Output "----- $Label -----"
+            Write-Output $output
+            if ($exitCode -ne 0) { throw "$Label failed with exit code $exitCode." }
+            return $output
+          }
+
           $source = Join-Path $env:RUNNER_TEMP "template-source"
           $project = Join-Path $env:RUNNER_TEMP "windows-update-project"
           Copy-Item -Path . -Destination $source -Recurse -Force
@@ -67,20 +80,23 @@ jobs:
           ./scripts/project-harness.ps1 new $project --no-git
           Pop-Location
 
-          Add-Content -Path (Join-Path $source "scripts/lab.ps1") -Value "# windows update smoke"
+          Add-Content -Path (Join-Path $source "scripts/lab.sh") -Value "# windows update smoke"
 
           Push-Location $project
-          $help = ./scripts/project-harness.ps1 update --help 2>&1 | Out-String
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $help = Invoke-SmokeCommand "project-harness update help" {
+            ./scripts/project-harness.ps1 update --help
+          }
           if ($help -notmatch "--dry-run") { throw "PowerShell update help did not reach argparse." }
 
-          $dryRun = ./scripts/project-harness.ps1 update --dry-run --source-path $source 2>&1 | Out-String
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          if ($dryRun -notmatch "scripts/lab.ps1") { throw "Dry-run output did not include changed file." }
+          $dryRun = Invoke-SmokeCommand "project-harness update dry-run" {
+            ./scripts/project-harness.ps1 update --dry-run --source-path $source
+          }
+          if ($dryRun -notmatch "scripts[\\/]lab.sh") { throw "Dry-run output did not include changed file." }
 
-          $apply = ./scripts/project-harness.ps1 update --apply --source-path $source --yes 2>&1 | Out-String
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          if ($apply -notmatch "scripts/lab.ps1") { throw "Apply output did not include changed file." }
+          $apply = Invoke-SmokeCommand "project-harness update apply" {
+            ./scripts/project-harness.ps1 update --apply --source-path $source --yes
+          }
+          if ($apply -notmatch "scripts[\\/]lab.sh") { throw "Apply output did not include changed file." }
           if ($apply -notmatch "validate-governance: 0") { throw "Apply output did not include validation summary." }
           if ($apply -notmatch "Backup directory:") { throw "Apply output did not include backup location." }
           Pop-Location
