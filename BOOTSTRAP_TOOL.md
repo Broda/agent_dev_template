@@ -57,12 +57,16 @@ The manifest records:
 - wrapper/runtime compatibility versions
 - supported modes
 - stable wrapper entrypoints and their backend commands
-- expected `state/project-init.json` schema version
+- expected `state/project-init.json` schema version and schema file path
 - artifact ownership classes: harness-owned, project-owned, mixed/generated, and archival
 
 Future `update` work should load this manifest rather than scraping Markdown
 docs. Update tooling must preserve project-owned and archival paths by default
 and classify mixed/generated paths conservatively.
+
+State schema changes must ship as a new schema artifact, update the manifest
+compatibility entry, and include migration tests before finalization or
+rendering starts writing the new version.
 
 ## Command Discovery
 

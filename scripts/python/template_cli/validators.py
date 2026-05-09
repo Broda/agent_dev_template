@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-import json
 import re
 import sys
 from pathlib import Path
 
+from template_cli.state_schema import validate_project_state_file
 from template_cli.validator_artifacts import BRAINSTORMING_CORE_ARTIFACTS, DEVELOPMENT_REQUIRED_ARTIFACTS
 from template_cli.validator_code_size import validate_python_file_sizes
 from template_cli.validator_intents import (
@@ -138,6 +138,7 @@ def run_validate_brainstorming(root: Path) -> int:
     validate_lab_command_parity(root, result)
     validate_intent_registry(root, result)
     validate_intent_sync_ci(root, result)
+    validate_project_state_file(root, result, variant="draft")
     validate_template_cli_file_map(root, result)
     validate_module_boundaries(root, result)
     validate_python_file_sizes(root, result)
@@ -186,55 +187,12 @@ def run_validate_development(root: Path) -> int:
     if not changelog_path.exists() or "## [Unreleased]" not in read_text(changelog_path):
         result.add_failure("CHANGELOG.md is missing the [Unreleased] section.")
 
-    state: dict = {}
-    state_path = root / "state/project-init.json"
-    if state_path.exists():
-        try:
-            state = json.loads(read_text(state_path))
-        except json.JSONDecodeError:
-            state = {}
-
-        if state.get("status") != "finalized":
-            result.add_failure("state/project-init.json must be marked finalized.")
-        if not str(state.get("ideaId", "")).strip():
-            result.add_failure("state/project-init.json must include a non-empty ideaId.")
-        if not str(state.get("projectType", "")).strip():
-            result.add_failure("state/project-init.json must include a non-empty projectType.")
-        schema_version = state.get("schemaVersion")
-        if schema_version:
-            if schema_version != 2:
-                result.add_failure("state/project-init.json schemaVersion must be 2.")
-            product = state.get("product", {})
-            governance = state.get("governance", {})
-            artifacts = state.get("artifacts", {})
-            if not str(product.get("problemStatement", "")).strip():
-                result.add_failure("state/project-init.json must include product.problemStatement.")
-            if not str(product.get("solutionSummary", "")).strip():
-                result.add_failure("state/project-init.json must include product.solutionSummary.")
-            if not str(governance.get("topRisks", "")).strip():
-                result.add_failure("state/project-init.json must include governance.topRisks.")
-            session_files = artifacts.get("sessionFiles", [])
-            if not isinstance(session_files, list) or not session_files:
-                result.add_failure("state/project-init.json must include artifacts.sessionFiles.")
-            adr_references = artifacts.get("adrReferences", [])
-            if not isinstance(adr_references, list) or not adr_references:
-                result.add_failure("state/project-init.json must include artifacts.adrReferences.")
-            else:
-                for adr_reference in adr_references:
-                    if not isinstance(adr_reference, str) or not adr_reference.strip():
-                        result.add_failure(
-                            "state/project-init.json contains an empty artifacts.adrReferences entry."
-                        )
-                        continue
-                    if not path_exists(root, adr_reference):
-                        result.add_failure(
-                            f"state/project-init.json references a missing ADR file: {adr_reference}"
-                        )
-            summary_export = str(artifacts.get("summaryExport", "")).strip()
-            if summary_export and not path_exists(root, summary_export):
-                result.add_failure(
-                    f"state/project-init.json references a missing summary export: {summary_export}"
-                )
+    state = validate_project_state_file(
+        root,
+        result,
+        variant="finalized",
+        check_artifact_references=True,
+    )
 
     if not _state_allows_game_terms(state):
         for relative_path in DEVELOPMENT_SEMANTIC_DOCS:

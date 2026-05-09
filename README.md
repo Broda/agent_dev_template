@@ -62,8 +62,8 @@ validation fails if the generated views drift.
 compatibility contract a generated project expects. It includes the manifest
 schema version, harness release version, template repository URL, source commit
 provenance, supported modes, stable wrapper entrypoints, the expected
-`state/project-init.json` schema version, and artifact ownership classes for
-future conservative update tooling.
+`state/project-init.json` schema version and schema file path, and artifact
+ownership classes for future conservative update tooling.
 
 In the template repository, `sourceCommitType` is `template`. When
 `./scripts/project-harness new` creates a project from a Git checkout, it stamps
@@ -207,6 +207,17 @@ This will:
 3. Optionally generate a summary snapshot under `exports/`.
 4. Render the development governance docs into `docs/`, `README.md`, `CHANGELOG.md`, and `.gitignore`.
 5. Switch `MODE.md` to `development`.
+
+`state/project-init.json` uses schemaVersion 2, with the checked-in contract at
+`state/project-init.schema.v2.json`. Draft state keeps the full canonical shape
+but may leave values empty while brainstorming. Finalized state must include the
+non-empty product, governance, session, and ADR fields required to render and
+validate development mode.
+
+Future state schema changes should add a new schema file, update
+`harness_commands/harness_manifest.json` compatibility metadata, keep fixture
+coverage for old and new valid states, and include an explicit migration path
+before changing finalization or rendering behavior.
 
 ## Development Phase
 

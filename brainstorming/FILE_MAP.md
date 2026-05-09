@@ -65,6 +65,7 @@ Lean file registry for the Project Harness Template.
 | `tests/test_template_validation.py` | Template governance, skill, plugin, and launcher validation tests |
 | `tests/test_project_harness_bootstrap.py` | Project harness bootstrap command regression tests |
 | `tests/test_project_harness_update.py` | Project harness update dry-run regression tests |
+| `tests/test_state_schema.py` | Project state schema contract regression tests |
 | `tests/fixtures/finalized_state_v2.json` | Canonical finalized-state fixture for development render/validate regression |
 | `tests/fixtures/finalized_state_web_app_v2.json` | Non-game finalized-state fixture for product-neutral development rendering regression |
 | `tests/fixtures/finalized_state_with_persistence_v2.json` | Persistence-enabled finalized-state fixture for migration-policy render regression |
@@ -108,6 +109,7 @@ Lean file registry for the Project Harness Template.
 | `scripts/lab-note.sh` | POSIX launcher for Python research note capture helper |
 | `scripts/project-harness.sh` | POSIX launcher for harness bootstrap helpers |
 | `state/project-init.json` | Canonical structured handoff state |
+| `state/project-init.schema.v2.json` | JSON Schema and variant contract for canonical state schemaVersion 2 |
 | `.github/workflows/ci.yml` | Blocking CI for tests and governance validation |
 | `.github/workflows/governance-audit.yml` | Warn-only CI audit |
 | `.github/PULL_REQUEST_TEMPLATE.md` | PR checklist |
@@ -136,6 +138,7 @@ Lean file registry for the Project Harness Template.
 | `scripts/python/template_cli/render_helpers.py` | State-extraction, file-manipulation, and hydration helpers for development doc rendering |
 | `scripts/python/template_cli/render_governance_templates.py` | Pure templates for rendered architecture and roadmap governance docs |
 | `scripts/python/template_cli/render_templates.py` | Pure template functions for development document generation |
+| `scripts/python/template_cli/state_schema.py` | Shared schema-backed validator for draft and finalized canonical state |
 | `scripts/python/template_cli/sync.py` | Git sync helpers for milestone commit and push flows |
 | `scripts/python/template_cli/validator_placeholders.py` | Precise unresolved-placeholder detection for generated development docs |
 | `scripts/python/template_cli/validators.py` | Brainstorming and development validation orchestration |

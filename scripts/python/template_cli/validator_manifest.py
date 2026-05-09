@@ -17,6 +17,7 @@ EXPECTED_COMPATIBILITY = {
     "wrapperRuntimeVersion": 1,
     "capabilityVersion": 1,
     "stateSchemaVersion": 2,
+    "stateSchemaPath": "state/project-init.schema.v2.json",
 }
 EXPECTED_MODES = ["brainstorming", "development"]
 COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")

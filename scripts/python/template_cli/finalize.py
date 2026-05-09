@@ -29,11 +29,13 @@ from template_cli.finalize_state import (
     _write_summary_export,
     resolve_finalize_idea_id,
 )
-from template_cli.render import run_render_development_docs
 from template_cli.io_helpers import (
+    ValidationResult,
     read_text,
     write_text,
 )
+from template_cli.render import run_render_development_docs
+from template_cli.state_schema import validate_project_state_data
 from template_cli.validators import (
     run_validate_development,
 )
@@ -360,6 +362,10 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
             existing_detail = existing_state.get(detail_key) if isinstance(existing_state, dict) else None
             if isinstance(existing_detail, dict) and existing_detail:
                 state[detail_key] = existing_detail
+        schema_result = ValidationResult()
+        validate_project_state_data(root, schema_result, state, variant="finalized")
+        if schema_result.failures:
+            raise SystemExit("\n".join(schema_result.failures))
         write_text(root / STATE_FILE, json.dumps(state, indent=2) + "\n")
         if write_export:
             _write_summary_export(root, export_path, state)

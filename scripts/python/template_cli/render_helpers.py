@@ -5,7 +5,8 @@ import re
 import shutil
 from pathlib import Path
 
-from template_cli.io_helpers import read_text, replace_literal, write_text
+from template_cli.io_helpers import ValidationResult, read_text, replace_literal, write_text
+from template_cli.state_schema import validate_project_state_data
 
 
 MILESTONE_NAME = "Milestone 0 — Foundation"
@@ -23,11 +24,18 @@ def _trim(value: str | None) -> str:
 def _load_state(root: Path) -> dict:
     state_path = root / STATE_FILE
     try:
-        return json.loads(read_text(state_path))
+        state = json.loads(read_text(state_path))
     except FileNotFoundError as exc:
         raise RenderError(f"Missing state file: {STATE_FILE}") from exc
     except json.JSONDecodeError as exc:
         raise RenderError(f"Invalid JSON in {STATE_FILE}: {exc}") from exc
+    if not isinstance(state, dict):
+        raise RenderError("state/project-init.json root must be an object.")
+    schema_result = ValidationResult()
+    validate_project_state_data(root, schema_result, state, variant="finalized")
+    if schema_result.failures:
+        raise RenderError(schema_result.failures[0])
+    return state
 
 
 def _extract_value(state: dict, path: str) -> str:

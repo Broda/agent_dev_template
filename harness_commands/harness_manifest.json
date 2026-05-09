@@ -8,7 +8,8 @@
   "compatibility": {
     "wrapperRuntimeVersion": 1,
     "capabilityVersion": 1,
-    "stateSchemaVersion": 2
+    "stateSchemaVersion": 2,
+    "stateSchemaPath": "state/project-init.schema.v2.json"
   },
   "supportedModes": [
     "brainstorming",
@@ -56,6 +57,7 @@
       "notes/",
       "exports/",
       "state/project-init.json",
+      "state/project-init.schema.v2.json",
       "docs/",
       "src/",
       "tests/"

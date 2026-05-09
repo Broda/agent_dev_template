@@ -15,8 +15,9 @@ from template_cli.finalize_helpers import (
     trim,
     unique_values,
 )
-from template_cli.io_helpers import IDEA_ROW_RE, parse_markdown_table_rows, read_text, write_text
+from template_cli.io_helpers import IDEA_ROW_RE, ValidationResult, parse_markdown_table_rows, read_text, write_text
 from template_cli.render_contract import collect_implementation_contract
+from template_cli.state_schema import validate_project_state_data
 from template_cli.sync import run_lab_sync
 from template_cli.workflow_readiness import resolved_finalize_target
 
@@ -165,6 +166,10 @@ def run_lab_handoff(root: Path, *, idea_id: str = "", check: bool = False, no_sy
 
     session_path = _write_handoff_session(root, context.idea_id, context.idea_files, context.session_paths, filled, missing, contract_sections)
     _fill_list(state, "artifacts.sessionFiles", context.session_paths + [session_path], filled)
+    schema_result = ValidationResult()
+    validate_project_state_data(root, schema_result, state, variant="draft")
+    if schema_result.failures:
+        raise SystemExit("\n".join(schema_result.failures))
     write_text(root / STATE_FILE, json.dumps(state, indent=2) + "\n")
     sync_code = run_lab_sync(
         root,

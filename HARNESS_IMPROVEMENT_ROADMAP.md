@@ -164,22 +164,22 @@ Exit criteria:
 
 Goal: make `state/project-init.json` evolution explicit and testable.
 
-- [ ] Add a JSON Schema for `state/project-init.json` schemaVersion 2.
-- [ ] Validate draft and finalized variants separately where their required
+- [x] Add a JSON Schema for `state/project-init.json` schemaVersion 2.
+- [x] Validate draft and finalized variants separately where their required
       fields differ.
-- [ ] Replace hand-written schemaVersion checks with a schema-backed validator
+- [x] Replace hand-written schemaVersion checks with a schema-backed validator
       while preserving precise error messages.
-- [ ] Add fixture tests for missing required fields, wrong types, unsupported
+- [x] Add fixture tests for missing required fields, wrong types, unsupported
       schemaVersion, missing artifact references, and valid draft/finalized
       states.
-- [ ] Document migration expectations for future schemaVersion changes.
-- [ ] Record state schema compatibility in the harness manifest.
+- [x] Document migration expectations for future schemaVersion changes.
+- [x] Record state schema compatibility in the harness manifest.
 
 Exit criteria:
 
-- [ ] Finalization, handoff, rendering, and development validation all use a
+- [x] Finalization, handoff, rendering, and development validation all use a
       shared schema contract.
-- [ ] Future schema changes have an obvious migration/test path.
+- [x] Future schema changes have an obvious migration/test path.
 
 ## Milestone 6 - Rendering Source-Of-Truth Cleanup
 
