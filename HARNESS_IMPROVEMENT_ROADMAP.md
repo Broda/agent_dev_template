@@ -390,6 +390,9 @@ can stay small and reviewable.
       `workflow_idea_commands.py`.
 - [ ] Lower the Python code-size validation threshold in stages after the large
       modules above are decomposed.
+  - Target: lower the enforced Python file-size threshold to 350 lines as the
+    normal template guardrail, then reevaluate whether a stricter 300-line cap
+    improves agent reviewability enough to justify the added module splitting.
 - [x] Lower the Python code-size validation threshold from 500 to 475 lines
       after the `finalize.py` decomposition.
 - [x] Add import-boundary validation for new workflow helper modules as they are
