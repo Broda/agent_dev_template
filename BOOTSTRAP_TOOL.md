@@ -92,15 +92,18 @@ Current local interface:
 
 ```sh
 ./scripts/project-harness update --dry-run --source-path <template-checkout>
+./scripts/project-harness update --dry-run --source-commit <40-char-sha>
 ./scripts/project-harness update --apply --source-path <template-checkout> --yes
+./scripts/project-harness update --apply --source-commit <40-char-sha> --yes
 ```
 
-The dry-run command is implemented for an explicit local source checkout. It
-loads the current project's recorded harness manifest, loads the source
-manifest, classifies candidate files by manifest ownership class, and prints a
-deterministic no-write plan. `--source-commit` and `--release-version` are
-reserved explicit source selectors; until release/source resolution exists, the
-local helper refuses them with guidance to use `--source-path`.
+The dry-run command is implemented for an explicit local source checkout or a
+40-character Git source commit. Commit resolution clones the current project's
+recorded `templateRepository` into a temporary detached checkout. It loads the
+current project's recorded harness manifest, loads the source manifest,
+classifies candidate files by manifest ownership class, and prints a
+deterministic no-write plan. `--release-version` remains a reserved explicit
+source selector until release lookup exists.
 
 Apply mode is conservative. It applies only clean `harnessOwned` paths by
 default, refuses conflicts, refuses mixed/generated paths unless

@@ -313,7 +313,7 @@ can stay small and reviewable.
       `scripts/project-harness` includes `project-harness-update`.
 - [x] Add validation that manifest stable wrapper backend commands match real
       CLI parser subcommands.
-- [ ] Implement or intentionally remove the advertised `--source-commit` update
+- [x] Implement or intentionally remove the advertised `--source-commit` update
       source selector.
 - [ ] Implement or intentionally remove the advertised `--release-version`
       update source selector.

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import shutil
 from pathlib import Path
 
@@ -136,6 +137,36 @@ class ProjectHarnessUpdateTests(LabWorkflowTestCase):
         self.assertIn("harness-owned:", result.stdout)
         self.assertIn("scripts/lab.sh", result.stdout)
         self.assertNotIn("conflicted: 1\n  - scripts/lab.sh", result.stdout)
+
+    def test_update_dry_run_can_resolve_source_commit_from_template_repository(self) -> None:
+        source = self.copy_source()
+        self.init_git_source(source)
+        project = self.tmpdir / "generated-project"
+        run_cmd(["./scripts/project-harness", "new", str(project), "--no-git"], cwd=source)
+        project_manifest_path = project / "harness_commands/harness_manifest.json"
+        project_manifest = json.loads(project_manifest_path.read_text(encoding="utf-8"))
+        project_manifest["templateRepository"] = source.as_posix()
+        project_manifest_path.write_text(json.dumps(project_manifest, indent=2) + "\n", encoding="utf-8")
+
+        source_wrapper = source / "scripts/lab.sh"
+        source_wrapper.write_text(
+            source_wrapper.read_text(encoding="utf-8") + "\n# committed source-commit update\n",
+            encoding="utf-8",
+        )
+        run_cmd(["git", "add", "scripts/lab.sh"], cwd=source)
+        run_cmd(["git", "commit", "-m", "update wrapper"], cwd=source)
+        target_commit = run_cmd(["git", "rev-parse", "HEAD"], cwd=source).stdout.strip()
+
+        result = run_cmd(
+            ["./scripts/project-harness", "update", "--dry-run", "--source-commit", target_commit],
+            cwd=project,
+        )
+
+        self.assertIn("Project harness update dry run", result.stdout)
+        self.assertIn(f"Target harness: 0.1.0 ({target_commit})", result.stdout)
+        self.assertIn("Target source worktree: clean", result.stdout)
+        self.assertIn("Recorded source baseline: resolved", result.stdout)
+        self.assertIn("scripts/lab.sh", result.stdout)
 
     def test_update_dry_run_conflicts_when_current_and_target_changed_from_recorded_source(self) -> None:
         source = self.copy_source()

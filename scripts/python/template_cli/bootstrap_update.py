@@ -5,8 +5,14 @@ import subprocess
 import sys
 from pathlib import Path
 
+from template_cli.bootstrap_update_source import (
+    UpdateSource,
+    cleanup_update_source,
+    resolve_update_source,
+    source_worktree_state,
+)
 from template_cli.io_helpers import read_mode
-from template_cli.validator_manifest import MANIFEST_PATH, load_harness_manifest, stamp_harness_manifest
+from template_cli.validator_manifest import MANIFEST_PATH, stamp_harness_manifest
 
 
 DRY_RUN_EXCLUDE_DIRS = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", ".venv", "node_modules"}
@@ -19,14 +25,17 @@ def run_project_harness_update_dry_run(
     source_commit: str = "",
     release_version: str = "",
 ) -> int:
-    resolved = _resolve_update_source(root, source_path, source_commit, release_version, apply=False)
+    resolved = resolve_update_source(root, source_path, source_commit, release_version, apply=False)
     if isinstance(resolved, int):
         return resolved
-    source_root, current_manifest, target_manifest = resolved
+    source = resolved
 
-    plan = _build_update_plan(root.resolve(), source_root, current_manifest, target_manifest)
-    _print_update_plan(root.resolve(), source_root, current_manifest, target_manifest, plan)
-    return 0
+    try:
+        plan = _build_update_plan(root.resolve(), source.root, source.current_manifest, source.target_manifest)
+        _print_update_plan(root.resolve(), source.root, source.current_manifest, source.target_manifest, plan)
+        return 0
+    finally:
+        cleanup_update_source(source)
 
 
 def run_project_harness_update_apply(
@@ -38,12 +47,18 @@ def run_project_harness_update_apply(
     yes: bool = False,
     include_mixed: bool = False,
 ) -> int:
-    resolved = _resolve_update_source(root, source_path, source_commit, release_version, apply=True)
+    resolved = resolve_update_source(root, source_path, source_commit, release_version, apply=True)
     if isinstance(resolved, int):
         return resolved
-    source_root, current_manifest, target_manifest = resolved
+    try:
+        return _apply_update_source(root, resolved, yes=yes, include_mixed=include_mixed)
+    finally:
+        cleanup_update_source(resolved)
+
+
+def _apply_update_source(root: Path, source: UpdateSource, *, yes: bool, include_mixed: bool) -> int:
     root = root.resolve()
-    plan, _baseline_available = _build_update_plan(root, source_root, current_manifest, target_manifest)
+    plan, _baseline_available = _build_update_plan(root, source.root, source.current_manifest, source.target_manifest)
 
     if plan["conflicted"]:
         print("Refusing to apply update while conflicts are present:")
@@ -74,7 +89,7 @@ def run_project_harness_update_apply(
             backup_path = backup_dir / relative_path
             backup_path.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(current_path, backup_path)
-        _copy_source_file(source_root / relative_path, current_path)
+        _copy_source_file(source.root / relative_path, current_path)
 
     hook_results: list[tuple[str, int]] = []
     if any(path.startswith(".agents/skills/") for path in update_paths):
@@ -99,7 +114,7 @@ def run_project_harness_update_apply(
             print(f"  {backup_dir}")
             return result
 
-    stamp_harness_manifest(root, source_root)
+    stamp_harness_manifest(root, source.root)
     final_validation = _run(_template_cli_command("validate-governance"), root)
     validation_results.append(("validate-governance-after-provenance", final_validation))
     if final_validation != 0:
@@ -109,7 +124,7 @@ def run_project_harness_update_apply(
 
     print("Applied harness update.")
     print(f"Backup directory: {backup_dir}")
-    print(f"Target source worktree: {_source_worktree_state(source_root)}")
+    print(f"Target source worktree: {source_worktree_state(source.root)}")
     print("Changed paths:")
     for path in update_paths:
         print(f"  - {path}")
@@ -122,58 +137,6 @@ def run_project_harness_update_apply(
         print(f"  - {label}: {result}")
     print("Review with: git diff")
     return 0
-
-
-def _resolve_update_source(
-    root: Path,
-    source_path: str,
-    source_commit: str,
-    release_version: str,
-    *,
-    apply: bool,
-) -> tuple[Path, dict, dict] | int:
-    selected_sources = [
-        label
-        for label, value in [
-            ("--source-path", source_path),
-            ("--source-commit", source_commit),
-            ("--release-version", release_version),
-        ]
-        if value
-    ]
-    command = "project-harness update --apply" if apply else "project-harness update --dry-run"
-    if len(selected_sources) != 1:
-        print(
-            f"{command} requires exactly one explicit update source: "
-            "--source-path, --source-commit, or --release-version."
-        )
-        return 2
-    if source_commit or release_version:
-        selected = source_commit or release_version
-        print(f"Update source is explicit but unavailable locally: {selected}")
-        print("Use --source-path <template-checkout> for dry-run comparison in this local helper.")
-        return 1
-
-    source_root = Path(source_path).expanduser()
-    if not source_root.is_absolute():
-        source_root = (root / source_root).resolve()
-    else:
-        source_root = source_root.resolve()
-    root = root.resolve()
-    if source_root == root:
-        print("Refusing update dry run: --source-path must point to a different template checkout.")
-        return 2
-    if not source_root.exists() or not source_root.is_dir():
-        print(f"Update source path does not exist: {source_root}")
-        return 1
-
-    try:
-        current_manifest = load_harness_manifest(root)
-        target_manifest = load_harness_manifest(source_root)
-    except (FileNotFoundError, OSError, ValueError) as exc:
-        print(f"Cannot load harness manifest for update: {exc}")
-        return 1
-    return source_root, current_manifest, target_manifest
 
 
 def _build_update_plan(
@@ -268,7 +231,7 @@ def _print_update_plan(
         f"{target_manifest.get('harnessVersion', 'unknown')} "
         f"({target_manifest.get('sourceCommit', 'unknown')})"
     )
-    print(f"Target source worktree: {_source_worktree_state(source_root)}")
+    print(f"Target source worktree: {source_worktree_state(source_root)}")
     if baseline_available:
         print("Recorded source baseline: resolved")
     else:
@@ -422,19 +385,6 @@ def _git_file_dirty(root: Path, relative_path: str) -> bool:
     if result.returncode != 0:
         return False
     return bool(result.stdout.strip())
-
-
-def _source_worktree_state(source_root: Path) -> str:
-    result = subprocess.run(
-        ["git", "status", "--porcelain"],
-        cwd=source_root,
-        text=True,
-        capture_output=True,
-        check=False,
-    )
-    if result.returncode != 0:
-        return "unavailable"
-    return "dirty" if result.stdout.strip() else "clean"
 
 
 def _run(command: list[str], cwd: Path) -> int:
