@@ -56,6 +56,35 @@ jobs:
         shell: pwsh
         run: python -m unittest tests.test_lab_launcher tests.test_project_harness_bootstrap -v
 
+      - name: Run PowerShell project-harness update smoke
+        shell: pwsh
+        run: |
+          $source = Join-Path $env:RUNNER_TEMP "template-source"
+          $project = Join-Path $env:RUNNER_TEMP "windows-update-project"
+          Copy-Item -Path . -Destination $source -Recurse -Force
+
+          Push-Location $source
+          ./scripts/project-harness.ps1 new $project --no-git
+          Pop-Location
+
+          Add-Content -Path (Join-Path $source "scripts/lab.ps1") -Value "# windows update smoke"
+
+          Push-Location $project
+          $help = ./scripts/project-harness.ps1 update --help 2>&1 | Out-String
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if ($help -notmatch "--dry-run") { throw "PowerShell update help did not reach argparse." }
+
+          $dryRun = ./scripts/project-harness.ps1 update --dry-run --source-path $source 2>&1 | Out-String
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if ($dryRun -notmatch "scripts/lab.ps1") { throw "Dry-run output did not include changed file." }
+
+          $apply = ./scripts/project-harness.ps1 update --apply --source-path $source --yes 2>&1 | Out-String
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if ($apply -notmatch "scripts/lab.ps1") { throw "Apply output did not include changed file." }
+          if ($apply -notmatch "validate-governance: 0") { throw "Apply output did not include validation summary." }
+          if ($apply -notmatch "Backup directory:") { throw "Apply output did not include backup location." }
+          Pop-Location
+
       - name: Run governance through PowerShell launcher
         shell: pwsh
         run: ./scripts/validate-governance.ps1

@@ -504,7 +504,7 @@ Next-task sequencing:
 
 ### Cross-Platform And CI Coverage
 
-- [ ] Add Windows PowerShell smoke coverage for `project-harness update --dry-run`
+- [x] Add Windows PowerShell smoke coverage for `project-harness update --dry-run`
       and `project-harness update --apply --yes`.
   - Add a Windows CI job that creates a generated project from the template,
     mutates a clean harness-owned file in the source checkout, runs dry-run, then

@@ -188,6 +188,11 @@ def _validate_windows_ci_launcher_job(root: Path, result: ValidationResult) -> N
         "Windows runner": "runs-on: windows-latest",
         "PowerShell shell": "shell: pwsh",
         "launcher smoke tests": "python -m unittest tests.test_lab_launcher tests.test_project_harness_bootstrap -v",
+        "PowerShell update smoke": "Run PowerShell project-harness update smoke",
+        "PowerShell update help": "./scripts/project-harness.ps1 update --help",
+        "PowerShell update dry run": "./scripts/project-harness.ps1 update --dry-run --source-path $source",
+        "PowerShell update apply": "./scripts/project-harness.ps1 update --apply --source-path $source --yes",
+        "PowerShell update backup assertion": "Backup directory:",
         "PowerShell governance launcher": "./scripts/validate-governance.ps1",
     }
     for label, snippet in required_snippets.items():
