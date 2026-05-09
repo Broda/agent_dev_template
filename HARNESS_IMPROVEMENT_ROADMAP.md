@@ -567,7 +567,7 @@ Next-task sequencing:
 
 ### Runtime Extraction Preparation
 
-- [ ] Define the installed Python runtime package interface before extracting
+- [x] Define the installed Python runtime package interface before extracting
       any local wrapper behavior.
   - Specify the console entrypoint name, version reporting command, expected
     Python package/module layout, supported Python versions, and compatibility

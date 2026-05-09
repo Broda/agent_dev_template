@@ -151,6 +151,19 @@ or standalone binary path is considered. Thin wrappers may discover an installed
 runtime later, but they must validate the recorded harness manifest first and
 preserve `scripts/python/cli.py` as the repo-local fallback.
 
+The planned installed Python package is `project_harness_runtime` with a
+`project-harness-runtime` console entrypoint. Wrappers may call
+`project-harness-runtime version --json` for `runtimeVersion`,
+`wrapperRuntimeVersion`, `capabilityVersion`, `stateSchemaVersion`, and
+`supportedBackendCommands`, then compare those values with
+`harness_commands/harness_manifest.json`. Python 3.12 is the first supported
+runtime baseline.
+
+Only read-only validation and contract commands are eligible for the first
+installed-runtime slice. Commands that write project state, generated docs,
+plugin mirrors, update backups, or Git history remain repo-local until
+compatibility, rollback, and fallback behavior are tested.
+
 Candidate extraction order:
 
 1. Read-only contract and validation helpers.

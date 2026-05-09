@@ -61,6 +61,50 @@ If an installed runtime is present but incompatible, wrappers must print a clear
 compatibility error and either fall back to the local runtime or explain why
 fallback is unsafe for that command.
 
+## Installed Python Runtime Interface
+
+The first installed runtime interface should be a Python package named
+`project_harness_runtime` with one console entrypoint:
+
+```sh
+project-harness-runtime BACKEND_COMMAND [args]
+```
+
+The package should support Python 3.12 as the release baseline and may support
+newer CPython versions after CI proves compatibility. The package layout should
+keep public adapter modules separate from implementation modules:
+
+- `project_harness_runtime.__main__` for `python -m project_harness_runtime`
+- `project_harness_runtime.cli` for console entrypoint dispatch
+- `project_harness_runtime.compat` for manifest/runtime compatibility checks
+- `project_harness_runtime.commands` for stable backend command adapters
+- `project_harness_runtime.template_cli` only as an internal compatibility
+  namespace while modules are migrated out of repo-local source
+
+The version interface must be machine-readable:
+
+```sh
+project-harness-runtime version --json
+```
+
+It should print a JSON object with `runtimeVersion`, `pythonPackage`,
+`pythonVersion`, `wrapperRuntimeVersion`, `capabilityVersion`,
+`stateSchemaVersion`, and `supportedBackendCommands`. Human-readable
+`project-harness-runtime --version` may exist, but wrappers must use
+`version --json`.
+
+Generated wrappers may read compatibility metadata only from the checked-in
+`harness_commands/harness_manifest.json` and the installed runtime version JSON.
+They must not import private package modules or inspect package internals.
+
+The first extraction slice may expose only read-only backend commands through
+the installed runtime, such as manifest validation, artifact inventory
+validation, intent registry validation, launcher validation, plugin/skill
+validation, Python config validation, and state schema validation. Mutating
+commands must remain repo-local in the first slice, including `lab-*`,
+`finalize-project`, `render-development-docs`, `render-intent-docs`,
+`sync-plugin-skills`, and `project-harness update --apply`.
+
 ## Compatibility Checks
 
 The installed runtime must validate:
