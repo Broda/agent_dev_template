@@ -96,11 +96,8 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
             "gameplay",
             "player",
             "battle",
-            "economy",
-            "market",
             "playable loop",
             "starter progression",
-            "onboarding",
         ]:
             self.assertNotIn(banned_term, readme)
             self.assertNotIn(banned_term, project_context)

@@ -6,8 +6,6 @@ from pathlib import Path
 
 from template_cli.io_helpers import (
     ADR_LINK_RE,
-    DEVELOPMENT_SEMANTIC_DOCS,
-    FORBIDDEN_DEVELOPMENT_TEMPLATE_TERMS,
     IDEA_ROW_RE,
     NOTE_DATE_RE,
     NOTE_ID_RE,
@@ -17,8 +15,9 @@ from template_cli.io_helpers import (
     is_noneish,
     parse_markdown_table_rows,
     path_exists,
-    print_brainstorming_summary,
-    print_development_summary,
+    print_brainstorming_summary_result,
+    print_development_summary_result,
+    print_validation_json,
     read_mode,
     read_text,
 )
@@ -121,7 +120,12 @@ def validate_template_cli_file_map(root: Path, result: ValidationResult) -> None
             result.add_failure(f"FILE_MAP.md missing registry row for template CLI module: {relative_path}")
 
 
-def run_validate_brainstorming(root: Path) -> int:
+def run_validate_brainstorming(
+    root: Path,
+    *,
+    json_output: bool = False,
+    json_command: str = "validate-brainstorming",
+) -> int:
     result = ValidationResult()
 
     for artifact in BRAINSTORMING_CORE_ARTIFACTS:
@@ -197,10 +201,15 @@ def run_validate_brainstorming(root: Path) -> int:
             if f"`{artifact}`" not in file_map_contents:
                 result.add_warning(f"FILE_MAP.md missing registry row for: {artifact}")
 
-    return print_brainstorming_summary(result)
+    return print_brainstorming_summary_result(result, json_output=json_output, json_command=json_command)
 
 
-def run_validate_development(root: Path) -> int:
+def run_validate_development(
+    root: Path,
+    *,
+    json_output: bool = False,
+    json_command: str = "validate-development",
+) -> int:
     result = ValidationResult()
 
     for artifact in DEVELOPMENT_REQUIRED_ARTIFACTS:
@@ -225,25 +234,12 @@ def run_validate_development(root: Path) -> int:
     if not changelog_path.exists() or "## [Unreleased]" not in read_text(changelog_path):
         result.add_failure("CHANGELOG.md is missing the [Unreleased] section.")
 
-    state = validate_project_state_file(
+    validate_project_state_file(
         root,
         result,
         variant="finalized",
         check_artifact_references=True,
     )
-
-    if not _state_allows_game_terms(state):
-        for relative_path in DEVELOPMENT_SEMANTIC_DOCS:
-            path = root / relative_path
-            if not path.exists():
-                continue
-            text = read_text(path).lower()
-            for term in FORBIDDEN_DEVELOPMENT_TEMPLATE_TERMS:
-                if term in text:
-                    result.add_failure(
-                        f"Generated development docs contain template-specific language '{term}' in {relative_path}."
-                    )
-                    break
 
     validate_notes_catalog(root, result, base=".harness/history")
     validate_module_boundaries(root, result)
@@ -254,36 +250,19 @@ def run_validate_development(root: Path) -> int:
     validate_finalization_overwrite_policy(root, result)
     validate_repo_plugins(root, result)
     validate_repo_skills(root, result)
-    return print_development_summary(result)
+    return print_development_summary_result(result, json_output=json_output, json_command=json_command)
 
 
-def _state_allows_game_terms(state: dict) -> bool:
-    if not isinstance(state, dict):
-        return False
-    project_type = str(state.get("projectType", "")).strip().lower()
-    if "game" in project_type:
-        return True
-    text = _state_text(state).lower()
-    text = re.sub(r"\b(?:non-game|not a game|not game|game-template|game template)\b", "", text)
-    return bool(re.search(r"\b(game|gameplay|player|playable|battle)\b", text))
-
-
-def _state_text(value: object) -> str:
-    if isinstance(value, dict):
-        return " ".join(_state_text(child) for child in value.values())
-    if isinstance(value, list):
-        return " ".join(_state_text(child) for child in value)
-    if value is None:
-        return ""
-    return str(value)
-
-
-def run_validate_governance(root: Path) -> int:
+def run_validate_governance(root: Path, *, json_output: bool = False) -> int:
     mode = read_mode(root)
     if mode == "brainstorming":
-        return run_validate_brainstorming(root)
+        return run_validate_brainstorming(root, json_output=json_output, json_command="validate-governance")
     if mode == "development":
-        return run_validate_development(root)
+        return run_validate_development(root, json_output=json_output, json_command="validate-governance")
 
+    if json_output:
+        result = ValidationResult(failures=[f"Unknown mode in MODE.md: {mode}"])
+        print_validation_json("validate-governance", mode or "unknown", result)
+        return 1
     print(f"Unknown mode in MODE.md: {mode}", file=sys.stderr)
     return 1

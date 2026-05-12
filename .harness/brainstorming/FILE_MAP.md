@@ -59,6 +59,7 @@ Lean file registry for the Project Harness Template.
 | `exports/` | Optional archival project summaries |
 | `tests/` | Regression tests for CLI and workflow runtime |
 | `.harness/tests/workflow_test_helpers.py` | Shared temp-repo fixtures and command helpers for workflow tests |
+| `.harness/tests/test_development_domain_terms.py` | Development validation regression tests for non-template domain language |
 | `.harness/tests/test_development_adr.py` | Development ADR command regression tests |
 | `.harness/tests/test_development_evidence.py` | Development roadmap evidence command regression tests |
 | `.harness/tests/test_development_rendering.py` | Development doc render and validation regression tests |
@@ -94,6 +95,7 @@ Lean file registry for the Project Harness Template.
 | `.harness/docs/adr/ADR-0003-keep-plugin-skill-mirrors-copied.md` | Harness docs copy of plugin mirror ownership ADR |
 | `.harness/docs/adr/ADR-0004-defer-official-binary-and-package-manager-install-paths.md` | Harness docs copy of runtime install path deferral ADR |
 | `scripts/validate-governance` | Cross-platform launcher for Python governance validation |
+| `scripts/harness-release-check` | Cross-platform launcher for local public-template release checks |
 | `scripts/lab` | Cross-platform launcher for brainstorming lifecycle commands |
 | `scripts/lab-sync` | Cross-platform launcher for Python commit+push sync |
 | `scripts/lab-note` | Cross-platform launcher for Python research note capture |
@@ -105,6 +107,7 @@ Lean file registry for the Project Harness Template.
 | `scripts/validate-development` | Development-mode integrity validator |
 | `scripts/validate-brainstorming` | Brainstorming-mode integrity validator |
 | `scripts/validate-governance.ps1` | PowerShell launcher for Python governance validation |
+| `scripts/harness-release-check.ps1` | PowerShell launcher for local public-template release checks |
 | `scripts/lab.ps1` | PowerShell launcher for brainstorming lifecycle commands |
 | `scripts/lab-sync.ps1` | PowerShell launcher for Python commit+push sync |
 | `scripts/lab-note.ps1` | PowerShell launcher for Python research note capture |
@@ -113,6 +116,7 @@ Lean file registry for the Project Harness Template.
 | `scripts/sync-plugin-skills.ps1` | PowerShell launcher for plugin skill mirror syncing |
 | `scripts/validate-brainstorming.ps1` | Windows brainstorming validator |
 | `scripts/finalize-project.sh` | POSIX launcher for Python in-place finalization |
+| `scripts/harness-release-check.sh` | POSIX launcher for local public-template release checks |
 | `scripts/render-intent-docs.sh` | POSIX launcher for generated intent table rendering |
 | `scripts/sync-plugin-skills.sh` | POSIX launcher for plugin skill mirror syncing |
 | `scripts/render-development-docs.sh` | Native macOS/Linux development doc renderer |
@@ -183,6 +187,7 @@ Lean file registry for the Project Harness Template.
 | `.harness/runtime/python/template_cli/render_templates.py` | Compatibility exports for development document renderers |
 | `.harness/runtime/python/template_cli/render_project_context.py` | Pure renderer for generated project context docs |
 | `.harness/runtime/python/template_cli/render_readme.py` | Pure renderer for generated README docs |
+| `.harness/runtime/python/template_cli/release_check.py` | Local public-template release check orchestration |
 | `.harness/runtime/python/template_cli/runtime_discovery.py` | Installed runtime discovery and compatibility resolution helpers |
 | `.harness/runtime/python/template_cli/state_schema.py` | Shared schema-backed validator for draft and finalized canonical state |
 | `.harness/runtime/python/template_cli/sync.py` | Git sync helpers for milestone commit and push flows |

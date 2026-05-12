@@ -70,6 +70,38 @@ def _roadmap_task_counts(root: Path) -> tuple[int, int]:
 
 
 def run_development_status(root: Path) -> int:
+    status = development_status_data(root)
+
+    print("Mode: development")
+    print(f"Project: {status['project']}")
+    if status["ideaId"]:
+        if status["stateStatus"]:
+            print(f"Canonical state: {status['stateStatus']} for {status['ideaId']}")
+        else:
+            print(f"Canonical state: {status['ideaId']}")
+    else:
+        print("Canonical state: no finalized idea recorded")
+    print(f"Active milestone: {status['activeMilestone']}")
+    docs = status["governanceDocs"]
+    print(f"Governance docs: {docs['presentCount']}/{docs['totalCount']} present")
+    if docs["missing"]:
+        print("Missing governance docs: " + ", ".join(docs["missing"]))
+    tasks = status["roadmapTasks"]
+    print(f"Roadmap tasks: {tasks['open']} open, {tasks['complete']} complete")
+    wiki = status["wiki"]
+    if wiki["enabled"]:
+        print(f"Wiki: enabled ({wiki['defaultCheckout']})")
+    else:
+        print("Wiki: disabled")
+    if status["validationCommand"]:
+        print(f"Validation command: {status['validationCommand']}")
+    else:
+        print("Validation command: not set")
+    print(status["nextStep"])
+    return 0
+
+
+def development_status_data(root: Path) -> dict:
     state = _read_state(root)
     idea_id = str(state.get("ideaId") or existing_state_value(root, "ideaId") or "").strip()
     state_status = str(state.get("status") or existing_state_value(root, "status") or "").strip()
@@ -79,28 +111,23 @@ def run_development_status(root: Path) -> int:
     missing_docs = [relpath for relpath in DEVELOPMENT_GOVERNANCE_DOCS if not (root / relpath).exists()]
     open_tasks, completed_tasks = _roadmap_task_counts(root)
     wiki = wiki_config(root)
-
-    print("Mode: development")
-    print(f"Project: {project_name}")
-    if idea_id:
-        if state_status:
-            print(f"Canonical state: {state_status} for {idea_id}")
-        else:
-            print(f"Canonical state: {idea_id}")
-    else:
-        print("Canonical state: no finalized idea recorded")
-    print(f"Active milestone: {_development_active_milestone(root)}")
-    print(f"Governance docs: {len(present_docs)}/{len(DEVELOPMENT_GOVERNANCE_DOCS)} present")
-    if missing_docs:
-        print("Missing governance docs: " + ", ".join(missing_docs))
-    print(f"Roadmap tasks: {open_tasks} open, {completed_tasks} complete")
-    if wiki["enabled"]:
-        print(f"Wiki: enabled ({wiki['defaultCheckout']})")
-    else:
-        print("Wiki: disabled")
-    if validation_command:
-        print(f"Validation command: {validation_command}")
-    else:
-        print("Validation command: not set")
-    print("Next step: align changes with docs/ROADMAP.md and record evidence under completed tasks")
-    return 0
+    return {
+        "mode": "development",
+        "project": project_name,
+        "ideaId": idea_id,
+        "stateStatus": state_status,
+        "activeMilestone": _development_active_milestone(root),
+        "governanceDocs": {
+            "present": present_docs,
+            "missing": missing_docs,
+            "presentCount": len(present_docs),
+            "totalCount": len(DEVELOPMENT_GOVERNANCE_DOCS),
+        },
+        "roadmapTasks": {
+            "open": open_tasks,
+            "complete": completed_tasks,
+        },
+        "wiki": wiki,
+        "validationCommand": validation_command,
+        "nextStep": "Next step: align changes with docs/ROADMAP.md and record evidence under completed tasks",
+    }

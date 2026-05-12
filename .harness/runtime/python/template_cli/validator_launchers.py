@@ -11,6 +11,7 @@ from template_cli.validator_manifest import load_harness_manifest
 
 PYTHON_COMMAND_LAUNCHERS = {
     "finalize-project": "finalize-project",
+    "harness-release-check": "harness-release-check",
     "lab-note": "lab-note",
     "lab-sync": "lab-sync",
     "project-harness": "project-harness-new",

@@ -456,13 +456,15 @@
       "filesTouched": "no write",
       "writeBehavior": "no-write",
       "requiredArgs": [],
-      "optionalArgs": [],
+      "optionalArgs": [
+        "--json"
+      ],
       "wrapperPath": "scripts/lab",
       "readOnlySafe": true,
       "mutationScope": [
         "none"
       ],
-      "output": "human-readable status report on stdout",
+      "output": "human-readable status report on stdout by default; JSON object on stdout with --json",
       "exitCodes": {
         "0": "success",
         "1": "runtime or validation failure",
@@ -485,14 +487,15 @@
       "writeBehavior": "no-write",
       "requiredArgs": [],
       "optionalArgs": [
-        "--idea-id"
+        "--idea-id",
+        "--json"
       ],
       "wrapperPath": "scripts/lab",
       "readOnlySafe": true,
       "mutationScope": [
         "none"
       ],
-      "output": "human-readable status report on stdout",
+      "output": "human-readable status report on stdout by default; JSON object on stdout with --json",
       "exitCodes": {
         "0": "success",
         "1": "runtime or validation failure",

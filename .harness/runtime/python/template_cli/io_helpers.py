@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -12,16 +13,6 @@ ADR_LINK_RE = re.compile(
     r"ADR-[0-9]{4}-[a-z0-9-]+\.md"
 )
 PLACEHOLDER_RE = re.compile(r"<[^>]+>")
-FORBIDDEN_DEVELOPMENT_TEMPLATE_TERMS = [
-    "gameplay",
-    "player",
-    "battle",
-    "economy",
-    "market",
-    "playable loop",
-    "starter progression",
-    "onboarding",
-]
 DEVELOPMENT_SEMANTIC_DOCS = [
     "README.md",
     "docs/PROJECT_CONTEXT.md",
@@ -110,6 +101,19 @@ class ValidationResult:
 
 
 def print_brainstorming_summary(result: ValidationResult) -> int:
+    return print_brainstorming_summary_result(result, json_output=False)
+
+
+def print_brainstorming_summary_result(
+    result: ValidationResult,
+    *,
+    json_output: bool,
+    json_command: str = "validate-brainstorming",
+) -> int:
+    if json_output:
+        print_validation_json(json_command, "brainstorming", result)
+        return 1 if result.failures else 0
+
     print("Lean validation summary")
     print(f"- Failures: {len(result.failures)}")
     print(f"- Warnings: {len(result.warnings)}")
@@ -133,6 +137,19 @@ def print_brainstorming_summary(result: ValidationResult) -> int:
 
 
 def print_development_summary(result: ValidationResult) -> int:
+    return print_development_summary_result(result, json_output=False)
+
+
+def print_development_summary_result(
+    result: ValidationResult,
+    *,
+    json_output: bool,
+    json_command: str = "validate-development",
+) -> int:
+    if json_output:
+        print_validation_json(json_command, "development", result)
+        return 1 if result.failures else 0
+
     print("Development validation summary")
     print(f"- Failures: {len(result.failures)}")
 
@@ -146,3 +163,21 @@ def print_development_summary(result: ValidationResult) -> int:
     print()
     print("PASS: development integrity checks completed with no blocking failures.")
     return 0
+
+
+def print_validation_json(command: str, mode: str, result: ValidationResult) -> None:
+    print(
+        json.dumps(
+            {
+                "command": command,
+                "mode": mode,
+                "ok": not result.failures,
+                "failureCount": len(result.failures),
+                "warningCount": len(result.warnings),
+                "failures": result.failures,
+                "warnings": result.warnings,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )

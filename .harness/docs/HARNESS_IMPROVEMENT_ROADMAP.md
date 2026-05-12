@@ -357,7 +357,7 @@ Ruff CI and runtime-discovery preparation landed.
   - Preserve the separate 300-line guardrail reevaluation as its own decision.
   - Acceptance: `rg "^- \\[ \\]" .harness/docs/HARNESS_IMPROVEMENT_ROADMAP.md` no longer
     reports duplicate wording for the same decomposition lane.
-- [ ] Add machine-readable output for read-only status and validation commands.
+- [x] Add machine-readable output for read-only status and validation commands.
   - Start with `./scripts/lab status --json`, `./scripts/lab doctor --json`,
     `./scripts/project-harness update --dry-run --json`, and
     `./scripts/validate-governance --json`.
@@ -365,7 +365,7 @@ Ruff CI and runtime-discovery preparation landed.
     schemas or stable fields for external adapters.
   - Acceptance: JSON outputs are covered by tests, avoid parsing human text, and
     remain read-only unless the underlying command is already mutating.
-- [ ] Add a local release-check wrapper for maintainers.
+- [x] Add a local release-check wrapper for maintainers.
   - Add a `./scripts/harness-release-check` launcher that runs the local portion
     of `.harness/docs/HARNESS_RELEASE_CHECKLIST.md`: generated-artifact maintenance,
     governance validation, Ruff checks, full unit suite, fresh copy validation,

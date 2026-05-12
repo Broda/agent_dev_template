@@ -37,6 +37,23 @@ expectations, and exit-code meanings.
 Run `./scripts/render-intent-docs` after changing the registry; governance
 validation fails if the generated views drift.
 
+## Machine-Readable Output
+
+Read-only status and validation commands keep human-readable output as the
+default and support `--json` for adapters that need stable fields:
+
+```sh
+./scripts/lab status --json
+./scripts/lab doctor --json
+./scripts/project-harness update --dry-run --source-path <template-checkout> --json
+./scripts/validate-governance --json
+```
+
+The JSON payloads use stable top-level keys for command identity, mode or target
+context, write behavior, counts, failures, warnings, and next-command hints.
+Adapters should treat unknown additional keys as forward-compatible metadata and
+must not infer write behavior from human-readable text.
+
 ## Tooling Runtime
 
 - Python 3 is required for the repository automation scripts under `scripts/`.
@@ -70,6 +87,8 @@ remains the local fallback for users without a global harness install.
 `.harness/docs/HARNESS_IMPROVEMENT_ROADMAP.md` tracks public-template improvement milestones.
 `.harness/docs/HARNESS_RELEASE_CHECKLIST.md` and `.harness/docs/HARNESS_CHANGELOG.md` track template release
 readiness and release notes separately from generated project changelogs.
+Before dispatching the manual release-readiness workflow, maintainers can run
+the local release checks with `./scripts/harness-release-check`.
 
 ## Harness Manifest
 

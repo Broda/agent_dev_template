@@ -9,6 +9,16 @@ class TemplateValidationTests(LabWorkflowTestCase):
     def test_validate_brainstorming_clean_template(self) -> None:
         run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo)
 
+    def test_validate_governance_json_reports_summary(self) -> None:
+        result = run_cmd(["./scripts/validate-governance", "--json"], cwd=self.repo)
+        payload = json.loads(result.stdout)
+
+        self.assertEqual(payload["command"], "validate-governance")
+        self.assertEqual(payload["mode"], "brainstorming")
+        self.assertTrue(payload["ok"])
+        self.assertEqual(payload["failureCount"], 0)
+        self.assertEqual(payload["warnings"], [])
+
     def test_validate_brainstorming_requires_repo_skills(self) -> None:
         skill_path = self.repo / ".agents/skills/brainstorming-lab/SKILL.md"
         skill_path.unlink()

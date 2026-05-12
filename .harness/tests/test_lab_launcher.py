@@ -36,6 +36,11 @@ class LabLauncherTests(LabWorkflowTestCase):
 
         self.assertIn("usage: template-cli validate-governance", result.stdout)
 
+    def test_harness_release_check_help_reaches_argparse(self) -> None:
+        result = run_cmd(["./scripts/harness-release-check", "--help"], cwd=self.repo)
+
+        self.assertIn("usage: template-cli harness-release-check", result.stdout)
+
     @unittest.skipUnless(shutil.which("pwsh") or shutil.which("powershell"), "PowerShell is not available")
     def test_lab_powershell_help_prints_command_guidance(self) -> None:
         powershell = shutil.which("pwsh") or shutil.which("powershell")
@@ -67,6 +72,7 @@ class LabLauncherTests(LabWorkflowTestCase):
         smoke_commands = [
             ("lab.ps1", ["status", "--help"], "usage: template-cli lab-status"),
             ("finalize-project.ps1", ["--help"], "usage: template-cli finalize-project"),
+            ("harness-release-check.ps1", ["--help"], "usage: template-cli harness-release-check"),
             ("validate-governance.ps1", ["--help"], "usage: template-cli validate-governance"),
         ]
         for script_name, args, expected in smoke_commands:

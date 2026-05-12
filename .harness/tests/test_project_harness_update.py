@@ -24,6 +24,20 @@ class ProjectHarnessUpdateTests(ProjectHarnessUpdateTestCase):
         self.assertNotIn("not implemented yet", result.stdout)
         self.assertEqual(before, (self.repo / "scripts/lab.sh").read_text(encoding="utf-8"))
 
+    def test_update_dry_run_json_reports_plan_without_writes(self) -> None:
+        source = self.copy_source()
+        result = run_cmd(
+            ["./scripts/project-harness", "update", "--dry-run", "--source-path", str(source), "--json"],
+            cwd=self.repo,
+        )
+        payload = json.loads(result.stdout)
+
+        self.assertEqual(payload["command"], "project-harness update --dry-run")
+        self.assertEqual(payload["writes"], "none")
+        self.assertEqual(payload["targetSource"], source.as_posix())
+        self.assertIn("harness-owned", payload["plan"])
+        self.assertIn("applyCleanHarnessOwned", payload["nextCommands"])
+
     def test_update_dry_run_refuses_ambiguous_sources(self) -> None:
         source = self.copy_source()
 

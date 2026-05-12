@@ -23,6 +23,7 @@ from template_cli.intents import IntentRegistryError, run_render_intent_docs  # 
 from template_cli.io_helpers import read_mode  # noqa: E402
 from template_cli.lab_cli import add_lab_subparsers, dispatch_lab_command  # noqa: E402
 from template_cli.plugin_sync import run_sync_plugin_skills  # noqa: E402
+from template_cli.release_check import run_harness_release_check  # noqa: E402
 from template_cli.render import run_render_development_docs  # noqa: E402
 from template_cli.validators import (  # noqa: E402
     run_validate_brainstorming,
@@ -35,12 +36,16 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="template-cli")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    subparsers.add_parser("validate-brainstorming")
-    subparsers.add_parser("validate-development")
-    subparsers.add_parser("validate-governance")
+    validate_brainstorming_parser = subparsers.add_parser("validate-brainstorming")
+    validate_brainstorming_parser.add_argument("--json", action="store_true")
+    validate_development_parser = subparsers.add_parser("validate-development")
+    validate_development_parser.add_argument("--json", action="store_true")
+    validate_governance_parser = subparsers.add_parser("validate-governance")
+    validate_governance_parser.add_argument("--json", action="store_true")
     subparsers.add_parser("render-development-docs")
     subparsers.add_parser("render-intent-docs")
     subparsers.add_parser("sync-plugin-skills")
+    subparsers.add_parser("harness-release-check")
     harness_new_parser = subparsers.add_parser("project-harness-new")
     harness_new_parser.add_argument("target")
     harness_new_parser.add_argument("--origin", default="")
@@ -53,6 +58,7 @@ def build_parser() -> argparse.ArgumentParser:
     harness_update_parser.add_argument("--apply", action="store_true")
     harness_update_parser.add_argument("--yes", action="store_true")
     harness_update_parser.add_argument("--include-mixed", action="store_true")
+    harness_update_parser.add_argument("--json", action="store_true")
     subparsers.add_parser("project-harness-validate")
     finalize_parser = subparsers.add_parser("finalize-project")
     finalize_parser.add_argument("--idea-id", default="")
@@ -105,17 +111,19 @@ def main(argv: list[str] | None = None) -> int:
         return mode_error
 
     if args.command == "validate-brainstorming":
-        return run_validate_brainstorming(Path.cwd())
+        return run_validate_brainstorming(Path.cwd(), json_output=args.json)
     if args.command == "validate-development":
-        return run_validate_development(Path.cwd())
+        return run_validate_development(Path.cwd(), json_output=args.json)
     if args.command == "validate-governance":
-        return run_validate_governance(Path.cwd())
+        return run_validate_governance(Path.cwd(), json_output=args.json)
     if args.command == "render-development-docs":
         return run_render_development_docs(Path.cwd())
     if args.command == "render-intent-docs":
         return run_render_intent_docs(Path.cwd())
     if args.command == "sync-plugin-skills":
         return run_sync_plugin_skills(Path.cwd())
+    if args.command == "harness-release-check":
+        return run_harness_release_check(Path.cwd())
     if args.command == "project-harness-new":
         return run_project_harness_new(
             Path.cwd(),
@@ -128,6 +136,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "project-harness-update":
         if args.apply == args.dry_run:
             print("project-harness update requires exactly one mode: --dry-run or --apply.", file=sys.stderr)
+            return 2
+        if args.apply and args.json:
+            print("project-harness update --json is only supported with --dry-run.", file=sys.stderr)
             return 2
         if args.apply:
             return run_project_harness_update_apply(
@@ -143,6 +154,7 @@ def main(argv: list[str] | None = None) -> int:
             source_path=args.source_path,
             source_commit=args.source_commit,
             release_version=args.release_version,
+            json_output=args.json,
         )
     if args.command == "finalize-project":
         return run_finalize_project(

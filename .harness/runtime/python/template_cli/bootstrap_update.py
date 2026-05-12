@@ -17,6 +17,7 @@ def run_project_harness_update_dry_run(
     source_path: str = "",
     source_commit: str = "",
     release_version: str = "",
+    json_output: bool = False,
 ) -> int:
     resolved = resolve_update_source(root, source_path, source_commit, release_version, apply=False)
     if isinstance(resolved, int):
@@ -25,7 +26,14 @@ def run_project_harness_update_dry_run(
 
     try:
         plan = _build_update_plan(root.resolve(), source.root, source.current_manifest, source.target_manifest)
-        _print_update_plan(root.resolve(), source.root, source.current_manifest, source.target_manifest, plan)
+        _print_update_plan(
+            root.resolve(),
+            source.root,
+            source.current_manifest,
+            source.target_manifest,
+            plan,
+            json_output=json_output,
+        )
         return 0
     finally:
         cleanup_update_source(source)

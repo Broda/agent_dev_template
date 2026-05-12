@@ -16,7 +16,7 @@ Usage: ./scripts/project-harness <command> [args]
 
 Commands:
   new <path> [--origin <url>] [--no-git]
-  update --dry-run [--source-path <template-checkout> | --source-commit <sha> | --release-version <version>]
+  update --dry-run [--source-path <template-checkout> | --source-commit <sha> | --release-version <version>] [--json]
   update --apply --source-path <template-checkout> --yes [--include-mixed]
   update --apply --source-commit <sha> --yes [--include-mixed]
   update --apply --release-version <version> --yes [--include-mixed]

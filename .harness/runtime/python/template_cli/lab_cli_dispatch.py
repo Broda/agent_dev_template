@@ -45,11 +45,11 @@ def _dispatch_sync(root: Path, args: Any, remaining: list[str]) -> int:
 
 
 def _dispatch_status(root: Path, args: Any, remaining: list[str]) -> int:
-    return run_lab_status(root)
+    return run_lab_status(root, json_output=args.json)
 
 
 def _dispatch_doctor(root: Path, args: Any, remaining: list[str]) -> int:
-    return run_lab_doctor(root, idea_id=args.idea_id)
+    return run_lab_doctor(root, idea_id=args.idea_id, json_output=args.json)
 
 
 def _dispatch_audit(root: Path, args: Any, remaining: list[str]) -> int:

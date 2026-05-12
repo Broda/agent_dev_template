@@ -25,6 +25,10 @@
       "backendCommand": "finalize-project"
     },
     {
+      "path": "scripts/harness-release-check",
+      "backendCommand": "harness-release-check"
+    },
+    {
       "path": "scripts/validate-governance",
       "backendCommand": "validate-governance"
     },

@@ -41,6 +41,26 @@ class LabStatusTests(LabWorkflowTestCase):
         self.assertNotIn("Finalize readiness:", result.stdout)
         self.assertNotIn("Finalize target:", result.stdout)
 
+    def test_lab_status_json_reports_brainstorming_context(self) -> None:
+        result = run_cmd(["./scripts/lab", "status", "--json"], cwd=self.repo)
+        status = json.loads(result.stdout)
+
+        self.assertEqual(status["mode"], "brainstorming")
+        self.assertEqual(status["ideas"]["total"], 0)
+        self.assertEqual(status["finalize"]["targetSource"], "none")
+        self.assertEqual(status["finalize"]["readiness"], "blocked")
+
+    def test_lab_status_json_reports_development_context(self) -> None:
+        self.write_render_fixture()
+        run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
+        result = run_cmd(["./scripts/lab", "status", "--json"], cwd=self.repo)
+        status = json.loads(result.stdout)
+
+        self.assertEqual(status["mode"], "development")
+        self.assertEqual(status["project"], "Render Fixture")
+        self.assertEqual(status["ideaId"], "idea-render-fixture")
+        self.assertEqual(status["governanceDocs"]["presentCount"], status["governanceDocs"]["totalCount"])
+
     def test_lab_status_reports_ready_target_context(self) -> None:
         self.write_finalize_fixture("idea-status-ready")
         result = run_cmd(["./scripts/lab", "status"], cwd=self.repo)
@@ -111,4 +131,17 @@ class LabStatusTests(LabWorkflowTestCase):
         self.assertIn("- top risks: OK via state.governance.topRisks", result.stdout)
         self.assertIn(
             "Next step: finalize can run now with ./scripts/finalize-project --idea-id idea-doctor-ready", result.stdout
+        )
+
+    def test_lab_doctor_json_reports_field_checks(self) -> None:
+        self.write_finalize_fixture("idea-doctor-json")
+        result = run_cmd(["./scripts/lab", "doctor", "--json"], cwd=self.repo)
+        doctor = json.loads(result.stdout)
+
+        self.assertEqual(doctor["targetStatus"], "resolved")
+        self.assertEqual(doctor["target"]["ideaId"], "idea-doctor-json")
+        self.assertEqual(doctor["readiness"], "ready")
+        self.assertIn(
+            {"name": "build command", "ok": True, "source": "state.commands.build"},
+            doctor["fieldChecks"],
         )

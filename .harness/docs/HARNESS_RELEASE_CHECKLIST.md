@@ -6,10 +6,11 @@ release. It applies to this template repository, not to generated projects.
 ## Required Checks
 
 - [ ] Manual Release Readiness workflow passes in GitHub Actions.
+- [ ] `./scripts/harness-release-check`
 - [ ] `./scripts/validate-governance`
 - [ ] `python3 -m pip install -r requirements-dev.txt`
-- [ ] `python3 -m ruff check .`
-- [ ] `python3 -m ruff format --check .`
+- [ ] `ruff check .` or `python3 -m ruff check .`
+- [ ] `ruff format --check .` or `python3 -m ruff format --check .`
 - [ ] `python3 -m unittest discover -s .harness/tests -v`
 - [ ] Fresh copy validates:
 
