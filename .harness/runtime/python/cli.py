@@ -30,6 +30,7 @@ from template_cli.validators import (  # noqa: E402
     run_validate_development,
     run_validate_governance,
 )
+from template_cli.workflow_data import normalize_idea_id  # noqa: E402
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -61,7 +62,7 @@ def build_parser() -> argparse.ArgumentParser:
     harness_update_parser.add_argument("--json", action="store_true")
     subparsers.add_parser("project-harness-validate")
     finalize_parser = subparsers.add_parser("finalize-project")
-    finalize_parser.add_argument("--idea-id", default="")
+    finalize_parser.add_argument("--idea-id", default="", type=normalize_idea_id)
     finalize_parser.add_argument("--write-export", action="store_true")
     finalize_parser.add_argument("--interactive", action="store_true")
     add_lab_subparsers(subparsers)

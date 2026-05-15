@@ -42,6 +42,13 @@ def _trim(value: str | None) -> str:
     return (value or "").strip()
 
 
+def normalize_idea_id(idea_id: str | None) -> str:
+    trimmed = _trim(idea_id)
+    if not trimmed or trimmed.startswith("idea-"):
+        return trimmed
+    return f"idea-{trimmed}"
+
+
 def _today() -> str:
     return datetime.now().date().isoformat()
 

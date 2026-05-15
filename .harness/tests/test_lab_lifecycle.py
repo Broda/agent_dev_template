@@ -31,6 +31,29 @@ class LabLifecycleTests(LabWorkflowTestCase):
         run_cmd(["./scripts/lab", "export", "--idea-id", "idea-wrapper-flow", "--no-sync"], cwd=self.repo)
         run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo)
 
+    def test_lab_capture_adds_missing_idea_prefix(self) -> None:
+        capture = run_cmd(
+            [
+                "./scripts/lab",
+                "capture",
+                "--idea-id",
+                "short-slug",
+                "--title",
+                "Short Slug",
+                "--no-sync",
+            ],
+            cwd=self.repo,
+        )
+        self.assertIn("Idea captured: idea-short-slug", capture.stdout)
+
+        run_cmd(["./scripts/lab", "activate", "--idea-id", "short-slug", "--no-sync"], cwd=self.repo)
+
+        catalog = (self.repo / "IDEA_CATALOG.md").read_text(encoding="utf-8")
+        active = (self.repo / "ideas/_active.md").read_text(encoding="utf-8")
+        self.assertIn("| idea-short-slug | Short Slug | active |", catalog)
+        self.assertIn("- Idea ID: `idea-short-slug`", active)
+        self.assertTrue(list((self.repo / "sessions").glob("*_idea-short-slug.md")))
+
     def test_lab_export_missing_idea_fails(self) -> None:
         result = run_cmd(
             ["./scripts/lab", "export", "--idea-id", "idea-does-not-exist", "--no-sync"],

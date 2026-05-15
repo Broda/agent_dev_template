@@ -4,6 +4,8 @@ import argparse
 from dataclasses import dataclass
 from typing import Any
 
+from template_cli.workflow_data import normalize_idea_id
+
 
 @dataclass(frozen=True)
 class ArgumentSpec:
@@ -15,11 +17,15 @@ def arg(*flags: str, **kwargs: Any) -> ArgumentSpec:
     return ArgumentSpec(flags=flags, kwargs=kwargs)
 
 
+def idea_arg(**kwargs: Any) -> ArgumentSpec:
+    return arg("--idea-id", type=normalize_idea_id, **kwargs)
+
+
 LAB_COMMAND_ARGUMENTS: dict[str, tuple[ArgumentSpec, ...]] = {
     "lab-note": (
         arg("--topic", required=True),
         arg("--source", default="recent assistant research context"),
-        arg("--idea-id", default=""),
+        idea_arg(default=""),
         arg("--tags", default=""),
         arg("--summary", action="append", default=[]),
         arg("--summary-file", action="append", default=[]),
@@ -35,7 +41,7 @@ LAB_COMMAND_ARGUMENTS: dict[str, tuple[ArgumentSpec, ...]] = {
     ),
     "lab-sync": (),
     "lab-status": (arg("--json", action="store_true"),),
-    "lab-doctor": (arg("--idea-id", default=""), arg("--json", action="store_true")),
+    "lab-doctor": (idea_arg(default=""), arg("--json", action="store_true")),
     "lab-audit": (),
     "lab-wiki-render": (),
     "lab-wiki-check": (),
@@ -60,17 +66,17 @@ LAB_COMMAND_ARGUMENTS: dict[str, tuple[ArgumentSpec, ...]] = {
     "lab-push": (),
     "lab-commit": (arg("--message", default="brainstorm: milestone update"),),
     "lab-finalize": (
-        arg("--idea-id", default=""),
+        idea_arg(default=""),
         arg("--write-export", action="store_true"),
         arg("--interactive", action="store_true"),
     ),
     "lab-handoff": (
-        arg("--idea-id", default=""),
+        idea_arg(default=""),
         arg("--check", action="store_true"),
         arg("--no-sync", action="store_true"),
     ),
     "lab-capture": (
-        arg("--idea-id", required=True),
+        idea_arg(required=True),
         arg("--title", default=""),
         arg("--owner", default=""),
         arg("--problem", default=""),
@@ -80,26 +86,26 @@ LAB_COMMAND_ARGUMENTS: dict[str, tuple[ArgumentSpec, ...]] = {
         arg("--no-sync", action="store_true"),
     ),
     "lab-activate": (
-        arg("--idea-id", required=True),
+        idea_arg(required=True),
         arg("--title", default=""),
         arg("--owner", default=""),
         arg("--session", default=""),
         arg("--no-sync", action="store_true"),
     ),
     "lab-park": (
-        arg("--idea-id", required=True),
+        idea_arg(required=True),
         arg("--owner", default=""),
         arg("--reason", default=""),
         arg("--no-sync", action="store_true"),
     ),
     "lab-kill": (
-        arg("--idea-id", required=True),
+        idea_arg(required=True),
         arg("--owner", default=""),
         arg("--reason", default=""),
         arg("--no-sync", action="store_true"),
     ),
     "lab-path-note": (
-        arg("--idea-id", required=True),
+        idea_arg(required=True),
         arg("--title", required=True),
         arg("--summary", action="append", default=[]),
         arg("--deferred", default=""),
@@ -107,7 +113,7 @@ LAB_COMMAND_ARGUMENTS: dict[str, tuple[ArgumentSpec, ...]] = {
         arg("--no-sync", action="store_true"),
     ),
     "lab-decide": (
-        arg("--idea-id", required=True),
+        idea_arg(required=True),
         arg("--decision-id", default=""),
         arg("--owner", default=""),
         arg("--session", default=""),
@@ -119,7 +125,7 @@ LAB_COMMAND_ARGUMENTS: dict[str, tuple[ArgumentSpec, ...]] = {
         arg("--no-sync", action="store_true"),
     ),
     "lab-risk": (
-        arg("--idea-id", required=True),
+        idea_arg(required=True),
         arg("--risk-id", default=""),
         arg("--owner", default=""),
         arg("--session", default=""),
@@ -131,7 +137,7 @@ LAB_COMMAND_ARGUMENTS: dict[str, tuple[ArgumentSpec, ...]] = {
         arg("--no-sync", action="store_true"),
     ),
     "lab-review": (
-        arg("--idea-id", required=True),
+        idea_arg(required=True),
         arg("--result", required=True),
         arg("--owner", default=""),
         arg("--session", default=""),
@@ -141,7 +147,7 @@ LAB_COMMAND_ARGUMENTS: dict[str, tuple[ArgumentSpec, ...]] = {
         arg("--no-sync", action="store_true"),
     ),
     "lab-export": (
-        arg("--idea-id", required=True),
+        idea_arg(required=True),
         arg("--no-sync", action="store_true"),
     ),
 }

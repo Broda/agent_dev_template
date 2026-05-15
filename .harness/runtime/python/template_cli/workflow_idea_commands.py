@@ -9,6 +9,7 @@ from template_cli.workflow_data import (
     _build_idea_fields,
     _collect_session_links,
     _default_owner,
+    normalize_idea_id,
     _remove_idea_from_buckets,
     _sync,
     _title_from_idea_id,
@@ -29,6 +30,7 @@ def run_lab_capture(
     constraints: str = "",
     no_sync: bool = False,
 ) -> int:
+    idea_id = normalize_idea_id(idea_id)
     fields = _build_idea_fields(
         root,
         idea_id,
@@ -71,6 +73,7 @@ def run_lab_activate(
     session: str = "",
     no_sync: bool = False,
 ) -> int:
+    idea_id = normalize_idea_id(idea_id)
     current_owner = owner or _default_owner(root)
     session_path = _ensure_session_file(root, idea_id, title or _title_from_idea_id(idea_id), current_owner, session)
     row = _extract_catalog_row(root, idea_id)
@@ -116,6 +119,7 @@ def _transition_idea_state(
     note: str = "",
     no_sync: bool = False,
 ) -> int:
+    idea_id = normalize_idea_id(idea_id)
     row = _extract_catalog_row(root, idea_id)
     sessions = _collect_session_links(root, idea_id, row)
     fields = _build_idea_fields(
