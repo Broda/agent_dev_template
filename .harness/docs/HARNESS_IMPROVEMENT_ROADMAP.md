@@ -550,6 +550,14 @@ Ruff CI and runtime-discovery preparation landed.
   - Acceptance: CI reports lint/format failures clearly, the local governance
     validation still passes, and formatter/linter behavior is documented in the
     contributor-facing release checklist.
+- [x] Batch `--no-sync` lab changes into the next normal sync commit.
+  - Record file-scoped lab writes skipped by `--no-sync` in Git-local metadata
+    rather than a tracked harness file.
+  - Merge the pending file list into the next `run_lab_sync` call so a note,
+    path note, decision, risk, or review sequence can land as one milestone
+    commit.
+  - Acceptance: a skipped research note is included in the following decision
+    commit, and the pending list clears after the commit succeeds.
 
 ### Rendering And Finalization Hardening
 

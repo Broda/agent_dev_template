@@ -14,7 +14,7 @@ from template_cli.io_helpers import (
     read_text,
     write_text,
 )
-from template_cli.sync import run_lab_sync
+from template_cli.sync import record_pending_sync_files, run_lab_sync
 from template_cli.workflow_catalog import _extract_catalog_row
 
 BUCKET_FILES = {
@@ -231,6 +231,7 @@ def _build_idea_fields(
 
 def _sync(root: Path, *, message: str, files: list[str], no_sync: bool) -> int:
     if no_sync:
+        record_pending_sync_files(root, files)
         return 0
     mode = read_mode(root) or "brainstorming"
     return run_lab_sync(

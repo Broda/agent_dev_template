@@ -7,7 +7,7 @@ from pathlib import Path
 
 from template_cli.finalize_history import HISTORY_ROOT
 from template_cli.io_helpers import read_mode, read_text, write_text
-from template_cli.sync import run_lab_sync
+from template_cli.sync import record_pending_sync_files, run_lab_sync
 
 NOTE_ROW_RE = re.compile(r"^\|\s*note-(\d{4})\s*\|")
 
@@ -158,18 +158,21 @@ def run_lab_note(
             f"| {note_id} | {topic} | {date_stamp} | {idea_id or 'n/a'} | {source_context} | `{note_path.as_posix()}` | {tags or 'n/a'} |\n"
         )
 
+    changed = [note_path.as_posix(), (notes_base / "NOTES_CATALOG.md").as_posix()]
+
     if not no_sync:
         exit_code = run_lab_sync(
             root,
             message=f"{mode}: note {note_id}",
             quiet=True,
             no_warn_push_failure=True,
-            files=[note_path.as_posix(), (notes_base / "NOTES_CATALOG.md").as_posix()],
+            files=changed,
         )
         if exit_code != 0:
             raise SystemExit(exit_code)
         print(f"Note saved and persisted: {note_path.as_posix()}")
     else:
+        record_pending_sync_files(root, changed)
         print(f"Note saved (sync skipped): {note_path.as_posix()}")
 
     return 0

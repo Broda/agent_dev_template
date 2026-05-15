@@ -19,6 +19,50 @@ def _warn(message: str) -> None:
     print(message, file=sys.stderr)
 
 
+def _pending_sync_path(root: Path) -> Path | None:
+    result = _run_git(root, ["rev-parse", "--git-path", "lab-pending-sync"], check=False)
+    if result.returncode != 0:
+        return None
+    path_text = result.stdout.strip()
+    if not path_text:
+        return None
+    path = Path(path_text)
+    return path if path.is_absolute() else root / path
+
+
+def _read_pending_sync_files(root: Path) -> list[str]:
+    path = _pending_sync_path(root)
+    if path is None or not path.exists():
+        return []
+    return [line.strip() for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+
+def _write_pending_sync_files(root: Path, files: list[str]) -> None:
+    path = _pending_sync_path(root)
+    if path is None:
+        return
+    if not files:
+        path.unlink(missing_ok=True)
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(files) + "\n", encoding="utf-8")
+
+
+def _merge_file_lists(first: list[str], second: list[str]) -> list[str]:
+    merged: list[str] = []
+    seen: set[str] = set()
+    for item in [*first, *second]:
+        if item and item not in seen:
+            merged.append(item)
+            seen.add(item)
+    return merged
+
+
+def record_pending_sync_files(root: Path, files: list[str]) -> None:
+    pending = _read_pending_sync_files(root)
+    _write_pending_sync_files(root, _merge_file_lists(pending, files))
+
+
 def run_lab_sync(
     root: Path,
     *,
@@ -29,6 +73,9 @@ def run_lab_sync(
     files: list[str] | None = None,
 ) -> int:
     files = files or []
+    pending_files = _read_pending_sync_files(root)
+    if files:
+        files = _merge_file_lists(files, pending_files)
 
     add_args = ["add", "--", *files] if files else ["add", "-A"]
     add_result = _run_git(root, add_args, check=False)
@@ -40,6 +87,8 @@ def run_lab_sync(
     staged_result = _run_git(root, ["diff", "--cached", "--name-only"], check=False)
     staged = staged_result.stdout.strip()
     if not staged:
+        if pending_files:
+            _write_pending_sync_files(root, [])
         if not quiet:
             print("No staged changes to commit.")
         return 0
@@ -49,6 +98,8 @@ def run_lab_sync(
         if commit_result.stderr:
             _warn(commit_result.stderr.strip())
         return commit_result.returncode
+    if pending_files:
+        _write_pending_sync_files(root, [])
 
     sha_result = _run_git(root, ["rev-parse", "--short", "HEAD"], check=False)
     commit_sha = sha_result.stdout.strip()
