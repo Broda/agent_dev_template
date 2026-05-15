@@ -33,6 +33,7 @@ def validate_python_launchers(root: Path, result: ValidationResult) -> None:
     _validate_project_harness_update_launcher(root, result)
     _validate_shell_launchers_are_portable(root, result)
     _validate_windows_ci_launcher_job(root, result)
+    _validate_brainstorming_workflows_manual_only(root, result)
     _validate_release_readiness_workflow(root, result)
 
 
@@ -248,6 +249,21 @@ def _validate_windows_ci_launcher_job(root: Path, result: ValidationResult) -> N
     for label, snippet in required_snippets.items():
         if snippet not in ci_text:
             result.add_failure(f"CI workflow is missing Windows PowerShell launcher coverage: {label}")
+
+
+def _validate_brainstorming_workflows_manual_only(root: Path, result: ValidationResult) -> None:
+    if read_mode(root) != "brainstorming":
+        return
+    workflows_dir = root / ".github/workflows"
+    if not workflows_dir.exists():
+        return
+    for workflow_path in sorted(workflows_dir.glob("*.yml")) + sorted(workflows_dir.glob("*.yaml")):
+        workflow_text = read_text(workflow_path)
+        if re.search(r"(?m)^  (?:pull_request|push):\s*$", workflow_text):
+            relative_path = workflow_path.relative_to(root).as_posix()
+            result.add_failure(
+                f"Brainstorming workflow must stay manual-only: {relative_path} has pull_request/push trigger."
+            )
 
 
 def _validate_release_readiness_workflow(root: Path, result: ValidationResult) -> None:

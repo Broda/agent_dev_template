@@ -646,6 +646,15 @@ Ruff CI and runtime-discovery preparation landed.
     generated outputs.
   - Acceptance: the artifact is produced only on failure and is small enough for
     routine CI use.
+- [x] Keep checked-in brainstorming GitHub workflows manual-only.
+  - Remove automatic PR/push triggers from the template's brainstorming
+    workflows so idea capture, session notes, and other lab history do not spend
+    GitHub Actions minutes before finalization.
+  - Add brainstorming validation that fails if any `.github/workflows/*.yml` or
+    `.github/workflows/*.yaml` file reintroduces a `pull_request` or `push`
+    trigger.
+  - Development-mode rendering still emits project CI with PR/push triggers
+    after finalization.
 - [x] Add a scheduled or manual release-readiness CI workflow that runs the full
       public-template smoke checklist.
   - Expose a `workflow_dispatch` trigger first; add a schedule only if runtime
