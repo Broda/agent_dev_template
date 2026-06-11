@@ -26,7 +26,7 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
         "docs/adr/ADR-TEMPLATE.md",
     ]
     RENDERED_ARTIFACT_HASHES_WITH_PERSISTENCE = {
-        "README.md": "7bdabfcb8d036126b17a8449c68de35649d096cf506a71b145f447f97ae40e1b",
+        "README.md": "c2e9cbe27ec3736862d63926b052581b3ccc95aba64e8960b5f508657a10f4a3",
         "CHANGELOG.md": "6b0e43176413e4e809d46f89b5da23c3976050f6c2dc22a774852399963f09a3",
         ".gitignore": "8ed32c34caaa326b71d25ce9835819a720ec3c2a91585b53bf22c75d0bbea2fe",
         ".github/workflows/ci.yml": "906f2350397192fad881369ec876626aa8c76f3bf0343d8c0094dfe3545c2287",

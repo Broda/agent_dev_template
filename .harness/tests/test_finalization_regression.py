@@ -36,7 +36,6 @@ class FinalizationRegressionTests(LabWorkflowTestCase):
             session_two,
             custom_adr,
         )
-
         result = run_cmd(
             ["./scripts/lab", "finalize", "--idea-id", idea_id, "--write-export"],
             cwd=self.repo,
@@ -71,6 +70,7 @@ class FinalizationRegressionTests(LabWorkflowTestCase):
             self.assertIn(project_name, content)
         self.assertIn(purpose, outputs["README"])
         self.assertIn('python3 -m pytest "tests/integration cases" -k "happy path"', outputs["README"])
+        self.assertFalse(any(term in outputs["README"] for term in ["# Research Notes", "# Philosophy"]))
         self.assertIn(key_decisions, outputs["PROJECT_CONTEXT"])
         self.assertIn(mitigation, outputs["PROJECT_CONTEXT"])
         self.assertIn(contingency, outputs["PROJECT_CONTEXT"])
