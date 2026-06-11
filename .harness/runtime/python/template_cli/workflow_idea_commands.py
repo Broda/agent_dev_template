@@ -9,10 +9,10 @@ from template_cli.workflow_data import (
     _build_idea_fields,
     _collect_session_links,
     _default_owner,
-    normalize_idea_id,
     _remove_idea_from_buckets,
     _sync,
     _title_from_idea_id,
+    normalize_idea_id,
 )
 from template_cli.workflow_render import _render_idea_block
 from template_cli.workflow_sessions import _ensure_session_file
