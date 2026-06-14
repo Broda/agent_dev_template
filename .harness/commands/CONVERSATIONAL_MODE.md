@@ -33,6 +33,7 @@ It is the agent-facing interface across harness modes: the user can speak natura
 | Natural phrase family | Modes | Action | Read-only safe | Mutation scope | Files touched |
 |---|---|---|---|---|---|
 | "capture this idea", "save this idea", "log this idea" | `brainstorming` | add idea intake | `no` | `project-files` | `ideas/_inbox.md`, `IDEA_CATALOG.md` |
+| "import external idea", "seed this project from an idea", "load idea payload" | `brainstorming` | import an externally sourced idea through the stable lab API | `no` | `project-files` | `ideas/_inbox.md` or `ideas/_active.md`, `sessions/*`, `IDEA_CATALOG.md` |
 | "make this active", "promote this idea", "work on this now" | `brainstorming` | move to active | `no` | `project-files` | `ideas/_active.md`, `sessions/*`, `IDEA_CATALOG.md` |
 | "decision: ... because ...", "we should do X", "record this decision" | `brainstorming` | record decision | `no` | `project-files` | `sessions/*` and optionally `.harness/brainstorming/docs/adr/*` |
 | "risk: ...", "log this risk", "what could go wrong here?" | `brainstorming` | record risk | `no` | `project-files` | `sessions/*` |

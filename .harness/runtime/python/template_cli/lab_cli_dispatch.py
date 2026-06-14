@@ -13,7 +13,7 @@ from template_cli.wiki import run_lab_wiki_check, run_lab_wiki_render
 from template_cli.workflow import run_lab_audit, run_lab_commit_command, run_lab_finalize, run_lab_push_command
 from template_cli.workflow_commands import run_lab_decide, run_lab_path_note, run_lab_review, run_lab_risk
 from template_cli.workflow_export import run_lab_export
-from template_cli.workflow_idea_commands import run_lab_activate, run_lab_capture, run_lab_kill, run_lab_park
+from template_cli.workflow_idea_commands import run_lab_activate, run_lab_capture, run_lab_import_idea, run_lab_kill, run_lab_park
 from template_cli.workflow_status import run_lab_doctor, run_lab_status
 
 Dispatcher = Callable[[Path, Any, list[str]], int]
@@ -110,6 +110,23 @@ def _dispatch_finalize(root: Path, args: Any, remaining: list[str]) -> int:
 def _dispatch_handoff(root: Path, args: Any, remaining: list[str]) -> int:
     return run_lab_handoff(root, idea_id=args.idea_id, check=args.check, no_sync=args.no_sync)
 
+
+
+def _dispatch_import_idea(root: Path, args: Any, remaining: list[str]) -> int:
+    return run_lab_import_idea(
+        root,
+        idea_id=args.idea_id,
+        title=args.title,
+        summary=args.summary,
+        source=args.source,
+        source_id=args.source_id,
+        payload_file=args.payload_file,
+        activate=args.activate,
+        create_session=args.create_session,
+        path_note=args.path_note,
+        no_sync=args.no_sync,
+        json_output=args.json,
+    )
 
 def _dispatch_capture(root: Path, args: Any, remaining: list[str]) -> int:
     return run_lab_capture(
@@ -221,6 +238,7 @@ LAB_COMMAND_DISPATCHERS: dict[str, Dispatcher] = {
     "lab-finalize": _dispatch_finalize,
     "lab-handoff": _dispatch_handoff,
     "lab-capture": _dispatch_capture,
+    "lab-import-idea": _dispatch_import_idea,
     "lab-activate": _dispatch_activate,
     "lab-park": _dispatch_park,
     "lab-kill": _dispatch_kill,

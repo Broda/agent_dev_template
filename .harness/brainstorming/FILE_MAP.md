@@ -15,6 +15,8 @@ Lean file registry for the Project Harness Template.
 | `.harness/docs/HARNESS_RELEASE_CHECKLIST.md` | Public harness template release checklist |
 | `.harness/docs/HARNESS_CHANGELOG.md` | Public harness template release notes |
 | `.harness/docs/HARNESS_IMPROVEMENT_ROADMAP.md` | Public-template improvement roadmap and milestone backlog |
+| `.hermes/plans/2026-06-14_103831-template-external-idea-import-api.md` | Implementation plan for the external idea import API slice |
+| `docs/EXTERNAL_INTEGRATION.md` | Public-safe automation contract for importing external ideas |
 | `AGENTS.md` | Agent behavior contract |
 | `MODE.md` | Active repository phase selector |
 | `.agents/skills/brainstorming-lab/SKILL.md` | Repo-scoped skill for brainstorming-mode lifecycle work |
@@ -70,8 +72,10 @@ Lean file registry for the Project Harness Template.
 | `.harness/tests/test_lab_finalization.py` | Lab finalization command regression tests |
 | `.harness/tests/test_intent_registry_contract.py` | Intent-registry render, parity, and CI-contract regression suite |
 | `.harness/tests/test_lab_launcher.py` | Lab shell and PowerShell launcher help regression tests |
+| `.harness/tests/test_external_idea_import.py` | External idea import and project bootstrap API regression tests |
 | `.harness/tests/test_lab_lifecycle.py` | Lab command, finalize, status, doctor, and review regression tests |
 | `.harness/tests/test_template_validation.py` | Template governance, skill, plugin, and launcher validation tests |
+| `.harness/tests/test_public_safety.py` | Public documentation safety regression tests |
 | `.harness/tests/test_project_harness_bootstrap.py` | Project harness bootstrap command regression tests |
 | `.harness/tests/test_project_harness_update.py` | Project harness update dry-run regression tests |
 | `.harness/tests/test_runtime_discovery.py` | Installed runtime discovery contract tests |
@@ -141,6 +145,7 @@ Lean file registry for the Project Harness Template.
 | `.harness/runtime/python/template_cli/bootstrap_update_output.py` | Project harness update dry-run output rendering helpers |
 | `.harness/runtime/python/template_cli/bootstrap_update_plan.py` | Project harness update plan classification and baseline comparison helpers |
 | `.harness/runtime/python/template_cli/bootstrap_update_source.py` | Project harness update source resolution helpers |
+| `.harness/runtime/python/template_cli/external_idea.py` | External idea payload validation and JSON result contracts |
 | `.harness/runtime/python/template_cli/evidence.py` | Development roadmap evidence capture command implementation |
 | `.harness/runtime/python/template_cli/finalize_artifacts.py` | Finalization artifact directory setup, backup registration, existing-state load, and session-log writing helpers |
 | `.harness/runtime/python/template_cli/finalize_context.py` | Finalization target, owner, session, and hydration context resolution |

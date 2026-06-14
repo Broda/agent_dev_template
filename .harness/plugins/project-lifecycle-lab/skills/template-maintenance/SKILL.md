@@ -22,6 +22,7 @@ Use this skill when maintaining the harness template rather than brainstorming a
 - Update tests or fixtures when behavior changes.
 - Do not hand-edit generated intent tables in `.harness/commands/CONVERSATIONAL_MODE.md` or `.harness/commands/COMMANDS.md`.
 - To change natural-language mappings, edit `.harness/commands/intent_registry.json`, run `./scripts/render-intent-docs`, then validate.
+- For external idea ingestion, keep `docs/EXTERNAL_INTEGRATION.md`, `lab import-idea`, and `project-harness new-from-idea` public-safe: examples must use generic placeholders and callers must not edit catalog, bucket, or session internals directly.
 
 ## Verification
 

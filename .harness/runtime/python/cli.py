@@ -11,6 +11,7 @@ if str(SCRIPT_DIR) not in sys.path:
 
 from template_cli.bootstrap import (  # noqa: E402
     run_project_harness_new,
+    run_project_harness_new_from_idea,
     run_project_harness_validate,
 )
 from template_cli.bootstrap_update import (  # noqa: E402
@@ -51,6 +52,20 @@ def build_parser() -> argparse.ArgumentParser:
     harness_new_parser.add_argument("target")
     harness_new_parser.add_argument("--origin", default="")
     harness_new_parser.add_argument("--no-git", action="store_true")
+    harness_new_parser.add_argument("--template-root", default="")
+    harness_new_from_idea_parser = subparsers.add_parser("project-harness-new-from-idea")
+    harness_new_from_idea_parser.add_argument("target")
+    harness_new_from_idea_parser.add_argument("--template-root", default="")
+    harness_new_from_idea_parser.add_argument("--idea-id", default="", type=normalize_idea_id)
+    harness_new_from_idea_parser.add_argument("--payload-file", default="")
+    harness_new_from_idea_parser.add_argument("--title", default="")
+    harness_new_from_idea_parser.add_argument("--summary", default="")
+    harness_new_from_idea_parser.add_argument("--source", default="external")
+    harness_new_from_idea_parser.add_argument("--source-id", default="")
+    harness_new_from_idea_parser.add_argument("--activate", action="store_true")
+    harness_new_from_idea_parser.add_argument("--commit", action="store_true")
+    harness_new_from_idea_parser.add_argument("--no-git", action="store_true")
+    harness_new_from_idea_parser.add_argument("--json", action="store_true")
     harness_update_parser = subparsers.add_parser("project-harness-update")
     harness_update_parser.add_argument("--dry-run", action="store_true")
     harness_update_parser.add_argument("--source-path", default="")
@@ -107,33 +122,49 @@ def _enforce_lab_mode(root: Path, command: str) -> int:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args, remaining = parser.parse_known_args(argv)
-    mode_error = _enforce_lab_mode(Path.cwd(), args.command)
+    root = Path(getattr(args, "root", "") or getattr(args, "template_root", "") or Path.cwd()).expanduser().resolve()
+    mode_error = _enforce_lab_mode(root, args.command)
     if mode_error:
         return mode_error
 
     if args.command == "validate-brainstorming":
-        return run_validate_brainstorming(Path.cwd(), json_output=args.json)
+        return run_validate_brainstorming(root, json_output=args.json)
     if args.command == "validate-development":
-        return run_validate_development(Path.cwd(), json_output=args.json)
+        return run_validate_development(root, json_output=args.json)
     if args.command == "validate-governance":
-        return run_validate_governance(Path.cwd(), json_output=args.json)
+        return run_validate_governance(root, json_output=args.json)
     if args.command == "render-development-docs":
-        return run_render_development_docs(Path.cwd())
+        return run_render_development_docs(root)
     if args.command == "render-intent-docs":
-        return run_render_intent_docs(Path.cwd())
+        return run_render_intent_docs(root)
     if args.command == "sync-plugin-skills":
-        return run_sync_plugin_skills(Path.cwd())
+        return run_sync_plugin_skills(root)
     if args.command == "harness-release-check":
-        return run_harness_release_check(Path.cwd())
+        return run_harness_release_check(root)
     if args.command == "project-harness-new":
         return run_project_harness_new(
-            Path.cwd(),
+            root,
             args.target,
             origin=args.origin,
             no_git=args.no_git,
         )
+    if args.command == "project-harness-new-from-idea":
+        return run_project_harness_new_from_idea(
+            root,
+            args.target,
+            idea_id=args.idea_id,
+            title=args.title,
+            summary=args.summary,
+            source=args.source,
+            source_id=args.source_id,
+            payload_file=args.payload_file,
+            activate=args.activate,
+            commit=args.commit,
+            no_git=args.no_git,
+            json_output=args.json,
+        )
     if args.command == "project-harness-validate":
-        return run_project_harness_validate(Path.cwd())
+        return run_project_harness_validate(root)
     if args.command == "project-harness-update":
         if args.apply == args.dry_run:
             print("project-harness update requires exactly one mode: --dry-run or --apply.", file=sys.stderr)
@@ -143,7 +174,7 @@ def main(argv: list[str] | None = None) -> int:
             return 2
         if args.apply:
             return run_project_harness_update_apply(
-                Path.cwd(),
+                root,
                 source_path=args.source_path,
                 source_commit=args.source_commit,
                 release_version=args.release_version,
@@ -151,7 +182,7 @@ def main(argv: list[str] | None = None) -> int:
                 include_mixed=args.include_mixed,
             )
         return run_project_harness_update_dry_run(
-            Path.cwd(),
+            root,
             source_path=args.source_path,
             source_commit=args.source_commit,
             release_version=args.release_version,
@@ -159,12 +190,12 @@ def main(argv: list[str] | None = None) -> int:
         )
     if args.command == "finalize-project":
         return run_finalize_project(
-            Path.cwd(),
+            root,
             args.idea_id or "",
             write_export=args.write_export,
             interactive=args.interactive,
         )
-    lab_result = dispatch_lab_command(Path.cwd(), args, remaining)
+    lab_result = dispatch_lab_command(root, args, remaining)
     if lab_result is not None:
         return lab_result
 

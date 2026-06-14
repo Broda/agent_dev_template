@@ -2,6 +2,15 @@
 set -euo pipefail
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+root_arg=()
+if [[ "${1:-}" == "--root" ]]; then
+  if [[ -z "${2:-}" ]]; then
+    echo "--root requires a path" >&2
+    exit 2
+  fi
+  root_arg=("--root" "$2")
+  shift 2
+fi
 subcommand="${1:-}"
 
 if [[ -z "$subcommand" || "$subcommand" == "-h" || "$subcommand" == "--help" || "$subcommand" == "help" ]]; then
@@ -12,6 +21,7 @@ Commands:
   status
   doctor [--idea-id <id>]
   capture --idea-id <id> --title "Title"
+  import-idea (--payload-file <json> | --idea-id <id> --title "Title")
   activate --idea-id <id>
   decide --idea-id <id> --chosen-option "Decision" --rationale "Reason"
   risk --idea-id <id> --statement "Risk"
@@ -40,11 +50,11 @@ fi
 shift
 
 if command -v python3 >/dev/null 2>&1; then
-  exec python3 "$script_dir/../.harness/runtime/python/cli.py" "lab-$subcommand" "$@"
+  exec python3 "$script_dir/../.harness/runtime/python/cli.py" "lab-$subcommand" "${root_arg[@]}" "$@"
 fi
 
 if command -v python >/dev/null 2>&1; then
-  exec python "$script_dir/../.harness/runtime/python/cli.py" "lab-$subcommand" "$@"
+  exec python "$script_dir/../.harness/runtime/python/cli.py" "lab-$subcommand" "${root_arg[@]}" "$@"
 fi
 
 echo "Error: Python 3 is required but was not found." >&2

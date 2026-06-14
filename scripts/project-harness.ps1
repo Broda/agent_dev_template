@@ -15,7 +15,8 @@ if (-not $Command -or $Command -eq '-h' -or $Command -eq '--help') {
 Usage: ./scripts/project-harness <command> [args]
 
 Commands:
-  new <path> [--origin <url>] [--no-git]
+  new <path> [--origin <url>] [--no-git] [--template-root <path>]
+  new-from-idea <path> [--payload-file <json> | --idea-id <id> --title <title>] [--json]
   update --dry-run [--source-path <template-checkout> | --source-commit <sha> | --release-version <version>] [--json]
   update --apply --source-path <template-checkout> --yes [--include-mixed]
   update --apply --source-commit <sha> --yes [--include-mixed]
@@ -28,6 +29,8 @@ Commands:
 switch ($Command) {
     # Delegates to project-harness-new.
     'new' { $cliCommand = 'project-harness-new' }
+    # Delegates to project-harness-new-from-idea.
+    'new-from-idea' { $cliCommand = 'project-harness-new-from-idea' }
     # Delegates to project-harness-validate.
     'validate' { $cliCommand = 'project-harness-validate' }
     # Delegates to project-harness-update.

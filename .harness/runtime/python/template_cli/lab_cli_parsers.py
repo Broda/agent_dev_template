@@ -85,6 +85,20 @@ LAB_COMMAND_ARGUMENTS: dict[str, tuple[ArgumentSpec, ...]] = {
         arg("--constraints", default=""),
         arg("--no-sync", action="store_true"),
     ),
+
+    "lab-import-idea": (
+        idea_arg(default=""),
+        arg("--payload-file", default=""),
+        arg("--title", default=""),
+        arg("--summary", default=""),
+        arg("--source", default="external"),
+        arg("--source-id", default=""),
+        arg("--activate", action="store_true"),
+        arg("--create-session", action="store_true"),
+        arg("--path-note", default=""),
+        arg("--no-sync", action="store_true"),
+        arg("--json", action="store_true"),
+    ),
     "lab-activate": (
         idea_arg(required=True),
         arg("--title", default=""),
@@ -156,5 +170,6 @@ LAB_COMMAND_ARGUMENTS: dict[str, tuple[ArgumentSpec, ...]] = {
 def add_lab_subparsers(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
     for command, arguments in LAB_COMMAND_ARGUMENTS.items():
         parser = subparsers.add_parser(command)
+        parser.add_argument("--root", default="")
         for argument in arguments:
             parser.add_argument(*argument.flags, **argument.kwargs)

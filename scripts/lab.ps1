@@ -20,6 +20,7 @@ Commands:
   status
   doctor [--idea-id <id>]
   capture --idea-id <id> --title "Title"
+  import-idea (--payload-file <json> | --idea-id <id> --title "Title")
   activate --idea-id <id>
   decide --idea-id <id> --chosen-option "Decision" --rationale "Reason"
   risk --idea-id <id> --statement "Risk"

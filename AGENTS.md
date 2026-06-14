@@ -25,6 +25,7 @@ Python 3 is required. Keep these command paths stable:
 ./scripts/lab status
 ./scripts/lab doctor
 ./scripts/lab capture --idea-id <id> --title "Title"
+./scripts/lab import-idea --payload-file /tmp/example-idea.json --activate --create-session --json --no-sync
 ./scripts/lab activate --idea-id <id>
 ./scripts/finalize-project --idea-id <id>
 ./scripts/validate-governance

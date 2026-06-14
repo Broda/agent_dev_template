@@ -1,11 +1,16 @@
 from __future__ import annotations
 
+import contextlib
+import io
+import json
 import shutil
 import subprocess
 import sys
 from pathlib import Path
 
+from template_cli.external_idea import ExternalIdeaImportResult, ExternalIdeaPayload, load_external_idea_payload
 from template_cli.io_helpers import read_mode, write_text
+from template_cli.workflow_idea_commands import import_external_idea
 from template_cli.validator_manifest import stamp_harness_manifest
 
 COPY_IGNORE = shutil.ignore_patterns(
@@ -79,6 +84,113 @@ def run_project_harness_new(
         print("Initialized independent Git repository with no remote.")
     return 0
 
+
+
+def _run_maybe_quiet(command: list[str], cwd: Path, *, quiet: bool) -> int:
+    if not quiet:
+        return _run(command, cwd)
+    with contextlib.redirect_stdout(io.StringIO()):
+        return _run(command, cwd)
+
+
+def _call_maybe_quiet(func, *args, quiet: bool, **kwargs) -> int:
+    if not quiet:
+        return func(*args, **kwargs)
+    with contextlib.redirect_stdout(io.StringIO()):
+        return func(*args, **kwargs)
+
+
+def run_project_harness_new_from_idea(
+    root: Path,
+    target: str,
+    *,
+    idea_id: str = "",
+    title: str = "",
+    summary: str = "",
+    source: str = "external",
+    source_id: str = "",
+    payload_file: str = "",
+    activate: bool = False,
+    commit: bool = False,
+    no_git: bool = False,
+    json_output: bool = False,
+) -> int:
+    if payload_file:
+        payload = load_external_idea_payload(Path(payload_file).expanduser())
+    else:
+        payload = ExternalIdeaPayload(
+            idea_id=idea_id,
+            title=title,
+            summary=summary,
+            source=source,
+            source_id=source_id,
+        )
+
+    create_result = _call_maybe_quiet(run_project_harness_new, root, target, no_git=True, quiet=json_output)
+    if create_result != 0:
+        return create_result
+    target_path = Path(target).expanduser()
+    if not target_path.is_absolute():
+        target_path = (Path.cwd() / target_path).resolve()
+    else:
+        target_path = target_path.resolve()
+
+    import_result = import_external_idea(
+        target_path,
+        payload,
+        activate=activate or True,
+        create_session=True,
+        path_note="Imported from an external idea source.",
+        no_sync=True,
+    )
+
+    commit_sha = ""
+    if not no_git:
+        init_result = _run_maybe_quiet(["git", "init", "-b", "main"], target_path, quiet=json_output)
+        if init_result != 0:
+            return init_result
+        identity_result = _ensure_initial_commit_identity(target_path)
+        if identity_result != 0:
+            return identity_result
+        add_result = _run_maybe_quiet(["git", "add", "-A"], target_path, quiet=json_output)
+        if add_result != 0:
+            return add_result
+        message = "Initialize project harness"
+        if commit:
+            message = f"brainstorm: import external idea {import_result.idea_id}"
+        commit_result = _run_maybe_quiet(["git", "commit", "-m", message], target_path, quiet=json_output)
+        if commit_result != 0:
+            return commit_result
+        rev = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=target_path, text=True, capture_output=True, check=False)
+        if rev.returncode == 0:
+            commit_sha = rev.stdout.strip()
+
+    validation_result = _run_maybe_quiet(_template_cli_command("validate-governance"), target_path, quiet=json_output)
+    if validation_result != 0:
+        return validation_result
+
+    result = ExternalIdeaImportResult(
+        ok=True,
+        idea_id=import_result.idea_id,
+        title=import_result.title,
+        status=import_result.status,
+        source=import_result.source,
+        source_id=import_result.source_id,
+        session_path=import_result.session_path,
+        changed_files=import_result.changed_files,
+        readiness=import_result.readiness,
+        target_created=True,
+        target_path=str(target_path),
+        commit=commit_sha,
+    )
+    if json_output:
+        print(json.dumps(result.to_json_dict(), sort_keys=True))
+    else:
+        print(f"Created project harness from external idea: {target_path}")
+        print(f"Idea: {result.idea_id}")
+        if result.session_path:
+            print(f"Session: {result.session_path}")
+    return 0
 
 def run_project_harness_validate(root: Path) -> int:
     commands = [("validate-governance", "./scripts/validate-governance")]

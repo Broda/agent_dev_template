@@ -31,6 +31,7 @@ It is for agent dispatch: humans can speak the phrase family naturally, and agen
 | Command | Modes | Backend intent | Wrapper | Required args | Optional args | Write behavior | Output and exit codes |
 |---|---|---|---|---|---|---|---|
 | `/lab capture` | `brainstorming` | `/lab capture <idea-id>` | `scripts/lab` | `--idea-id` | `--title`, `--owner`, `--problem`, `--summary`, `--scope`, `--constraints`, `--no-sync` | `write` | human-readable command result on stdout; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
+| `/lab import-idea` | `brainstorming` | `/lab import-idea <idea-id>` | `scripts/lab` | none | `--idea-id`, `--payload-file`, `--title`, `--summary`, `--source`, `--source-id`, `--activate`, `--create-session`, `--path-note`, `--no-sync`, `--json` | `write` | human-readable command result or JSON when --json is supplied; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
 | `/lab activate` | `brainstorming` | `/lab activate <idea-id>` | `scripts/lab` | `--idea-id` | `--title`, `--owner`, `--session`, `--no-sync` | `write` | human-readable command result on stdout; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
 | `/lab decide` | `brainstorming` | `/lab decide <decision-slug>` | `scripts/lab` | `--idea-id` | `--decision-id`, `--owner`, `--session`, `--decision-level`, `--situation`, `--rationale`, `--constraints`, `--no-sync` | `write` | human-readable command result on stdout; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
 | `/lab risk` | `brainstorming` | `/lab risk <idea-id>` | `scripts/lab` | `--idea-id` | `--risk-id`, `--owner`, `--session`, `--mitigation`, `--contingency`, `--probability`, `--impact`, `--no-sync` | `write` | human-readable command result on stdout; `0` success, `1` runtime or validation failure, `2` usage, mode, or registry error |
@@ -62,6 +63,14 @@ It is for agent dispatch: humans can speak the phrase family naturally, and agen
 - Update `.harness/brainstorming/FILE_MAP.md` when file inventory changes.
 - Example:
   - `./scripts/lab capture --idea-id idea-template-hardening --title "Template Hardening"`
+
+### `/lab import-idea <idea-id>`
+- Import a sanitized external idea payload through the stable lab API.
+- Add/update the canonical idea bucket and `IDEA_CATALOG.md` without external callers editing files directly.
+- Optionally activate the idea, create a session file, and append an import path note.
+- Prefer `--payload-file` for automation to avoid shell quoting issues.
+- Example:
+  - `./scripts/lab import-idea --payload-file /tmp/example-idea.json --activate --create-session --json --no-sync`
 
 ### `/lab activate <idea-id>`
 - Move/update idea in `ideas/_active.md`.

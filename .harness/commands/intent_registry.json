@@ -44,6 +44,46 @@
       }
     },
     {
+      "command": "import-idea",
+      "backendIntent": "/lab import-idea <idea-id>",
+      "modes": [
+        "brainstorming"
+      ],
+      "phrases": [
+        "import external idea",
+        "seed this project from an idea",
+        "load idea payload"
+      ],
+      "description": "import an externally sourced idea through the stable lab API",
+      "filesTouched": "`ideas/_inbox.md` or `ideas/_active.md`, `sessions/*`, `IDEA_CATALOG.md`",
+      "writeBehavior": "write",
+      "requiredArgs": [],
+      "optionalArgs": [
+        "--idea-id",
+        "--payload-file",
+        "--title",
+        "--summary",
+        "--source",
+        "--source-id",
+        "--activate",
+        "--create-session",
+        "--path-note",
+        "--no-sync",
+        "--json"
+      ],
+      "wrapperPath": "scripts/lab",
+      "readOnlySafe": false,
+      "mutationScope": [
+        "project-files"
+      ],
+      "output": "human-readable command result or JSON when --json is supplied",
+      "exitCodes": {
+        "0": "success",
+        "1": "runtime or validation failure",
+        "2": "usage, mode, or registry error"
+      }
+    },
+    {
       "command": "activate",
       "backendIntent": "/lab activate <idea-id>",
       "modes": [

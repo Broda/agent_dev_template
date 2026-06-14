@@ -20,6 +20,7 @@ Use this skill after `MODE.md` confirms `brainstorming`.
 Use `./scripts/lab <command>` for durable brainstorming lifecycle writes:
 
 - Capture: `./scripts/lab capture --idea-id <id> --title "<title>"`
+- Import external idea package: `./scripts/lab import-idea --payload-file /tmp/example-idea.json --activate --create-session --json --no-sync`
 - Activate: `./scripts/lab activate --idea-id <id>`
 - Decision: `./scripts/lab decide --idea-id <id> --chosen-option "<choice>" --rationale "<why>"`
 - Risk: `./scripts/lab risk --idea-id <id> --statement "<risk>"`

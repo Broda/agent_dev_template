@@ -373,6 +373,12 @@ Ruff CI and runtime-discovery preparation landed.
   - Keep the manual GitHub Release Readiness workflow as the release gate.
   - Acceptance: maintainers can run one local command before dispatching the
     manual GitHub workflow, and the checklist references that command.
+- [x] Add stable external idea import APIs for automation.
+  - Add `./scripts/lab import-idea` for idempotent payload-file or flag-based ingestion.
+  - Add `./scripts/project-harness new-from-idea` for one-command project creation and seeding.
+  - Add explicit `--root` and `--template-root` support so automation does not depend on current working directory.
+  - Document the public-safe contract in `docs/EXTERNAL_INTEGRATION.md` and keep examples generic.
+  - Acceptance: focused import tests, public-safety tests, governance validation, and the full unit suite pass.
 - [ ] Add dependency/update monitoring for public-template maintenance.
   - Add Dependabot or an equivalent update-tracking workflow for GitHub Actions
     versions and `requirements-dev.txt`.

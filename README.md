@@ -37,6 +37,19 @@ expectations, and exit-code meanings.
 Run `./scripts/render-intent-docs` after changing the registry; governance
 validation fails if the generated views drift.
 
+## External Automation
+
+External systems can seed brainstorming projects through the stable import commands documented in `docs/EXTERNAL_INTEGRATION.md`.
+
+Prefer:
+
+```sh
+./scripts/lab import-idea --payload-file /tmp/example-idea.json --activate --create-session --json --no-sync
+./scripts/project-harness new-from-idea /tmp/example-project --payload-file /tmp/example-idea.json --json
+```
+
+over editing `IDEA_CATALOG.md`, `ideas/_*.md`, or `sessions/*.md` directly. Automation examples in this public template must use generic placeholders only.
+
 ## Machine-Readable Output
 
 Read-only status and validation commands keep human-readable output as the
