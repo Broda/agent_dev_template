@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
+from json import JSONDecodeError
 from pathlib import Path
 from typing import Any
 
@@ -87,8 +88,33 @@ class ExternalIdeaImportResult:
         return data
 
 
+def external_idea_error_json(code: str, error: str) -> dict[str, str | bool]:
+    return {"ok": False, "code": code, "error": error}
+
+
+def external_idea_error_code(error: Exception) -> str:
+    if isinstance(error, FileNotFoundError):
+        return "payload_file_not_found"
+    if isinstance(error, JSONDecodeError):
+        return "invalid_json"
+    if isinstance(error, ValueError):
+        message = str(error)
+        if "schema_version" in message:
+            return "unsupported_schema"
+        if "tags" in message:
+            return "invalid_tags"
+        if "required" in message:
+            return "missing_required_field"
+        if "NUL" in message or "newline" in message:
+            return "invalid_field"
+        return "invalid_payload"
+    return "external_idea_error"
+
+
 def load_external_idea_payload(path: Path) -> ExternalIdeaPayload:
     data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError("external idea payload must be a JSON object")
     if data.get("schema_version", 1) != 1:
         raise ValueError("unsupported external idea payload schema_version")
     return payload_from_mapping(data)

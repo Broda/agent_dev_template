@@ -85,7 +85,6 @@ LAB_COMMAND_ARGUMENTS: dict[str, tuple[ArgumentSpec, ...]] = {
         arg("--constraints", default=""),
         arg("--no-sync", action="store_true"),
     ),
-
     "lab-import-idea": (
         idea_arg(default=""),
         arg("--payload-file", default=""),

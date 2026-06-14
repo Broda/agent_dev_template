@@ -1,9 +1,16 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
-from template_cli.external_idea import ExternalIdeaImportResult, ExternalIdeaPayload, load_external_idea_payload
+from template_cli.external_idea import (
+    ExternalIdeaImportResult,
+    ExternalIdeaPayload,
+    external_idea_error_code,
+    external_idea_error_json,
+    load_external_idea_payload,
+)
 from template_cli.workflow_catalog import _extract_catalog_row, _upsert_catalog_row
 from template_cli.workflow_data import (
     BUCKET_FILES,
@@ -18,7 +25,6 @@ from template_cli.workflow_data import (
 )
 from template_cli.workflow_render import _render_idea_block
 from template_cli.workflow_sessions import _append_under_section, _ensure_session_file
-
 
 
 def import_external_idea(
@@ -109,24 +115,32 @@ def run_lab_import_idea(
     no_sync: bool = False,
     json_output: bool = False,
 ) -> int:
-    if payload_file:
-        payload = load_external_idea_payload(Path(payload_file).expanduser())
-    else:
-        payload = ExternalIdeaPayload(
-            idea_id=idea_id,
-            title=title,
-            summary=summary,
-            source=source,
-            source_id=source_id,
+    try:
+        if payload_file:
+            payload = load_external_idea_payload(Path(payload_file).expanduser())
+        else:
+            payload = ExternalIdeaPayload(
+                idea_id=idea_id,
+                title=title,
+                summary=summary,
+                source=source,
+                source_id=source_id,
+            )
+        result = import_external_idea(
+            root,
+            payload,
+            activate=activate,
+            create_session=create_session,
+            path_note=path_note,
+            no_sync=no_sync,
         )
-    result = import_external_idea(
-        root,
-        payload,
-        activate=activate,
-        create_session=create_session,
-        path_note=path_note,
-        no_sync=no_sync,
-    )
+    except (FileNotFoundError, json.JSONDecodeError, ValueError) as error:
+        code = external_idea_error_code(error)
+        if json_output:
+            print(json.dumps(external_idea_error_json(code, str(error)), sort_keys=True))
+        else:
+            print(f"External idea import failed [{code}]: {error}", file=sys.stderr)
+        return 1
     if json_output:
         print(json.dumps(result.to_json_dict(), sort_keys=True))
     else:
@@ -134,6 +148,7 @@ def run_lab_import_idea(
         if result.session_path:
             print(f"Session: {result.session_path}")
     return 0
+
 
 def run_lab_capture(
     root: Path,

@@ -1,13 +1,17 @@
 from __future__ import annotations
 
 import json
-import os
-import shutil
+import sys
 from pathlib import Path
 
-from workflow_test_helpers import LabWorkflowTestCase, run_cmd
+SCRIPT_ROOT = Path(__file__).resolve().parents[1]
+RUNTIME_PYTHON = SCRIPT_ROOT / "runtime" / "python"
+if str(RUNTIME_PYTHON) not in sys.path:
+    sys.path.insert(0, str(RUNTIME_PYTHON))
 
-from template_cli.external_idea import ExternalIdeaImportResult, ExternalIdeaPayload
+from workflow_test_helpers import LabWorkflowTestCase, run_cmd  # noqa: E402
+
+from template_cli.external_idea import ExternalIdeaImportResult, ExternalIdeaPayload  # noqa: E402
 
 
 class ExternalIdeaPayloadTests(LabWorkflowTestCase):
@@ -216,6 +220,57 @@ class ExternalIdeaPayloadTests(LabWorkflowTestCase):
 
         data = json.loads(result.stdout)
         self.assertEqual(data["idea_id"], "idea-payload-web-app")
+
+    def test_lab_import_idea_reports_payload_errors_as_json(self) -> None:
+        payload_path = self.tmpdir / "bad-payload.json"
+        payload_path.write_text(json.dumps({"schema_version": 2, "idea_id": "x", "title": "Bad"}), encoding="utf-8")
+
+        result = run_cmd(
+            [
+                "./scripts/lab",
+                "import-idea",
+                "--payload-file",
+                str(payload_path),
+                "--json",
+                "--no-sync",
+            ],
+            cwd=self.repo,
+            check=False,
+        )
+
+        self.assertEqual(result.returncode, 1)
+        self.assertFalse(result.stderr)
+        data = json.loads(result.stdout)
+        self.assertEqual(data["ok"], False)
+        self.assertEqual(data["code"], "unsupported_schema")
+        self.assertIn("schema_version", data["error"])
+
+    def test_project_harness_new_from_idea_reports_payload_errors_as_json(self) -> None:
+        target = self.tmpdir / "bad-project"
+        payload_path = self.tmpdir / "bad-payload.json"
+        payload_path.write_text("{not-json", encoding="utf-8")
+
+        result = run_cmd(
+            [
+                str(self.repo / "scripts/project-harness"),
+                "--template-root",
+                str(self.repo),
+                "new-from-idea",
+                str(target),
+                "--payload-file",
+                str(payload_path),
+                "--json",
+            ],
+            cwd=self.tmpdir,
+            check=False,
+        )
+
+        self.assertEqual(result.returncode, 1)
+        self.assertFalse(result.stderr)
+        data = json.loads(result.stdout)
+        self.assertEqual(data["ok"], False)
+        self.assertEqual(data["code"], "invalid_json")
+        self.assertFalse(target.exists())
 
 
 if __name__ == "__main__":

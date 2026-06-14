@@ -79,8 +79,9 @@ must not infer write behavior from human-readable text.
 On Windows, PowerShell launchers prefer `py -3` and fall back to `python`.
 On macOS/Linux, shell launchers prefer `python3` and fall back to `python`.
 CI keeps Ubuntu as the full regression baseline and runs a Windows PowerShell
-launcher smoke job for `lab`, `finalize-project`, `validate-governance`, and
-`project-harness new --no-git`.
+launcher smoke job for `lab`, `lab import-idea`, `finalize-project`,
+`validate-governance`, `project-harness new --no-git`, and
+`project-harness new-from-idea`.
 
 Runtime extraction is planned but not active. ADR-0002 records the boundary:
 the first extracted runtime should remain Python, wrappers must verify manifest

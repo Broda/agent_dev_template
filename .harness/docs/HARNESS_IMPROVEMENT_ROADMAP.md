@@ -737,3 +737,35 @@ Ruff CI and runtime-discovery preparation landed.
     template support implications.
   - Acceptance: no official install path is advertised until the ADR is accepted
     and reflected in README/release docs.
+
+## Milestone 16 - External Idea API Release Hardening
+
+Goal: make `lab import-idea` and `project-harness new-from-idea` safe, predictable automation contracts for DevOS and other external systems.
+
+Product decisions:
+
+- External callers must use the template-owned API instead of writing catalog, bucket, session, or state files directly.
+- Payload validation errors should be machine-readable when `--json` is supplied and must not print Python tracebacks.
+- `project-harness new-from-idea` keeps its current behavior of activating the imported idea by default because a newly created brainstorming repo needs one active thread; the `--activate` flag remains compatibility sugar until a future breaking release.
+- Payload `tags` are accepted and validated as reserved forward-compatible metadata until a later schema version defines durable tag persistence.
+
+Scope:
+
+- [x] Fix release-blocking unittest discovery for external idea tests.
+- [x] Fix Ruff import ordering/formatting introduced by the external idea API.
+- [x] Return stable JSON error objects for invalid payloads before file writes.
+- [x] Document the JSON failure contract, tag semantics, and activation compatibility behavior.
+- [x] Remove container-specific workspace-root examples from public external-integration docs.
+- [x] Add regression coverage for invalid `lab import-idea --json` payloads.
+- [x] Add regression coverage proving invalid `project-harness new-from-idea --json` payloads do not create a target repo.
+- [ ] Add broader negative coverage for missing files, missing required fields, invalid tag types, field validation, and sync/validation failures after writes.
+- [ ] Add root-flag examples to wrapper help and generated command docs.
+- [ ] Add dependency/update monitoring for GitHub Actions and Python tool pins.
+
+Exit criteria:
+
+- `python3 -m unittest discover -s .harness/tests -v` passes without external `PYTHONPATH`.
+- `./scripts/harness-release-check` passes.
+- Invalid payloads with `--json` return `{"ok": false, "code": ..., "error": ...}` and no traceback.
+- Public docs avoid private hostnames, private paths, and container-specific workspace-root assumptions.
+

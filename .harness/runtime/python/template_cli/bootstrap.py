@@ -8,10 +8,16 @@ import subprocess
 import sys
 from pathlib import Path
 
-from template_cli.external_idea import ExternalIdeaImportResult, ExternalIdeaPayload, load_external_idea_payload
+from template_cli.external_idea import (
+    ExternalIdeaImportResult,
+    ExternalIdeaPayload,
+    external_idea_error_code,
+    external_idea_error_json,
+    load_external_idea_payload,
+)
 from template_cli.io_helpers import read_mode, write_text
-from template_cli.workflow_idea_commands import import_external_idea
 from template_cli.validator_manifest import stamp_harness_manifest
+from template_cli.workflow_idea_commands import import_external_idea
 
 COPY_IGNORE = shutil.ignore_patterns(
     ".git",
@@ -85,7 +91,6 @@ def run_project_harness_new(
     return 0
 
 
-
 def _run_maybe_quiet(command: list[str], cwd: Path, *, quiet: bool) -> int:
     if not quiet:
         return _run(command, cwd)
@@ -115,16 +120,24 @@ def run_project_harness_new_from_idea(
     no_git: bool = False,
     json_output: bool = False,
 ) -> int:
-    if payload_file:
-        payload = load_external_idea_payload(Path(payload_file).expanduser())
-    else:
-        payload = ExternalIdeaPayload(
-            idea_id=idea_id,
-            title=title,
-            summary=summary,
-            source=source,
-            source_id=source_id,
-        )
+    try:
+        if payload_file:
+            payload = load_external_idea_payload(Path(payload_file).expanduser())
+        else:
+            payload = ExternalIdeaPayload(
+                idea_id=idea_id,
+                title=title,
+                summary=summary,
+                source=source,
+                source_id=source_id,
+            )
+    except (FileNotFoundError, json.JSONDecodeError, ValueError) as error:
+        code = external_idea_error_code(error)
+        if json_output:
+            print(json.dumps(external_idea_error_json(code, str(error)), sort_keys=True))
+        else:
+            print(f"External idea import failed [{code}]: {error}", file=sys.stderr)
+        return 1
 
     create_result = _call_maybe_quiet(run_project_harness_new, root, target, no_git=True, quiet=json_output)
     if create_result != 0:
@@ -161,7 +174,9 @@ def run_project_harness_new_from_idea(
         commit_result = _run_maybe_quiet(["git", "commit", "-m", message], target_path, quiet=json_output)
         if commit_result != 0:
             return commit_result
-        rev = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=target_path, text=True, capture_output=True, check=False)
+        rev = subprocess.run(
+            ["git", "rev-parse", "--short", "HEAD"], cwd=target_path, text=True, capture_output=True, check=False
+        )
         if rev.returncode == 0:
             commit_sha = rev.stdout.strip()
 
@@ -191,6 +206,7 @@ def run_project_harness_new_from_idea(
         if result.session_path:
             print(f"Session: {result.session_path}")
     return 0
+
 
 def run_project_harness_validate(root: Path) -> int:
     commands = [("validate-governance", "./scripts/validate-governance")]

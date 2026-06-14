@@ -10,8 +10,8 @@ This repository is public. Documentation, tests, and fixtures must use placehold
 
 - `external-system`
 - `example-source-id-123`
+- `/tmp/example-template`
 - `/tmp/example-project`
-- `/workspace/example-project`
 - `idea-example-web-app`
 
 Do not commit personal machine names, private hostnames, private repository names, account IDs, private network names, credentials, tokens, or user-specific absolute paths.
@@ -50,6 +50,8 @@ Payload files avoid shell-quoting bugs:
 }
 ```
 
+`tags` is accepted for forward compatibility and validated as a list of strings. The current template does not persist tags in catalog or session files; callers should treat tags as reserved metadata until a future schema version defines durable tag behavior.
+
 Use the payload with:
 
 ```bash
@@ -71,7 +73,7 @@ Use the payload with:
   --json
 ```
 
-This command creates a new brainstorming-mode project, imports and activates the idea, creates a session, validates governance, initializes Git unless `--no-git` is supplied, and returns a JSON summary.
+This command creates a new brainstorming-mode project, imports and activates the idea, creates a session, validates governance, initializes Git unless `--no-git` is supplied, and returns a JSON summary. `new-from-idea` always activates the imported idea because a newly created project is expected to start with one active brainstorming thread; the `--activate` flag remains accepted for compatibility with older automation.
 
 ## Explicit roots for automation
 
@@ -82,7 +84,7 @@ Automation can avoid current-working-directory assumptions:
 ```
 
 ```bash
-./scripts/project-harness --template-root /workspace/template new-from-idea /tmp/example-project \
+./scripts/project-harness --template-root /tmp/example-template new-from-idea /tmp/example-project \
   --payload-file /tmp/example-idea.json \
   --json
 ```
@@ -110,6 +112,31 @@ Typical `lab import-idea --json` output:
 ```
 
 `project-harness new-from-idea --json` also includes `target_created`, `target_path`, and `commit` when available.
+
+## JSON failure shape
+
+When validation fails before any template files are written, commands that receive `--json` return a stable machine-readable error object on stdout and exit `1`:
+
+```json
+{
+  "ok": false,
+  "code": "unsupported_schema",
+  "error": "unsupported external idea payload schema_version"
+}
+```
+
+Current error codes include:
+
+- `payload_file_not_found`
+- `invalid_json`
+- `unsupported_schema`
+- `invalid_tags`
+- `missing_required_field`
+- `invalid_field`
+- `invalid_payload`
+- `external_idea_error`
+
+For non-JSON mode, the same validation failures are printed as concise stderr messages. Payload validation happens before repository creation in `project-harness new-from-idea`, so invalid payloads do not leave partially created target directories. Later runtime, Git, or validation failures may occur after file writes; callers should inspect the exit code and retry idempotently with the same payload after fixing the environment.
 
 ## Idempotency
 
