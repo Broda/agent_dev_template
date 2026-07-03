@@ -3,8 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from template_cli.finalize_existing import ExistingFinalizeValues
-from template_cli.finalize_helpers import first_value_for_label, is_placeholder_value, latest_session_path
+from template_cli.finalize.existing import ExistingFinalizeValues
+from template_cli.finalize.helpers import first_value_for_label, is_placeholder_value, latest_session_path
 
 
 @dataclass(frozen=True)

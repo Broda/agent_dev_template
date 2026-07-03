@@ -6,8 +6,8 @@ import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
-from template_cli.bootstrap_update_plan import _build_update_plan
-from template_cli.bootstrap_update_source import UpdateSource, source_worktree_state
+from template_cli.bootstrap.update_plan import _build_update_plan
+from template_cli.bootstrap.update_source import UpdateSource, source_worktree_state
 from template_cli.io_helpers import read_mode
 from template_cli.validator_manifest import stamp_harness_manifest
 

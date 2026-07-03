@@ -3,22 +3,22 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from template_cli.finalize_artifacts import (
+from template_cli.finalize.artifacts import (
     _backup_finalization_outputs,
     _write_finalization_session_log,
 )
-from template_cli.finalize_context import FinalizeContext
-from template_cli.finalize_helpers import STATE_FILE
-from template_cli.finalize_history import archive_brainstorming_history
-from template_cli.finalize_project_settings import FinalizeProjectSettings
-from template_cli.finalize_state import (
+from template_cli.finalize.context import FinalizeContext
+from template_cli.finalize.helpers import STATE_FILE
+from template_cli.finalize.history import archive_brainstorming_history
+from template_cli.finalize.project_settings import FinalizeProjectSettings
+from template_cli.finalize.state import (
     BackupManager,
     _update_catalog_transition,
     _write_mode_development,
     _write_summary_export,
 )
-from template_cli.finalize_state_builder import _build_finalized_state
-from template_cli.finalize_value_collection import HydratedFinalizeValues
+from template_cli.finalize.state_builder import _build_finalized_state
+from template_cli.finalize.value_collection import HydratedFinalizeValues
 from template_cli.io_helpers import ValidationResult, write_text
 from template_cli.render import run_render_development_docs
 from template_cli.state_schema import validate_project_state_data

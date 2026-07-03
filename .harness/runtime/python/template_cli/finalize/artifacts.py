@@ -3,8 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from template_cli.finalize_helpers import STATE_FILE, join_lines
-from template_cli.finalize_state import BackupManager
+from template_cli.finalize.helpers import STATE_FILE, join_lines
+from template_cli.finalize.state import BackupManager
 from template_cli.io_helpers import read_text, write_text
 
 FINALIZATION_BACKUP_PATHS = [

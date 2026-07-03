@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from template_cli.finalize_helpers import existing_state_value, files_containing, first_value_for_label
+from template_cli.finalize.helpers import existing_state_value, files_containing, first_value_for_label
 from template_cli.io_helpers import clean_backticks, path_exists, read_text
 from template_cli.workflow_data import (
     FINALIZE_ADVISORY_FIELDS,

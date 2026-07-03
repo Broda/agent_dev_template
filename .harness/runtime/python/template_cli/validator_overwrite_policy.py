@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from template_cli.finalize_artifacts import FINALIZATION_BACKUP_PATHS
+from template_cli.finalize.artifacts import FINALIZATION_BACKUP_PATHS
 from template_cli.io_helpers import ValidationResult, read_text
 from template_cli.render_helpers import RENDERED_ARTIFACTS
 

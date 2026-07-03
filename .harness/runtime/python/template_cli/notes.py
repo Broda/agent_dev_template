@@ -5,7 +5,7 @@ import sys
 from datetime import date
 from pathlib import Path
 
-from template_cli.finalize_history import HISTORY_ROOT
+from template_cli.finalize.history import HISTORY_ROOT
 from template_cli.io_helpers import read_mode, read_text, write_text
 from template_cli.sync import record_pending_sync_files, run_lab_sync
 

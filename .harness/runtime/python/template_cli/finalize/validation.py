@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from template_cli.finalize_helpers import (
+from template_cli.finalize.helpers import (
     existing_state_value,
     first_value_for_label,
     is_placeholder_value,

@@ -3,8 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from template_cli.finalize_context import load_finalize_context
-from template_cli.finalize_helpers import (
+from template_cli.finalize.context import load_finalize_context
+from template_cli.finalize.helpers import (
     STATE_FILE,
     STATE_SCHEMA_VERSION,
     infer_project_type,

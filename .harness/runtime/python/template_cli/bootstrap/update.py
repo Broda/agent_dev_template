@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from template_cli.bootstrap_update_apply import _apply_update_source
-from template_cli.bootstrap_update_output import _print_update_plan
-from template_cli.bootstrap_update_plan import _build_update_plan
-from template_cli.bootstrap_update_source import (
+from template_cli.bootstrap.update_apply import _apply_update_source
+from template_cli.bootstrap.update_output import _print_update_plan
+from template_cli.bootstrap.update_plan import _build_update_plan
+from template_cli.bootstrap.update_source import (
     cleanup_update_source,
     resolve_update_source,
 )

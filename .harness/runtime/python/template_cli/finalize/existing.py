@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from template_cli.finalize_helpers import existing_state_value
+from template_cli.finalize.helpers import existing_state_value
 
 
 @dataclass(frozen=True)

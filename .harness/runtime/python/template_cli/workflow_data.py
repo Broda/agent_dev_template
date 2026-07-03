@@ -4,7 +4,7 @@ import re
 from datetime import datetime
 from pathlib import Path
 
-from template_cli.finalize_helpers import (
+from template_cli.finalize.helpers import (
     files_containing,
 )
 from template_cli.git_helpers import git_stdout

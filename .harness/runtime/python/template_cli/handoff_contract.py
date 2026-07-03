@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from template_cli.finalize_helpers import STATE_SCHEMA_VERSION
+from template_cli.finalize.helpers import STATE_SCHEMA_VERSION
 
 STATE_DEFAULTS = {
     "schemaVersion": STATE_SCHEMA_VERSION,

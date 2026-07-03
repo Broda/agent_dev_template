@@ -3,27 +3,27 @@ from __future__ import annotations
 from datetime import date
 from pathlib import Path
 
-from template_cli.finalize_artifacts import (
+from template_cli.finalize.artifacts import (
     _ensure_finalization_dirs,
     _load_existing_state,
 )
-from template_cli.finalize_context import load_finalize_context
-from template_cli.finalize_execution import _write_and_validate_finalized_project
-from template_cli.finalize_existing import _load_existing_finalize_values
-from template_cli.finalize_helpers import (
+from template_cli.finalize.context import load_finalize_context
+from template_cli.finalize.execution import _write_and_validate_finalized_project
+from template_cli.finalize.existing import _load_existing_finalize_values
+from template_cli.finalize.helpers import (
     ask_non_empty,
 )
-from template_cli.finalize_output import _print_finalization_result
-from template_cli.finalize_project_settings import _collect_finalize_project_settings
-from template_cli.finalize_state import (
+from template_cli.finalize.output import _print_finalization_result
+from template_cli.finalize.project_settings import _collect_finalize_project_settings
+from template_cli.finalize.state import (
     resolve_finalize_idea_id,
 )
-from template_cli.finalize_validation import (
+from template_cli.finalize.validation import (
     _collect_missing_noninteractive_fields,
     _fail_noninteractive,
     _required_value,
 )
-from template_cli.finalize_value_collection import _hydrate_finalize_values
+from template_cli.finalize.value_collection import _hydrate_finalize_values
 
 
 def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False, interactive: bool = False) -> int:

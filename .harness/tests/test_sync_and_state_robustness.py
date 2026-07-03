@@ -12,7 +12,7 @@ if str(RUNTIME_PYTHON) not in sys.path:
 
 from workflow_test_helpers import LabWorkflowTestCase, run_cmd  # noqa: E402
 
-from template_cli.finalize_state import BackupManager  # noqa: E402
+from template_cli.finalize.state import BackupManager  # noqa: E402
 from template_cli.sync import run_lab_sync  # noqa: E402
 
 

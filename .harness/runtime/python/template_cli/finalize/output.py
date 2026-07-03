@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from template_cli.finalize_helpers import STATE_FILE
+from template_cli.finalize.helpers import STATE_FILE
 
 
 def _print_finalization_result(session_path: str, export_path: str, *, write_export: bool) -> None:

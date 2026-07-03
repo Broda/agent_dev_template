@@ -4,7 +4,7 @@ import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
-from template_cli.finalize_helpers import files_containing, split_linkish_values, trim
+from template_cli.finalize.helpers import files_containing, split_linkish_values, trim
 from template_cli.io_helpers import IDEA_ROW_RE, clean_backticks, parse_markdown_table_rows, path_exists
 
 

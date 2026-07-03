@@ -4,7 +4,7 @@ import json
 import re
 from pathlib import Path
 
-from template_cli.finalize_helpers import existing_state_value
+from template_cli.finalize.helpers import existing_state_value
 from template_cli.io_helpers import read_text
 from template_cli.wiki_config import wiki_config
 

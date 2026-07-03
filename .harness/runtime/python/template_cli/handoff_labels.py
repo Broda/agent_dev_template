@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from template_cli.finalize_helpers import trim
+from template_cli.finalize.helpers import trim
 from template_cli.handoff_state import is_empty_handoff_value
 from template_cli.io_helpers import read_text
 

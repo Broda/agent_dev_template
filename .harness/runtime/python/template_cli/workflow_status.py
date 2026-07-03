@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from template_cli.finalize_helpers import existing_state_value, files_containing
+from template_cli.finalize.helpers import existing_state_value, files_containing
 from template_cli.io_helpers import IDEA_ROW_RE, clean_backticks, parse_markdown_table_rows, path_exists, read_mode
 from template_cli.workflow_data import (
     FINALIZE_ADVISORY_FIELDS,

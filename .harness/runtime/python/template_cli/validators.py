@@ -112,7 +112,7 @@ def validate_template_cli_file_map(root: Path, result: ValidationResult) -> None
         return
 
     file_map_contents = read_text(file_map_path)
-    for path in sorted(module_root.glob("*.py")):
+    for path in sorted(module_root.rglob("*.py")):
         if path.name == "__init__.py":
             continue
         relative_path = path.relative_to(root).as_posix()

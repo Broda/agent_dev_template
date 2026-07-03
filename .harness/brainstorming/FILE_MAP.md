@@ -142,26 +142,26 @@ Lean file registry for the Project Harness Template.
 | `.github/ISSUE_TEMPLATE/feature_request.md` | Feature request issue template |
 | `.harness/runtime/python/template_cli/io_helpers.py` | I/O primitives, regex constants, ValidationResult, and summary printers shared across the CLI |
 | `.harness/runtime/python/template_cli/adr.py` | Development ADR capture command implementation |
-| `.harness/runtime/python/template_cli/bootstrap.py` | Project harness bootstrap command implementation |
-| `.harness/runtime/python/template_cli/bootstrap_update.py` | Project harness update dry-run and apply orchestration |
-| `.harness/runtime/python/template_cli/bootstrap_update_apply.py` | Project harness update apply execution, backup, rollback, hook, and validation helpers |
-| `.harness/runtime/python/template_cli/bootstrap_update_output.py` | Project harness update dry-run output rendering helpers |
-| `.harness/runtime/python/template_cli/bootstrap_update_plan.py` | Project harness update plan classification and baseline comparison helpers |
-| `.harness/runtime/python/template_cli/bootstrap_update_source.py` | Project harness update source resolution helpers |
+| `.harness/runtime/python/template_cli/bootstrap/projects.py` | Project harness bootstrap command implementation |
+| `.harness/runtime/python/template_cli/bootstrap/update.py` | Project harness update dry-run and apply orchestration |
+| `.harness/runtime/python/template_cli/bootstrap/update_apply.py` | Project harness update apply execution, backup, rollback, hook, and validation helpers |
+| `.harness/runtime/python/template_cli/bootstrap/update_output.py` | Project harness update dry-run output rendering helpers |
+| `.harness/runtime/python/template_cli/bootstrap/update_plan.py` | Project harness update plan classification and baseline comparison helpers |
+| `.harness/runtime/python/template_cli/bootstrap/update_source.py` | Project harness update source resolution helpers |
 | `.harness/runtime/python/template_cli/external_idea.py` | External idea payload validation and JSON result contracts |
 | `.harness/runtime/python/template_cli/git_helpers.py` | Shared captured-output git command runner |
 | `.harness/runtime/python/template_cli/evidence.py` | Development roadmap evidence capture command implementation |
-| `.harness/runtime/python/template_cli/finalize_artifacts.py` | Finalization artifact directory setup, backup registration, existing-state load, and session-log writing helpers |
-| `.harness/runtime/python/template_cli/finalize_context.py` | Finalization target, owner, session, and hydration context resolution |
-| `.harness/runtime/python/template_cli/finalize_existing.py` | Existing finalized-state value collection helpers |
-| `.harness/runtime/python/template_cli/finalize_execution.py` | Transactional finalization state writing, rendering, and validation execution |
-| `.harness/runtime/python/template_cli/finalize_history.py` | Brainstorming history archival into `.harness/history/` during finalization |
-| `.harness/runtime/python/template_cli/finalize_output.py` | Finalization user-facing success output helpers |
-| `.harness/runtime/python/template_cli/finalize.py` | In-place finalization orchestration |
-| `.harness/runtime/python/template_cli/finalize_project_settings.py` | Finalization project setting prompt and noninteractive choice collection |
-| `.harness/runtime/python/template_cli/finalize_state_builder.py` | Finalized canonical state assembly helpers |
-| `.harness/runtime/python/template_cli/finalize_validation.py` | Finalization required-value and noninteractive missing-field validation helpers |
-| `.harness/runtime/python/template_cli/finalize_value_collection.py` | Finalization hydrated value collection from existing state and source files |
+| `.harness/runtime/python/template_cli/finalize/artifacts.py` | Finalization artifact directory setup, backup registration, existing-state load, and session-log writing helpers |
+| `.harness/runtime/python/template_cli/finalize/context.py` | Finalization target, owner, session, and hydration context resolution |
+| `.harness/runtime/python/template_cli/finalize/existing.py` | Existing finalized-state value collection helpers |
+| `.harness/runtime/python/template_cli/finalize/execution.py` | Transactional finalization state writing, rendering, and validation execution |
+| `.harness/runtime/python/template_cli/finalize/history.py` | Brainstorming history archival into `.harness/history/` during finalization |
+| `.harness/runtime/python/template_cli/finalize/output.py` | Finalization user-facing success output helpers |
+| `.harness/runtime/python/template_cli/finalize/project.py` | In-place finalization orchestration |
+| `.harness/runtime/python/template_cli/finalize/project_settings.py` | Finalization project setting prompt and noninteractive choice collection |
+| `.harness/runtime/python/template_cli/finalize/state_builder.py` | Finalized canonical state assembly helpers |
+| `.harness/runtime/python/template_cli/finalize/validation.py` | Finalization required-value and noninteractive missing-field validation helpers |
+| `.harness/runtime/python/template_cli/finalize/value_collection.py` | Finalization hydrated value collection from existing state and source files |
 | `.harness/runtime/python/template_cli/handoff.py` | Brainstorming handoff compiler orchestration for draft canonical finalization state |
 | `.harness/runtime/python/template_cli/handoff_contract.py` | Handoff default-state, label, required-field, and implementation-contract constants |
 | `.harness/runtime/python/template_cli/handoff_implementation.py` | Handoff implementation-contract extraction and state fill helpers |
@@ -206,8 +206,8 @@ Lean file registry for the Project Harness Template.
 | `.harness/runtime/python/template_cli/wiki_config.py` | Wiki configuration and checkout-path resolution helpers |
 | `.harness/runtime/python/template_cli/wiki_git.py` | Wiki git execution, clone, and relevant-change detection helpers |
 | `.harness/runtime/python/template_cli/wiki_pages.py` | Curated GitHub Wiki page rendering helpers |
-| `.harness/runtime/python/template_cli/finalize_helpers.py` | Utility functions, interactive prompts, markdown extraction, and state helpers for finalization |
-| `.harness/runtime/python/template_cli/finalize_state.py` | BackupManager, catalog transition functions, and summary export writer for finalization |
+| `.harness/runtime/python/template_cli/finalize/helpers.py` | Utility functions, interactive prompts, markdown extraction, and state helpers for finalization |
+| `.harness/runtime/python/template_cli/finalize/state.py` | BackupManager, catalog transition functions, and summary export writer for finalization |
 | `.harness/runtime/python/template_cli/workflow_catalog.py` | IDEA_CATALOG row parsing and upsert helpers for lab workflow state |
 | `.harness/runtime/python/template_cli/workflow_data.py` | Idea-block I/O, session helpers, and data primitives for lab workflow commands |
 | `.harness/runtime/python/template_cli/workflow_commands.py` | Session-scoped lab mutation commands for path notes, decisions, risks, and reviews |

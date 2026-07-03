@@ -5,7 +5,7 @@ import tempfile
 from contextlib import AbstractContextManager
 from pathlib import Path
 
-from template_cli.finalize_helpers import (
+from template_cli.finalize.helpers import (
     STATE_FILE,
     choose_idea_to_finalize,
     existing_state_value,

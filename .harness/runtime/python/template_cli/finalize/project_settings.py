@@ -2,15 +2,15 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from template_cli.finalize_existing import ExistingFinalizeValues
-from template_cli.finalize_helpers import (
+from template_cli.finalize.existing import ExistingFinalizeValues
+from template_cli.finalize.helpers import (
     ask_non_empty,
     choose_from_list,
     choose_project_type,
     infer_project_type,
     summarize_decisions,
 )
-from template_cli.finalize_validation import _pick_noninteractive_choice, _required_value
+from template_cli.finalize.validation import _pick_noninteractive_choice, _required_value
 
 
 @dataclass(frozen=True)

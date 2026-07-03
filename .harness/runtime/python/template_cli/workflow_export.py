@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from template_cli.finalize_helpers import (
+from template_cli.finalize.helpers import (
     existing_state_value,
     files_containing,
     first_value_for_label,
     infer_project_type,
 )
-from template_cli.finalize_state import _write_summary_export
+from template_cli.finalize.state import _write_summary_export
 from template_cli.io_helpers import path_exists
 from template_cli.workflow_catalog import _extract_catalog_row, _upsert_catalog_row
 from template_cli.workflow_data import (

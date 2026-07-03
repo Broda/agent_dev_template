@@ -14,7 +14,7 @@ from template_cli.bootstrap import (  # noqa: E402
     run_project_harness_new_from_idea,
     run_project_harness_validate,
 )
-from template_cli.bootstrap_update import (  # noqa: E402
+from template_cli.bootstrap.update import (  # noqa: E402
     run_project_harness_update_apply,
     run_project_harness_update_dry_run,
 )

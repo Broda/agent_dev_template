@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from template_cli.finalize_helpers import STATE_FILE, trim, unique_values
+from template_cli.finalize.helpers import STATE_FILE, trim, unique_values
 from template_cli.handoff_contract import EMPTY_HANDOFF_VALUES, STATE_DEFAULTS
 from template_cli.io_helpers import read_text
 

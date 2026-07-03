@@ -18,7 +18,7 @@ WORKFLOW_MODULES = [
     ".harness/runtime/python/template_cli/workflow_status.py",
 ]
 DISALLOWED_MODULE_IMPORTS = {
-    ".harness/runtime/python/template_cli/bootstrap_update_source.py": {"template_cli.bootstrap_update"},
+    ".harness/runtime/python/template_cli/bootstrap/update_source.py": {"template_cli.bootstrap.update"},
 }
 
 

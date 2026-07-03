@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from template_cli.bootstrap_update_source import source_worktree_state
+from template_cli.bootstrap.update_source import source_worktree_state
 
 
 def _print_update_plan(
