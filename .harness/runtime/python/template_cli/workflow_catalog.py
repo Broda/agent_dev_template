@@ -2,7 +2,14 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from template_cli.io_helpers import IDEA_ROW_RE, clean_backticks, parse_markdown_table_rows, read_text, write_text
+from template_cli.io_helpers import (
+    IDEA_ROW_RE,
+    clean_backticks,
+    parse_markdown_table_rows,
+    read_text,
+    split_table_row,
+    write_text,
+)
 
 
 def _trim(value: str | None) -> str:
@@ -13,10 +20,8 @@ def _extract_catalog_row(root: Path, idea_id: str) -> dict[str, str]:
     catalog_path = root / "IDEA_CATALOG.md"
     if not catalog_path.exists():
         return {}
-    for cells in parse_markdown_table_rows(catalog_path, IDEA_ROW_RE):
+    for cells in parse_markdown_table_rows(catalog_path, IDEA_ROW_RE, width=7):
         if cells and cells[0].strip() == idea_id:
-            while len(cells) < 7:
-                cells.append("")
             return {
                 "idea_id": cells[0].strip(),
                 "title": cells[1].strip(),
@@ -61,7 +66,7 @@ def _upsert_catalog_row(
     inserted = False
     for line in lines:
         if IDEA_ROW_RE.search(line):
-            cells = [cell.strip() for cell in line.split("|")[1:-1]]
+            cells = split_table_row(line)
             if cells and cells[0] == idea_id:
                 updated.append(row)
                 inserted = True

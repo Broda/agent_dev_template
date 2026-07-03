@@ -12,7 +12,7 @@ Core requirements:
 - Identify the active milestone in `docs/ROADMAP.md`.
 - Run the project validation commands from `docs/PROJECT_CONTEXT.md` and `state/project-init.json`.
 - Record evidence under completed roadmap tasks.
-- Keep code files at or under 500 lines.
+- Keep Python code files at or under the enforced 350-line guardrail, splitting by cohesive responsibility.
 - Treat public contract changes as ADR- and version-aligned work.
 
 ## Research Notes

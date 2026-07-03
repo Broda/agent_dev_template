@@ -34,7 +34,7 @@ class ProjectHarnessUpdateTests(ProjectHarnessUpdateTestCase):
 
         self.assertEqual(payload["command"], "project-harness update --dry-run")
         self.assertEqual(payload["writes"], "none")
-        self.assertEqual(payload["targetSource"], source.as_posix())
+        self.assertEqual(payload["targetSource"], source.resolve().as_posix())
         self.assertIn("harness-owned", payload["plan"])
         self.assertIn("applyCleanHarnessOwned", payload["nextCommands"])
 

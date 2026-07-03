@@ -15,7 +15,6 @@ Lean file registry for the Project Harness Template.
 | `.harness/docs/HARNESS_RELEASE_CHECKLIST.md` | Public harness template release checklist |
 | `.harness/docs/HARNESS_CHANGELOG.md` | Public harness template release notes |
 | `.harness/docs/HARNESS_IMPROVEMENT_ROADMAP.md` | Public-template improvement roadmap and milestone backlog |
-| `.hermes/plans/2026-06-14_103831-template-external-idea-import-api.md` | Implementation plan for the external idea import API slice |
 | `docs/EXTERNAL_INTEGRATION.md` | Public-safe automation contract for importing external ideas |
 | `AGENTS.md` | Agent behavior contract |
 | `MODE.md` | Active repository phase selector |
@@ -71,6 +70,7 @@ Lean file registry for the Project Harness Template.
 | `.harness/tests/test_lab_handoff.py` | Lab handoff compiler regression tests for lossless brainstorming-to-finalization state |
 | `.harness/tests/test_lab_finalization.py` | Lab finalization command regression tests |
 | `.harness/tests/test_intent_registry_contract.py` | Intent-registry render, parity, and CI-contract regression suite |
+| `.harness/tests/test_intent_registry_parser_parity.py` | Registry-versus-CLI-parser argument parity regression tests |
 | `.harness/tests/test_lab_launcher.py` | Lab shell and PowerShell launcher help regression tests |
 | `.harness/tests/test_external_idea_import.py` | External idea import and project bootstrap API regression tests |
 | `.harness/tests/test_lab_lifecycle.py` | Lab command, finalize, status, doctor, and review regression tests |
@@ -80,6 +80,7 @@ Lean file registry for the Project Harness Template.
 | `.harness/tests/test_project_harness_update.py` | Project harness update dry-run regression tests |
 | `.harness/tests/test_runtime_discovery.py` | Installed runtime discovery contract tests |
 | `.harness/tests/test_state_schema.py` | Project state schema contract regression tests |
+| `.harness/tests/test_sync_and_state_robustness.py` | Lab sync failure-path, BackupManager rollback, and malformed catalog row tests |
 | `.harness/tests/fixtures/finalized_state_v2.json` | Canonical finalized-state fixture for development render/validate regression |
 | `.harness/tests/fixtures/finalized_state_web_app_v2.json` | Non-game finalized-state fixture for product-neutral development rendering regression |
 | `.harness/tests/fixtures/finalized_state_with_persistence_v2.json` | Persistence-enabled finalized-state fixture for migration-policy render regression |
@@ -137,6 +138,8 @@ Lean file registry for the Project Harness Template.
 | `.github/workflows/governance-audit.yml` | Warn-only CI audit |
 | `.github/workflows/release-readiness.yml` | Manual public-template release readiness smoke workflow |
 | `.github/PULL_REQUEST_TEMPLATE.md` | PR checklist |
+| `.github/ISSUE_TEMPLATE/bug_report.md` | Bug report issue template |
+| `.github/ISSUE_TEMPLATE/feature_request.md` | Feature request issue template |
 | `.harness/runtime/python/template_cli/io_helpers.py` | I/O primitives, regex constants, ValidationResult, and summary printers shared across the CLI |
 | `.harness/runtime/python/template_cli/adr.py` | Development ADR capture command implementation |
 | `.harness/runtime/python/template_cli/bootstrap.py` | Project harness bootstrap command implementation |
@@ -146,6 +149,7 @@ Lean file registry for the Project Harness Template.
 | `.harness/runtime/python/template_cli/bootstrap_update_plan.py` | Project harness update plan classification and baseline comparison helpers |
 | `.harness/runtime/python/template_cli/bootstrap_update_source.py` | Project harness update source resolution helpers |
 | `.harness/runtime/python/template_cli/external_idea.py` | External idea payload validation and JSON result contracts |
+| `.harness/runtime/python/template_cli/git_helpers.py` | Shared captured-output git command runner |
 | `.harness/runtime/python/template_cli/evidence.py` | Development roadmap evidence capture command implementation |
 | `.harness/runtime/python/template_cli/finalize_artifacts.py` | Finalization artifact directory setup, backup registration, existing-state load, and session-log writing helpers |
 | `.harness/runtime/python/template_cli/finalize_context.py` | Finalization target, owner, session, and hydration context resolution |

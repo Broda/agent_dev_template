@@ -121,7 +121,7 @@ def lab_cli_dispatch_commands(root: Path) -> set[str]:
             is_dispatch_table = any(
                 isinstance(target, ast.Name) and target.id == "LAB_COMMAND_DISPATCHERS" for target in node.targets
             )
-            value = node.value
+            value: ast.expr | None = node.value
         elif isinstance(node, ast.AnnAssign):
             is_dispatch_table = isinstance(node.target, ast.Name) and node.target.id == "LAB_COMMAND_DISPATCHERS"
             value = node.value

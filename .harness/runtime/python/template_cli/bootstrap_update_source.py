@@ -6,6 +6,7 @@ import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
+from template_cli.git_helpers import git_stdout, run_git
 from template_cli.validator_manifest import load_harness_manifest
 
 
@@ -54,13 +55,7 @@ def cleanup_update_source(source: UpdateSource) -> None:
 
 
 def source_worktree_state(source_root: Path) -> str:
-    result = subprocess.run(
-        ["git", "status", "--porcelain"],
-        cwd=source_root,
-        text=True,
-        capture_output=True,
-        check=False,
-    )
+    result = run_git(source_root, ["status", "--porcelain"])
     if result.returncode != 0:
         return "unavailable"
     return "dirty" if result.stdout.strip() else "clean"
@@ -189,16 +184,7 @@ def _looks_like_commit(value: str) -> bool:
 
 
 def _git_rev_parse(root: Path) -> str:
-    result = subprocess.run(
-        ["git", "rev-parse", "HEAD"],
-        cwd=root,
-        text=True,
-        capture_output=True,
-        check=False,
-    )
-    if result.returncode != 0:
-        return ""
-    commit = result.stdout.strip()
+    commit = git_stdout(root, ["rev-parse", "HEAD"])
     return commit if _looks_like_commit(commit) else ""
 
 

@@ -189,7 +189,7 @@ Candidate extraction order:
 4. Render, finalize, and workflow mutation commands only after rollback and
    compatibility behavior are proven.
 
-This section promotes the durable conclusions from `note-0001`: keep project
+This section records the durable runtime-versioning conclusions: keep project
 state and stable local wrappers in generated repositories, remove duplicated
 mutable implementation only behind manifest-backed compatibility checks, and
 avoid any global "latest" runtime dependency.

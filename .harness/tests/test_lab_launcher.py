@@ -26,6 +26,17 @@ class LabLauncherTests(LabWorkflowTestCase):
 
         self.assertIn("usage: template-cli lab-status", result.stdout)
 
+    def test_lab_leading_root_flag_is_forwarded(self) -> None:
+        result = run_cmd(["./scripts/lab", "--root", str(self.repo), "status"], cwd=self.repo)
+
+        self.assertIn("Mode: brainstorming", result.stdout)
+
+    def test_lab_leading_root_flag_without_path_fails_with_usage_error(self) -> None:
+        result = run_cmd(["./scripts/lab", "--root"], cwd=self.repo, check=False)
+
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("--root requires a path", result.stdout + result.stderr)
+
     def test_finalize_project_help_reaches_argparse(self) -> None:
         result = run_cmd(["./scripts/finalize-project", "--help"], cwd=self.repo)
 

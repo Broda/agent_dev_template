@@ -11,6 +11,23 @@ The intended flow stays simple:
 
 The harness remains self-contained. Project state, deterministic scripts, validation, and generated development docs live in the repository. Plugins and skills provide agent operating knowledge around that harness; they do not replace the harness runtime.
 
+## First 10 Minutes
+
+For a brand-new clone, this is the whole loop:
+
+```sh
+./scripts/lab status                                            # confirm brainstorming mode, no ideas yet
+./scripts/lab capture --idea-id my-idea --title "My Idea"       # capture the first idea
+./scripts/lab activate --idea-id my-idea                        # make it the active thread
+./scripts/lab decide --idea-id my-idea --chosen-option "..." --rationale "..."
+./scripts/lab risk --idea-id my-idea --statement "..." --mitigation "..."
+./scripts/lab review --idea-id my-idea --result conditional-pass --summary "..."
+./scripts/lab doctor                                            # see exactly what finalize still needs
+./scripts/finalize-project                                      # convert to development mode when ready
+```
+
+Milestone writes auto-commit (and push when `origin` exists) unless you pass `--no-sync`. Everything else in this README is reference detail around that loop.
+
 ## Agent Operation Model
 
 This harness is optimized for human-agent development, not for humans memorizing commands. The primary interface is conversational intent; the scripts are the auditable implementation layer underneath.
@@ -76,12 +93,15 @@ must not infer write behavior from human-readable text.
 - `pyproject.toml` records Ruff, Black, and isort defaults for maintainers.
 - `requirements-dev.txt` pins Ruff for local and CI lint/format checks.
 
-On Windows, PowerShell launchers prefer `py -3` and fall back to `python`.
-On macOS/Linux, shell launchers prefer `python3` and fall back to `python`.
-CI keeps Ubuntu as the full regression baseline and runs a Windows PowerShell
-launcher smoke job for `lab`, `lab import-idea`, `finalize-project`,
-`validate-governance`, `project-harness new --no-git`, and
-`project-harness new-from-idea`.
+PowerShell launchers prefer `py -3`, then `python3`, then `python`, so they also
+work under PowerShell on macOS/Linux. Shell launchers prefer `python3` and fall
+back to `python`.
+CI runs on pull requests and manual dispatch; push triggers stay disabled in
+brainstorming mode so milestone auto-commits do not spawn CI runs. The Ubuntu
+job runs Ruff, mypy, generated-artifact drift checks, the full regression
+suite, and governance plus brainstorming validation. The Windows job runs the
+same regression suite through the PowerShell launchers plus launcher-specific
+update and rendering smoke checks.
 
 Runtime extraction is planned but not active. ADR-0002 records the boundary:
 the first extracted runtime should remain Python, wrappers must verify manifest

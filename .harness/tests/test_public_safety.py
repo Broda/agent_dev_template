@@ -10,7 +10,6 @@ PUBLIC_DOC_PATHS = [
     "README.md",
     "AGENTS.md",
     "docs",
-    ".hermes/plans",
     ".harness/commands",
     ".harness/brainstorming",
     ".agents/skills",

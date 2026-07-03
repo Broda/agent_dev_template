@@ -50,7 +50,9 @@ Payload files avoid shell-quoting bugs:
 }
 ```
 
-`tags` is accepted for forward compatibility and validated as a list of strings. The current template does not persist tags in catalog or session files; callers should treat tags as reserved metadata until a future schema version defines durable tag behavior.
+`tags` is accepted for forward compatibility and validated as a list of non-empty single-line strings. The current template does not persist tags in catalog or session files; callers should treat tags as reserved metadata until a future schema version defines durable tag behavior.
+
+Payload text fields are limited to 4000 characters after whitespace trimming and newline normalization. Over-limit fields are rejected with the `invalid_field` error code instead of being silently truncated, so callers always know exactly what was stored.
 
 Use the payload with:
 
@@ -153,6 +155,20 @@ For non-JSON mode, the same validation failures are printed as concise stderr me
 - `0`: success
 - `1`: runtime, validation, or Git failure
 - `2`: usage, mode, or registry error
+
+## Sync exit codes
+
+Milestone writes auto-commit and best-effort push. The sync layer distinguishes
+soft outcomes from failures:
+
+- `0`: committed and pushed (or nothing to commit)
+- `2`: committed locally, push skipped by policy (detached HEAD, no `origin`
+  remote, or dirty working tree after commit) — the write is safe, push manually
+- `3`: committed locally, push attempted and failed — retry
+  `git push origin <branch>` when the remote is reachable
+
+Lab commands that auto-sync suppress push warnings and report the milestone
+write as successful; the commit is always kept locally.
 
 ## Do not rely on internals
 

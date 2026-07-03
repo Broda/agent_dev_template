@@ -18,7 +18,7 @@ if [[ -z "$subcommand" || "$subcommand" == "-h" || "$subcommand" == "--help" ]];
 Usage: ./scripts/project-harness <command> [args]
 
 Commands:
-  new <path> [--origin <url>] [--no-git]
+  new <path> [--origin <url>] [--no-git] [--template-root <path>]
   new-from-idea <path> [--payload-file <json> | --idea-id <id> --title <title>] [--json]
   update --dry-run [--source-path <template-checkout> | --source-commit <sha> | --release-version <version>] [--json]
   update --apply --source-path <template-checkout> --yes [--include-mixed]

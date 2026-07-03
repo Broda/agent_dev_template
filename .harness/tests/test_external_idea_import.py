@@ -26,6 +26,26 @@ class ExternalIdeaPayloadTests(LabWorkflowTestCase):
 
         self.assertEqual(payload.normalized_idea_id, "idea-example-web-app")
 
+    def test_payload_rejects_over_limit_field_instead_of_truncating(self) -> None:
+        with self.assertRaises(ValueError) as raised:
+            ExternalIdeaPayload(
+                idea_id="example-web-app",
+                title="Example Web App",
+                summary="x" * 4001,
+            )
+
+        self.assertIn("cannot exceed 4000 characters", str(raised.exception))
+
+    def test_payload_rejects_empty_tags_instead_of_rewriting(self) -> None:
+        with self.assertRaises(ValueError) as raised:
+            ExternalIdeaPayload(
+                idea_id="example-web-app",
+                title="Example Web App",
+                tags=["web", "  "],
+            )
+
+        self.assertIn("tags must be non-empty", str(raised.exception))
+
     def test_result_json_uses_relative_paths(self) -> None:
         result = ExternalIdeaImportResult(
             ok=True,

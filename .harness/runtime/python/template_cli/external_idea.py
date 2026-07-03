@@ -16,7 +16,9 @@ def _clean_text(value: str, *, default: str = "") -> str:
     if "\x00" in text:
         raise ValueError("external idea fields cannot contain NUL bytes")
     text = text.replace("\r\n", "\n").replace("\r", "\n")
-    return text[:MAX_TEXT_LENGTH]
+    if len(text) > MAX_TEXT_LENGTH:
+        raise ValueError(f"external idea fields cannot exceed {MAX_TEXT_LENGTH} characters")
+    return text
 
 
 def _clean_identifier(value: str, *, default: str = "external") -> str:
@@ -45,7 +47,10 @@ class ExternalIdeaPayload:
         object.__setattr__(self, "summary", _clean_text(self.summary))
         object.__setattr__(self, "source", _clean_identifier(self.source, default="external"))
         object.__setattr__(self, "source_id", _clean_identifier(self.source_id, default="") if self.source_id else "")
-        object.__setattr__(self, "tags", [_clean_identifier(tag, default="tag") for tag in self.tags])
+        cleaned_tags = [_clean_text(tag) for tag in self.tags]
+        if any(not tag or "\n" in tag for tag in cleaned_tags):
+            raise ValueError("external idea payload tags must be non-empty single-line strings")
+        object.__setattr__(self, "tags", cleaned_tags)
 
     @property
     def normalized_idea_id(self) -> str:
@@ -105,7 +110,7 @@ def external_idea_error_code(error: Exception) -> str:
             return "invalid_tags"
         if "required" in message:
             return "missing_required_field"
-        if "NUL" in message or "newline" in message:
+        if "NUL" in message or "newline" in message or "exceed" in message:
             return "invalid_field"
         return "invalid_payload"
     return "external_idea_error"

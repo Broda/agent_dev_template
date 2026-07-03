@@ -246,7 +246,7 @@ def lab_doctor_data(root: Path, *, idea_id: str = "") -> dict:
     active = [cells for cells in rows if len(cells) > 2 and cells[2].strip() == "active"]
 
     if idea_id:
-        target_row = _extract_catalog_row(root, idea_id)
+        target_row: dict[str, str] | None = _extract_catalog_row(root, idea_id)
         if not target_row:
             return {
                 "mode": mode,

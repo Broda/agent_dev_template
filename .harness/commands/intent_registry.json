@@ -141,6 +141,7 @@
         "--session",
         "--decision-level",
         "--situation",
+        "--chosen-option",
         "--rationale",
         "--constraints",
         "--no-sync"
@@ -178,6 +179,7 @@
         "--risk-id",
         "--owner",
         "--session",
+        "--statement",
         "--mitigation",
         "--contingency",
         "--probability",

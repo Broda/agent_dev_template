@@ -4,6 +4,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from collections.abc import Sequence
 from pathlib import Path
 
 GENERATED_ARTIFACT_PATHS = [
@@ -154,7 +155,7 @@ def _ruff_command(root: Path) -> list[str]:
     return [executable] if executable else []
 
 
-def _run(command: list[object], cwd: Path) -> int:
+def _run(command: Sequence[object], cwd: Path) -> int:
     display = " ".join(str(part) for part in command)
     print(f"$ {display}")
     return subprocess.run([str(part) for part in command], cwd=cwd, check=False).returncode

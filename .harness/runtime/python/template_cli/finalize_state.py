@@ -16,7 +16,14 @@ from template_cli.finalize_helpers import (
     trim,
     unique_values,
 )
-from template_cli.io_helpers import IDEA_ROW_RE, clean_backticks, parse_markdown_table_rows, read_text, write_text
+from template_cli.io_helpers import (
+    IDEA_ROW_RE,
+    clean_backticks,
+    parse_markdown_table_rows,
+    read_text,
+    split_table_row,
+    write_text,
+)
 
 
 class BackupManager(AbstractContextManager["BackupManager"]):
@@ -82,10 +89,8 @@ def _update_catalog_transition(root: Path, idea_id: str, session_path: str, expo
     updated: list[str] = []
     for line in lines:
         if IDEA_ROW_RE.search(line):
-            cells = [cell.strip() for cell in line.split("|")[1:-1]]
+            cells = split_table_row(line, width=7)
             if cells and cells[0] == idea_id:
-                while len(cells) < 7:
-                    cells.append("")
                 _, title, _, owner, sessions, existing_export, notes = cells[:7]
                 session_links = unique_values(
                     split_linkish_values(sessions, ("sessions",)) + ([session_path] if session_path else [])

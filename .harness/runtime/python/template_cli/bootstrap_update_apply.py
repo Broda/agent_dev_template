@@ -3,6 +3,7 @@ from __future__ import annotations
 import shutil
 import subprocess
 import sys
+from datetime import UTC, datetime
 from pathlib import Path
 
 from template_cli.bootstrap_update_plan import _build_update_plan
@@ -119,15 +120,7 @@ def _rollback_update(root: Path, backup_dir: Path, update_paths: list[str]) -> N
 
 
 def _timestamp_label() -> str:
-    result = subprocess.run(
-        ["date", "-u", "+%Y%m%dT%H%M%SZ"],
-        text=True,
-        capture_output=True,
-        check=False,
-    )
-    if result.returncode == 0 and result.stdout.strip():
-        return result.stdout.strip()
-    return "update-backup"
+    return datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
 
 
 def _run(command: list[str], cwd: Path) -> int:

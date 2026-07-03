@@ -228,10 +228,7 @@ def _validate_windows_ci_launcher_job(root: Path, result: ValidationResult) -> N
     required_snippets = {
         "Windows runner": "runs-on: windows-latest",
         "PowerShell shell": "shell: pwsh",
-        "launcher smoke tests": (
-            'python -m unittest discover -s .harness/tests -p "test_lab_launcher.py" -v'
-            '\n          python -m unittest discover -s .harness/tests -p "test_project_harness_bootstrap.py" -v'
-        ),
+        "full regression suite": "python -m unittest discover -s .harness/tests -v",
         "PowerShell update smoke": "Run PowerShell project-harness update smoke",
         "PowerShell update help": "./scripts/project-harness.ps1 update --help",
         "PowerShell update diagnostics": "Invoke-SmokeCommand",
@@ -252,6 +249,9 @@ def _validate_windows_ci_launcher_job(root: Path, result: ValidationResult) -> N
 
 
 def _validate_brainstorming_workflows_manual_only(root: Path, result: ValidationResult) -> None:
+    # Milestone writes auto-commit and push, so push triggers would run CI on
+    # every brainstorming milestone. pull_request triggers are allowed because
+    # PRs are developer-initiated, not milestone sync traffic.
     if read_mode(root) != "brainstorming":
         return
     workflows_dir = root / ".github/workflows"
@@ -259,11 +259,9 @@ def _validate_brainstorming_workflows_manual_only(root: Path, result: Validation
         return
     for workflow_path in sorted(workflows_dir.glob("*.yml")) + sorted(workflows_dir.glob("*.yaml")):
         workflow_text = read_text(workflow_path)
-        if re.search(r"(?m)^  (?:pull_request|push):\s*$", workflow_text):
+        if re.search(r"(?m)^  push:\s*$", workflow_text):
             relative_path = workflow_path.relative_to(root).as_posix()
-            result.add_failure(
-                f"Brainstorming workflow must stay manual-only: {relative_path} has pull_request/push trigger."
-            )
+            result.add_failure(f"Brainstorming workflow must not run on push: {relative_path} has a push trigger.")
 
 
 def _validate_release_readiness_workflow(root: Path, result: ValidationResult) -> None:

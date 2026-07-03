@@ -15,7 +15,10 @@ This repository is a two-phase project harness template. It starts in **brainsto
 | `MODE.md` says `development` | `$development-governance` | `.harness/development/AGENTS.development.md` |
 | Maintaining this harness template itself | `$template-maintenance` | this file plus current mode contract |
 
-The legacy contracts remain available for agents that do not support skills.
+Precedence: when an agent supports repo-scoped skills, the skill under
+`.agents/skills/` is the canonical instruction set. The legacy contracts remain
+available only for agents that do not support skills; if a skill and a legacy
+contract ever disagree, the skill wins and the contract should be fixed.
 
 ## Stable Runtime
 

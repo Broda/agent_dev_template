@@ -1,18 +1,9 @@
 from __future__ import annotations
 
-import subprocess
 import sys
 from pathlib import Path
 
-
-def _run_git(root: Path, args: list[str], check: bool = True) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(
-        ["git", *args],
-        cwd=root,
-        text=True,
-        capture_output=True,
-        check=check,
-    )
+from template_cli.git_helpers import run_git as _run_git
 
 
 def _warn(message: str) -> None:

@@ -27,7 +27,8 @@ def _read_text(path: Path) -> str:
 
 
 def _write_text(path: Path, content: str) -> None:
-    path.write_text(content, encoding="utf-8")
+    # newline="\n" keeps generated files LF on every platform, matching .gitattributes/.editorconfig.
+    path.write_text(content, encoding="utf-8", newline="\n")
 
 
 def _trim(value: str | None) -> str:

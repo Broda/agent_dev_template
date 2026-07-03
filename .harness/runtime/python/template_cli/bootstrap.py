@@ -15,6 +15,7 @@ from template_cli.external_idea import (
     external_idea_error_json,
     load_external_idea_payload,
 )
+from template_cli.git_helpers import git_stdout
 from template_cli.io_helpers import read_mode, write_text
 from template_cli.validator_manifest import stamp_harness_manifest
 from template_cli.workflow_idea_commands import import_external_idea
@@ -94,15 +95,24 @@ def run_project_harness_new(
 def _run_maybe_quiet(command: list[str], cwd: Path, *, quiet: bool) -> int:
     if not quiet:
         return _run(command, cwd)
-    with contextlib.redirect_stdout(io.StringIO()):
-        return _run(command, cwd)
+    buffer = io.StringIO()
+    with contextlib.redirect_stdout(buffer):
+        result = _run(command, cwd)
+    if result != 0 and buffer.getvalue():
+        # Keep JSON-mode stdout machine-readable, but never swallow the reason a step failed.
+        print(buffer.getvalue(), end="", file=sys.stderr)
+    return result
 
 
 def _call_maybe_quiet(func, *args, quiet: bool, **kwargs) -> int:
     if not quiet:
         return func(*args, **kwargs)
-    with contextlib.redirect_stdout(io.StringIO()):
-        return func(*args, **kwargs)
+    buffer = io.StringIO()
+    with contextlib.redirect_stdout(buffer):
+        result = func(*args, **kwargs)
+    if result != 0 and buffer.getvalue():
+        print(buffer.getvalue(), end="", file=sys.stderr)
+    return result
 
 
 def run_project_harness_new_from_idea(
@@ -174,11 +184,7 @@ def run_project_harness_new_from_idea(
         commit_result = _run_maybe_quiet(["git", "commit", "-m", message], target_path, quiet=json_output)
         if commit_result != 0:
             return commit_result
-        rev = subprocess.run(
-            ["git", "rev-parse", "--short", "HEAD"], cwd=target_path, text=True, capture_output=True, check=False
-        )
-        if rev.returncode == 0:
-            commit_sha = rev.stdout.strip()
+        commit_sha = git_stdout(target_path, ["rev-parse", "--short", "HEAD"])
 
     validation_result = _run_maybe_quiet(_template_cli_command("validate-governance"), target_path, quiet=json_output)
     if validation_result != 0:
@@ -269,13 +275,4 @@ def _ensure_initial_commit_identity(root: Path) -> int:
 
 
 def _git_config_value(root: Path, key: str) -> str:
-    result = subprocess.run(
-        ["git", "config", "--get", key],
-        cwd=root,
-        text=True,
-        capture_output=True,
-        check=False,
-    )
-    if result.returncode != 0:
-        return ""
-    return result.stdout.strip()
+    return git_stdout(root, ["config", "--get", key])

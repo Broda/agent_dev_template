@@ -15,7 +15,7 @@ def _build_update_plan(
     target_manifest: dict,
 ) -> tuple[dict[str, list[str]], bool]:
     inventory = current_manifest.get("artifactInventory", {})
-    categories = {
+    categories: dict[str, list[str]] = {
         "harness-owned": [],
         "project-owned-preserved": [],
         "mixed-generated": [],
@@ -152,7 +152,9 @@ def _file_content(path: Path) -> bytes | None:
     if not path.exists():
         return None
     try:
-        return path.read_bytes()
+        # CRLF working-tree copies must compare equal to LF git blobs under the
+        # repo-wide `* text=auto eol=lf` policy, so comparisons are LF-normalized.
+        return path.read_bytes().replace(b"\r\n", b"\n")
     except OSError:
         return None
 
@@ -189,7 +191,7 @@ def _baseline_file_content(source_root: Path, commit: str, relative_path: str) -
     )
     if result.returncode != 0:
         return None
-    return result.stdout
+    return result.stdout.replace(b"\r\n", b"\n")
 
 
 def _looks_like_commit(value: str) -> bool:

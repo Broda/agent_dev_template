@@ -1,6 +1,4 @@
 param(
-    [Parameter(Position = 0)]
-    [string]$Command,
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$Args
 )
@@ -9,6 +7,25 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+
+$templateRootArgs = @()
+if ($Args.Count -gt 0 -and $Args[0] -eq '--template-root') {
+    if ($Args.Count -lt 2 -or [string]::IsNullOrWhiteSpace($Args[1])) {
+        [Console]::Error.WriteLine('--template-root requires a path')
+        exit 2
+    }
+    $templateRootArgs = @('--template-root', $Args[1])
+    if ($Args.Count -gt 2) {
+        $Args = $Args[2..($Args.Count - 1)]
+    } else {
+        $Args = @()
+    }
+}
+
+$Command = ''
+if ($Args.Count -gt 0) {
+    $Command = $Args[0]
+}
 
 if (-not $Command -or $Command -eq '-h' -or $Command -eq '--help') {
     @'
@@ -36,18 +53,28 @@ switch ($Command) {
     # Delegates to project-harness-update.
     'update' { $cliCommand = 'project-harness-update' }
     default {
-        Write-Error "Unknown project-harness command: $Command"
+        [Console]::Error.WriteLine("Unknown project-harness command: $Command")
         exit 2
     }
 }
 
+$remaining = @()
+if ($Args.Count -gt 1) {
+    $remaining = $Args[1..($Args.Count - 1)]
+}
+
 if (Get-Command py -ErrorAction SilentlyContinue) {
-    & py -3 "$scriptDir/../.harness/runtime/python/cli.py" $cliCommand @Args
+    & py -3 "$scriptDir/../.harness/runtime/python/cli.py" $cliCommand @templateRootArgs @remaining
+    exit $LASTEXITCODE
+}
+
+if (Get-Command python3 -ErrorAction SilentlyContinue) {
+    & python3 "$scriptDir/../.harness/runtime/python/cli.py" $cliCommand @templateRootArgs @remaining
     exit $LASTEXITCODE
 }
 
 if (Get-Command python -ErrorAction SilentlyContinue) {
-    & python "$scriptDir/../.harness/runtime/python/cli.py" $cliCommand @Args
+    & python "$scriptDir/../.harness/runtime/python/cli.py" $cliCommand @templateRootArgs @remaining
     exit $LASTEXITCODE
 }
 

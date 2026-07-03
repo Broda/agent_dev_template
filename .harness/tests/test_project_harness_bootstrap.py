@@ -82,6 +82,23 @@ class ProjectHarnessBootstrapTests(LabWorkflowTestCase):
         self.assertIn("Git was not initialized because --no-git was supplied.", result.stdout)
         self.assertTrue((target / "README.md").exists())
 
+    def test_project_harness_leading_template_root_flag_is_forwarded(self) -> None:
+        target = self.tmpdir / "template-root-project"
+
+        result = run_cmd(
+            ["./scripts/project-harness", "--template-root", str(self.repo), "new", str(target), "--no-git"],
+            cwd=self.repo,
+        )
+
+        self.assertIn("Created project harness:", result.stdout)
+        self.assertTrue((target / "README.md").exists())
+
+    def test_project_harness_leading_template_root_without_path_fails_with_usage_error(self) -> None:
+        result = run_cmd(["./scripts/project-harness", "--template-root"], cwd=self.repo, check=False)
+
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("--template-root requires a path", result.stdout + result.stderr)
+
     def test_project_harness_new_refuses_existing_target(self) -> None:
         target = self.tmpdir / "existing-project"
         target.mkdir()

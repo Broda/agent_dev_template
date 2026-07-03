@@ -1,50 +1,12 @@
 from __future__ import annotations
 
 import json
-import shutil
-import subprocess
-import tempfile
 import unittest
-from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-
-
-def run_cmd(
-    args: list[str],
-    *,
-    cwd: Path,
-    input_text: str | None = None,
-    check: bool = True,
-) -> subprocess.CompletedProcess[str]:
-    result = subprocess.run(
-        args,
-        cwd=cwd,
-        input=input_text,
-        text=True,
-        capture_output=True,
-        check=False,
-    )
-    if check and result.returncode != 0:
-        raise AssertionError(
-            f"Command failed ({result.returncode}): {' '.join(args)}\nSTDOUT:\n{result.stdout}\nSTDERR:\n{result.stderr}"
-        )
-    return result
+from workflow_test_helpers import LabWorkflowTestCase, run_cmd
 
 
-class IntentRegistryContractTests(unittest.TestCase):
-    def setUp(self) -> None:
-        self.tmpdir = Path(tempfile.mkdtemp(prefix="codex-template-tests."))
-        self.repo = self.tmpdir / "repo"
-        shutil.copytree(
-            REPO_ROOT,
-            self.repo,
-            ignore=shutil.ignore_patterns(".git", "__pycache__", ".pytest_cache"),
-        )
-
-    def tearDown(self) -> None:
-        shutil.rmtree(self.tmpdir, ignore_errors=True)
-
+class IntentRegistryContractTests(LabWorkflowTestCase):
     def test_render_intent_docs_is_idempotent_on_clean_repo(self) -> None:
         run_cmd(["./scripts/render-intent-docs"], cwd=self.repo)
         first_conv = (self.repo / ".harness/commands/CONVERSATIONAL_MODE.md").read_text(encoding="utf-8")

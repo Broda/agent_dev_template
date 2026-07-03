@@ -55,7 +55,7 @@ def run_lab_adr(
     slug = _slugify(clean_title)
     path = docs_dir / f"ADR-{number:04d}-{slug}.md"
     if path.exists():
-        print(f"ADR already exists: {path.relative_to(root)}")
+        print(f"ADR already exists: {path.relative_to(root).as_posix()}")
         return 1
 
     content = _render_adr(
@@ -72,7 +72,7 @@ def run_lab_adr(
     )
     write_text(path, content)
 
-    print(f"Created {path.relative_to(root)}")
+    print(f"Created {path.relative_to(root).as_posix()}")
     return 0
 
 

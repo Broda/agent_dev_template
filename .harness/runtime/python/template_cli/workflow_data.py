@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import re
-import subprocess
 from datetime import datetime
 from pathlib import Path
 
 from template_cli.finalize_helpers import (
     files_containing,
 )
+from template_cli.git_helpers import git_stdout
 from template_cli.io_helpers import (
     path_exists,
     read_mode,
@@ -58,14 +58,7 @@ def _timestamp() -> str:
 
 
 def _default_owner(root: Path) -> str:
-    result = subprocess.run(
-        ["git", "config", "--get", "user.name"],
-        cwd=root,
-        text=True,
-        capture_output=True,
-        check=False,
-    )
-    return _trim(result.stdout) or "unassigned"
+    return _trim(git_stdout(root, ["config", "--get", "user.name"])) or "unassigned"
 
 
 def _title_from_idea_id(idea_id: str) -> str:

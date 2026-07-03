@@ -41,10 +41,13 @@ def _platform_command(args: list[str], cwd: Path) -> list[str]:
     if os.name != "nt" or not args:
         return args
     command = args[0]
-    if not command.startswith("./scripts/"):
-        return args
-    script_name = Path(command).name
-    ps1_script = cwd / "scripts" / f"{script_name}.ps1"
+    if command.startswith("./scripts/"):
+        ps1_script = cwd / "scripts" / f"{Path(command).name}.ps1"
+    else:
+        candidate = Path(command)
+        if not (candidate.is_absolute() and candidate.parent.name == "scripts" and not candidate.suffix):
+            return args
+        ps1_script = candidate.with_name(f"{candidate.name}.ps1")
     if not ps1_script.exists():
         return args
     powershell = shutil.which("pwsh") or shutil.which("powershell")

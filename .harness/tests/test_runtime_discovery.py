@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import json
+import os
 import stat
 import sys
 import textwrap
+import unittest
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -22,6 +24,10 @@ from template_cli.runtime_discovery import (  # noqa: E402
 
 
 class RuntimeDiscoveryTests(LabWorkflowTestCase):
+    @unittest.skipIf(
+        os.name == "nt",
+        "fake installed runtime is a POSIX shebang script; PATH discovery and execution require POSIX",
+    )
     def test_runtime_env_override_prefers_explicit_compatible_runtime(self) -> None:
         override = self.write_runtime("override-runtime", ["validate-governance"])
         path_runtime = self.write_runtime("path-runtime", ["validate-governance"])
@@ -48,6 +54,10 @@ class RuntimeDiscoveryTests(LabWorkflowTestCase):
         self.assertEqual(resolution.status, "source-override")
         self.assertEqual(resolution.command, self.local_command("validate-governance"))
 
+    @unittest.skipIf(
+        os.name == "nt",
+        "fake installed runtime is a POSIX shebang script; PATH discovery and execution require POSIX",
+    )
     def test_compatible_installed_runtime_on_path_is_selected(self) -> None:
         runtime = self.write_runtime("project-harness-runtime", ["validate-governance"])
 
@@ -72,6 +82,10 @@ class RuntimeDiscoveryTests(LabWorkflowTestCase):
         self.assertEqual(resolution.status, "repo-local")
         self.assertEqual(resolution.command, self.local_command("validate-governance"))
 
+    @unittest.skipIf(
+        os.name == "nt",
+        "fake installed runtime is a POSIX shebang script; PATH discovery and execution require POSIX",
+    )
     def test_incompatible_installed_runtime_warns_and_falls_back_for_read_only_command(self) -> None:
         runtime = self.write_runtime("project-harness-runtime", ["validate-governance"], capability_version=99)
 
@@ -86,6 +100,10 @@ class RuntimeDiscoveryTests(LabWorkflowTestCase):
         self.assertEqual(resolution.command, self.local_command("validate-governance"))
         self.assertEqual(resolution.stderr, READ_ONLY_FALLBACK_WARNING)
 
+    @unittest.skipIf(
+        os.name == "nt",
+        "fake installed runtime is a POSIX shebang script; PATH discovery and execution require POSIX",
+    )
     def test_incompatible_installed_runtime_fails_closed_for_mutating_command(self) -> None:
         runtime = self.write_runtime("project-harness-runtime", ["sync-plugin-skills"], capability_version=99)
 
@@ -156,6 +174,4 @@ class RuntimeDiscoveryTests(LabWorkflowTestCase):
 
 
 if __name__ == "__main__":
-    import unittest
-
     unittest.main()

@@ -245,21 +245,17 @@ class TemplateValidationTests(LabWorkflowTestCase):
         )
 
     def test_validate_brainstorming_checks_note_metadata_matches_catalog(self) -> None:
-        note_path = self.repo / "notes/2026-05-07_note-0001-harness-runtime-versioning-and-binary-migration.md"
+        note_path = self.repo / "notes/2026-04-05_note-0001-example-research-note.md"
         note_path.write_text(
-            note_path.read_text(encoding="utf-8")
-            .replace("- Note ID: note-0001", "- Note ID: note-9999", 1)
-            .replace(
-                "- Title: Harness runtime versioning and binary migration",
-                "- Title: Wrong note title",
-                1,
-            )
-            .replace("- Date: 2026-05-07", "- Date: 2026-05-08", 1)
-            .replace(
-                "- Tags: harness,versioning,binary,rust,external-adapters,public-template",
-                "- Tags: wrong-tag",
-                1,
-            ),
+            "# Research Note\n\n## Metadata\n\n- Note ID: note-9999\n- Title: Wrong note title\n"
+            "- Date: 2026-04-06\n- Related Idea ID: n/a\n- Source Context: example discussion\n- Tags: wrong-tag\n",
+            encoding="utf-8",
+        )
+        catalog_path = self.repo / "NOTES_CATALOG.md"
+        catalog_path.write_text(
+            catalog_path.read_text(encoding="utf-8")
+            + "| note-0001 | Example research note | 2026-04-05 | n/a | example discussion "
+            "| `notes/2026-04-05_note-0001-example-research-note.md` | example,research |\n",
             encoding="utf-8",
         )
 
@@ -269,7 +265,7 @@ class TemplateValidationTests(LabWorkflowTestCase):
         self.assertIn("Note metadata mismatch for 'note-0001'", result.stdout)
         self.assertIn("Note ID is 'note-9999', expected 'note-0001'", result.stdout)
         self.assertIn("Title is 'Wrong note title'", result.stdout)
-        self.assertIn("Date is '2026-05-08', expected '2026-05-07'", result.stdout)
+        self.assertIn("Date is '2026-04-06', expected '2026-04-05'", result.stdout)
         self.assertIn("Tags is 'wrong-tag'", result.stdout)
 
     def test_validate_brainstorming_checks_python_file_size(self) -> None:

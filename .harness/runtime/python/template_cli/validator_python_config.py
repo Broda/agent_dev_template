@@ -6,20 +6,17 @@ from template_cli.io_helpers import ValidationResult, read_text
 
 PYPROJECT_PATH = "pyproject.toml"
 REQUIRED_SECTIONS = [
-    "[tool.black]",
-    "[tool.isort]",
     "[tool.ruff]",
     "[tool.ruff.lint]",
     "[tool.ruff.lint.isort]",
+    "[tool.mypy]",
 ]
 REQUIRED_SNIPPETS = [
     "line-length = 120",
-    'target-version = ["py312"]',
     'target-version = "py312"',
-    'profile = "black"',
-    'known_first_party = ["template_cli"]',
     'known-first-party = ["template_cli"]',
     'select = ["E", "F", "I", "UP", "B"]',
+    'python_version = "3.12"',
 ]
 
 

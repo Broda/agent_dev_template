@@ -46,7 +46,7 @@ def resolve_runtime(
         override_path = Path(override)
         if override_path.is_dir():
             return _source_checkout_resolution(override_path, backend_command)
-        runtime_path = override
+        runtime_path: str | None = override
     else:
         runtime_path = shutil.which(RUNTIME_COMMAND, path=runtime_env.get("PATH"))
 

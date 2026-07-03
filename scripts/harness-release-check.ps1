@@ -13,6 +13,11 @@ if (Get-Command py -ErrorAction SilentlyContinue) {
     exit $LASTEXITCODE
 }
 
+if (Get-Command python3 -ErrorAction SilentlyContinue) {
+    & python3 "$scriptDir/../.harness/runtime/python/cli.py" harness-release-check @Args
+    exit $LASTEXITCODE
+}
+
 if (Get-Command python -ErrorAction SilentlyContinue) {
     & python "$scriptDir/../.harness/runtime/python/cli.py" harness-release-check @Args
     exit $LASTEXITCODE

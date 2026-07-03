@@ -7,6 +7,21 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+
+$rootArgs = @()
+if ($Args.Count -gt 0 -and $Args[0] -eq '--root') {
+    if ($Args.Count -lt 2 -or [string]::IsNullOrWhiteSpace($Args[1])) {
+        [Console]::Error.WriteLine('--root requires a path')
+        exit 2
+    }
+    $rootArgs = @('--root', $Args[1])
+    if ($Args.Count -gt 2) {
+        $Args = $Args[2..($Args.Count - 1)]
+    } else {
+        $Args = @()
+    }
+}
+
 $subcommand = ''
 if ($Args.Count -gt 0) {
     $subcommand = $Args[0]
@@ -52,12 +67,17 @@ if ($Args.Count -gt 1) {
 }
 
 if (Get-Command py -ErrorAction SilentlyContinue) {
-    & py -3 "$scriptDir/../.harness/runtime/python/cli.py" ("lab-" + $subcommand) @remaining
+    & py -3 "$scriptDir/../.harness/runtime/python/cli.py" ("lab-" + $subcommand) @rootArgs @remaining
+    exit $LASTEXITCODE
+}
+
+if (Get-Command python3 -ErrorAction SilentlyContinue) {
+    & python3 "$scriptDir/../.harness/runtime/python/cli.py" ("lab-" + $subcommand) @rootArgs @remaining
     exit $LASTEXITCODE
 }
 
 if (Get-Command python -ErrorAction SilentlyContinue) {
-    & python "$scriptDir/../.harness/runtime/python/cli.py" ("lab-" + $subcommand) @remaining
+    & python "$scriptDir/../.harness/runtime/python/cli.py" ("lab-" + $subcommand) @rootArgs @remaining
     exit $LASTEXITCODE
 }
 

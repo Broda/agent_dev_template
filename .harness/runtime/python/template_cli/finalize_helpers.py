@@ -5,9 +5,8 @@ import re
 import sys
 from pathlib import Path
 
-from template_cli.io_helpers import read_text, write_text
+from template_cli.io_helpers import STATE_FILE, read_text, write_text
 
-STATE_FILE = "state/project-init.json"
 STATE_SCHEMA_VERSION = 2
 
 

@@ -5,6 +5,7 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
+STATE_FILE = "state/project-init.json"
 NOTE_ID_RE = re.compile(r"^note-\d{4}$")
 NOTE_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 IDEA_ROW_RE = re.compile(r"^\|\s*idea-[a-z0-9-]+")
@@ -30,7 +31,8 @@ def read_text(path: Path) -> str:
 
 
 def write_text(path: Path, content: str) -> None:
-    path.write_text(content, encoding="utf-8")
+    # newline="\n" keeps generated files LF on every platform, matching .gitattributes/.editorconfig.
+    path.write_text(content, encoding="utf-8", newline="\n")
 
 
 def replace_literal(content: str, old: str, new: str) -> str:
@@ -47,14 +49,22 @@ def read_mode(root: Path) -> str:
     return ""
 
 
-def parse_markdown_table_rows(path: Path, pattern: re.Pattern[str]) -> list[list[str]]:
+def split_table_row(line: str, width: int = 0) -> list[str]:
+    """Split a markdown table row into trimmed cells, right-padded with "" to `width`."""
+    cells = [cell.strip() for cell in line.split("|")[1:-1]]
+    while len(cells) < width:
+        cells.append("")
+    return cells
+
+
+def parse_markdown_table_rows(path: Path, pattern: re.Pattern[str], width: int = 0) -> list[list[str]]:
     if not path.exists():
         return []
 
     rows: list[list[str]] = []
     for line in read_text(path).splitlines():
         if pattern.search(line):
-            rows.append([cell.strip() for cell in line.split("|")[1:-1]])
+            rows.append(split_table_row(line, width))
     return rows
 
 

@@ -5,11 +5,10 @@ import re
 import shutil
 from pathlib import Path
 
-from template_cli.io_helpers import ValidationResult, read_text, replace_literal, write_text
+from template_cli.io_helpers import STATE_FILE, ValidationResult, read_text, replace_literal, write_text
 from template_cli.state_schema import validate_project_state_data
 
 MILESTONE_NAME = "Milestone 0 — Foundation"
-STATE_FILE = "state/project-init.json"
 DEFAULT_CI_POLICY = (
     "Generated GitHub Actions CI is included as a baseline guardrail; local build, "
     "test, and manual verification remain authoritative."
