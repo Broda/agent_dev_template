@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import json
 import shutil
 import subprocess
 import sys
+import tarfile
 import tempfile
 from collections.abc import Sequence
 from pathlib import Path
@@ -29,6 +31,7 @@ def run_harness_release_check(root: Path) -> int:
         ("Run full unit suite", _check_full_unit_suite),
         ("Run plugin package smoke", _check_plugin_package),
         ("Run fresh copy smoke", _check_fresh_copy),
+        ("Run source archive executable-mode smoke", _check_source_archive_modes),
         ("Run finalize and render fixture smoke", _check_finalize_render_fixtures),
         ("Run update dry-run and apply smoke", _check_update_smoke),
     ]
@@ -102,6 +105,34 @@ def _check_fresh_copy(root: Path) -> int:
         if result != 0:
             return result
         return _run(["./scripts/validate-governance"], target)
+
+
+def _check_source_archive_modes(root: Path) -> int:
+    with tempfile.TemporaryDirectory(prefix="harness-release-archive.") as tmpdir:
+        base = Path(tmpdir)
+        target = base / "harness-smoke"
+        result = _run(["./scripts/project-harness", "new", target.as_posix()], root)
+        if result != 0:
+            return result
+        manifest = json.loads((target / ".harness/commands/harness_manifest.json").read_text(encoding="utf-8"))
+        executable_paths = manifest["posixExecutablePaths"]
+        archive = base / "harness-smoke.tar"
+        result = _run(
+            ["git", "-c", "tar.umask=0022", "archive", "--format=tar", f"--output={archive}", "HEAD"],
+            target,
+        )
+        if result != 0:
+            return result
+        with tarfile.open(archive) as package:
+            members = {member.name: member for member in package.getmembers()}
+        failures = [path for path in executable_paths if path not in members or members[path].mode != 0o755]
+        if failures:
+            print("Source archive contains POSIX launchers without mode 100755:")
+            for path in failures:
+                print(f"- {path}")
+            return 1
+        print(f"Source archive preserves mode 100755 for {len(executable_paths)} POSIX launchers.")
+        return 0
 
 
 def _check_finalize_render_fixtures(root: Path) -> int:

@@ -159,7 +159,7 @@ class ProjectHarnessUpdateTests(ProjectHarnessUpdateTestCase):
         )
 
         self.assertIn("Project harness update dry run", result.stdout)
-        self.assertIn(f"Target harness: 0.1.0 ({target_commit})", result.stdout)
+        self.assertIn(f"Target harness: 0.1.1 ({target_commit})", result.stdout)
         self.assertIn("Target source worktree: clean", result.stdout)
         self.assertIn("Recorded source baseline: resolved", result.stdout)
         self.assertIn("scripts/lab.sh", result.stdout)

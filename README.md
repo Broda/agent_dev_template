@@ -131,7 +131,9 @@ compatibility contract a generated project expects. It includes the manifest
 schema version, harness release version, template repository URL, source commit
 provenance, supported modes, stable wrapper entrypoints, the expected
 `state/project-init.json` schema version and schema file path, and artifact
-ownership classes for conservative update dry-run and apply tooling.
+ownership classes for conservative update dry-run and apply tooling. The
+`posixExecutablePaths` inventory is the distribution contract for launchers that
+must remain mode `100755` in generated repositories and source archives.
 
 In the template repository, `sourceCommitType` is `template`. When
 `./scripts/project-harness new` creates a project from a Git checkout, it stamps
@@ -314,7 +316,7 @@ Repo-scoped skills are canonical for this template because they can reference
 local state, scripts, validators, and governance docs directly. The
 `.harness/plugins/project-lifecycle-lab/` package is an optional distribution mirror for
 portable agent behavior; it must not replace repo-local runtime state or
-validation. The current harness and plugin version is `0.1.0`; keep the plugin
+validation. The current harness and plugin version is `0.1.1`; keep the plugin
 version aligned with the harness version and use
 `.harness/plugins/project-lifecycle-lab/README.md` for the external smoke-check steps.
 

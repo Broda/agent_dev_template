@@ -2,13 +2,13 @@
 set -euo pipefail
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-root_arg=()
+root=""
 if [[ "${1:-}" == "--root" ]]; then
   if [[ -z "${2:-}" ]]; then
     echo "--root requires a path" >&2
     exit 2
   fi
-  root_arg=("--root" "$2")
+  root="$2"
   shift 2
 fi
 subcommand="${1:-}"
@@ -49,12 +49,16 @@ fi
 
 shift
 
+if [[ -n "$root" ]]; then
+  set -- "--root" "$root" "$@"
+fi
+
 if command -v python3 >/dev/null 2>&1; then
-  exec python3 "$script_dir/../.harness/runtime/python/cli.py" "lab-$subcommand" "${root_arg[@]}" "$@"
+  exec python3 "$script_dir/../.harness/runtime/python/cli.py" "lab-$subcommand" "$@"
 fi
 
 if command -v python >/dev/null 2>&1; then
-  exec python "$script_dir/../.harness/runtime/python/cli.py" "lab-$subcommand" "${root_arg[@]}" "$@"
+  exec python "$script_dir/../.harness/runtime/python/cli.py" "lab-$subcommand" "$@"
 fi
 
 echo "Error: Python 3 is required but was not found." >&2

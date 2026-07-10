@@ -12,6 +12,10 @@ release. It applies to this template repository, not to generated projects.
 - [ ] `ruff check .` or `python3 -m ruff check .`
 - [ ] `ruff format --check .` or `python3 -m ruff format --check .`
 - [ ] `python3 -m unittest discover -s .harness/tests -v`
+- [ ] Every path in manifest `posixExecutablePaths` is mode `100755` in the
+      working tree, Git index, a fresh generated repository, and its Git archive.
+      Build release tar archives with `git -c tar.umask=0022 archive ...`; Git's
+      default archive mask may otherwise emit executable entries as `0775`.
 - [ ] Fresh copy validates:
 
 ```sh
@@ -67,6 +71,8 @@ python3 -m unittest discover -s .harness/tests -p "test_development_rendering.py
 - [ ] `./scripts/sync-plugin-skills` produces no uncommitted diff.
 - [ ] Generated command docs still match `.harness/commands/intent_registry.json`.
 - [ ] Plugin mirrors still match `.agents/skills/`.
+- [ ] Plugin cache/reinstall review confirms the skills-only package does not
+      replace repo-local launcher files or their manifest-backed mode contract.
 
 ## Public Template Review
 

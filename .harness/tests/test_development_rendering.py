@@ -30,7 +30,7 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
         "CHANGELOG.md": "6b0e43176413e4e809d46f89b5da23c3976050f6c2dc22a774852399963f09a3",
         ".gitignore": "8ed32c34caaa326b71d25ce9835819a720ec3c2a91585b53bf22c75d0bbea2fe",
         ".github/workflows/ci.yml": "906f2350397192fad881369ec876626aa8c76f3bf0343d8c0094dfe3545c2287",
-        "docs/PROJECT_CONTEXT.md": "78d3bed621fc48cdbf01edaf52dfceba1bf23d06b6b7d2d185db2fdd4bf9b6a1",
+        "docs/PROJECT_CONTEXT.md": "b570c7599f1291ad4895af757c6237204e1785be84dab0a51421628ee2086844",
         "docs/ROADMAP.md": "df15c13faef4234a6a77de7d6bbf50e0cb639afbd14611afb7aec43e4149427a",
         "docs/ARCHITECTURE.md": "a6b49978352cefcdff1c9ece45b705bc557bf3d12b6a1edc551e04af97bd254d",
         "docs/FILE_MAP.md": "7098cf4ce0d6ec3387972ad897e8462f0dd50357253222611e85a6ef7d6ea4bc",
@@ -55,6 +55,9 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
         self.assertIn("Render development docs from a finalized canonical state fixture.", readme)
         self.assertIn("Development-mode rendering needs a stable, reusable finalized-state fixture.", project_context)
         self.assertIn("Rendered docs drift from the state schema or validation contract.", project_context)
+        self.assertIn("- Active Milestone: Milestone 0 — Foundation", readme)
+        self.assertIn("Active Milestone: Milestone 0 — Foundation", project_context)
+        self.assertTrue(all(line.startswith("- [") for line in roadmap.splitlines() if "[ ]" in line))
         self.assertIn("./scripts/validate-development", roadmap)
         self.assertNotIn("python3 -m unittest discover -s .harness/tests -v", ci)
         self.assertIn(

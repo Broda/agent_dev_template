@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import json
 import os
 import shutil
+import stat
+import tarfile
 import unittest
 
 from workflow_test_helpers import LabWorkflowTestCase, run_cmd
@@ -53,6 +56,62 @@ class ProjectHarnessBootstrapTests(LabWorkflowTestCase):
         self.assertIn("Git was not initialized because --no-git was supplied.", result.stdout)
         self.assertFalse((target / ".git").exists())
         run_cmd(["./scripts/validate-governance"], cwd=target)
+
+    @unittest.skipIf(os.name == "nt", "POSIX file modes are not represented by the Windows filesystem")
+    def test_project_harness_new_normalizes_all_posix_launcher_modes(self) -> None:
+        target = self.tmpdir / "mode-project"
+
+        run_cmd(["./scripts/project-harness", "new", str(target), "--no-git"], cwd=self.repo)
+        manifest = json.loads((target / ".harness/commands/harness_manifest.json").read_text(encoding="utf-8"))
+
+        for relative_path in manifest["posixExecutablePaths"]:
+            with self.subTest(relative_path=relative_path):
+                self.assertEqual(stat.S_IMODE((target / relative_path).stat().st_mode), 0o755)
+
+    @unittest.skipIf(os.name == "nt", "POSIX file modes are not represented by the Windows filesystem")
+    def test_project_harness_new_repairs_mode_loss_in_source_copy(self) -> None:
+        manifest = json.loads((self.repo / ".harness/commands/harness_manifest.json").read_text(encoding="utf-8"))
+        for relative_path in manifest["posixExecutablePaths"]:
+            (self.repo / relative_path).chmod(0o644)
+        target = self.tmpdir / "repaired-project"
+
+        run_cmd(
+            [
+                "python3",
+                ".harness/runtime/python/cli.py",
+                "project-harness-new",
+                str(target),
+                "--no-git",
+            ],
+            cwd=self.repo,
+        )
+
+        for relative_path in manifest["posixExecutablePaths"]:
+            with self.subTest(relative_path=relative_path):
+                self.assertEqual(stat.S_IMODE((target / relative_path).stat().st_mode), 0o755)
+
+    def test_generated_git_archive_preserves_posix_launcher_modes(self) -> None:
+        target = self.tmpdir / "archive-project"
+        archive = self.tmpdir / "archive-project.tar"
+        run_cmd(["./scripts/project-harness", "new", str(target)], cwd=self.repo)
+        manifest = json.loads((target / ".harness/commands/harness_manifest.json").read_text(encoding="utf-8"))
+
+        index = run_cmd(
+            ["git", "ls-files", "--stage", "--", *manifest["posixExecutablePaths"]],
+            cwd=target,
+        )
+        run_cmd(
+            ["git", "-c", "tar.umask=0022", "archive", "--format=tar", f"--output={archive}", "HEAD"],
+            cwd=target,
+        )
+        with tarfile.open(archive) as package:
+            members = {member.name: member for member in package.getmembers()}
+
+        self.assertEqual(len(index.stdout.splitlines()), len(manifest["posixExecutablePaths"]))
+        self.assertTrue(all(line.startswith("100755 ") for line in index.stdout.splitlines()))
+        for relative_path in manifest["posixExecutablePaths"]:
+            with self.subTest(relative_path=relative_path):
+                self.assertEqual(members[relative_path].mode, 0o755)
 
     @unittest.skipUnless(
         os.name == "nt" or shutil.which("pwsh") or shutil.which("powershell"),

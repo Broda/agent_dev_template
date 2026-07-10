@@ -1,12 +1,36 @@
 from __future__ import annotations
 
 import json
+import os
+import stat
+import unittest
 
 from project_harness_update_helpers import ProjectHarnessUpdateTestCase
 from workflow_test_helpers import run_cmd
 
 
 class ProjectHarnessUpdateApplyTests(ProjectHarnessUpdateTestCase):
+    @unittest.skipIf(os.name == "nt", "POSIX file modes are not represented by the Windows filesystem")
+    def test_update_apply_repairs_mode_only_drift_from_degraded_source_copy(self) -> None:
+        source = self.copy_source()
+        self.init_git_source(source)
+        project = self.tmpdir / "generated-project"
+        run_cmd(["./scripts/project-harness", "new", str(project), "--no-git"], cwd=source)
+        manifest = json.loads((project / ".harness/commands/harness_manifest.json").read_text(encoding="utf-8"))
+        for relative_path in manifest["posixExecutablePaths"]:
+            (source / relative_path).chmod(0o644)
+            (project / relative_path).chmod(0o644)
+        backend = ["python3", ".harness/runtime/python/cli.py", "project-harness-update"]
+
+        dry_run = run_cmd([*backend, "--dry-run", "--source-path", str(source)], cwd=project)
+        result = run_cmd([*backend, "--apply", "--source-path", str(source), "--yes"], cwd=project)
+
+        self.assertIn("scripts/lab", dry_run.stdout)
+        self.assertIn("Applied harness update.", result.stdout)
+        for relative_path in manifest["posixExecutablePaths"]:
+            with self.subTest(relative_path=relative_path):
+                self.assertEqual(stat.S_IMODE((project / relative_path).stat().st_mode), 0o755)
+
     def test_update_apply_requires_yes_confirmation(self) -> None:
         source = self.copy_source()
         self.init_git_source(source)

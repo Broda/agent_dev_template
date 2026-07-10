@@ -56,6 +56,29 @@ class DevelopmentEvidenceTests(LabWorkflowTestCase):
         self.assertIn("- [ ] Manual smoke test complete", roadmap)
         self.assertIn("  - Evidence: `./scripts/validate-development` -> not run yet", roadmap)
 
+    def test_lab_evidence_accepts_all_commonmark_checkbox_bullets(self) -> None:
+        self.write_render_fixture()
+        run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
+        roadmap_path = self.repo / "docs/ROADMAP.md"
+
+        for marker in ["-", "*", "+"]:
+            with self.subTest(marker=marker):
+                roadmap_path.write_text(f"# Milestone\n\n{marker} [ ] Marker task\n", encoding="utf-8")
+                run_cmd(
+                    [
+                        "./scripts/lab",
+                        "evidence",
+                        "--task",
+                        "Marker task",
+                        "--command",
+                        "true",
+                        "--result",
+                        "pass",
+                    ],
+                    cwd=self.repo,
+                )
+                self.assertIn(f"{marker} [x] Marker task", roadmap_path.read_text(encoding="utf-8"))
+
 
 if __name__ == "__main__":
     import unittest

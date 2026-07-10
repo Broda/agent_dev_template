@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import shutil
 import unittest
 
@@ -36,6 +37,25 @@ class LabLauncherTests(LabWorkflowTestCase):
 
         self.assertEqual(result.returncode, 2)
         self.assertIn("--root requires a path", result.stdout + result.stderr)
+
+    @unittest.skipIf(os.name == "nt", "POSIX shell regression")
+    def test_posix_wrappers_run_without_optional_root_under_bash_3_2(self) -> None:
+        # /bin/bash is 3.2 on macOS, which errors on empty-array expansion under
+        # `set -u`; system bash is preferred so that regression stays exercised.
+        bash = "/bin/bash" if os.path.exists("/bin/bash") else shutil.which("bash")
+        assert bash is not None
+
+        lab_result = run_cmd([bash, "scripts/lab.sh", "status"], cwd=self.repo)
+        harness_result = run_cmd([bash, "scripts/project-harness.sh", "validate"], cwd=self.repo)
+
+        self.assertIn("Mode: brainstorming", lab_result.stdout)
+        self.assertIn("Running: ./scripts/validate-governance", harness_result.stdout)
+
+    def test_posix_wrappers_do_not_declare_empty_arrays(self) -> None:
+        for relative_path in ["scripts/lab.sh", "scripts/project-harness.sh"]:
+            with self.subTest(relative_path=relative_path):
+                text = (self.repo / relative_path).read_text(encoding="utf-8")
+                self.assertNotIn("=()", text)
 
     def test_finalize_project_help_reaches_argparse(self) -> None:
         result = run_cmd(["./scripts/finalize-project", "--help"], cwd=self.repo)

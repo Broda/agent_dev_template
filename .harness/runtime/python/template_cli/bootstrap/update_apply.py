@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
 import sys
@@ -9,6 +10,11 @@ from pathlib import Path
 from template_cli.bootstrap.update_plan import _build_update_plan
 from template_cli.bootstrap.update_source import UpdateSource, source_worktree_state
 from template_cli.io_helpers import read_mode
+from template_cli.posix_modes import (
+    ensure_posix_executable_modes,
+    manifest_posix_executable_paths,
+    stage_posix_executable_modes,
+)
 from template_cli.validator_manifest import stamp_harness_manifest
 
 
@@ -49,6 +55,13 @@ def _apply_update_source(root: Path, source: UpdateSource, *, yes: bool, include
             current_path.unlink()
         else:
             _copy_source_file(source.root / relative_path, current_path)
+    executable_paths = manifest_posix_executable_paths(source.target_manifest)
+    ensure_posix_executable_modes(root, executable_paths)
+    if os.name == "nt" and (root / ".git").exists():
+        # Windows working trees carry no POSIX mode bits, so chmod cannot reach
+        # the Git index; repair index-mode drift there directly. Best effort:
+        # a launcher missing from the index has nothing to restage.
+        stage_posix_executable_modes(root, executable_paths)
 
     hook_results: list[tuple[str, int]] = []
     if any(path.startswith(".agents/skills/") for path in update_paths):

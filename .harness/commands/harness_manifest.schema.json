@@ -14,6 +14,7 @@
     "compatibility",
     "supportedModes",
     "stableWrappers",
+    "posixExecutablePaths",
     "artifactInventory",
     "artifactInventoryExclusions",
     "artifactInventorySnapshotPolicy"
@@ -21,7 +22,7 @@
   "properties": {
     "schemaVersion": {
       "type": "integer",
-      "const": 1
+      "const": 2
     },
     "harnessVersion": {
       "type": "string",
@@ -79,6 +80,9 @@
         }
       },
       "minItems": 1
+    },
+    "posixExecutablePaths": {
+      "$ref": "#/$defs/pathList"
     },
     "artifactInventory": {
       "type": "object",

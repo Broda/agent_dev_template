@@ -17,7 +17,13 @@ from template_cli.external_idea import (
 )
 from template_cli.git_helpers import git_stdout
 from template_cli.io_helpers import read_mode, write_text
-from template_cli.validator_manifest import stamp_harness_manifest
+from template_cli.posix_modes import (
+    POSIX_EXECUTABLE_PATHS,
+    ensure_posix_executable_modes,
+    manifest_posix_executable_paths,
+    stage_posix_executable_modes,
+)
+from template_cli.validator_manifest import load_harness_manifest, stamp_harness_manifest
 from template_cli.workflow_idea_commands import import_external_idea
 
 COPY_IGNORE = shutil.ignore_patterns(
@@ -55,6 +61,8 @@ def run_project_harness_new(
     shutil.copytree(root, target_path, ignore=COPY_IGNORE)
     _write_brainstorming_mode(target_path)
     stamp_harness_manifest(target_path, root)
+    executable_paths = manifest_posix_executable_paths(load_harness_manifest(target_path)) or POSIX_EXECUTABLE_PATHS
+    ensure_posix_executable_modes(target_path, executable_paths)
 
     if origin and no_git:
         print("--origin cannot be used with --no-git.")
@@ -70,6 +78,9 @@ def run_project_harness_new(
         add_result = _run(["git", "add", "-A"], target_path)
         if add_result != 0:
             return add_result
+        mode_result = stage_posix_executable_modes(target_path, executable_paths)
+        if mode_result != 0:
+            return mode_result
         commit_result = _run(["git", "commit", "-m", "Initialize project harness"], target_path)
         if commit_result != 0:
             return commit_result
@@ -178,6 +189,10 @@ def run_project_harness_new_from_idea(
         add_result = _run_maybe_quiet(["git", "add", "-A"], target_path, quiet=json_output)
         if add_result != 0:
             return add_result
+        executable_paths = manifest_posix_executable_paths(load_harness_manifest(target_path)) or POSIX_EXECUTABLE_PATHS
+        mode_result = stage_posix_executable_modes(target_path, executable_paths)
+        if mode_result != 0:
+            return mode_result
         message = "Initialize project harness"
         if commit:
             message = f"brainstorm: import external idea {import_result.idea_id}"

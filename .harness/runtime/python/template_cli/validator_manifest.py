@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 from pathlib import Path
@@ -8,11 +9,12 @@ from typing import Any
 
 from template_cli.io_helpers import ValidationResult, read_text, write_text
 from template_cli.json_schema import validate_json_schema_file
+from template_cli.posix_modes import POSIX_EXECUTABLE_PATHS, git_index_mode, has_posix_executable_mode
 
 MANIFEST_PATH = ".harness/commands/harness_manifest.json"
 MANIFEST_SCHEMA_PATH = ".harness/commands/harness_manifest.schema.json"
-EXPECTED_SCHEMA_VERSION = 1
-EXPECTED_HARNESS_VERSION = "0.1.0"
+EXPECTED_SCHEMA_VERSION = 2
+EXPECTED_HARNESS_VERSION = "0.1.1"
 EXPECTED_TEMPLATE_REPOSITORY = "https://github.com/Broda/agent_dev_template"
 EXPECTED_COMPATIBILITY = {
     "wrapperRuntimeVersion": 1,
@@ -78,6 +80,7 @@ def validate_harness_manifest(root: Path, result: ValidationResult) -> None:
     _validate_top_level(manifest, result)
     _validate_compatibility(manifest, result)
     _validate_wrappers(root, manifest, result)
+    _validate_posix_executable_paths(root, manifest, result)
     _validate_inventory(manifest, result)
     _validate_snapshot_policy(manifest, result)
 
@@ -93,6 +96,7 @@ def _validate_top_level(manifest: dict[str, Any], result: ValidationResult) -> N
         "compatibility",
         "supportedModes",
         "stableWrappers",
+        "posixExecutablePaths",
         "artifactInventory",
         "artifactInventoryExclusions",
         "artifactInventorySnapshotPolicy",
@@ -102,9 +106,9 @@ def _validate_top_level(manifest: dict[str, Any], result: ValidationResult) -> N
         result.add_failure(f"Harness manifest missing required fields: {', '.join(missing)}")
 
     if manifest.get("schemaVersion") != EXPECTED_SCHEMA_VERSION:
-        result.add_failure("Harness manifest schemaVersion must be 1.")
+        result.add_failure("Harness manifest schemaVersion must be 2.")
     if manifest.get("harnessVersion") != EXPECTED_HARNESS_VERSION:
-        result.add_failure("Harness manifest harnessVersion must be 0.1.0.")
+        result.add_failure("Harness manifest harnessVersion must be 0.1.1.")
     if manifest.get("templateRepository") != EXPECTED_TEMPLATE_REPOSITORY:
         result.add_failure(f"Harness manifest templateRepository must be {EXPECTED_TEMPLATE_REPOSITORY}.")
     if manifest.get("supportedModes") != EXPECTED_MODES:
@@ -166,6 +170,23 @@ def _validate_wrappers(root: Path, manifest: dict[str, Any], result: ValidationR
     missing_expected_paths = sorted(set(EXPECTED_STABLE_WRAPPER_BACKENDS) - seen_paths)
     for path in missing_expected_paths:
         result.add_failure(f"Harness manifest missing stable wrapper entry: {path}")
+
+
+def _validate_posix_executable_paths(root: Path, manifest: dict[str, Any], result: ValidationResult) -> None:
+    paths = manifest.get("posixExecutablePaths")
+    if paths != POSIX_EXECUTABLE_PATHS:
+        result.add_failure("Harness manifest posixExecutablePaths must match the canonical POSIX launcher inventory.")
+        return
+    for relative_path in paths:
+        path = root / relative_path
+        if not path.is_file():
+            result.add_failure(f"Harness manifest POSIX executable path is missing: {relative_path}")
+            continue
+        if os.name != "nt" and not has_posix_executable_mode(path):
+            result.add_failure(f"POSIX launcher must have the owner execute bit set: {relative_path}")
+        index_mode = git_index_mode(root, relative_path)
+        if index_mode and index_mode != "100755":
+            result.add_failure(f"Git index must track POSIX launcher as mode 100755: {relative_path}")
 
 
 def _validate_inventory(manifest: dict[str, Any], result: ValidationResult) -> None:

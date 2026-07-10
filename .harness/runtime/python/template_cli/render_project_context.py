@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from template_cli.render_helpers import MILESTONE_NAME
+
 
 def _render_project_context(
     project_name: str,
@@ -180,4 +182,10 @@ No exceptions.
 
 ROADMAP.md is the execution map.
 It is not a scratchpad.
+
+---
+
+# 11. Current Active Milestone
+
+Active Milestone: {MILESTONE_NAME}
 """

@@ -179,6 +179,7 @@ Lean file registry for the Project Harness Template.
 | `.harness/runtime/python/template_cli/validator_python_config.py` | Python tool configuration validation helpers |
 | `.harness/runtime/python/template_cli/validator_skills.py` | Repo-scoped skill and skill metadata validation helpers |
 | `.harness/runtime/python/template_cli/plugin_sync.py` | Plugin skill mirror sync command implementation |
+| `.harness/runtime/python/template_cli/posix_modes.py` | Canonical POSIX launcher mode inventory plus generation, Git-index, and validation helpers |
 | `.harness/runtime/python/template_cli/intent_registry.py` | Intent registry loading, schema validation, and command lookup helpers |
 | `.harness/runtime/python/template_cli/intents.py` | Intent registry rendering and compatibility exports for generated intent-doc sync helpers |
 | `.harness/runtime/python/template_cli/lab_cli.py` | Compatibility exports for lab parser and dispatch wiring |

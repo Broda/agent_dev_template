@@ -30,6 +30,8 @@ def main(argv: list[str] | None = None) -> int:
 
     for skill_name in EXPECTED_SKILLS:
         _check_skill(plugin_root, skill_name, failures)
+    if (plugin_root / "scripts").exists():
+        failures.append("plugin package must not contain repo-local runtime scripts")
 
     if failures:
         print("Plugin package smoke check failed:")
@@ -76,6 +78,8 @@ def _check_skill(plugin_root: Path, skill_name: str, failures: list[str]) -> Non
             failures.append(f"skill UI metadata for {skill_name} missing {required}")
     if f"${skill_name}" not in metadata_text:
         failures.append(f"skill UI metadata for {skill_name} must reference ${skill_name}")
+    if skill_name == "template-maintenance" and "posixExecutablePaths" not in skill_text:
+        failures.append("template-maintenance skill must preserve the POSIX executable-mode contract")
 
 
 if __name__ == "__main__":

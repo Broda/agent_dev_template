@@ -17,6 +17,8 @@ DEVELOPMENT_GOVERNANCE_DOCS = [
     "docs/RUNTIME_VERIFICATION_REPORT.md",
     "docs/adr/ADR-0001-record-architecture-decisions.md",
 ]
+ACTIVE_MILESTONE_RE = re.compile(r"Active\s+Milestone\s*:\s*(.*)$", re.IGNORECASE)
+ROADMAP_TASK_RE = re.compile(r"(?m)^\s*[-*+]\s+\[([ xX])\]\s+")
 
 
 def _read_state(root: Path) -> dict:
@@ -35,19 +37,19 @@ def _development_active_milestone(root: Path) -> str:
     if project_context.exists():
         lines = read_text(project_context).splitlines()
         for index, line in enumerate(lines):
-            if line.strip() == "Active Milestone:":
+            match = ACTIVE_MILESTONE_RE.search(line)
+            if match and not match.group(1).strip():
                 for candidate in lines[index + 1 :]:
                     value = candidate.strip()
                     if value and not value.startswith("#"):
                         return value
-            match = re.search(r"Active Milestone:\s*(.+)$", line)
             if match and match.group(1).strip():
                 return match.group(1).strip()
 
     readme = root / "README.md"
     if readme.exists():
         for line in read_text(readme).splitlines():
-            match = re.search(r"Active Milestone:\s*(.+)$", line)
+            match = ACTIVE_MILESTONE_RE.search(line)
             if match and match.group(1).strip():
                 return match.group(1).strip()
 
@@ -64,8 +66,9 @@ def _roadmap_task_counts(root: Path) -> tuple[int, int]:
     if not roadmap.exists():
         return 0, 0
     content = read_text(roadmap)
-    completed = len(re.findall(r"(?m)^\s*-\s+\[[xX]\]\s+", content))
-    open_tasks = len(re.findall(r"(?m)^\s*-\s+\[\s\]\s+", content))
+    task_states = ROADMAP_TASK_RE.findall(content)
+    completed = sum(state.casefold() == "x" for state in task_states)
+    open_tasks = sum(state == " " for state in task_states)
     return open_tasks, completed
 
 

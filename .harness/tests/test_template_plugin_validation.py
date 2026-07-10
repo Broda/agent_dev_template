@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 
 from workflow_test_helpers import LabWorkflowTestCase, run_cmd
 
@@ -62,26 +63,26 @@ class TemplatePluginValidationTests(LabWorkflowTestCase):
     def test_validate_brainstorming_checks_plugin_version_matches_harness(self) -> None:
         manifest_path = self.repo / ".harness/plugins/project-lifecycle-lab/.codex-plugin/plugin.json"
         manifest_path.write_text(
-            manifest_path.read_text(encoding="utf-8").replace('"version": "0.1.0"', '"version": "9.9.9"', 1),
+            manifest_path.read_text(encoding="utf-8").replace('"version": "0.1.1"', '"version": "9.9.9"', 1),
             encoding="utf-8",
         )
 
         result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
 
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("Plugin manifest version must match harnessVersion 0.1.0", result.stdout)
+        self.assertIn("Plugin manifest version must match harnessVersion 0.1.1", result.stdout)
 
     def test_validate_brainstorming_checks_plugin_marketplace_version(self) -> None:
         marketplace_path = self.repo / ".agents/plugins/marketplace.json"
         marketplace_path.write_text(
-            marketplace_path.read_text(encoding="utf-8").replace('"version": "0.1.0"', '"version": "9.9.9"', 1),
+            marketplace_path.read_text(encoding="utf-8").replace('"version": "0.1.1"', '"version": "9.9.9"', 1),
             encoding="utf-8",
         )
 
         result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
 
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("Plugin marketplace version must match harnessVersion 0.1.0", result.stdout)
+        self.assertIn("Plugin marketplace version must match harnessVersion 0.1.1", result.stdout)
 
     def test_validate_brainstorming_checks_plugin_public_author_metadata(self) -> None:
         manifest_path = self.repo / ".harness/plugins/project-lifecycle-lab/.codex-plugin/plugin.json"
@@ -143,6 +144,20 @@ class TemplatePluginValidationTests(LabWorkflowTestCase):
         self.assertIn("Plugin package smoke check passed.", result.stdout)
         self.assertIn("brainstorming-lab", result.stdout)
         self.assertIn("template-maintenance", result.stdout)
+
+    def test_cached_plugin_copy_preserves_packaging_contract(self) -> None:
+        source = self.repo / ".harness/plugins/project-lifecycle-lab"
+        cached = self.tmpdir / "plugin-cache/project-lifecycle-lab"
+        shutil.copytree(source, cached)
+
+        result = run_cmd(["python3", "smoke_package.py"], cwd=cached)
+
+        self.assertIn("Plugin package smoke check passed.", result.stdout)
+        self.assertFalse((cached / "scripts").exists())
+        self.assertIn(
+            "posixExecutablePaths",
+            (cached / "skills/template-maintenance/SKILL.md").read_text(encoding="utf-8"),
+        )
 
     def test_validate_brainstorming_checks_plugin_skills_path(self) -> None:
         manifest_path = self.repo / ".harness/plugins/project-lifecycle-lab/.codex-plugin/plugin.json"

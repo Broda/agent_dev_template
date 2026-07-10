@@ -2,13 +2,13 @@
 set -euo pipefail
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-template_root_arg=()
+template_root=""
 if [[ "${1:-}" == "--template-root" ]]; then
   if [[ -z "${2:-}" ]]; then
     echo "--template-root requires a path" >&2
     exit 2
   fi
-  template_root_arg=("--template-root" "$2")
+  template_root="$2"
   shift 2
 fi
 subcommand="${1:-}"
@@ -54,12 +54,16 @@ case "$subcommand" in
     ;;
 esac
 
+if [[ -n "$template_root" ]]; then
+  set -- "--template-root" "$template_root" "$@"
+fi
+
 if command -v python3 >/dev/null 2>&1; then
-  exec python3 "$script_dir/../.harness/runtime/python/cli.py" "$cli_command" "${template_root_arg[@]}" "$@"
+  exec python3 "$script_dir/../.harness/runtime/python/cli.py" "$cli_command" "$@"
 fi
 
 if command -v python >/dev/null 2>&1; then
-  exec python "$script_dir/../.harness/runtime/python/cli.py" "$cli_command" "${template_root_arg[@]}" "$@"
+  exec python "$script_dir/../.harness/runtime/python/cli.py" "$cli_command" "$@"
 fi
 
 echo "Error: Python 3 is required but was not found." >&2

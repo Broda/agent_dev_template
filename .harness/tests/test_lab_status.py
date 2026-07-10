@@ -61,6 +61,53 @@ class LabStatusTests(LabWorkflowTestCase):
         self.assertEqual(status["ideaId"], "idea-render-fixture")
         self.assertEqual(status["governanceDocs"]["presentCount"], status["governanceDocs"]["totalCount"])
 
+    def test_development_status_accepts_milestone_case_and_commonmark_checkbox_bullets(self) -> None:
+        self.write_render_fixture()
+        run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
+        (self.repo / "docs/ROADMAP.md").write_text(
+            "# Milestone Compatibility\n\n"
+            "- [ ] Dash open\n- [x] Dash complete\n"
+            "* [ ] Star open\n* [X] Star complete\n"
+            "+ [ ] Plus open\n+ [x] Plus complete\n",
+            encoding="utf-8",
+        )
+        project_context = self.repo / "docs/PROJECT_CONTEXT.md"
+
+        for label in ["Active Milestone", "Active milestone", "active milestone"]:
+            with self.subTest(label=label):
+                project_context.write_text(f"# Context\n\n{label}: Milestone Compatibility\n", encoding="utf-8")
+                result = run_cmd(["./scripts/lab", "status", "--json"], cwd=self.repo)
+                status = json.loads(result.stdout)
+                self.assertEqual(status["activeMilestone"], "Milestone Compatibility")
+                self.assertEqual(status["roadmapTasks"], {"open": 3, "complete": 3})
+
+    def test_fresh_development_fixture_supports_advertised_validation_and_evidence_commands(self) -> None:
+        self.write_render_fixture()
+        run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
+
+        commands = [
+            ["./scripts/lab", "status"],
+            ["./scripts/lab", "audit"],
+            [
+                "./scripts/lab",
+                "evidence",
+                "--task",
+                "Tests pass",
+                "--command",
+                "python3 -m unittest",
+                "--result",
+                "pass",
+            ],
+            ["./scripts/validate-governance"],
+            ["./scripts/validate-development"],
+            ["./scripts/project-harness", "validate"],
+        ]
+        results = [run_cmd(command, cwd=self.repo) for command in commands]
+
+        self.assertIn("Mode: development", results[0].stdout)
+        self.assertIn("Recorded evidence for roadmap task: Tests pass", results[2].stdout)
+        self.assertIn("Running: ./scripts/validate-development", results[-1].stdout)
+
     def test_lab_status_reports_ready_target_context(self) -> None:
         self.write_finalize_fixture("idea-status-ready")
         result = run_cmd(["./scripts/lab", "status"], cwd=self.repo)

@@ -3,7 +3,7 @@
 This plugin packages reusable Codex operating knowledge for project harness templates.
 
 The plugin is intentionally not the project runtime. Canonical project state, deterministic scripts, validators, generated development docs, and local workflow history stay in the harness repository.
-Current plugin version: `0.1.0`.
+Current plugin version: `0.1.1`.
 
 ## Packaging Decision
 
@@ -15,6 +15,9 @@ Current plugin version: `0.1.0`.
 - `./scripts/sync-plugin-skills` is the maintenance path for refreshing plugin mirrors.
 - `./scripts/validate-governance` validates manifest shape, marketplace registration, mirror drift, and the harness/plugin boundary wording.
 - The plugin `version` stays aligned with `.harness/commands/harness_manifest.json` `harnessVersion`.
+- Cached or reinstalled plugin copies contain skill mirrors only. Repo launcher
+  modes are carried by the harness manifest, generation/update tooling, and
+  release archive checks rather than by the plugin package.
 
 ADR-0003 records the plugin mirror ownership decision. Generated plugin mirrors are deliberately deferred. Copied mirrors are simpler to inspect in a public template, and drift validation keeps the package honest until there is a stronger reason to generate plugin artifacts.
 

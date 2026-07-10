@@ -3,6 +3,7 @@ from __future__ import annotations
 import subprocess
 from pathlib import Path
 
+from template_cli.posix_modes import has_posix_executable_mode, manifest_posix_executable_paths
 from template_cli.validator_manifest import MANIFEST_PATH
 
 DRY_RUN_EXCLUDE_DIRS = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", ".venv", "node_modules"}
@@ -30,6 +31,7 @@ def _build_update_plan(
     baseline_commit = str(current_manifest.get("sourceCommit", "")).strip()
     baseline_files = _baseline_candidate_files(source_root, baseline_commit)
     baseline_available = baseline_files is not None
+    executable_paths = set(manifest_posix_executable_paths(target_manifest))
     all_files = sorted(current_files | source_files | (baseline_files or set()))
     for relative_path in all_files:
         if relative_path == MANIFEST_PATH:
@@ -58,7 +60,7 @@ def _build_update_plan(
             continue
         if not current_exists or not source_exists:
             continue
-        if _same_file(current_path, source_path):
+        if _same_file(current_path, source_path, require_executable=relative_path in executable_paths):
             categories["unchanged"].append(relative_path)
             continue
 
@@ -141,9 +143,11 @@ def _matches_inventory_entry(relative_path: str, entry: str) -> bool:
     return relative_path == entry
 
 
-def _same_file(left: Path, right: Path) -> bool:
+def _same_file(left: Path, right: Path, *, require_executable: bool = False) -> bool:
     try:
-        return left.read_bytes() == right.read_bytes()
+        if left.read_bytes() != right.read_bytes():
+            return False
+        return not require_executable or has_posix_executable_mode(left)
     except OSError:
         return False
 

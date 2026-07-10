@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 1,
-  "harnessVersion": "0.1.0",
+  "schemaVersion": 2,
+  "harnessVersion": "0.1.1",
   "templateRepository": "https://github.com/Broda/agent_dev_template",
   "sourceCommit": "template-source",
   "sourceCommitType": "template",
@@ -44,6 +44,32 @@
       "path": "scripts/sync-plugin-skills",
       "backendCommand": "sync-plugin-skills"
     }
+  ],
+  "posixExecutablePaths": [
+    "scripts/finalize-project",
+    "scripts/finalize-project.sh",
+    "scripts/harness-release-check",
+    "scripts/harness-release-check.sh",
+    "scripts/lab",
+    "scripts/lab-note",
+    "scripts/lab-note.sh",
+    "scripts/lab-sync",
+    "scripts/lab-sync.sh",
+    "scripts/lab.sh",
+    "scripts/project-harness",
+    "scripts/project-harness.sh",
+    "scripts/render-development-docs",
+    "scripts/render-development-docs.sh",
+    "scripts/render-intent-docs",
+    "scripts/render-intent-docs.sh",
+    "scripts/sync-plugin-skills",
+    "scripts/sync-plugin-skills.sh",
+    "scripts/validate-brainstorming",
+    "scripts/validate-brainstorming.sh",
+    "scripts/validate-development",
+    "scripts/validate-development.sh",
+    "scripts/validate-governance",
+    "scripts/validate-governance.sh"
   ],
   "artifactInventory": {
     "harnessOwned": [

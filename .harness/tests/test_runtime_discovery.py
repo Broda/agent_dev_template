@@ -139,16 +139,20 @@ class RuntimeDiscoveryTests(LabWorkflowTestCase):
         name: str,
         supported_commands: list[str],
         *,
-        capability_version: int = 1,
+        capability_version: int | None = None,
     ) -> Path:
         runtime = self.tmpdir / name
+        manifest = json.loads(
+            (self.repo / ".harness/commands/harness_manifest.json").read_text(encoding="utf-8")
+        )
+        compatibility = manifest["compatibility"]
         version = {
-            "runtimeVersion": "0.1.0",
+            "runtimeVersion": manifest["harnessVersion"],
             "pythonPackage": "project_harness_runtime",
             "pythonVersion": "3.12",
-            "wrapperRuntimeVersion": 1,
-            "capabilityVersion": capability_version,
-            "stateSchemaVersion": 2,
+            "wrapperRuntimeVersion": compatibility["wrapperRuntimeVersion"],
+            "capabilityVersion": capability_version or compatibility["capabilityVersion"],
+            "stateSchemaVersion": compatibility["stateSchemaVersion"],
             "supportedBackendCommands": supported_commands,
         }
         runtime.write_text(

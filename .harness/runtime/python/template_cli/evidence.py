@@ -5,7 +5,7 @@ from pathlib import Path
 
 from template_cli.io_helpers import read_text, write_text
 
-TASK_RE = re.compile(r"^(\s*-\s+\[)([ xX])(\]\s+)(.+)$")
+TASK_RE = re.compile(r"^(\s*[-*+]\s+\[)([ xX])(\]\s+)(.+)$")
 
 
 def run_lab_evidence(

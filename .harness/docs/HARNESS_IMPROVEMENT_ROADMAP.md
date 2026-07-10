@@ -212,6 +212,8 @@ support.
 - [x] Add PowerShell smoke tests for `lab status --help`, `finalize-project
       --help`, and `validate-governance`.
 - [x] Add a macOS CI job only if platform-specific shell behavior appears.
+- [x] Cover macOS Bash 3.2 empty-argument forwarding, declare POSIX executable
+      modes in the manifest, and verify generated/update/archive mode retention.
 - [x] Keep Ubuntu as the full regression and governance baseline.
 - [x] Document any platform requirements, such as `py -3` versus `python`.
 
@@ -768,4 +770,3 @@ Exit criteria:
 - `./scripts/harness-release-check` passes.
 - Invalid payloads with `--json` return `{"ok": false, "code": ..., "error": ...}` and no traceback.
 - Public docs avoid private hostnames, private paths, and container-specific workspace-root assumptions.
-

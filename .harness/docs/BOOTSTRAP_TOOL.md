@@ -40,6 +40,8 @@ Current local interface:
 Behavior:
 
 - Copies the harness working tree to a new path.
+- Normalizes every declared POSIX launcher to mode `100755` and records that mode
+  in the initial Git index, including when the source copy lost local mode bits.
 - Refuses to overwrite an existing target.
 - Excludes local Git history and common cache/dependency directories.
 - Stamps `.harness/commands/harness_manifest.json` with the source checkout commit when available.
@@ -60,6 +62,7 @@ The manifest records:
 - wrapper/runtime compatibility versions
 - supported modes
 - stable wrapper entrypoints and their backend commands
+- POSIX launcher paths that must be distributed as mode `100755`
 - expected `state/project-init.json` schema version and schema file path
 - artifact ownership classes: harness-owned, project-owned, mixed/generated, and archival
 
@@ -114,7 +117,8 @@ changes, and removals by default, refuses conflicts, refuses mixed/generated
 paths unless `--include-mixed` is supplied, writes backups under
 `.harness-update-backups/`, runs generated-file hooks when relevant, validates
 before provenance stamping, then validates the stamped manifest. Review changed
-paths with `git diff`.
+paths with `git diff`. Mode-only launcher drift is a harness-owned update and is
+repaired from the target manifest even when file bytes are unchanged.
 
 Expected behavior:
 
