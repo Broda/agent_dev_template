@@ -4,9 +4,35 @@ import re
 from pathlib import Path
 
 from template_cli.io_helpers import read_text
+from template_cli.render_capabilities import contract_milestones, finalized_contract
 from template_cli.render_helpers import _state_list, _state_value
 
 CONTRACT_SECTIONS = [
+    (
+        "Ownership Boundaries",
+        ["finalizedContract.ownershipBoundaries"],
+        ["Ownership boundaries", "Ownership"],
+    ),
+    (
+        "Invariants",
+        ["finalizedContract.invariants"],
+        ["Invariants", "Core invariants"],
+    ),
+    (
+        "Domain And Data Model",
+        ["finalizedContract.domainModel", "finalizedContract.dataModel"],
+        ["Domain model", "Data model"],
+    ),
+    (
+        "Public Contracts",
+        ["finalizedContract.publicContracts"],
+        ["Public contracts"],
+    ),
+    (
+        "Version Domains",
+        ["finalizedContract.versionDomains"],
+        ["Version domains", "Versioning domains"],
+    ),
     (
         "Workspace / Package Layout",
         ["implementation.workspaceCrates", "implementation.workspaceLayout", "mvpContract.workspaceCrates"],
@@ -47,6 +73,11 @@ CONTRACT_SECTIONS = [
         ["implementation.postMvpDecisions", "mvpContract.postMvpDecisions"],
         ["Post-MVP decisions", "Deferred decisions", "Later decisions"],
     ),
+    (
+        "Deferred Scope",
+        ["finalizedContract.deferredScope"],
+        ["Deferred scope"],
+    ),
 ]
 
 
@@ -63,6 +94,8 @@ def _split_detail_value(value: str) -> list[str]:
 def _state_details(state: dict, paths: list[str]) -> list[str]:
     values: list[str] = []
     for path in paths:
+        if path.startswith("finalizedContract."):
+            continue
         listed = _state_list(state, path)
         if listed:
             values.extend(listed)
@@ -70,6 +103,43 @@ def _state_details(state: dict, paths: list[str]) -> list[str]:
         value = _state_value(state, path)
         values.extend(_split_detail_value(value))
     return values
+
+
+def _value_at(state: dict, path: str) -> object:
+    cur: object = state
+    for part in path.split("."):
+        if not isinstance(cur, dict):
+            return None
+        cur = cur.get(part)
+    return cur
+
+
+def _structured_details(value: object) -> list[str]:
+    if isinstance(value, list):
+        details: list[str] = []
+        for item in value:
+            details.extend(_structured_details(item))
+        return details
+    if isinstance(value, dict):
+        preferred = [
+            "name",
+            "contract",
+            "boundary",
+            "invariant",
+            "format",
+            "domain",
+            "description",
+            "summary",
+            "owner",
+        ]
+        parts = [str(value.get(key, "") or "").strip() for key in preferred]
+        rendered = " - ".join(part for part in parts if part)
+        if rendered:
+            return [rendered]
+        return [f"{key}: {item}" for key, item in value.items() if str(item).strip()]
+    if isinstance(value, str):
+        return _split_detail_value(value)
+    return []
 
 
 def _line_label_values(files: list[Path], labels: list[str]) -> list[str]:
@@ -129,14 +199,33 @@ def _unique(values: list[str]) -> list[str]:
 def collect_implementation_contract(state: dict, hydration_files: list[Path]) -> list[tuple[str, list[str]]]:
     sections: list[tuple[str, list[str]]] = []
     for title, state_paths, labels in CONTRACT_SECTIONS:
+        structured = []
+        for path in state_paths:
+            if path.startswith("finalizedContract."):
+                structured.extend(_structured_details(_value_at(state, path)))
         details = _unique(
-            _state_details(state, state_paths)
+            structured
+            + _state_details(state, state_paths)
             + _line_label_values(hydration_files, labels)
             + _heading_values(hydration_files, labels)
         )
         if details:
             sections.append((title, details))
+    milestone_details = _milestone_details(state)
+    if milestone_details:
+        sections.append(("Ordered Milestones", milestone_details))
     return sections
+
+
+def _milestone_details(state: dict) -> list[str]:
+    if not finalized_contract(state):
+        return []
+    details: list[str] = []
+    for milestone in contract_milestones(state):
+        goal = milestone.get("goal", "")
+        suffix = f" - {goal}" if goal else ""
+        details.append(f"{milestone['id']}: {milestone['name']}{suffix}")
+    return details
 
 
 def format_contract_sections(sections: list[tuple[str, list[str]]], *, heading_level: int = 2) -> str:

@@ -36,6 +36,7 @@ from template_cli.validator_overwrite_policy import validate_finalization_overwr
 from template_cli.validator_placeholders import find_unresolved_placeholders
 from template_cli.validator_plugins import validate_repo_plugins
 from template_cli.validator_python_config import validate_python_tool_config
+from template_cli.validator_semantics import validate_semantic_finalization
 from template_cli.validator_skills import validate_repo_skills
 
 
@@ -234,12 +235,14 @@ def run_validate_development(
     if not changelog_path.exists() or "## [Unreleased]" not in read_text(changelog_path):
         result.add_failure("CHANGELOG.md is missing the [Unreleased] section.")
 
-    validate_project_state_file(
+    state = validate_project_state_file(
         root,
         result,
         variant="finalized",
         check_artifact_references=True,
     )
+    if state:
+        validate_semantic_finalization(root, result, state)
 
     validate_notes_catalog(root, result, base=".harness/history")
     validate_module_boundaries(root, result)

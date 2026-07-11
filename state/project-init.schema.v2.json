@@ -136,7 +136,32 @@
       }
     },
     "implementation": { "type": "object" },
-    "mvpContract": { "type": "object" }
+    "mvpContract": { "type": "object" },
+    "finalizedContract": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "schemaVersion": { "type": "integer" },
+        "capabilities": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "interfaces": { "type": "array", "items": { "type": "string" } },
+            "surfaces": { "type": "array", "items": { "type": "string" } },
+            "authentication": { "type": "string" }
+          }
+        },
+        "ownershipBoundaries": { "type": "array", "items": { "type": "string" } },
+        "invariants": { "type": "array", "items": { "type": "string" } },
+        "domainConcepts": { "type": "array", "items": { "type": "string" } },
+        "domainModel": { "type": "array" },
+        "dataModel": { "type": "array" },
+        "publicContracts": { "type": "array" },
+        "versionDomains": { "type": "array" },
+        "milestones": { "type": "array" },
+        "deferredScope": { "type": "array", "items": { "type": "string" } }
+      }
+    }
   },
   "x-variantRequirements": {
     "draft": {

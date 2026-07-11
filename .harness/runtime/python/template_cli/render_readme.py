@@ -15,10 +15,15 @@ def _render_readme(
     test_command: str,
     solution_summary: str,
     mvp_scope: str,
+    active_milestone: str = MILESTONE_NAME,
+    public_contracts: list[str] | None = None,
+    deferred_scope: list[str] | None = None,
 ) -> str:
     core_loop = solution_summary or purpose
     if mvp_scope:
         core_loop = f"{core_loop} MVP scope: {mvp_scope}"
+    contract_lines = _render_lines(public_contracts or [], "- See docs/ARCHITECTURE.md")
+    deferred_lines = _render_lines(deferred_scope or [], "- None recorded.")
     return f"""# {project_name}
 
 {purpose}
@@ -28,7 +33,7 @@ def _render_readme(
 # Status
 
 - Phase: MVP
-- Active Milestone: {MILESTONE_NAME}
+- Active Milestone: {active_milestone}
 
 ---
 
@@ -44,6 +49,14 @@ Tooling: {package_tool}
 # Product Shape
 
 {core_loop}
+
+## Public Contracts
+
+{contract_lines}
+
+## Deferred Scope
+
+{deferred_lines}
 
 ---
 
@@ -82,3 +95,14 @@ See:
 - docs/FILE_MAP.md
 - docs/adr/
 """
+
+
+def _render_lines(values: list[str], fallback: str) -> str:
+    if not values:
+        return fallback
+    rendered: list[str] = []
+    for value in values:
+        if "<" in value and ">" in value:
+            value = f"`{value}`"
+        rendered.append(f"- {value}")
+    return "\n".join(rendered)

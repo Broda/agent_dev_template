@@ -29,7 +29,14 @@ def _render_project_context(
     build_command: str,
     run_command: str,
     test_command: str,
+    active_milestone: str = MILESTONE_NAME,
+    invariants: list[str] | None = None,
+    milestone_summaries: list[str] | None = None,
+    deferred_scope: list[str] | None = None,
 ) -> str:
+    invariant_lines = _render_lines(invariants or [], "- None captured.")
+    milestone_lines = _render_lines(milestone_summaries or [], "- Use ROADMAP.md for milestone details.")
+    deferred_lines = _render_lines(deferred_scope or [], "- None recorded.")
     return f"""# PROJECT_CONTEXT.md — Structured Mode v2
 
 This document defines how this project evolves.
@@ -130,6 +137,18 @@ Refactors must be intentional and milestone-scoped.
 - Contingencies: {contingencies}
 - Latest review outcome: {latest_review_outcome}
 
+Captured invariants:
+
+{invariant_lines}
+
+Ordered milestones:
+
+{milestone_lines}
+
+Deferred scope:
+
+{deferred_lines}
+
 ---
 
 # 7. Product Risks To Respect
@@ -167,7 +186,7 @@ A task may be marked complete only when:
 
 Example evidence:
 
-- Evidence: `npm test` (pass), `npm run build` (success), manual smoke verified.
+- Evidence: `{test_command}` (pass), `{build_command}` (success), manual smoke verified.
 
 No exceptions.
 
@@ -187,5 +206,9 @@ It is not a scratchpad.
 
 # 11. Current Active Milestone
 
-Active Milestone: {MILESTONE_NAME}
+Active Milestone: {active_milestone}
 """
+
+
+def _render_lines(values: list[str], fallback: str) -> str:
+    return "\n".join(f"- {value}" for value in values) if values else fallback

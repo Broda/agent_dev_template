@@ -210,8 +210,9 @@ def _first_value_for_label(files: list[Path], labels: list[str]) -> str:
 
 def _infer_domain_concepts(text: str) -> list[str]:
     concepts: list[str] = []
-    for chunk in re.split(r"[.;]\s*", text):
-        value = _trim(chunk)
+    sentence_break = re.compile(r";\s*|(?<=[A-Za-z0-9])\.(?=\s+[A-Z0-9])")
+    for chunk in sentence_break.split(text):
+        value = _trim(chunk).strip(" .")
         if not value:
             continue
         if len(value) > 90:

@@ -285,6 +285,12 @@ but may leave values empty while brainstorming. Finalized state must include the
 non-empty product, governance, session, and ADR fields required to render and
 validate development mode.
 
+Finalized schema v2 also accepts an optional `finalizedContract` object for
+structured ownership boundaries, invariants, domain/data model details, public
+contracts, version domains, ordered milestones, and deferred scope. Renderers
+prefer that structure when present and fall back to legacy prose fields for
+older states.
+
 Generated development docs include a GitHub Actions baseline by default. Set
 `documentation.ciPolicy` in `state/project-init.json` before rendering when a
 project needs different CI versus local verification wording.

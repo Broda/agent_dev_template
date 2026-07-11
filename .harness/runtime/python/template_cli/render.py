@@ -4,6 +4,14 @@ import shutil
 from pathlib import Path
 
 from template_cli.io_helpers import read_text, write_text
+from template_cli.render_capabilities import (
+    active_milestone_name,
+    contract_list,
+    contract_milestones,
+    milestone_summary_lines,
+    project_profile,
+    structured_domain_concepts,
+)
 from template_cli.render_ci import render_development_ci
 from template_cli.render_contract import collect_implementation_contract
 from template_cli.render_governance_templates import _render_architecture, _render_decision_adr, _render_roadmap
@@ -19,9 +27,11 @@ from template_cli.render_helpers import (
     _related_hydration_files_from_state,
     _render_artifact_source_table,
     _replace_file_literals,
+    _state_list,
     _state_value,
     _write_rendered_text,
 )
+from template_cli.render_policy_docs import apply_capability_policy_docs
 from template_cli.render_templates import _render_project_context, _render_readme
 
 
@@ -84,10 +94,15 @@ def run_render_development_docs(root: Path) -> int:
     latest_review_outcome = _state_value(state, "governance.latestReviewOutcome") or "conditional-pass"
     ci_policy = _state_value(state, "documentation.ciPolicy") or DEFAULT_CI_POLICY
     session_files = [str(item) for item in state.get("artifacts", {}).get("sessionFiles", []) if str(item).strip()]
-    domain_concepts = _infer_domain_concepts(
-        " ".join([purpose, problem_statement, solution_summary, mvp_scope, out_of_scope])
-    )
+    profile = project_profile(state)
+    inferred_concepts = _infer_domain_concepts(" ".join([purpose, problem_statement, solution_summary, mvp_scope]))
+    domain_concepts = structured_domain_concepts(state) or inferred_concepts
     implementation_contract = collect_implementation_contract(state, hydration_files)
+    milestones = contract_milestones(state)
+    deferred_scope = contract_list(state, "deferredScope") or _state_list(state, "implementation.mvpExclusions")
+    public_contracts = contract_list(state, "publicContracts")
+    invariants = contract_list(state, "invariants")
+    active_milestone = active_milestone_name(state)
 
     _copy_base_if_missing(root, ".harness/development/templates/docs/FILE_MAP.base.md", "docs/FILE_MAP.md")
     _copy_base_if_missing(
@@ -157,6 +172,7 @@ def run_render_development_docs(root: Path) -> int:
         "docs/adr/ADR-TEMPLATE.md",
     ]:
         _replace_file_literals(root / relative_path, shared_replacements)
+    apply_capability_policy_docs(root, profile)
 
     _write_rendered_text(
         root,
@@ -173,6 +189,9 @@ def run_render_development_docs(root: Path) -> int:
             test_command,
             solution_summary,
             mvp_scope,
+            active_milestone,
+            public_contracts,
+            deferred_scope,
         ),
     )
     _write_rendered_text(
@@ -204,6 +223,10 @@ def run_render_development_docs(root: Path) -> int:
             build_command,
             run_command,
             test_command,
+            active_milestone,
+            invariants,
+            milestone_summary_lines(state),
+            deferred_scope,
         ),
     )
     _write_rendered_text(
@@ -222,6 +245,8 @@ def run_render_development_docs(root: Path) -> int:
             constraints or "None recorded",
             domain_concepts,
             implementation_contract,
+            profile,
+            deferred_scope,
         ),
     )
     _write_rendered_text(
@@ -252,6 +277,9 @@ def run_render_development_docs(root: Path) -> int:
             top_risks,
             domain_concepts,
             implementation_contract,
+            profile,
+            milestones,
+            deferred_scope,
         ),
     )
     _replace_file_literals(
