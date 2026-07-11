@@ -20,6 +20,19 @@ from template_cli.validator_manifest import MANIFEST_PATH, load_harness_manifest
 
 
 class ProjectHarnessUpdateManifestRollbackTests(ProjectHarnessUpdateTestCase):
+    def test_rollback_removes_manifest_created_when_manifest_was_absent_before_apply(self) -> None:
+        project = self.tmpdir / "manifest-created-during-apply"
+        backup_dir = project / ".harness-update-backups" / "rollback"
+        project_manifest = project / MANIFEST_PATH
+        manifest_backup = update_apply._backup_path_state(project, backup_dir, MANIFEST_PATH)
+        project_manifest.parent.mkdir(parents=True, exist_ok=True)
+        project_manifest.write_text('{"created": true}\n', encoding="utf-8")
+
+        with mock.patch.object(update_apply, "_run", return_value=0):
+            update_apply._rollback_update(project, backup_dir, [], manifest_backup)
+
+        self.assertFalse(project_manifest.exists())
+
     def test_update_apply_restores_manifest_when_provenance_validation_fails(self) -> None:
         source, project = self._project_with_source_update("# final validation rollback marker")
         project_wrapper = project / "scripts/lab.sh"

@@ -67,9 +67,10 @@ def _active_task_lines(roadmap: str) -> list[str]:
         if heading:
             level = len(heading.group(1))
             title = heading.group(2).strip().lower()
-            if deferred_heading_level is not None and level > deferred_heading_level:
-                continue
-            deferred_heading_level = None
+            if deferred_heading_level is not None:
+                if level > deferred_heading_level:
+                    continue
+                deferred_heading_level = None
             if title in {
                 "deferred scope",
                 "mvp exclusions",
