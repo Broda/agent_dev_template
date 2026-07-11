@@ -61,20 +61,25 @@ def _reject_terms(result: ValidationResult, lower_content: str, terms: list[str]
 
 def _active_task_lines(roadmap: str) -> list[str]:
     lines: list[str] = []
-    in_deferred_scope = False
+    deferred_heading_level: int | None = None
     for line in roadmap.splitlines():
-        heading = re.match(r"^#{1,6}\s+(.+?)\s*$", line)
+        heading = re.match(r"^(#{1,6})\s+(.+?)\s*$", line)
         if heading:
-            title = heading.group(1).strip().lower()
-            in_deferred_scope = title in {
+            level = len(heading.group(1))
+            title = heading.group(2).strip().lower()
+            if deferred_heading_level is not None and level > deferred_heading_level:
+                continue
+            deferred_heading_level = None
+            if title in {
                 "deferred scope",
                 "mvp exclusions",
                 "out of scope",
                 "post-mvp decisions",
                 "deferred decisions",
-            }
+            }:
+                deferred_heading_level = level
             continue
-        if in_deferred_scope:
+        if deferred_heading_level is not None:
             continue
         if re.match(r"^\s*-\s+\[[ xX]\]", line):
             lines.append(line)

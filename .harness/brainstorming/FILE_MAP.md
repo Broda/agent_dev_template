@@ -65,6 +65,7 @@ Lean file registry for the Project Harness Template.
 | `.harness/tests/test_development_evidence.py` | Development roadmap evidence command regression tests |
 | `.harness/tests/test_development_rendering.py` | Development doc render and validation regression tests |
 | `.harness/tests/test_development_wiki.py` | Development wiki render and sync-check regression tests |
+| `.harness/tests/test_semantic_deferred_headings.py` | Semantic validator regressions for nested deferred roadmap headings |
 | `.harness/tests/test_semantic_finalization_fidelity.py` | Semantic finalization fidelity regression tests for structured contracts and unsupported generated surfaces |
 | `.harness/tests/test_finalization_regression.py` | End-to-end finalization regression tests for multi-session detail carryover |
 | `.harness/tests/test_harness_manifest.py` | Harness manifest validation and provenance stamping regression tests |
@@ -78,6 +79,7 @@ Lean file registry for the Project Harness Template.
 | `.harness/tests/test_template_validation.py` | Template governance, skill, plugin, and launcher validation tests |
 | `.harness/tests/test_public_safety.py` | Public documentation safety regression tests |
 | `.harness/tests/test_project_harness_bootstrap.py` | Project harness bootstrap command regression tests |
+| `.harness/tests/test_project_harness_update_manifest_rollback.py` | Project harness update manifest rollback regression tests |
 | `.harness/tests/test_project_harness_update.py` | Project harness update dry-run regression tests |
 | `.harness/tests/test_runtime_discovery.py` | Installed runtime discovery contract tests |
 | `.harness/tests/test_state_schema.py` | Project state schema contract regression tests |

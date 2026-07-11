@@ -15,7 +15,7 @@ from template_cli.posix_modes import (
     manifest_posix_executable_paths,
     stage_posix_executable_modes,
 )
-from template_cli.validator_manifest import stamp_harness_manifest
+from template_cli.validator_manifest import MANIFEST_PATH, stamp_harness_manifest
 
 
 def _apply_update_source(root: Path, source: UpdateSource, *, yes: bool, include_mixed: bool) -> int:
@@ -50,12 +50,11 @@ def _apply_update_source(root: Path, source: UpdateSource, *, yes: bool, include
         return 2
 
     backup_dir = root / ".harness-update-backups" / _timestamp_label()
+    manifest_backup_path = _backup_existing_path(root, backup_dir, MANIFEST_PATH)
     for relative_path in update_paths:
         current_path = root / relative_path
         if current_path.exists():
-            backup_path = backup_dir / relative_path
-            backup_path.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(current_path, backup_path)
+            _backup_existing_path(root, backup_dir, relative_path)
         if relative_path in plan["removed"]:
             current_path.unlink()
         else:
@@ -75,7 +74,7 @@ def _apply_update_source(root: Path, source: UpdateSource, *, yes: bool, include
         hook_results.append(("render-intent-docs", _run(_template_cli_command("render-intent-docs"), root)))
     failed_hooks = [(label, result) for label, result in hook_results if result != 0]
     if failed_hooks:
-        _rollback_update(root, backup_dir, update_paths)
+        _rollback_update(root, backup_dir, update_paths, manifest_backup_path)
         print("Post-update hook failed. Rolled back copied files from backup:")
         print(f"  {backup_dir}")
         return failed_hooks[0][1]
@@ -88,16 +87,23 @@ def _apply_update_source(root: Path, source: UpdateSource, *, yes: bool, include
         result = _run(_template_cli_command(cli_command), root)
         validation_results.append((label, result))
         if result != 0:
-            _rollback_update(root, backup_dir, update_paths)
+            _rollback_update(root, backup_dir, update_paths, manifest_backup_path)
             print("Validation failed after update apply. Rolled back copied files from backup:")
             print(f"  {backup_dir}")
             return result
 
-    stamp_harness_manifest(root, source.root)
+    try:
+        stamp_harness_manifest(root, source.root)
+    except Exception as exc:
+        _rollback_update(root, backup_dir, update_paths, manifest_backup_path)
+        print("Manifest stamping failed after update apply. Rolled back copied files from backup:")
+        print(f"  {backup_dir}")
+        print(f"  {exc}")
+        return 1
     final_validation = _run(_template_cli_command("validate-governance"), root)
     validation_results.append(("validate-governance-after-provenance", final_validation))
     if final_validation != 0:
-        _rollback_update(root, backup_dir, update_paths)
+        _rollback_update(root, backup_dir, update_paths, manifest_backup_path)
         print("Provenance validation failed after update apply. Rolled back copied files from backup:")
         print(f"  {backup_dir}")
         return final_validation
@@ -124,6 +130,16 @@ def _copy_source_file(source_path: Path, target_path: Path) -> None:
     shutil.copy2(source_path, target_path)
 
 
+def _backup_existing_path(root: Path, backup_dir: Path, relative_path: str) -> Path | None:
+    current_path = root / relative_path
+    if not current_path.exists():
+        return None
+    backup_path = backup_dir / relative_path
+    backup_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(current_path, backup_path)
+    return backup_path
+
+
 def _classified_missing_update_paths(missing_paths: list[str], target_manifest: dict) -> tuple[list[str], list[str]]:
     inventory = target_manifest.get("artifactInventory", {})
     harness_owned: list[str] = []
@@ -137,7 +153,9 @@ def _classified_missing_update_paths(missing_paths: list[str], target_manifest: 
     return harness_owned, mixed_generated
 
 
-def _rollback_update(root: Path, backup_dir: Path, update_paths: list[str]) -> None:
+def _rollback_update(
+    root: Path, backup_dir: Path, update_paths: list[str], manifest_backup_path: Path | None = None
+) -> None:
     for relative_path in update_paths:
         current_path = root / relative_path
         backup_path = backup_dir / relative_path
@@ -146,6 +164,10 @@ def _rollback_update(root: Path, backup_dir: Path, update_paths: list[str]) -> N
             shutil.copy2(backup_path, current_path)
         elif current_path.exists():
             current_path.unlink()
+    if manifest_backup_path is not None and manifest_backup_path.exists():
+        manifest_path = root / MANIFEST_PATH
+        manifest_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(manifest_backup_path, manifest_path)
     _run(_template_cli_command("sync-plugin-skills"), root)
     _run(_template_cli_command("render-intent-docs"), root)
 
