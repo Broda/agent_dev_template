@@ -93,7 +93,7 @@ def _validate_unique_deferred_scope(result: ValidationResult, deferred: list[str
 
 
 def _validate_deferred_scope_not_active(result: ValidationResult, roadmap: str, deferred: list[str]) -> None:
-    checkbox_lines = [line.lower() for line in roadmap.splitlines() if re.match(r"^\s*-\s+\[[ xX]\]", line)]
+    checkbox_lines = [line.lower() for line in _active_task_lines(roadmap)]
     for item in deferred:
         key = item.strip().lower()
         if not key:

@@ -7,7 +7,7 @@ import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
-from template_cli.bootstrap.update_plan import _build_update_plan
+from template_cli.bootstrap.update_plan import _build_update_plan, _ownership_class
 from template_cli.bootstrap.update_source import UpdateSource, source_worktree_state
 from template_cli.io_helpers import read_mode
 from template_cli.posix_modes import (
@@ -27,14 +27,19 @@ def _apply_update_source(root: Path, source: UpdateSource, *, yes: bool, include
         for path in plan["conflicted"]:
             print(f"  - {path}")
         return 1
-    if plan["mixed-generated"] and not include_mixed:
+    missing_harness_owned, missing_mixed_generated = _classified_missing_update_paths(
+        plan["missing"], source.target_manifest
+    )
+    mixed_requires_review = list(plan["mixed-generated"]) + missing_mixed_generated
+    if mixed_requires_review and not include_mixed:
         print("Refusing to apply mixed/generated updates without --include-mixed:")
-        for path in plan["mixed-generated"]:
+        for path in sorted(mixed_requires_review):
             print(f"  - {path}")
         return 1
-    update_paths = list(plan["harness-owned"]) + list(plan["removed"])
+    update_paths = list(plan["harness-owned"]) + list(plan["removed"]) + missing_harness_owned
     if include_mixed:
         update_paths.extend(plan["mixed-generated"])
+        update_paths.extend(missing_mixed_generated)
     update_paths = sorted(update_paths)
     if not update_paths:
         print("No clean harness-owned updates to apply.")
@@ -117,6 +122,19 @@ def _apply_update_source(root: Path, source: UpdateSource, *, yes: bool, include
 def _copy_source_file(source_path: Path, target_path: Path) -> None:
     target_path.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(source_path, target_path)
+
+
+def _classified_missing_update_paths(missing_paths: list[str], target_manifest: dict) -> tuple[list[str], list[str]]:
+    inventory = target_manifest.get("artifactInventory", {})
+    harness_owned: list[str] = []
+    mixed_generated: list[str] = []
+    for relative_path in missing_paths:
+        ownership = _ownership_class(relative_path, inventory)
+        if ownership == "harnessOwned":
+            harness_owned.append(relative_path)
+        elif ownership == "mixedGenerated":
+            mixed_generated.append(relative_path)
+    return harness_owned, mixed_generated
 
 
 def _rollback_update(root: Path, backup_dir: Path, update_paths: list[str]) -> None:

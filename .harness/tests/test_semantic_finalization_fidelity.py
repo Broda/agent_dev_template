@@ -70,8 +70,11 @@ class SemanticFinalizationFidelityTests(LabWorkflowTestCase):
         run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
         roadmap = self.repo / "docs/ROADMAP.md"
         roadmap.write_text(
-            roadmap.read_text(encoding="utf-8")
-            + "\n- [ ] Build Web UI admin flow with API endpoints and DTO structures.\n",
+            roadmap.read_text(encoding="utf-8").replace(
+                "\n# Deferred Scope\n",
+                "\n- [ ] Build Web UI admin flow with API endpoints and DTO structures.\n\n# Deferred Scope\n",
+                1,
+            ),
             encoding="utf-8",
         )
 
@@ -96,6 +99,43 @@ class SemanticFinalizationFidelityTests(LabWorkflowTestCase):
 
         self.assertEqual(0, result.returncode)
 
+    def test_semantic_validation_allows_deferred_scope_checkbox_under_deferred_section(self) -> None:
+        self.write_render_fixture("finalized_state_cli_data_pipeline_v2.json")
+        self._append_deferred_scope("Web UI")
+        run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
+        roadmap = self.repo / "docs/ROADMAP.md"
+        roadmap.write_text(
+            roadmap.read_text(encoding="utf-8").replace(
+                "\n# Verification Baseline\n",
+                "\n- [ ] Web UI\n\n# Verification Baseline\n",
+                1,
+            ),
+            encoding="utf-8",
+        )
+
+        result = run_cmd(["./scripts/validate-development"], cwd=self.repo)
+
+        self.assertEqual(0, result.returncode)
+
+    def test_semantic_validation_rejects_deferred_scope_checkbox_in_active_milestone(self) -> None:
+        self.write_render_fixture("finalized_state_cli_data_pipeline_v2.json")
+        self._append_deferred_scope("Web UI")
+        run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
+        roadmap = self.repo / "docs/ROADMAP.md"
+        roadmap.write_text(
+            roadmap.read_text(encoding="utf-8").replace(
+                "\n# Deferred Scope\n",
+                "\n- [ ] Web UI\n\n# Deferred Scope\n",
+                1,
+            ),
+            encoding="utf-8",
+        )
+
+        result = run_cmd(["./scripts/validate-development"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Deferred scope appears as an active roadmap task: Web UI", result.stdout)
+
     def test_structured_cli_api_capabilities_allow_active_api_tasks(self) -> None:
         self.write_render_fixture("finalized_state_cli_data_pipeline_v2.json")
         state_path = self.repo / "state/project-init.json"
@@ -111,7 +151,11 @@ class SemanticFinalizationFidelityTests(LabWorkflowTestCase):
         run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
         roadmap = self.repo / "docs/ROADMAP.md"
         roadmap.write_text(
-            roadmap.read_text(encoding="utf-8") + "\n- [ ] Build API endpoints for CLI automation.\n",
+            roadmap.read_text(encoding="utf-8").replace(
+                "\n# Deferred Scope\n",
+                "\n- [ ] Build API endpoints for CLI automation.\n\n# Deferred Scope\n",
+                1,
+            ),
             encoding="utf-8",
         )
 
@@ -128,8 +172,17 @@ class SemanticFinalizationFidelityTests(LabWorkflowTestCase):
         state_path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
         run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
         roadmap = self.repo / "docs/ROADMAP.md"
+        roadmap_text = roadmap.read_text(encoding="utf-8")
+        if "\n# Deferred Scope\n" in roadmap_text:
+            roadmap_text = roadmap_text.replace(
+                "\n# Deferred Scope\n",
+                "\n- [ ] Build API endpoints from apiary records.\n\n# Deferred Scope\n",
+                1,
+            )
+        else:
+            roadmap_text += "\n- [ ] Build API endpoints from apiary records.\n"
         roadmap.write_text(
-            roadmap.read_text(encoding="utf-8") + "\n- [ ] Build API endpoints from apiary records.\n",
+            roadmap_text,
             encoding="utf-8",
         )
 
@@ -143,7 +196,11 @@ class SemanticFinalizationFidelityTests(LabWorkflowTestCase):
         run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
         roadmap = self.repo / "docs/ROADMAP.md"
         roadmap.write_text(
-            roadmap.read_text(encoding="utf-8") + "\n- [ ] Collectors\n",
+            roadmap.read_text(encoding="utf-8").replace(
+                "\n# Deferred Scope\n",
+                "\n- [ ] Collectors\n\n# Deferred Scope\n",
+                1,
+            ),
             encoding="utf-8",
         )
         for relative_path in [
@@ -183,6 +240,12 @@ class SemanticFinalizationFidelityTests(LabWorkflowTestCase):
         state = json.loads((self.repo / "state/project-init.json").read_text(encoding="utf-8"))
         self.assertEqual(2, state["schemaVersion"])
         self.assertEqual(1, state["finalizedContract"]["schemaVersion"])
+
+    def _append_deferred_scope(self, item: str) -> None:
+        state_path = self.repo / "state/project-init.json"
+        state = json.loads(state_path.read_text(encoding="utf-8"))
+        state["finalizedContract"]["deferredScope"].append(item)
+        state_path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
 
     def test_normal_finalize_hydrates_structured_contract_from_session_json(self) -> None:
         idea_id = "idea-finalize-contract-json"
