@@ -242,7 +242,7 @@ Rules:
 def _render_milestone(milestone: dict[str, Any]) -> str:
     goal = milestone.get("goal", "") or "Complete the finalized milestone slice."
     tasks = _render_task_groups(milestone.get("tasks", []))
-    gates = "\n".join(f"- [ ] {gate}" for gate in milestone.get("gates", [])) or "- [ ] Evidence recorded."
+    gates = _render_gates(milestone.get("gates", []))
     return f"""## {milestone['id']} - {milestone['name']}
 
 Goal: {goal}
@@ -273,3 +273,15 @@ def _render_task_groups(tasks: list[dict[str, str]]) -> str:
             current_area = area
         lines.append(f"- [ ] {task['text']}")
     return "\n".join(lines)
+
+
+def _render_gates(gates: list[dict[str, str]]) -> str:
+    if not gates:
+        return "- [ ] Evidence recorded."
+    rendered: list[str] = []
+    for gate in gates:
+        name = gate.get("name", "")
+        evidence = gate.get("evidence", "")
+        suffix = f" Evidence: {evidence}" if evidence else ""
+        rendered.append(f"- [ ] {name}{suffix}")
+    return "\n".join(rendered)

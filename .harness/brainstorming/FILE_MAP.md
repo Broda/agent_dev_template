@@ -151,6 +151,8 @@ Lean file registry for the Project Harness Template.
 | `.harness/runtime/python/template_cli/bootstrap/update_plan.py` | Project harness update plan classification and baseline comparison helpers |
 | `.harness/runtime/python/template_cli/bootstrap/update_source.py` | Project harness update source resolution helpers |
 | `.harness/runtime/python/template_cli/external_idea.py` | External idea payload validation and JSON result contracts |
+| `.harness/runtime/python/template_cli/finalized_contract.py` | Finalized structured-contract hydration, preservation, and capability normalization helpers |
+| `.harness/runtime/python/template_cli/finalized_contract_tokens.py` | Canonical finalized-contract capability tokens, aliases, and fallback inference helpers |
 | `.harness/runtime/python/template_cli/git_helpers.py` | Shared captured-output git command runner |
 | `.harness/runtime/python/template_cli/evidence.py` | Development roadmap evidence capture command implementation |
 | `.harness/runtime/python/template_cli/finalize/artifacts.py` | Finalization artifact directory setup, backup registration, existing-state load, and session-log writing helpers |

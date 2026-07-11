@@ -108,6 +108,45 @@ class StateSchemaTests(LabWorkflowTestCase):
             result.failures,
         )
 
+    def test_finalized_contract_reports_invalid_schema_version(self) -> None:
+        self.write_render_fixture("finalized_state_cli_data_pipeline_v2.json")
+        state = self._read_state()
+        state["finalizedContract"]["schemaVersion"] = 2
+        self._write_state(state)
+        result = ValidationResult()
+
+        validate_project_state_file(self.repo, result, variant="finalized")
+
+        self.assertIn("state/project-init.json finalizedContract.schemaVersion must be 1.", result.failures)
+
+    def test_finalized_contract_reports_invalid_capability_token(self) -> None:
+        self.write_render_fixture("finalized_state_cli_data_pipeline_v2.json")
+        state = self._read_state()
+        state["finalizedContract"]["capabilities"]["interfaces"] = ["CLI"]
+        self._write_state(state)
+        result = ValidationResult()
+
+        validate_project_state_file(self.repo, result, variant="finalized")
+
+        self.assertTrue(
+            any(
+                failure.startswith("state/project-init.json finalizedContract.capabilities.interfaces[0] must be one of:")
+                for failure in result.failures
+            ),
+            result.failures,
+        )
+
+    def test_finalized_contract_reports_invalid_milestone_shape(self) -> None:
+        self.write_render_fixture("finalized_state_cli_data_pipeline_v2.json")
+        state = self._read_state()
+        del state["finalizedContract"]["milestones"][0]["gates"]
+        self._write_state(state)
+        result = ValidationResult()
+
+        validate_project_state_file(self.repo, result, variant="finalized")
+
+        self.assertIn("state/project-init.json must include finalizedContract.milestones[0].gates.", result.failures)
+
     def _read_state(self) -> dict:
         return json.loads((self.repo / "state/project-init.json").read_text(encoding="utf-8"))
 

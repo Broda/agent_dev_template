@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import re
 from typing import Any
 
 from template_cli.render_helpers import MILESTONE_NAME, _state_list, _state_value
@@ -92,7 +93,7 @@ def contract_milestones(state: dict) -> list[dict[str, Any]]:
         milestone_id = str(item.get("id", "") or f"M{index}").strip()
         name = str(item.get("name", "") or item.get("title", "") or milestone_id).strip()
         tasks = _task_items(item.get("tasks", []))
-        gates = _string_list(item.get("gates", []))
+        gates = _gate_items(item.get("gates", []))
         milestones.append(
             {
                 "id": milestone_id,
@@ -124,6 +125,25 @@ def _task_items(value: Any) -> list[dict[str, str]]:
     return tasks
 
 
+def _gate_items(value: Any) -> list[dict[str, str]]:
+    gates: list[dict[str, str]] = []
+    if not isinstance(value, list):
+        return gates
+    for item in value:
+        if isinstance(item, str):
+            text = item.strip()
+            if text:
+                gates.append({"name": text, "evidence": ""})
+            continue
+        if not isinstance(item, dict):
+            continue
+        name = str(item.get("name", "") or item.get("gate", "") or item.get("description", "") or "").strip()
+        if not name:
+            continue
+        gates.append({"name": name, "evidence": str(item.get("evidence", "") or "").strip()})
+    return gates
+
+
 def active_milestone_name(state: dict) -> str:
     milestones = contract_milestones(state)
     if not milestones:
@@ -146,10 +166,10 @@ def project_profile(state: dict) -> ProjectProfile:
     capabilities = contract.get("capabilities", {})
     if not isinstance(capabilities, dict):
         capabilities = {}
+    structured_capabilities = bool(capabilities)
     project_type = str(state.get("projectType", "") or "")
-    project_text = " ".join([project_type, *contract_list(state, "capabilities")]).lower()
-    interface_text = " ".join(_string_list(capabilities.get("interfaces"))).lower()
-    surface_text = " ".join(_string_list(capabilities.get("surfaces"))).lower()
+    interfaces = set(_string_list(capabilities.get("interfaces")))
+    surfaces = set(_string_list(capabilities.get("surfaces")))
     stack_text = " ".join(
         [
             _state_value(state, "techStack.language"),
@@ -160,16 +180,22 @@ def project_profile(state: dict) -> ProjectProfile:
     ).lower()
     auth_text = str(capabilities.get("authentication", state.get("authentication", "")) or "").strip().lower()
 
-    is_cli = "cli" in project_text or "cli" in interface_text
-    is_data_pipeline = "data pipeline" in project_text or "pipeline" in project_text or "pipeline" in surface_text
-    web_signals = ["web", "browser", "react", "vite", "frontend"]
-    api_signals = ["api", "http", "rest", "graphql", "endpoint", "axum", "fastapi"]
-    admin_signals = ["admin", "editor", "privileged"]
-    explicit_cli_only = is_cli and not any(token in interface_text for token in ["web", "api", "admin", "editor"])
-
-    has_web_ui = not explicit_cli_only and any(token in " ".join([project_text, interface_text, stack_text]) for token in web_signals)
-    has_api = not explicit_cli_only and any(token in " ".join([project_text, interface_text, surface_text, stack_text]) for token in api_signals)
-    has_admin = not explicit_cli_only and any(token in " ".join([project_text, interface_text, surface_text]) for token in admin_signals)
+    if structured_capabilities:
+        is_cli = "cli" in interfaces
+        is_data_pipeline = "data_pipeline" in surfaces
+        has_web_ui = "web_ui" in interfaces or "browser_ui" in surfaces
+        has_api = "api" in interfaces or "http_api" in surfaces
+        has_admin = "admin_ui" in interfaces or "admin_ui" in surfaces
+    else:
+        project_text = project_type.lower()
+        is_cli = _contains_word(project_text, "cli") or _contains_phrase(project_text, "command line")
+        is_data_pipeline = _contains_phrase(project_text, "data pipeline") or _contains_word(project_text, "pipeline")
+        has_web_ui = any(_contains_word(" ".join([project_text, stack_text]), token) for token in ["web", "browser", "react", "vite", "frontend"])
+        has_api = any(
+            _contains_word(" ".join([project_text, stack_text]), token)
+            for token in ["api", "http", "rest", "graphql", "endpoint", "axum", "fastapi"]
+        )
+        has_admin = any(_contains_word(project_text, token) for token in ["admin", "editor", "privileged"])
     uses_javascript = any(token in stack_text for token in ["javascript", "typescript", "node", "npm", "pnpm", "yarn"])
     has_authentication = auth_text not in {"", "none", "no", "n/a", "_none_", "not applicable"}
 
@@ -183,6 +209,14 @@ def project_profile(state: dict) -> ProjectProfile:
         is_cli=is_cli,
         is_data_pipeline=is_data_pipeline,
     )
+
+
+def _contains_word(text: str, token: str) -> bool:
+    return bool(re.search(rf"(?<![a-z0-9]){re.escape(token.lower())}(?![a-z0-9])", text.lower()))
+
+
+def _contains_phrase(text: str, phrase: str) -> bool:
+    return bool(re.search(rf"(?<![a-z0-9]){re.escape(phrase.lower())}(?![a-z0-9])", text.lower()))
 
 
 def structured_domain_concepts(state: dict) -> list[str]:

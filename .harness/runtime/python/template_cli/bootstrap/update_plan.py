@@ -67,8 +67,11 @@ def _build_update_plan(
         if baseline_available:
             current_content = _file_content(current_path)
             baseline_content = _baseline_file_content(source_root, baseline_commit, relative_path)
+            source_content = _file_content(source_path)
             if current_content == baseline_content:
                 _add_update_category(categories, ownership, relative_path)
+            elif ownership == "mixedGenerated" and source_content == baseline_content:
+                categories["project-owned-preserved"].append(relative_path)
             else:
                 categories["conflicted"].append(relative_path)
             continue

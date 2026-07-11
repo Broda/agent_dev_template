@@ -23,16 +23,16 @@ def validate_semantic_finalization(root: Path, result: ValidationResult, state: 
     profile = project_profile(state)
     documents = _read_documents(root)
     combined = "\n".join(documents.values())
-    lower_combined = combined.lower()
+    active_content = "\n".join(_active_task_lines(documents.get("docs/ROADMAP.md", ""))).lower()
 
     if profile.is_cli:
-        _reject_terms(result, lower_combined, ["web ui", "admin ui", "editor-facing"], "CLI project")
+        _reject_terms(result, active_content, ["web ui", "admin ui", "editor-facing"], "CLI project")
     if not profile.has_api:
-        _reject_terms(result, lower_combined, ["api endpoints", "dto structures", "api handlers"], "non-API project")
+        _reject_terms(result, active_content, ["api endpoints", "dto structures", "api handlers"], "non-API project")
     if not profile.has_authentication:
-        _reject_terms(result, lower_combined, ["configure auth", "configure authentication"], "no-auth project")
+        _reject_terms(result, active_content, ["configure auth", "configure authentication"], "no-auth project")
     if not profile.uses_javascript:
-        _reject_terms(result, lower_combined, ["typescript", "npm", "unhandled promise"], "non-JavaScript project")
+        _reject_terms(result, active_content, ["typescript", "npm", "unhandled promise"], "non-JavaScript project")
 
     if re.search(r"\bCom,\s", combined):
         result.add_failure("Generated docs contain malformed dotted-name concept fragment: Com,")
@@ -57,6 +57,28 @@ def _reject_terms(result: ValidationResult, lower_content: str, terms: list[str]
         pattern = r"\b" + re.escape(term) + r"\b" if re.fullmatch(r"[a-z0-9]+", term) else re.escape(term)
         if re.search(pattern, lower_content):
             result.add_failure(f"Generated development docs contain unsupported {context} surface: {term}")
+
+
+def _active_task_lines(roadmap: str) -> list[str]:
+    lines: list[str] = []
+    in_deferred_scope = False
+    for line in roadmap.splitlines():
+        heading = re.match(r"^#{1,6}\s+(.+?)\s*$", line)
+        if heading:
+            title = heading.group(1).strip().lower()
+            in_deferred_scope = title in {
+                "deferred scope",
+                "mvp exclusions",
+                "out of scope",
+                "post-mvp decisions",
+                "deferred decisions",
+            }
+            continue
+        if in_deferred_scope:
+            continue
+        if re.match(r"^\s*-\s+\[[ xX]\]", line):
+            lines.append(line)
+    return lines
 
 
 def _validate_unique_deferred_scope(result: ValidationResult, deferred: list[str]) -> None:

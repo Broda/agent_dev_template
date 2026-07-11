@@ -90,7 +90,21 @@ def _validate_required_and_types(
     expected_type = schema.get("type")
     if expected_type and not _matches_type(value, expected_type):
         if prefix:
-            result.add_failure(f"state/project-init.json {prefix} must be a {_type_name(expected_type)}.")
+            article = "an" if str(expected_type)[:1].lower() in {"a", "e", "i", "o", "u"} else "a"
+            result.add_failure(f"state/project-init.json {prefix} must be {article} {_type_name(expected_type)}.")
+        return
+    if "const" in schema and value != schema["const"]:
+        result.add_failure(f"state/project-init.json {prefix} must be {schema['const']}.")
+        return
+    enum_values = schema.get("enum")
+    if isinstance(enum_values, list) and value not in enum_values:
+        result.add_failure(
+            f"state/project-init.json {prefix} must be one of: {', '.join(str(item) for item in enum_values)}."
+        )
+        return
+
+    if isinstance(value, list):
+        _validate_array_items(value, schema, prefix, result)
         return
 
     if not isinstance(value, dict):
@@ -106,16 +120,17 @@ def _validate_required_and_types(
     if not isinstance(properties, dict):
         return
 
+    if schema.get("additionalProperties") is False:
+        for key in value:
+            if key not in properties:
+                result.add_failure(f"state/project-init.json {_join_path(prefix, key)} is not a supported field.")
+
     for key, child_schema in properties.items():
         if key not in value or not isinstance(child_schema, dict):
             continue
         child_path = _join_path(prefix, key)
         child = value[key]
-        _validate_array_items(child, child_schema, child_path, result)
-        if child_schema.get("type") == "object":
-            _validate_required_and_types(child, child_schema, result, child_path)
-        elif child_schema.get("type") and not _matches_type(child, child_schema["type"]):
-            result.add_failure(f"state/project-init.json {child_path} must be a {_type_name(child_schema['type'])}.")
+        _validate_required_and_types(child, child_schema, result, child_path)
 
 
 def _validate_array_items(
@@ -124,18 +139,15 @@ def _validate_array_items(
     path: str,
     result: ValidationResult,
 ) -> None:
-    if schema.get("type") != "array":
-        return
-    if not isinstance(value, list):
-        result.add_failure(f"state/project-init.json {path} must be an array.")
-        return
     item_schema = schema.get("items", {})
-    if not isinstance(item_schema, dict) or item_schema.get("type") != "string":
+    if not isinstance(item_schema, dict):
         return
-    for item in value:
-        if not isinstance(item, str):
+    for index, item in enumerate(value):
+        item_path = f"{path}[{index}]"
+        if item_schema.get("type") == "string" and not isinstance(item, str):
             result.add_failure(f"state/project-init.json {path} entries must be strings.")
             return
+        _validate_required_and_types(item, item_schema, result, item_path)
 
 
 def _validate_schema_version(state: dict[str, Any], result: ValidationResult) -> None:
@@ -227,8 +239,4 @@ def _type_name(expected: str) -> str:
         return "array"
     if expected == "object":
         return "object"
-    if expected == "integer":
-        return "integer"
-    if expected == "boolean":
-        return "boolean"
     return expected

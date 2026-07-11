@@ -59,14 +59,14 @@
     "schemaVersion": 1,
     "capabilities": {
       "interfaces": [
-        "CLI"
+        "cli"
       ],
       "surfaces": [
-        "data pipeline",
-        "local files",
-        "SQLite"
+        "data_pipeline",
+        "local_files",
+        "sqlite"
       ],
-      "authentication": "None"
+      "authentication": "none"
     },
     "ownershipBoundaries": [
       "Hermes owns source packet production outside this repository.",
@@ -91,27 +91,27 @@
       "deterministic Markdown report"
     ],
     "domainModel": [
-      "ReportRun stores run id, source packet path, packet status, timestamps, and Markdown artifact path.",
-      "PacketFact stores child rows only when the packet is valid.",
-      "Correction records superseding changes while preserving prior facts."
+      { "name": "ReportRun stores run id, source packet path, packet status, timestamps, and Markdown artifact path." },
+      { "name": "PacketFact stores child rows only when the packet is valid." },
+      { "name": "Correction records superseding changes while preserving prior facts." }
     ],
     "dataModel": [
-      "XDG data directory contains the SQLite database.",
-      "XDG state directory contains generated Markdown and run logs.",
-      "Canonical packet JSON v1 fields are allowlisted before persistence."
+      { "name": "XDG data directory contains the SQLite database." },
+      { "name": "XDG state directory contains generated Markdown and run logs." },
+      { "name": "Canonical packet JSON v1 fields are allowlisted before persistence." }
     ],
     "publicContracts": [
-      "CLI command: report-pipeline run --packet <path>",
-      "CLI command: report-pipeline show --run-id <id>",
-      "Canonical allowlisted JSON v1 packet format",
-      "Deterministic Markdown report format",
-      "SQLite schema version domain"
+      { "name": "CLI command: report-pipeline run --packet <path>", "surface": "cli_commands" },
+      { "name": "CLI command: report-pipeline show --run-id <id>", "surface": "cli_commands" },
+      { "name": "Canonical allowlisted JSON v1 packet format", "surface": "data_pipeline" },
+      { "name": "Deterministic Markdown report format", "surface": "local_files" },
+      { "name": "SQLite schema version domain", "surface": "sqlite" }
     ],
     "versionDomains": [
-      "Packet JSON schema v1",
-      "SQLite schema version",
-      "Markdown report format version",
-      "CLI command surface"
+      { "domain": "Packet JSON schema v1" },
+      { "domain": "SQLite schema version" },
+      { "domain": "Markdown report format version" },
+      { "domain": "CLI command surface" }
     ],
     "milestones": [
       {
@@ -123,8 +123,8 @@
           { "area": "Verification", "text": "Wire build, run, and unit test commands." }
         ],
         "gates": [
-          "Build command succeeds.",
-          "CLI help runs locally."
+          { "name": "Build command succeeds.", "evidence": "" },
+          { "name": "CLI help runs locally.", "evidence": "" }
         ]
       },
       {
@@ -136,8 +136,8 @@
           { "area": "Domain", "text": "Guarantee report run inserts are append-only." }
         ],
         "gates": [
-          "A second run inserts a new row instead of mutating the first.",
-          "SQLite file lands under the XDG data directory."
+          { "name": "A second run inserts a new row instead of mutating the first.", "evidence": "" },
+          { "name": "SQLite file lands under the XDG data directory.", "evidence": "" }
         ]
       },
       {
@@ -149,9 +149,9 @@
           { "area": "Persistence", "text": "Insert child rows only for valid packet items." }
         ],
         "gates": [
-          "Invalid packet still creates a report run.",
-          "Missing packet still creates a report run.",
-          "Invalid and missing packets create no child fact rows."
+          { "name": "Invalid packet still creates a report run.", "evidence": "" },
+          { "name": "Missing packet still creates a report run.", "evidence": "" },
+          { "name": "Invalid and missing packets create no child fact rows.", "evidence": "" }
         ]
       },
       {
@@ -163,8 +163,8 @@
           { "area": "Verification", "text": "Assert identical stored inputs produce identical Markdown." }
         ],
         "gates": [
-          "Valid, invalid, and missing packet runs each write Markdown.",
-          "Golden Markdown output is stable."
+          { "name": "Valid, invalid, and missing packet runs each write Markdown.", "evidence": "" },
+          { "name": "Golden Markdown output is stable.", "evidence": "" }
         ]
       },
       {
@@ -176,8 +176,8 @@
           { "area": "Persistence", "text": "Preserve prior fact rows when corrections are added." }
         ],
         "gates": [
-          "Correction lookup returns the latest superseding value.",
-          "Original facts remain auditable."
+          { "name": "Correction lookup returns the latest superseding value.", "evidence": "" },
+          { "name": "Original facts remain auditable.", "evidence": "" }
         ]
       },
       {
@@ -189,9 +189,9 @@
           { "area": "Governance", "text": "Record milestone evidence in ROADMAP and runtime verification docs." }
         ],
         "gates": [
-          "All fixture runs produce expected SQLite state.",
-          "All fixture runs produce deterministic Markdown.",
-          "Deferred scope remains excluded from active implementation."
+          { "name": "All fixture runs produce expected SQLite state.", "evidence": "" },
+          { "name": "All fixture runs produce deterministic Markdown.", "evidence": "" },
+          { "name": "Deferred scope remains excluded from active implementation.", "evidence": "" }
         ]
       }
     ],

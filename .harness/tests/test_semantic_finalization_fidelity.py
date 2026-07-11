@@ -82,6 +82,62 @@ class SemanticFinalizationFidelityTests(LabWorkflowTestCase):
         self.assertIn("unsupported non-API project surface: api endpoints", result.stdout)
         self.assertIn("unsupported non-API project surface: dto structures", result.stdout)
 
+    def test_semantic_validation_allows_banned_phrases_in_deferred_scope(self) -> None:
+        self.write_render_fixture("finalized_state_cli_data_pipeline_v2.json")
+        run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
+        roadmap = self.repo / "docs/ROADMAP.md"
+        roadmap.write_text(
+            roadmap.read_text(encoding="utf-8")
+            + "\n# Deferred Scope\n\n- Web UI, API endpoints, DTO structures, TypeScript, and npm remain deferred.\n",
+            encoding="utf-8",
+        )
+
+        result = run_cmd(["./scripts/validate-development"], cwd=self.repo)
+
+        self.assertEqual(0, result.returncode)
+
+    def test_structured_cli_api_capabilities_allow_active_api_tasks(self) -> None:
+        self.write_render_fixture("finalized_state_cli_data_pipeline_v2.json")
+        state_path = self.repo / "state/project-init.json"
+        state = json.loads(state_path.read_text(encoding="utf-8"))
+        state["finalizedContract"]["capabilities"]["interfaces"] = ["api", "cli"]
+        state["finalizedContract"]["capabilities"]["surfaces"] = [
+            "cli_commands",
+            "data_pipeline",
+            "http_api",
+            "sqlite",
+        ]
+        state_path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+        run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
+        roadmap = self.repo / "docs/ROADMAP.md"
+        roadmap.write_text(
+            roadmap.read_text(encoding="utf-8") + "\n- [ ] Build API endpoints for CLI automation.\n",
+            encoding="utf-8",
+        )
+
+        result = run_cmd(["./scripts/validate-development"], cwd=self.repo)
+
+        self.assertEqual(0, result.returncode)
+
+    def test_legacy_capability_fallback_uses_word_boundaries(self) -> None:
+        self.write_render_fixture()
+        state_path = self.repo / "state/project-init.json"
+        state = json.loads(state_path.read_text(encoding="utf-8"))
+        state["projectType"] = "Apiary CLI"
+        state.pop("finalizedContract", None)
+        state_path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+        run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
+        roadmap = self.repo / "docs/ROADMAP.md"
+        roadmap.write_text(
+            roadmap.read_text(encoding="utf-8") + "\n- [ ] Build API endpoints from apiary records.\n",
+            encoding="utf-8",
+        )
+
+        result = run_cmd(["./scripts/validate-development"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("unsupported non-API project surface: api endpoints", result.stdout)
+
     def test_semantic_validation_rejects_missing_invariant_and_active_deferred_scope(self) -> None:
         self.write_render_fixture("finalized_state_cli_data_pipeline_v2.json")
         run_cmd(["./scripts/render-development-docs"], cwd=self.repo)
@@ -127,6 +183,78 @@ class SemanticFinalizationFidelityTests(LabWorkflowTestCase):
         state = json.loads((self.repo / "state/project-init.json").read_text(encoding="utf-8"))
         self.assertEqual(2, state["schemaVersion"])
         self.assertEqual(1, state["finalizedContract"]["schemaVersion"])
+
+    def test_normal_finalize_hydrates_structured_contract_from_session_json(self) -> None:
+        idea_id = "idea-finalize-contract-json"
+        self.write_finalize_fixture(idea_id)
+        session_path = self.repo / f"sessions/2026-04-03_{idea_id}.md"
+        session_path.write_text(
+            session_path.read_text(encoding="utf-8")
+            + """
+
+## Finalized Contract
+
+```json
+{
+  "capabilities": {
+    "interfaces": ["CLI"],
+    "surfaces": ["data pipeline", "SQLite"],
+    "authentication": "None"
+  },
+  "ownershipBoundaries": [
+    "Operator owns packet selection before command execution.",
+    "Core owns validation and append-only run storage."
+  ],
+  "invariants": [
+    "Report runs are append-only.",
+    "Invalid packets still create audit records."
+  ],
+  "domainConcepts": ["packet run", "audit record"],
+  "domainModel": [
+    {"name": "ReportRun", "description": "Append-only command execution record."}
+  ],
+  "dataModel": [
+    {"name": "SQLite report_runs table"}
+  ],
+  "publicContracts": [
+    {"name": "CLI command: packet-report run --packet <path>", "surface": "cli_commands"}
+  ],
+  "versionDomains": [
+    {"domain": "Packet JSON schema", "version": "v1"}
+  ],
+  "milestones": [
+    {
+      "id": "M0",
+      "name": "CLI Baseline",
+      "goal": "Create the packet-report command shell.",
+      "tasks": [{"area": "CLI", "text": "Implement packet-report help and argument parsing."}],
+      "gates": [{"name": "CLI help runs locally.", "evidence": "./packet-report --help"}]
+    }
+  ],
+  "deferredScope": ["Web UI", "Remote APIs"]
+}
+```
+""",
+            encoding="utf-8",
+        )
+
+        run_cmd(["./scripts/finalize-project", "--idea-id", idea_id], cwd=self.repo)
+
+        state = json.loads((self.repo / "state/project-init.json").read_text(encoding="utf-8"))
+        contract = state["finalizedContract"]
+        self.assertEqual(1, contract["schemaVersion"])
+        self.assertEqual(["cli"], contract["capabilities"]["interfaces"])
+        self.assertEqual("none", contract["capabilities"]["authentication"])
+        self.assertIn("data_pipeline", contract["capabilities"]["surfaces"])
+        self.assertEqual("M0", contract["milestones"][0]["id"])
+
+        docs = self._rendered_docs()
+        combined = "\n".join(docs.values())
+        self.assertIn("Report runs are append-only.", combined)
+        self.assertIn("Core owns validation and append-only run storage.", combined)
+        self.assertIn("CLI command: packet-report run --packet <path>", combined)
+        self.assertIn("M0 - CLI Baseline", docs["docs/ROADMAP.md"])
+        self.assertIn("Active Milestone: M0 - CLI Baseline", docs["docs/PROJECT_CONTEXT.md"])
 
     def _rendered_docs(self) -> dict[str, str]:
         paths = [
