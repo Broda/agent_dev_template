@@ -130,7 +130,9 @@ class StateSchemaTests(LabWorkflowTestCase):
 
         self.assertTrue(
             any(
-                failure.startswith("state/project-init.json finalizedContract.capabilities.interfaces[0] must be one of:")
+                failure.startswith(
+                    "state/project-init.json finalizedContract.capabilities.interfaces[0] must be one of:"
+                )
                 for failure in result.failures
             ),
             result.failures,

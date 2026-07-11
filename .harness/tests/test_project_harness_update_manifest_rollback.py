@@ -41,9 +41,7 @@ class ProjectHarnessUpdateManifestRollbackTests(ProjectHarnessUpdateTestCase):
         original_manifest = project_manifest.read_text(encoding="utf-8")
 
         stdout = io.StringIO()
-        with contextlib.redirect_stdout(stdout), mock.patch.object(
-            update_apply, "_run", side_effect=[0, 1, 0, 0]
-        ):
+        with contextlib.redirect_stdout(stdout), mock.patch.object(update_apply, "_run", side_effect=[0, 1, 0, 0]):
             result = update_apply._apply_update_source(
                 project,
                 self._update_source(source, project),

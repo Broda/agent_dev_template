@@ -81,7 +81,9 @@ _AUTH_ALIASES = {
 def normalize_capabilities(capabilities: dict[str, Any], state: dict) -> dict[str, Any]:
     interfaces = _token_list(capabilities.get("interfaces"), _INTERFACE_ALIASES, INTERFACE_TOKENS)
     surfaces = _token_list(capabilities.get("surfaces"), _SURFACE_ALIASES, SURFACE_TOKENS)
-    authentication = _normalize_token(capabilities.get("authentication", state.get("authentication", "")), _AUTH_ALIASES)
+    authentication = _normalize_token(
+        capabilities.get("authentication", state.get("authentication", "")), _AUTH_ALIASES
+    )
     if not interfaces:
         interfaces = _infer_interfaces(state)
     if not surfaces:

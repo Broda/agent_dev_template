@@ -243,7 +243,7 @@ def _render_milestone(milestone: dict[str, Any]) -> str:
     goal = milestone.get("goal", "") or "Complete the finalized milestone slice."
     tasks = _render_task_groups(milestone.get("tasks", []))
     gates = _render_gates(milestone.get("gates", []))
-    return f"""## {milestone['id']} - {milestone['name']}
+    return f"""## {milestone["id"]} - {milestone["name"]}
 
 Goal: {goal}
 

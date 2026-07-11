@@ -196,7 +196,11 @@ def _object_list(value: Any, preferred_keys: list[str]) -> list[Any]:
     items: list[Any] = []
     for item in value:
         if isinstance(item, dict):
-            cleaned = {key: str(item.get(key, "") or "").strip() for key in preferred_keys if str(item.get(key, "") or "").strip()}
+            cleaned = {
+                key: str(item.get(key, "") or "").strip()
+                for key in preferred_keys
+                if str(item.get(key, "") or "").strip()
+            }
             if cleaned:
                 items.append(cleaned)
         elif isinstance(item, str) and item.strip():

@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from template_cli.finalized_contract import build_finalized_contract
 from template_cli.finalize.helpers import STATE_SCHEMA_VERSION, is_placeholder_value, summarize_decisions, unique_values
+from template_cli.finalized_contract import build_finalized_contract
 from template_cli.wiki import default_wiki_config
 
 

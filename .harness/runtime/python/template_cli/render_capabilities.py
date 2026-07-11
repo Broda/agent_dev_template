@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 import re
+from dataclasses import dataclass
 from typing import Any
 
 from template_cli.render_helpers import MILESTONE_NAME, _state_list, _state_value
@@ -190,7 +190,10 @@ def project_profile(state: dict) -> ProjectProfile:
         project_text = project_type.lower()
         is_cli = _contains_word(project_text, "cli") or _contains_phrase(project_text, "command line")
         is_data_pipeline = _contains_phrase(project_text, "data pipeline") or _contains_word(project_text, "pipeline")
-        has_web_ui = any(_contains_word(" ".join([project_text, stack_text]), token) for token in ["web", "browser", "react", "vite", "frontend"])
+        has_web_ui = any(
+            _contains_word(" ".join([project_text, stack_text]), token)
+            for token in ["web", "browser", "react", "vite", "frontend"]
+        )
         has_api = any(
             _contains_word(" ".join([project_text, stack_text]), token)
             for token in ["api", "http", "rest", "graphql", "endpoint", "axum", "fastapi"]

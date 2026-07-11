@@ -142,9 +142,7 @@ class RuntimeDiscoveryTests(LabWorkflowTestCase):
         capability_version: int | None = None,
     ) -> Path:
         runtime = self.tmpdir / name
-        manifest = json.loads(
-            (self.repo / ".harness/commands/harness_manifest.json").read_text(encoding="utf-8")
-        )
+        manifest = json.loads((self.repo / ".harness/commands/harness_manifest.json").read_text(encoding="utf-8"))
         compatibility = manifest["compatibility"]
         version = {
             "runtimeVersion": manifest["harnessVersion"],

@@ -179,11 +179,7 @@ def _rollback_update(
             current_path.unlink()
     if manifest_backup is not None:
         manifest_path = root / manifest_backup.relative_path
-        if (
-            manifest_backup.existed
-            and manifest_backup.backup_path is not None
-            and manifest_backup.backup_path.exists()
-        ):
+        if manifest_backup.existed and manifest_backup.backup_path is not None and manifest_backup.backup_path.exists():
             manifest_path.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(manifest_backup.backup_path, manifest_path)
         elif not manifest_backup.existed and manifest_path.exists():
