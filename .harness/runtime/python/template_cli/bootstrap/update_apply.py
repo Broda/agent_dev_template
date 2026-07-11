@@ -4,10 +4,11 @@ import os
 import shutil
 import subprocess
 import sys
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
-from template_cli.bootstrap.update_plan import _build_update_plan
+from template_cli.bootstrap.update_plan import _build_update_plan, _ownership_class
 from template_cli.bootstrap.update_source import UpdateSource, source_worktree_state
 from template_cli.io_helpers import read_mode
 from template_cli.posix_modes import (
@@ -15,7 +16,14 @@ from template_cli.posix_modes import (
     manifest_posix_executable_paths,
     stage_posix_executable_modes,
 )
-from template_cli.validator_manifest import stamp_harness_manifest
+from template_cli.validator_manifest import MANIFEST_PATH, stamp_harness_manifest
+
+
+@dataclass(frozen=True)
+class _PathBackup:
+    relative_path: str
+    backup_path: Path | None
+    existed: bool
 
 
 def _apply_update_source(root: Path, source: UpdateSource, *, yes: bool, include_mixed: bool) -> int:
@@ -27,14 +35,19 @@ def _apply_update_source(root: Path, source: UpdateSource, *, yes: bool, include
         for path in plan["conflicted"]:
             print(f"  - {path}")
         return 1
-    if plan["mixed-generated"] and not include_mixed:
+    missing_harness_owned, missing_mixed_generated = _classified_missing_update_paths(
+        plan["missing"], source.target_manifest
+    )
+    mixed_requires_review = list(plan["mixed-generated"]) + missing_mixed_generated
+    if mixed_requires_review and not include_mixed:
         print("Refusing to apply mixed/generated updates without --include-mixed:")
-        for path in plan["mixed-generated"]:
+        for path in sorted(mixed_requires_review):
             print(f"  - {path}")
         return 1
-    update_paths = list(plan["harness-owned"]) + list(plan["removed"])
+    update_paths = list(plan["harness-owned"]) + list(plan["removed"]) + missing_harness_owned
     if include_mixed:
         update_paths.extend(plan["mixed-generated"])
+        update_paths.extend(missing_mixed_generated)
     update_paths = sorted(update_paths)
     if not update_paths:
         print("No clean harness-owned updates to apply.")
@@ -45,12 +58,11 @@ def _apply_update_source(root: Path, source: UpdateSource, *, yes: bool, include
         return 2
 
     backup_dir = root / ".harness-update-backups" / _timestamp_label()
+    manifest_backup = _backup_path_state(root, backup_dir, MANIFEST_PATH)
     for relative_path in update_paths:
         current_path = root / relative_path
         if current_path.exists():
-            backup_path = backup_dir / relative_path
-            backup_path.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(current_path, backup_path)
+            _backup_existing_path(root, backup_dir, relative_path)
         if relative_path in plan["removed"]:
             current_path.unlink()
         else:
@@ -70,7 +82,7 @@ def _apply_update_source(root: Path, source: UpdateSource, *, yes: bool, include
         hook_results.append(("render-intent-docs", _run(_template_cli_command("render-intent-docs"), root)))
     failed_hooks = [(label, result) for label, result in hook_results if result != 0]
     if failed_hooks:
-        _rollback_update(root, backup_dir, update_paths)
+        _rollback_update(root, backup_dir, update_paths, manifest_backup)
         print("Post-update hook failed. Rolled back copied files from backup:")
         print(f"  {backup_dir}")
         return failed_hooks[0][1]
@@ -83,16 +95,23 @@ def _apply_update_source(root: Path, source: UpdateSource, *, yes: bool, include
         result = _run(_template_cli_command(cli_command), root)
         validation_results.append((label, result))
         if result != 0:
-            _rollback_update(root, backup_dir, update_paths)
+            _rollback_update(root, backup_dir, update_paths, manifest_backup)
             print("Validation failed after update apply. Rolled back copied files from backup:")
             print(f"  {backup_dir}")
             return result
 
-    stamp_harness_manifest(root, source.root)
+    try:
+        stamp_harness_manifest(root, source.root)
+    except Exception as exc:
+        _rollback_update(root, backup_dir, update_paths, manifest_backup)
+        print("Manifest stamping failed after update apply. Rolled back copied files from backup:")
+        print(f"  {backup_dir}")
+        print(f"  {exc}")
+        return 1
     final_validation = _run(_template_cli_command("validate-governance"), root)
     validation_results.append(("validate-governance-after-provenance", final_validation))
     if final_validation != 0:
-        _rollback_update(root, backup_dir, update_paths)
+        _rollback_update(root, backup_dir, update_paths, manifest_backup)
         print("Provenance validation failed after update apply. Rolled back copied files from backup:")
         print(f"  {backup_dir}")
         return final_validation
@@ -119,7 +138,37 @@ def _copy_source_file(source_path: Path, target_path: Path) -> None:
     shutil.copy2(source_path, target_path)
 
 
-def _rollback_update(root: Path, backup_dir: Path, update_paths: list[str]) -> None:
+def _backup_existing_path(root: Path, backup_dir: Path, relative_path: str) -> Path | None:
+    backup = _backup_path_state(root, backup_dir, relative_path)
+    return backup.backup_path
+
+
+def _backup_path_state(root: Path, backup_dir: Path, relative_path: str) -> _PathBackup:
+    current_path = root / relative_path
+    if not current_path.exists():
+        return _PathBackup(relative_path=relative_path, backup_path=None, existed=False)
+    backup_path = backup_dir / relative_path
+    backup_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(current_path, backup_path)
+    return _PathBackup(relative_path=relative_path, backup_path=backup_path, existed=True)
+
+
+def _classified_missing_update_paths(missing_paths: list[str], target_manifest: dict) -> tuple[list[str], list[str]]:
+    inventory = target_manifest.get("artifactInventory", {})
+    harness_owned: list[str] = []
+    mixed_generated: list[str] = []
+    for relative_path in missing_paths:
+        ownership = _ownership_class(relative_path, inventory)
+        if ownership == "harnessOwned":
+            harness_owned.append(relative_path)
+        elif ownership == "mixedGenerated":
+            mixed_generated.append(relative_path)
+    return harness_owned, mixed_generated
+
+
+def _rollback_update(
+    root: Path, backup_dir: Path, update_paths: list[str], manifest_backup: _PathBackup | None = None
+) -> None:
     for relative_path in update_paths:
         current_path = root / relative_path
         backup_path = backup_dir / relative_path
@@ -128,6 +177,17 @@ def _rollback_update(root: Path, backup_dir: Path, update_paths: list[str]) -> N
             shutil.copy2(backup_path, current_path)
         elif current_path.exists():
             current_path.unlink()
+    if manifest_backup is not None:
+        manifest_path = root / manifest_backup.relative_path
+        if (
+            manifest_backup.existed
+            and manifest_backup.backup_path is not None
+            and manifest_backup.backup_path.exists()
+        ):
+            manifest_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(manifest_backup.backup_path, manifest_path)
+        elif not manifest_backup.existed and manifest_path.exists():
+            manifest_path.unlink()
     _run(_template_cli_command("sync-plugin-skills"), root)
     _run(_template_cli_command("render-intent-docs"), root)
 

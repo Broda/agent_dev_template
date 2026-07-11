@@ -136,7 +136,154 @@
       }
     },
     "implementation": { "type": "object" },
-    "mvpContract": { "type": "object" }
+    "mvpContract": { "type": "object" },
+    "finalizedContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schemaVersion",
+        "capabilities",
+        "ownershipBoundaries",
+        "invariants",
+        "domainConcepts",
+        "domainModel",
+        "dataModel",
+        "publicContracts",
+        "versionDomains",
+        "milestones",
+        "deferredScope"
+      ],
+      "properties": {
+        "schemaVersion": { "type": "integer", "const": 1 },
+        "capabilities": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["interfaces", "surfaces", "authentication"],
+          "properties": {
+            "interfaces": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["cli", "api", "web_ui", "admin_ui", "worker", "library"]
+              }
+            },
+            "surfaces": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "cli_commands",
+                  "http_api",
+                  "browser_ui",
+                  "admin_ui",
+                  "data_pipeline",
+                  "local_files",
+                  "sqlite",
+                  "database",
+                  "library_api"
+                ]
+              }
+            },
+            "authentication": { "type": "string", "enum": ["none", "local", "external", "unknown"] }
+          }
+        },
+        "ownershipBoundaries": { "type": "array", "items": { "type": "string" } },
+        "invariants": { "type": "array", "items": { "type": "string" } },
+        "domainConcepts": { "type": "array", "items": { "type": "string" } },
+        "domainModel": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string" },
+              "description": { "type": "string" }
+            }
+          }
+        },
+        "dataModel": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string" },
+              "description": { "type": "string" }
+            }
+          }
+        },
+        "publicContracts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string" },
+              "contract": { "type": "string" },
+              "surface": {
+                "type": "string",
+                "enum": ["cli_commands", "http_api", "browser_ui", "admin_ui", "data_pipeline", "local_files", "sqlite", "database", "library_api"]
+              },
+              "version": { "type": "string" }
+            }
+          }
+        },
+        "versionDomains": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["domain"],
+            "properties": {
+              "domain": { "type": "string" },
+              "version": { "type": "string" },
+              "compatibility": { "type": "string" }
+            }
+          }
+        },
+        "milestones": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "name", "tasks", "gates"],
+            "properties": {
+              "id": { "type": "string" },
+              "name": { "type": "string" },
+              "goal": { "type": "string" },
+              "tasks": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["area", "text"],
+                  "properties": {
+                    "area": { "type": "string" },
+                    "text": { "type": "string" }
+                  }
+                }
+              },
+              "gates": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["name", "evidence"],
+                  "properties": {
+                    "name": { "type": "string" },
+                    "evidence": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deferredScope": { "type": "array", "items": { "type": "string" } }
+      }
+    }
   },
   "x-variantRequirements": {
     "draft": {

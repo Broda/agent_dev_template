@@ -86,6 +86,7 @@ def _write_and_validate_finalized_project(
             latest_review_session=hydrated.latest_review_session,
             idea_files=context.idea_files,
             session_paths=context.session_paths,
+            hydration_files=context.hydrate_files,
             session_path=session_path,
             notes_col=context.notes_col,
             export_path=export_path,

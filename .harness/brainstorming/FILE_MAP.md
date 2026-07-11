@@ -65,6 +65,8 @@ Lean file registry for the Project Harness Template.
 | `.harness/tests/test_development_evidence.py` | Development roadmap evidence command regression tests |
 | `.harness/tests/test_development_rendering.py` | Development doc render and validation regression tests |
 | `.harness/tests/test_development_wiki.py` | Development wiki render and sync-check regression tests |
+| `.harness/tests/test_semantic_deferred_headings.py` | Semantic validator regressions for nested deferred roadmap headings |
+| `.harness/tests/test_semantic_finalization_fidelity.py` | Semantic finalization fidelity regression tests for structured contracts and unsupported generated surfaces |
 | `.harness/tests/test_finalization_regression.py` | End-to-end finalization regression tests for multi-session detail carryover |
 | `.harness/tests/test_harness_manifest.py` | Harness manifest validation and provenance stamping regression tests |
 | `.harness/tests/test_lab_handoff.py` | Lab handoff compiler regression tests for lossless brainstorming-to-finalization state |
@@ -77,6 +79,7 @@ Lean file registry for the Project Harness Template.
 | `.harness/tests/test_template_validation.py` | Template governance, skill, plugin, and launcher validation tests |
 | `.harness/tests/test_public_safety.py` | Public documentation safety regression tests |
 | `.harness/tests/test_project_harness_bootstrap.py` | Project harness bootstrap command regression tests |
+| `.harness/tests/test_project_harness_update_manifest_rollback.py` | Project harness update manifest rollback regression tests |
 | `.harness/tests/test_project_harness_update.py` | Project harness update dry-run regression tests |
 | `.harness/tests/test_runtime_discovery.py` | Installed runtime discovery contract tests |
 | `.harness/tests/test_state_schema.py` | Project state schema contract regression tests |
@@ -84,6 +87,7 @@ Lean file registry for the Project Harness Template.
 | `.harness/tests/fixtures/finalized_state_v2.json` | Canonical finalized-state fixture for development render/validate regression |
 | `.harness/tests/fixtures/finalized_state_web_app_v2.json` | Non-game finalized-state fixture for product-neutral development rendering regression |
 | `.harness/tests/fixtures/finalized_state_with_persistence_v2.json` | Persistence-enabled finalized-state fixture for migration-policy render regression |
+| `.harness/tests/fixtures/finalized_state_cli_data_pipeline_v2.json` | CLI/data-pipeline finalized-state fixture for semantic finalization fidelity regressions |
 | `.harness/tests/fixtures/finalized_session.md` | Matching finalized session fixture for development render/validate regression |
 | `.harness/brainstorming/templates/idea_template.md` | Idea capture template |
 | `.harness/brainstorming/templates/decision_template.md` | Decision template |
@@ -149,6 +153,8 @@ Lean file registry for the Project Harness Template.
 | `.harness/runtime/python/template_cli/bootstrap/update_plan.py` | Project harness update plan classification and baseline comparison helpers |
 | `.harness/runtime/python/template_cli/bootstrap/update_source.py` | Project harness update source resolution helpers |
 | `.harness/runtime/python/template_cli/external_idea.py` | External idea payload validation and JSON result contracts |
+| `.harness/runtime/python/template_cli/finalized_contract.py` | Finalized structured-contract hydration, preservation, and capability normalization helpers |
+| `.harness/runtime/python/template_cli/finalized_contract_tokens.py` | Canonical finalized-contract capability tokens, aliases, and fallback inference helpers |
 | `.harness/runtime/python/template_cli/git_helpers.py` | Shared captured-output git command runner |
 | `.harness/runtime/python/template_cli/evidence.py` | Development roadmap evidence capture command implementation |
 | `.harness/runtime/python/template_cli/finalize/artifacts.py` | Finalization artifact directory setup, backup registration, existing-state load, and session-log writing helpers |
@@ -177,6 +183,7 @@ Lean file registry for the Project Harness Template.
 | `.harness/runtime/python/template_cli/validator_overwrite_policy.py` | Finalization/render output ownership policy validation helpers |
 | `.harness/runtime/python/template_cli/validator_plugins.py` | Local plugin manifest and marketplace validation helpers |
 | `.harness/runtime/python/template_cli/validator_python_config.py` | Python tool configuration validation helpers |
+| `.harness/runtime/python/template_cli/validator_semantics.py` | Semantic validation for finalized development docs and structured contract fidelity |
 | `.harness/runtime/python/template_cli/validator_skills.py` | Repo-scoped skill and skill metadata validation helpers |
 | `.harness/runtime/python/template_cli/plugin_sync.py` | Plugin skill mirror sync command implementation |
 | `.harness/runtime/python/template_cli/posix_modes.py` | Canonical POSIX launcher mode inventory plus generation, Git-index, and validation helpers |
@@ -187,9 +194,11 @@ Lean file registry for the Project Harness Template.
 | `.harness/runtime/python/template_cli/lab_cli_parsers.py` | Declarative lab subcommand parser argument table |
 | `.harness/runtime/python/template_cli/notes.py` | Durable research note capture command implementation |
 | `.harness/runtime/python/template_cli/render.py` | Development document render orchestration |
+| `.harness/runtime/python/template_cli/render_capabilities.py` | Capability and structured finalized-contract helpers for development doc rendering |
 | `.harness/runtime/python/template_cli/render_ci.py` | Pure renderer for generated development CI workflow |
 | `.harness/runtime/python/template_cli/render_contract.py` | Implementation contract extraction and formatting for finalized development docs |
 | `.harness/runtime/python/template_cli/render_helpers.py` | State-extraction, file-manipulation, and hydration helpers for development doc rendering |
+| `.harness/runtime/python/template_cli/render_policy_docs.py` | Capability-aware policy document cleanup for generated development docs |
 | `.harness/runtime/python/template_cli/render_governance_templates.py` | Compatibility exports for governance document renderers |
 | `.harness/runtime/python/template_cli/render_adr.py` | Pure renderer for the generated initial architecture ADR |
 | `.harness/runtime/python/template_cli/render_architecture.py` | Pure renderer for generated architecture governance docs |

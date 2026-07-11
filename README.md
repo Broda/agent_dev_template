@@ -285,6 +285,56 @@ but may leave values empty while brainstorming. Finalized state must include the
 non-empty product, governance, session, and ADR fields required to render and
 validate development mode.
 
+Finalized schema v2 also accepts an optional `finalizedContract` object for
+structured ownership boundaries, invariants, domain/data model details, public
+contracts, version domains, ordered milestones, and deferred scope. The
+finalizer preserves an existing `state/project-init.json.finalizedContract`;
+otherwise it hydrates the object from a `## Finalized Contract` fenced JSON
+block in the active idea or session history and normalizes capability values to
+canonical tokens.
+
+````md
+## Finalized Contract
+
+```json
+{
+  "capabilities": {
+    "interfaces": ["cli"],
+    "surfaces": ["cli_commands", "data_pipeline", "sqlite"],
+    "authentication": "none"
+  },
+  "ownershipBoundaries": ["Core owns validation and persistence."],
+  "invariants": ["Report runs are append-only."],
+  "domainConcepts": ["packet run"],
+  "domainModel": [{"name": "ReportRun"}],
+  "dataModel": [{"name": "SQLite report_runs table"}],
+  "publicContracts": [{"name": "CLI command: report run --packet <path>", "surface": "cli_commands"}],
+  "versionDomains": [{"domain": "Packet JSON schema", "version": "v1"}],
+  "milestones": [{
+    "id": "M0",
+    "name": "CLI Baseline",
+    "tasks": [{"area": "CLI", "text": "Implement command help."}],
+    "gates": [{"name": "CLI help runs locally.", "evidence": "./report --help"}]
+  }],
+  "deferredScope": ["Web UI", "Remote APIs"]
+}
+```
+````
+
+Accepted capability tokens are:
+
+- `interfaces`: `cli`, `api`, `web_ui`, `admin_ui`, `worker`, `library`
+- `surfaces`: `cli_commands`, `http_api`, `browser_ui`, `admin_ui`,
+  `data_pipeline`, `local_files`, `sqlite`, `database`, `library_api`
+- `authentication`: `none`, `local`, `external`, `unknown`
+
+Render coverage is intentionally scoped: `README.md` renders public contracts
+and deferred scope, `docs/PROJECT_CONTEXT.md` renders invariants, ordered
+milestones, and deferred scope, and `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`,
+and the initial ADR render the detailed implementation contract sections.
+`CHANGELOG.md` keeps the initialization entry only. Older states without
+`finalizedContract` still validate and render through legacy prose fallback.
+
 Generated development docs include a GitHub Actions baseline by default. Set
 `documentation.ciPolicy` in `state/project-init.json` before rendering when a
 project needs different CI versus local verification wording.

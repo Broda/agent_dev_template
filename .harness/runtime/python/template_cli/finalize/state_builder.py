@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from template_cli.finalized_contract import build_finalized_contract
 from template_cli.finalize.helpers import STATE_SCHEMA_VERSION, is_placeholder_value, summarize_decisions, unique_values
 from template_cli.wiki import default_wiki_config
 
@@ -46,6 +47,7 @@ def _build_finalized_state(
     latest_review_session: str,
     idea_files: list[str],
     session_paths: list[str],
+    hydration_files: list[Path],
     session_path: str,
     notes_col: str,
     export_path: str,
@@ -146,4 +148,5 @@ def _build_finalized_state(
         existing_detail = existing_state.get(detail_key) if isinstance(existing_state, dict) else None
         if isinstance(existing_detail, dict) and existing_detail:
             state[detail_key] = existing_detail
+    state["finalizedContract"] = build_finalized_contract(existing_state, state, hydration_files)
     return state

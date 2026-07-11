@@ -592,6 +592,16 @@ Ruff CI and runtime-discovery preparation landed.
   - Normalize dates, owner names, temp paths, and command ordering where needed.
   - Acceptance: a renderer drift failure points to the exact generated document
     and preserves the existing semantic assertions.
+- [x] Add semantic finalization fidelity coverage for structured finalized
+      contracts.
+  - Renderers now prefer optional `finalizedContract` ownership, invariants,
+    domain/data model, public contracts, version domains, ordered milestones,
+    and deferred scope while preserving schemaVersion 2 compatibility.
+  - Development validation now flags unsupported generated surfaces, malformed
+    dotted-name concept fragments, active deferred scope, duplicate exclusions,
+    and missing structured invariants or milestones.
+  - Acceptance: a no-auth CLI/data-pipeline fixture preserves its reviewed
+    M0-M5 roadmap and rejects web/API/auth/package-manager residue.
 - [x] Add coverage for finalized projects with generated wiki enabled and
       disabled across render, validate, and status commands.
   - Add one finalized-state fixture with wiki disabled and one with wiki enabled.

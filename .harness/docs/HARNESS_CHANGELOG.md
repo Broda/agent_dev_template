@@ -18,3 +18,7 @@ projects receive their own `CHANGELOG.md` during finalization.
   milestone labels and CommonMark `-`, `*`, or `+` checkbox bullets.
 - Canonicalized rendered development documents on `Active Milestone:` and `-`
   checkbox bullets.
+- Added optional structured `finalizedContract` rendering and semantic
+  validation so CLI/data-pipeline finalization preserves reviewed milestones,
+  invariants, deferred scope, and capability boundaries without web/API/auth
+  template residue.

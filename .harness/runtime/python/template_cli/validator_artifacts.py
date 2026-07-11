@@ -96,6 +96,7 @@ BRAINSTORMING_CORE_ARTIFACTS = [
     ".harness/tests/workflow_test_helpers.py",
     ".harness/tests/test_development_domain_terms.py",
     ".harness/tests/test_development_rendering.py",
+    ".harness/tests/test_semantic_finalization_fidelity.py",
     ".harness/tests/test_lab_lifecycle.py",
     ".harness/tests/test_lab_launcher.py",
     ".harness/tests/test_harness_manifest.py",
@@ -109,6 +110,7 @@ BRAINSTORMING_CORE_ARTIFACTS = [
     ".harness/tests/fixtures/finalized_state_v2.json",
     ".harness/tests/fixtures/finalized_state_web_app_v2.json",
     ".harness/tests/fixtures/finalized_state_with_persistence_v2.json",
+    ".harness/tests/fixtures/finalized_state_cli_data_pipeline_v2.json",
     ".harness/tests/fixtures/finalized_session.md",
     "state/project-init.json",
     "state/project-init.schema.v2.json",
@@ -120,7 +122,9 @@ BRAINSTORMING_CORE_ARTIFACTS = [
     ".harness/runtime/python/template_cli/render_adr.py",
     ".harness/runtime/python/template_cli/render_architecture.py",
     ".harness/runtime/python/template_cli/render_ci.py",
+    ".harness/runtime/python/template_cli/render_capabilities.py",
     ".harness/runtime/python/template_cli/render_project_context.py",
+    ".harness/runtime/python/template_cli/render_policy_docs.py",
     ".harness/runtime/python/template_cli/render_readme.py",
     ".harness/runtime/python/template_cli/render_roadmap.py",
     ".harness/runtime/python/template_cli/bootstrap/projects.py",
@@ -154,6 +158,7 @@ BRAINSTORMING_CORE_ARTIFACTS = [
     ".harness/runtime/python/template_cli/release_check.py",
     ".harness/runtime/python/template_cli/runtime_discovery.py",
     ".harness/runtime/python/template_cli/validator_python_config.py",
+    ".harness/runtime/python/template_cli/validator_semantics.py",
 ]
 
 DEVELOPMENT_REQUIRED_ARTIFACTS = [

@@ -1,0 +1,205 @@
+{
+  "schemaVersion": 2,
+  "status": "finalized",
+  "finalizedAt": "2026-07-11",
+  "ideaId": "idea-automate-thought-reports",
+  "projectName": "AutomateThought Report Pipeline",
+  "owner": "Test User",
+  "purpose": "Generate deterministic Markdown reports for AutomateThought.com newsletter packet runs.",
+  "projectType": "CLI data pipeline",
+  "techStack": {
+    "language": "Python",
+    "runtime": "Python 3.12",
+    "framework": "None",
+    "packageTool": "None"
+  },
+  "persistence": "XDG-local SQLite",
+  "authentication": "None",
+  "determinism": "High - derived Markdown must be stable for identical inputs.",
+  "packaging": "Local CLI entrypoint",
+  "constraints": "Append-only report runs, canonical allowlisted JSON v1, deterministic derived Markdown, and superseding corrections.",
+  "commands": {
+    "build": "python3 -m py_compile src/automate_thought/*.py",
+    "run": "python3 -m automate_thought run --packet fixtures/packet-valid.json",
+    "test": "python3 -m unittest discover -s tests -v"
+  },
+  "product": {
+    "problemStatement": "Report operators need append-only AutomateThought.com packet processing without losing invalid or missing packet evidence.",
+    "targetUsers": "Hermes operators, core maintainers, and downstream report consumers",
+    "whyNow": "Reviewed M0-M5 gates are ready to become development governance.",
+    "expectedValue": "Every report run produces unconditional Markdown and auditable SQLite rows.",
+    "solutionSummary": "Build a local CLI data pipeline that ingests allowlisted JSON v1 packets, records valid-only child rows, and renders deterministic Markdown.",
+    "mvpScope": "Ship append-only report run storage, unconditional Markdown output, packet validity accounting, and superseding corrections.",
+    "outOfScope": "Collectors, remote APIs, and browser UI are deferred.",
+    "assumptions": "Operators can provide packet JSON files on disk and use XDG data locations.",
+    "nonGoals": "Do not build collectors, remote service integrations, or browser surfaces in the MVP."
+  },
+  "governance": {
+    "keyDecisions": "Preserve the reviewed M0-M5 plan, keep authentication out of scope, and make canonical JSON v1 the public input contract.",
+    "topRisks": "Renderer drift could promote deferred collectors or corrupt AutomateThought.com into malformed concept tasks.",
+    "mitigationPlans": "Use structured finalizedContract milestones and semantic validation of generated development docs.",
+    "contingencies": "Stop finalization if generated docs contradict accepted decisions or deferred scope.",
+    "remainingAcceptedRisks": "Packet source quality remains non-gating for report run creation.",
+    "latestReviewOutcome": "pass",
+    "latestReviewSession": "sessions/2026-07-11_idea-automate-thought-reports.md"
+  },
+  "artifacts": {
+    "ideaFiles": [],
+    "sessionFiles": [
+      "sessions/2026-07-11_idea-automate-thought-reports.md"
+    ],
+    "noteReferences": "None recorded",
+    "summaryExport": "",
+    "finalizationSession": "sessions/2026-07-11_FINALIZATION_SESSION_idea-automate-thought-reports.md",
+    "adrReferences": [
+      "docs/adr/ADR-0001-record-architecture-decisions.md"
+    ]
+  },
+  "finalizedContract": {
+    "schemaVersion": 1,
+    "capabilities": {
+      "interfaces": [
+        "cli"
+      ],
+      "surfaces": [
+        "data_pipeline",
+        "local_files",
+        "sqlite"
+      ],
+      "authentication": "none"
+    },
+    "ownershipBoundaries": [
+      "Hermes owns source packet production outside this repository.",
+      "Core owns canonical validation, run storage, and deterministic Markdown derivation.",
+      "Consumers own downstream reading of generated Markdown and JSON summaries."
+    ],
+    "invariants": [
+      "Report runs are append-only.",
+      "Markdown is written unconditionally for every run.",
+      "Packet valid, invalid, and missing states are recorded but do not gate run creation.",
+      "Child rows are inserted only for valid packet items.",
+      "Corrections supersede previous facts without destructive rewrites.",
+      "Canonical allowlisted JSON v1 is the only accepted packet input format.",
+      "Derived Markdown is deterministic for identical stored inputs."
+    ],
+    "domainConcepts": [
+      "AutomateThought.com newsletter packet",
+      "append-only report run",
+      "packet validity state",
+      "valid-only child rows",
+      "superseding correction",
+      "deterministic Markdown report"
+    ],
+    "domainModel": [
+      { "name": "ReportRun stores run id, source packet path, packet status, timestamps, and Markdown artifact path." },
+      { "name": "PacketFact stores child rows only when the packet is valid." },
+      { "name": "Correction records superseding changes while preserving prior facts." }
+    ],
+    "dataModel": [
+      { "name": "XDG data directory contains the SQLite database." },
+      { "name": "XDG state directory contains generated Markdown and run logs." },
+      { "name": "Canonical packet JSON v1 fields are allowlisted before persistence." }
+    ],
+    "publicContracts": [
+      { "name": "CLI command: report-pipeline run --packet <path>", "surface": "cli_commands" },
+      { "name": "CLI command: report-pipeline show --run-id <id>", "surface": "cli_commands" },
+      { "name": "Canonical allowlisted JSON v1 packet format", "surface": "data_pipeline" },
+      { "name": "Deterministic Markdown report format", "surface": "local_files" },
+      { "name": "SQLite schema version domain", "surface": "sqlite" }
+    ],
+    "versionDomains": [
+      { "domain": "Packet JSON schema v1" },
+      { "domain": "SQLite schema version" },
+      { "domain": "Markdown report format version" },
+      { "domain": "CLI command surface" }
+    ],
+    "milestones": [
+      {
+        "id": "M0",
+        "name": "Repository And CLI Baseline",
+        "goal": "Create the local Python CLI skeleton and verification commands.",
+        "tasks": [
+          { "area": "CLI", "text": "Create the report-pipeline entrypoint and help output." },
+          { "area": "Verification", "text": "Wire build, run, and unit test commands." }
+        ],
+        "gates": [
+          { "name": "Build command succeeds.", "evidence": "" },
+          { "name": "CLI help runs locally.", "evidence": "" }
+        ]
+      },
+      {
+        "id": "M1",
+        "name": "Append-Only Run Storage",
+        "goal": "Persist every report run in XDG-local SQLite.",
+        "tasks": [
+          { "area": "Persistence", "text": "Create SQLite tables for report runs, packet facts, and corrections." },
+          { "area": "Domain", "text": "Guarantee report run inserts are append-only." }
+        ],
+        "gates": [
+          { "name": "A second run inserts a new row instead of mutating the first.", "evidence": "" },
+          { "name": "SQLite file lands under the XDG data directory.", "evidence": "" }
+        ]
+      },
+      {
+        "id": "M2",
+        "name": "Packet Validity Accounting",
+        "goal": "Record valid, invalid, and missing packet states without gating run creation.",
+        "tasks": [
+          { "area": "Domain", "text": "Classify packet state as valid, invalid, or missing." },
+          { "area": "Persistence", "text": "Insert child rows only for valid packet items." }
+        ],
+        "gates": [
+          { "name": "Invalid packet still creates a report run.", "evidence": "" },
+          { "name": "Missing packet still creates a report run.", "evidence": "" },
+          { "name": "Invalid and missing packets create no child fact rows.", "evidence": "" }
+        ]
+      },
+      {
+        "id": "M3",
+        "name": "Deterministic Markdown Derivation",
+        "goal": "Render unconditional Markdown for every stored run.",
+        "tasks": [
+          { "area": "Rendering", "text": "Render deterministic Markdown from stored run state." },
+          { "area": "Verification", "text": "Assert identical stored inputs produce identical Markdown." }
+        ],
+        "gates": [
+          { "name": "Valid, invalid, and missing packet runs each write Markdown.", "evidence": "" },
+          { "name": "Golden Markdown output is stable.", "evidence": "" }
+        ]
+      },
+      {
+        "id": "M4",
+        "name": "Superseding Corrections",
+        "goal": "Record corrections without destructive rewrites.",
+        "tasks": [
+          { "area": "Domain", "text": "Model corrections as superseding facts." },
+          { "area": "Persistence", "text": "Preserve prior fact rows when corrections are added." }
+        ],
+        "gates": [
+          { "name": "Correction lookup returns the latest superseding value.", "evidence": "" },
+          { "name": "Original facts remain auditable.", "evidence": "" }
+        ]
+      },
+      {
+        "id": "M5",
+        "name": "Release Verification Packet",
+        "goal": "Prove the full local pipeline with fixtures and governance evidence.",
+        "tasks": [
+          { "area": "Verification", "text": "Run valid, invalid, and missing packet fixtures end to end." },
+          { "area": "Governance", "text": "Record milestone evidence in ROADMAP and runtime verification docs." }
+        ],
+        "gates": [
+          { "name": "All fixture runs produce expected SQLite state.", "evidence": "" },
+          { "name": "All fixture runs produce deterministic Markdown.", "evidence": "" },
+          { "name": "Deferred scope remains excluded from active implementation.", "evidence": "" }
+        ]
+      }
+    ],
+    "deferredScope": [
+      "Collectors",
+      "Remote APIs",
+      "Browser UI",
+      "Authentication"
+    ]
+  }
+}
