@@ -75,6 +75,18 @@ def _apply_update_source(root: Path, source: UpdateSource, *, yes: bool, include
         # a launcher missing from the index has nothing to restage.
         stage_posix_executable_modes(root, executable_paths)
 
+    try:
+        # Hooks and validators may require the target manifest schema. Stamp the
+        # target manifest before invoking either; rollback restores the original
+        # manifest if stamping or any subsequent step fails.
+        stamp_harness_manifest(root, source.root)
+    except Exception as exc:
+        _rollback_update(root, backup_dir, update_paths, manifest_backup)
+        print("Manifest stamping failed after update apply. Rolled back copied files from backup:")
+        print(f"  {backup_dir}")
+        print(f"  {exc}")
+        return 1
+
     hook_results: list[tuple[str, int]] = []
     if any(path.startswith(".agents/skills/") for path in update_paths):
         hook_results.append(("sync-plugin-skills", _run(_template_cli_command("sync-plugin-skills"), root)))
@@ -86,18 +98,6 @@ def _apply_update_source(root: Path, source: UpdateSource, *, yes: bool, include
         print("Post-update hook failed. Rolled back copied files from backup:")
         print(f"  {backup_dir}")
         return failed_hooks[0][1]
-
-    try:
-        # The target validators may require a newer manifest schema. Stamp the
-        # target manifest before running them; rollback restores the original
-        # manifest if stamping or any subsequent validation fails.
-        stamp_harness_manifest(root, source.root)
-    except Exception as exc:
-        _rollback_update(root, backup_dir, update_paths, manifest_backup)
-        print("Manifest stamping failed after update apply. Rolled back copied files from backup:")
-        print(f"  {backup_dir}")
-        print(f"  {exc}")
-        return 1
 
     validation_commands = [("validate-governance", "validate-governance")]
     if read_mode(root) == "development":
