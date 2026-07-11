@@ -33,15 +33,15 @@ class ProjectHarnessUpdateManifestRollbackTests(ProjectHarnessUpdateTestCase):
 
         self.assertFalse(project_manifest.exists())
 
-    def test_update_apply_restores_manifest_when_provenance_validation_fails(self) -> None:
-        source, project = self._project_with_source_update("# final validation rollback marker")
+    def test_update_apply_restores_manifest_when_post_stamp_validation_fails(self) -> None:
+        source, project = self._project_with_source_update("# validation rollback marker")
         project_wrapper = project / "scripts/lab.sh"
         original_wrapper = project_wrapper.read_text(encoding="utf-8")
         project_manifest = project / MANIFEST_PATH
         original_manifest = project_manifest.read_text(encoding="utf-8")
 
         stdout = io.StringIO()
-        with contextlib.redirect_stdout(stdout), mock.patch.object(update_apply, "_run", side_effect=[0, 1, 0, 0]):
+        with contextlib.redirect_stdout(stdout), mock.patch.object(update_apply, "_run", side_effect=[1, 0, 0]):
             result = update_apply._apply_update_source(
                 project,
                 self._update_source(source, project),
@@ -50,7 +50,7 @@ class ProjectHarnessUpdateManifestRollbackTests(ProjectHarnessUpdateTestCase):
             )
 
         self.assertEqual(1, result)
-        self.assertIn("Provenance validation failed after update apply.", stdout.getvalue())
+        self.assertIn("Validation failed after update apply.", stdout.getvalue())
         self.assertEqual(original_manifest, project_manifest.read_text(encoding="utf-8"))
         self.assertEqual(original_wrapper, project_wrapper.read_text(encoding="utf-8"))
 

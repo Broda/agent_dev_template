@@ -87,6 +87,18 @@ def _apply_update_source(root: Path, source: UpdateSource, *, yes: bool, include
         print(f"  {backup_dir}")
         return failed_hooks[0][1]
 
+    try:
+        # The target validators may require a newer manifest schema. Stamp the
+        # target manifest before running them; rollback restores the original
+        # manifest if stamping or any subsequent validation fails.
+        stamp_harness_manifest(root, source.root)
+    except Exception as exc:
+        _rollback_update(root, backup_dir, update_paths, manifest_backup)
+        print("Manifest stamping failed after update apply. Rolled back copied files from backup:")
+        print(f"  {backup_dir}")
+        print(f"  {exc}")
+        return 1
+
     validation_commands = [("validate-governance", "validate-governance")]
     if read_mode(root) == "development":
         validation_commands.append(("validate-development", "validate-development"))
@@ -99,22 +111,6 @@ def _apply_update_source(root: Path, source: UpdateSource, *, yes: bool, include
             print("Validation failed after update apply. Rolled back copied files from backup:")
             print(f"  {backup_dir}")
             return result
-
-    try:
-        stamp_harness_manifest(root, source.root)
-    except Exception as exc:
-        _rollback_update(root, backup_dir, update_paths, manifest_backup)
-        print("Manifest stamping failed after update apply. Rolled back copied files from backup:")
-        print(f"  {backup_dir}")
-        print(f"  {exc}")
-        return 1
-    final_validation = _run(_template_cli_command("validate-governance"), root)
-    validation_results.append(("validate-governance-after-provenance", final_validation))
-    if final_validation != 0:
-        _rollback_update(root, backup_dir, update_paths, manifest_backup)
-        print("Provenance validation failed after update apply. Rolled back copied files from backup:")
-        print(f"  {backup_dir}")
-        return final_validation
 
     print("Applied harness update.")
     print(f"Backup directory: {backup_dir}")
