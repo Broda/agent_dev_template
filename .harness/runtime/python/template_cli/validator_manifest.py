@@ -40,7 +40,10 @@ def load_harness_manifest(root: Path) -> dict[str, Any]:
 
 def stamp_harness_manifest(root: Path, source_root: Path) -> None:
     manifest_path = root / MANIFEST_PATH
-    manifest = json.loads(read_text(manifest_path))
+    # The source manifest is the target harness contract. Seed from it so
+    # updates can migrate manifest schema/version/inventory fields, then stamp
+    # provenance for the concrete source checkout used.
+    manifest = json.loads(read_text(source_root / MANIFEST_PATH))
     source_commit = _source_commit(source_root)
     if source_commit:
         manifest["sourceCommit"] = source_commit
