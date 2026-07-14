@@ -2,10 +2,45 @@ from __future__ import annotations
 
 import json
 
+from workflow_fixture_state import reset_project_state_for_workflow_tests
 from workflow_test_helpers import LabWorkflowTestCase, run_cmd
 
 
 class LabStatusTests(LabWorkflowTestCase):
+    def test_workflow_fixture_reset_discards_consumer_project_state(self) -> None:
+        sentinels = [
+            "ideas/consumer.md",
+            "sessions/consumer-session.md",
+            "notes/consumer-note.md",
+            "exports/consumer-export.md",
+        ]
+        for relative_path in sentinels:
+            (self.repo / relative_path).write_text("consumer state\n", encoding="utf-8")
+        (self.repo / "IDEA_CATALOG.md").write_text(
+            "| idea-consumer | Consumer Idea | active | User | session.md | _n/a_ | _none_ |\n",
+            encoding="utf-8",
+        )
+        (self.repo / "NOTES_CATALOG.md").write_text(
+            "| note-0004 | Consumer Note | 2026-07-14 | idea-consumer | chat | notes/consumer-note.md | test |\n",
+            encoding="utf-8",
+        )
+        state_path = self.repo / "state/project-init.json"
+        state = json.loads(state_path.read_text(encoding="utf-8"))
+        state["ideaId"] = "idea-consumer"
+        state["projectName"] = "Consumer Project"
+        state_path.write_text(json.dumps(state), encoding="utf-8")
+
+        reset_project_state_for_workflow_tests(self.repo)
+        result = run_cmd(["./scripts/lab", "status", "--json"], cwd=self.repo)
+        status = json.loads(result.stdout)
+
+        self.assertEqual(status["ideas"]["total"], 0)
+        self.assertEqual(status["finalize"]["targetSource"], "none")
+        self.assertTrue(all(not (self.repo / path).exists() for path in sentinels))
+        self.assertIn("_none yet_", (self.repo / "IDEA_CATALOG.md").read_text(encoding="utf-8"))
+        self.assertIn("_none yet_", (self.repo / "NOTES_CATALOG.md").read_text(encoding="utf-8"))
+        self.assertEqual(json.loads(state_path.read_text(encoding="utf-8"))["ideaId"], "")
+
     def test_lab_allows_shared_commands_in_development_mode(self) -> None:
         self.write_render_fixture()
         result = run_cmd(["./scripts/lab", "status"], cwd=self.repo)

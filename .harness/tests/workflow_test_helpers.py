@@ -9,6 +9,8 @@ import textwrap
 import unittest
 from pathlib import Path
 
+from workflow_fixture_state import reset_project_state_for_workflow_tests
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -65,6 +67,7 @@ class LabWorkflowTestCase(unittest.TestCase):
             self.repo,
             ignore=shutil.ignore_patterns(".git", "__pycache__", ".pytest_cache"),
         )
+        reset_project_state_for_workflow_tests(self.repo)
 
     def tearDown(self) -> None:
         shutil.rmtree(self.tmpdir, ignore_errors=True)

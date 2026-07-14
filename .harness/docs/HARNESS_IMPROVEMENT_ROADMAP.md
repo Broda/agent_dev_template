@@ -37,6 +37,9 @@ Goal: remove small public-template friction before deeper runtime changes.
       `lab---help` or `lab-help`.
 - [x] Add launcher tests for lab help handling on POSIX.
 - [x] Add or update PowerShell launcher tests for equivalent help behavior.
+- [x] Isolate workflow-test fixtures from instantiated projects' idea, session,
+      note, export, and draft-state content so consumer lifecycle data cannot
+      change pristine harness regression expectations.
 - [x] Decide whether `.github/workflows/governance-audit.yml` should be removed
       or changed to run a distinct warn-only audit that is not already covered
       by blocking CI.

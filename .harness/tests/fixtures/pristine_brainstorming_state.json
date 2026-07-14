@@ -1,0 +1,18 @@
+{
+  "clearDirectories": [
+    "ideas",
+    "sessions",
+    "notes",
+    "exports"
+  ],
+  "files": {
+    "MODE.md": "# Repository Mode\n\nCurrent mode: brainstorming\n\nAllowed values:\n\n- brainstorming\n- development\n\nSwitch modes with `./scripts/finalize-project`.\n",
+    "IDEA_CATALOG.md": "# Idea Catalog\n\nCentral index of tracked ideas.\n\n## Rules\n\n- Each idea ID appears once.\n- Status must be one of: `inbox`, `active`, `parked`, `killed`, `finalized`.\n- Finalized ideas may include an optional summary export path.\n\n## Registry\n\n| Idea ID | Title | Status | Owner | Sessions | Summary Export | Notes |\n|---|---|---|---|---|---|---|\n| _none yet_ | _none yet_ | inbox | unassigned | _none_ | _n/a_ | Add rows as ideas are captured |\n",
+    "NOTES_CATALOG.md": "# Notes Catalog\n\nCentral index of saved research and context notes.\n\n## Rules\n\n- Note IDs must be unique and use format `note-####`.\n- Note paths must point to files under `notes/`.\n- Dates use `YYYY-MM-DD`.\n\n## Registry\n\n| Note ID | Title | Date | Related Idea | Source Context | Path | Tags |\n|---|---|---|---|---|---|---|\n| _none yet_ | _none yet_ | YYYY-MM-DD | _none_ | _none_ | _none_ | _none_ |\n",
+    "ideas/_inbox.md": "# Idea Inbox\n\nUse `templates/idea_template.md` for each entry.\n\n---\n",
+    "ideas/_active.md": "# Active Ideas\n\nIdeas currently being evaluated and refined.\n\n---\n",
+    "ideas/_parked.md": "# Parked Ideas\n\nDeferred ideas with explicit re-entry criteria and review date.\n\n---\n",
+    "ideas/_killed.md": "# Killed Ideas\n\nRejected ideas with clear rationale and anti-goals.\n\n---\n",
+    "state/project-init.json": "{\n  \"schemaVersion\": 2,\n  \"status\": \"draft\",\n  \"finalizedAt\": \"\",\n  \"ideaId\": \"\",\n  \"projectName\": \"\",\n  \"owner\": \"\",\n  \"purpose\": \"\",\n  \"projectType\": \"\",\n  \"techStack\": {\n    \"language\": \"\",\n    \"runtime\": \"\",\n    \"framework\": \"\",\n    \"packageTool\": \"\"\n  },\n  \"persistence\": \"\",\n  \"authentication\": \"\",\n  \"determinism\": \"\",\n  \"packaging\": \"\",\n  \"constraints\": \"\",\n  \"commands\": {\n    \"build\": \"\",\n    \"run\": \"\",\n    \"test\": \"\"\n  },\n  \"product\": {\n    \"problemStatement\": \"\",\n    \"targetUsers\": \"\",\n    \"whyNow\": \"\",\n    \"expectedValue\": \"\",\n    \"solutionSummary\": \"\",\n    \"mvpScope\": \"\",\n    \"outOfScope\": \"\",\n    \"assumptions\": \"\",\n    \"nonGoals\": \"\"\n  },\n  \"governance\": {\n    \"keyDecisions\": \"\",\n    \"topRisks\": \"\",\n    \"mitigationPlans\": \"\",\n    \"contingencies\": \"\",\n    \"remainingAcceptedRisks\": \"\",\n    \"latestReviewOutcome\": \"\",\n    \"latestReviewSession\": \"\"\n  },\n  \"artifacts\": {\n    \"ideaFiles\": [],\n    \"sessionFiles\": [],\n    \"noteReferences\": \"\",\n    \"summaryExport\": \"\",\n    \"finalizationSession\": \"\",\n    \"adrReferences\": []\n  }\n}\n"
+  }
+}

@@ -60,6 +60,7 @@ Lean file registry for the Project Harness Template.
 | `exports/` | Optional archival project summaries |
 | `tests/` | Regression tests for CLI and workflow runtime |
 | `.harness/tests/workflow_test_helpers.py` | Shared temp-repo fixtures and command helpers for workflow tests |
+| `.harness/tests/workflow_fixture_state.py` | Consumer-state reset helper that gives workflow tests a deterministic blank project fixture |
 | `.harness/tests/test_development_domain_terms.py` | Development validation regression tests for non-template domain language |
 | `.harness/tests/test_development_adr.py` | Development ADR command regression tests |
 | `.harness/tests/test_development_evidence.py` | Development roadmap evidence command regression tests |
@@ -89,6 +90,7 @@ Lean file registry for the Project Harness Template.
 | `.harness/tests/fixtures/finalized_state_with_persistence_v2.json` | Persistence-enabled finalized-state fixture for migration-policy render regression |
 | `.harness/tests/fixtures/finalized_state_cli_data_pipeline_v2.json` | CLI/data-pipeline finalized-state fixture for semantic finalization fidelity regressions |
 | `.harness/tests/fixtures/finalized_session.md` | Matching finalized session fixture for development render/validate regression |
+| `.harness/tests/fixtures/pristine_brainstorming_state.json` | Deterministic blank project-owned state used to isolate workflow tests from instantiated consumer content |
 | `.harness/brainstorming/templates/idea_template.md` | Idea capture template |
 | `.harness/brainstorming/templates/decision_template.md` | Decision template |
 | `.harness/brainstorming/templates/note_template.md` | Research note template |
