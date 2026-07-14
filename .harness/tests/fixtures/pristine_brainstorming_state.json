@@ -6,7 +6,6 @@
     "exports"
   ],
   "files": {
-    "MODE.md": "# Repository Mode\n\nCurrent mode: brainstorming\n\nAllowed values:\n\n- brainstorming\n- development\n\nSwitch modes with `./scripts/finalize-project`.\n",
     "IDEA_CATALOG.md": "# Idea Catalog\n\nCentral index of tracked ideas.\n\n## Rules\n\n- Each idea ID appears once.\n- Status must be one of: `inbox`, `active`, `parked`, `killed`, `finalized`.\n- Finalized ideas may include an optional summary export path.\n\n## Registry\n\n| Idea ID | Title | Status | Owner | Sessions | Summary Export | Notes |\n|---|---|---|---|---|---|---|\n| _none yet_ | _none yet_ | inbox | unassigned | _none_ | _n/a_ | Add rows as ideas are captured |\n",
     "NOTES_CATALOG.md": "# Notes Catalog\n\nCentral index of saved research and context notes.\n\n## Rules\n\n- Note IDs must be unique and use format `note-####`.\n- Note paths must point to files under `notes/`.\n- Dates use `YYYY-MM-DD`.\n\n## Registry\n\n| Note ID | Title | Date | Related Idea | Source Context | Path | Tags |\n|---|---|---|---|---|---|---|\n| _none yet_ | _none yet_ | YYYY-MM-DD | _none_ | _none_ | _none_ | _none_ |\n",
     "ideas/_inbox.md": "# Idea Inbox\n\nUse `templates/idea_template.md` for each entry.\n\n---\n",
