@@ -31,9 +31,12 @@ projects receive their own `CHANGELOG.md` during finalization.
   bodies and substantive Current Focus / Exploration Path Notes with source
   traceability, render them into authoritative development contract sections,
   and detect generated-document omissions during semantic validation.
-- Reclassified the compatible state schema as harness-owned so update/apply
-  delivers runtime schema evolution automatically while preserving the
-  downstream project's `state/project-init.json` byte for byte.
+- Relocated the canonical compatible state schema to the harness-owned
+  `.harness/schemas/` namespace so an old downstream updater installs the
+  missing target path on its first apply, while preserving both the downstream
+  `state/project-init.json` and legacy project-owned schema byte for byte.
+- Ignored marker-only CommonMark bullets when compiling note and session
+  sections so empty template placeholders cannot become bogus contract items.
 - Unified effective deferred scope across state normalization, rendering, and
   validation so populated out-of-scope or non-goal fields cannot render as
   `None recorded`; structured Finalized Contract JSON and legacy headings

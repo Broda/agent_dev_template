@@ -140,7 +140,8 @@ Lean file registry for the Project Harness Template.
 | `scripts/lab-note.sh` | POSIX launcher for Python research note capture helper |
 | `scripts/project-harness.sh` | POSIX launcher for harness bootstrap helpers |
 | `state/project-init.json` | Canonical structured handoff state |
-| `state/project-init.schema.v2.json` | Harness-owned JSON Schema and variant contract delivered with compatible runtime evolution for project-owned canonical state |
+| `.harness/schemas/project-init.schema.v2.json` | Harness-owned canonical JSON Schema and variant contract delivered with compatible runtime evolution |
+| `state/project-init.schema.v2.json` | Legacy project-owned schema location preserved for older downstream runtimes |
 | `.github/workflows/ci.yml` | Blocking CI for tests and governance validation |
 | `.github/workflows/governance-audit.yml` | Warn-only CI audit |
 | `.github/workflows/release-readiness.yml` | Manual public-template release readiness smoke workflow |

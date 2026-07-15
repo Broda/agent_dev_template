@@ -279,11 +279,11 @@ This will:
 5. Render the development governance docs into `docs/`, `README.md`, `CHANGELOG.md`, and `.gitignore`.
 6. Switch `MODE.md` to `development`.
 
-`state/project-init.json` uses schemaVersion 2, with the checked-in contract at
-`state/project-init.schema.v2.json`. Draft state keeps the full canonical shape
-but may leave values empty while brainstorming. Finalized state must include the
-non-empty product, governance, session, and ADR fields required to render and
-validate development mode.
+`state/project-init.json` uses schemaVersion 2, with the canonical checked-in
+contract at `.harness/schemas/project-init.schema.v2.json`. Draft state keeps
+the full canonical shape but may leave values empty while brainstorming.
+Finalized state must include the non-empty product, governance, session, and ADR
+fields required to render and validate development mode.
 
 Finalized schema v2 also accepts an optional `finalizedContract` object for
 structured ownership boundaries, invariants, domain/data model details, public
@@ -365,12 +365,14 @@ Generated development docs include a GitHub Actions baseline by default. Set
 project needs different CI versus local verification wording.
 
 `state/project-init.json` is project-owned and update/apply never overwrites it.
-Its compatible `state/project-init.schema.v2.json` contract is harness-owned so
-runtime and additive schema evolution arrive together without requiring
-`--include-mixed`. Incompatible state changes should add a new schema file,
-update `.harness/commands/harness_manifest.json` compatibility metadata, keep
-fixture coverage for old and new valid states, and include an explicit migration
-path before finalization or rendering writes the new version.
+Its compatible `.harness/schemas/project-init.schema.v2.json` contract is
+harness-owned so runtime and additive schema evolution arrive together on the
+first update pass without requiring `--include-mixed`. The legacy
+`state/project-init.schema.v2.json` remains project-owned for older runtime
+compatibility and is not overwritten. Incompatible state changes should add a
+new schema file, update `.harness/commands/harness_manifest.json` compatibility
+metadata, keep fixture coverage for old and new valid states, and include an
+explicit migration path before finalization or rendering writes the new version.
 
 ## Development Phase
 

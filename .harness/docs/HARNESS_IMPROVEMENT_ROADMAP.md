@@ -589,9 +589,10 @@ Ruff CI and runtime-discovery preparation landed.
   - Acceptance: real CLI-path regressions cover multiple decisions, risks,
     notes with an empty idea-catalog Notes cell, blocking behavior, structured
     JSON compatibility, legacy headings, archive rewrites, and contradiction-free docs.
-  - Treat the compatible state schema as harness-owned during update/apply so
-    downstream runtime evolution cannot strand a project on an incompatible old
-    schema; preserve `state/project-init.json` byte for byte.
+  - Publish the compatible state schema at a new harness-owned `.harness/schemas/`
+    path so an old downstream updater installs it as a missing target artifact
+    in one pass; preserve `state/project-init.json` and the legacy project-owned
+    schema byte for byte.
 
 - [x] Add an end-to-end golden fixture for `lab handoff` followed by noninteractive
       finalization and development validation.

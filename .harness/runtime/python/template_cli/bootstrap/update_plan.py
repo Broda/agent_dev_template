@@ -37,7 +37,7 @@ def _build_update_plan(
         if relative_path == MANIFEST_PATH:
             categories["unchanged"].append(relative_path)
             continue
-        ownership = _update_ownership_class(relative_path, inventory, target_manifest)
+        ownership = _ownership_class(relative_path, inventory)
         current_path = root / relative_path
         source_path = source_root / relative_path
         current_exists = current_path.exists()
@@ -135,21 +135,6 @@ def _ownership_class(relative_path: str, inventory: dict) -> str:
                 best_class = ownership_class
                 best_length = len(entry)
     return best_class
-
-
-def _update_ownership_class(relative_path: str, current_inventory: dict, target_manifest: dict) -> str:
-    target_schema_path = str(target_manifest.get("compatibility", {}).get("stateSchemaPath", "") or "").strip()
-    target_inventory = target_manifest.get("artifactInventory", {})
-    is_schema_artifact = target_schema_path.startswith("state/project-init.schema.") and target_schema_path.endswith(
-        ".json"
-    )
-    if (
-        is_schema_artifact
-        and relative_path == target_schema_path
-        and _ownership_class(relative_path, target_inventory) == "harnessOwned"
-    ):
-        return "harnessOwned"
-    return _ownership_class(relative_path, current_inventory)
 
 
 def _matches_inventory_entry(relative_path: str, entry: str) -> bool:

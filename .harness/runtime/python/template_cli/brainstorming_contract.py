@@ -211,7 +211,7 @@ def _content_items(lines: list[str]) -> list[str]:
     items: list[str] = []
     for line in lines:
         stripped = line.strip()
-        if not stripped:
+        if not stripped or stripped in {"-", "*", "+"}:
             continue
         bullet = re.match(r"^[-*+]\s+(.+?)\s*$", stripped)
         if bullet:

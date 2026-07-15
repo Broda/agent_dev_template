@@ -9,7 +9,7 @@
     "wrapperRuntimeVersion": 1,
     "capabilityVersion": 1,
     "stateSchemaVersion": 2,
-    "stateSchemaPath": "state/project-init.schema.v2.json"
+    "stateSchemaPath": ".harness/schemas/project-init.schema.v2.json"
   },
   "supportedModes": [
     "brainstorming",
@@ -84,8 +84,8 @@
       ".harness/development/",
       ".harness/docs/",
       ".harness/runtime/python/template_cli/",
+      ".harness/schemas/",
       ".harness/tests/",
-      "state/project-init.schema.v2.json",
       "scripts/",
       ".agents/skills/",
       ".harness/plugins/project-lifecycle-lab/"
@@ -96,6 +96,7 @@
       "notes/",
       "exports/",
       "state/project-init.json",
+      "state/project-init.schema.v2.json",
       "docs/",
       "src/",
       "tests/"
@@ -141,6 +142,7 @@
       "ideas/",
       "notes/",
       ".harness/runtime/python/template_cli/",
+      ".harness/schemas/",
       ".harness/plugins/project-lifecycle-lab/",
       ".harness/tests/",
       "scripts/",

@@ -7,7 +7,7 @@ from typing import Any
 from template_cli.io_helpers import ValidationResult, path_exists, read_text
 
 STATE_FILE = "state/project-init.json"
-STATE_SCHEMA_FILE = "state/project-init.schema.v2.json"
+STATE_SCHEMA_FILE = ".harness/schemas/project-init.schema.v2.json"
 STATE_SCHEMA_VERSION = 2
 
 
@@ -76,7 +76,7 @@ def _load_schema(root: Path, result: ValidationResult) -> dict[str, Any]:
         result.add_failure(f"Invalid JSON in {STATE_SCHEMA_FILE}: {exc}")
         return {}
     if not isinstance(schema, dict):
-        result.add_failure("state/project-init.schema.v2.json root must be an object.")
+        result.add_failure(f"{STATE_SCHEMA_FILE} root must be an object.")
         return {}
     return schema
 

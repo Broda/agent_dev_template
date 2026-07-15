@@ -122,6 +122,48 @@ class NativeSemanticHandoffTests(LabWorkflowTestCase):
             result.stdout,
         )
 
+    def test_blank_template_bullets_do_not_become_semantic_items(self) -> None:
+        idea_id = "idea-blank-template-bullets"
+        self.write_finalize_fixture(idea_id)
+        session_path = self.repo / f"sessions/2026-04-03_{idea_id}.md"
+        session_text = session_path.read_text(encoding="utf-8")
+        session_text = session_text.replace(
+            "- Preserve continuity through finalize.",
+            "- Preserve continuity through finalize.\n- ",
+        ).replace("## Exploration Path Notes\n", "## Exploration Path Notes\n\n- \n")
+        session_path.write_text(session_text, encoding="utf-8")
+        run_cmd(
+            [
+                "./scripts/lab",
+                "note",
+                "--idea-id",
+                idea_id,
+                "--topic",
+                "Blank template sections",
+                "--summary",
+                "A retained observation.",
+                "--no-sync",
+            ],
+            cwd=self.repo,
+        )
+        note_path = next((self.repo / "notes").glob("*note-0001*.md"))
+        note_path.write_text(
+            note_path.read_text(encoding="utf-8").replace("- None recorded.", "- "),
+            encoding="utf-8",
+        )
+
+        run_cmd(["./scripts/lab", "handoff", "--idea-id", idea_id, "--no-sync"], cwd=self.repo)
+        state = json.loads((self.repo / "state/project-init.json").read_text(encoding="utf-8"))
+        note = state["brainstormingContract"]["relatedNotes"][0]
+        self.assertEqual(["A retained observation."], note["capturedInformation"])
+        self.assertEqual([], note["keyFacts"])
+        self.assertEqual([], note["openQuestions"])
+        self.assertEqual([], note["links"])
+        session_items = [
+            item for record in state["brainstormingContract"]["sessionSections"] for item in record["items"]
+        ]
+        self.assertEqual(["Preserve continuity through finalize."], session_items)
+
     def test_handoff_blocks_incomplete_native_decision_with_guidance(self) -> None:
         idea_id = "idea-incomplete-native-contract"
         self.write_finalize_fixture(idea_id)

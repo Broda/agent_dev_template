@@ -115,6 +115,7 @@ BRAINSTORMING_CORE_ARTIFACTS = [
     ".harness/tests/fixtures/finalized_session.md",
     ".harness/tests/fixtures/pristine_brainstorming_state.json",
     "state/project-init.json",
+    ".harness/schemas/project-init.schema.v2.json",
     "state/project-init.schema.v2.json",
     ".github/workflows/ci.yml",
     ".github/workflows/governance-audit.yml",
@@ -199,6 +200,7 @@ DEVELOPMENT_REQUIRED_ARTIFACTS = [
     "docs/adr/ADR-0001-record-architecture-decisions.md",
     "docs/adr/ADR-TEMPLATE.md",
     "state/project-init.json",
+    ".harness/schemas/project-init.schema.v2.json",
     "state/project-init.schema.v2.json",
     ".harness/commands/harness_manifest.json",
 ]

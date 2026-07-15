@@ -70,11 +70,13 @@ Future `update` work should load this manifest rather than scraping Markdown
 docs. Update tooling must preserve project-owned and archival paths by default
 and classify mixed/generated paths conservatively.
 
-Compatible state schema evolution ships through the harness-owned schema
-artifact while `state/project-init.json` remains project-owned. Incompatible
-changes must ship as a new schema artifact, update the manifest compatibility
-entry, and include migration tests before finalization or rendering starts
-writing the new version.
+Compatible state schema evolution ships through the harness-owned
+`.harness/schemas/` artifact while `state/project-init.json` and the legacy
+`state/project-init.schema.v2.json` remain project-owned. A missing target path
+lets even an older downstream updater install the incoming schema in one pass.
+Incompatible changes must ship as a new schema artifact, update the manifest
+compatibility entry, and include migration tests before finalization or
+rendering starts writing the new version.
 
 ## Command Discovery
 
@@ -126,7 +128,7 @@ Expected behavior:
 
 1. Show a dry-run summary before changing files.
 2. Preserve project-local state: `ideas/`, `sessions/`, `notes/`, `exports/`, `state/project-init.json`, and finalized `docs/`.
-3. Deliver the harness-owned `state/project-init.schema.v2.json` with compatible runtime evolution while preserving the project-owned state instance.
+3. Deliver the harness-owned `.harness/schemas/project-init.schema.v2.json` with compatible runtime evolution while preserving the project-owned state instance and legacy schema.
 4. Update reusable harness runtime files only after confirmation.
 5. Run `./scripts/sync-plugin-skills` when repo-scoped skills change.
 6. Run `./scripts/validate-governance`.

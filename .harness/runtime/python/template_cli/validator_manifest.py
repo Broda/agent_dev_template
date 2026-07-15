@@ -20,7 +20,7 @@ EXPECTED_COMPATIBILITY = {
     "wrapperRuntimeVersion": 1,
     "capabilityVersion": 1,
     "stateSchemaVersion": 2,
-    "stateSchemaPath": "state/project-init.schema.v2.json",
+    "stateSchemaPath": ".harness/schemas/project-init.schema.v2.json",
 }
 EXPECTED_MODES = ["brainstorming", "development"]
 EXPECTED_STABLE_WRAPPER_BACKENDS = {

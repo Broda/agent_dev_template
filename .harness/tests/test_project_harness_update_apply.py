@@ -75,34 +75,6 @@ class ProjectHarnessUpdateApplyTests(ProjectHarnessUpdateTestCase):
         self.assertIn("# target wrapper update", (project / "scripts/lab.sh").read_text(encoding="utf-8"))
         self.assertTrue((project / ".harness-update-backups").exists())
 
-    def test_update_apply_delivers_schema_evolution_without_overwriting_project_state(self) -> None:
-        source = self.copy_source()
-        self.init_git_source(source)
-        project = self.tmpdir / "generated-project"
-        run_cmd(["./scripts/project-harness", "new", str(project), "--no-git"], cwd=source)
-        self.mark_state_schema_project_owned(project)
-        project_state_path = project / "state/project-init.json"
-        project_state = json.loads(project_state_path.read_text(encoding="utf-8"))
-        project_state["projectName"] = "Preserve This Downstream Project Name"
-        project_state_before = json.dumps(project_state, indent=2) + "\n"
-        project_state_path.write_text(project_state_before, encoding="utf-8")
-        source_schema_path = source / "state/project-init.schema.v2.json"
-        source_schema = json.loads(source_schema_path.read_text(encoding="utf-8"))
-        contract_schema = source_schema["properties"]["brainstormingContract"]
-        contract_schema["description"] = "Harness-delivered semantic contract schema evolution."
-        evolved_schema = json.dumps(source_schema, indent=2) + "\n"
-        source_schema_path.write_text(evolved_schema, encoding="utf-8")
-
-        result = run_cmd(
-            ["./scripts/project-harness", "update", "--apply", "--source-path", str(source), "--yes"],
-            cwd=project,
-        )
-
-        self.assertIn("Applied harness update.", result.stdout)
-        self.assertIn("state/project-init.schema.v2.json", result.stdout)
-        self.assertEqual(project_state_before, project_state_path.read_text(encoding="utf-8"))
-        self.assertEqual(evolved_schema, (project / "state/project-init.schema.v2.json").read_text(encoding="utf-8"))
-
     def test_update_apply_removes_clean_harness_owned_deleted_source_file(self) -> None:
         source = self.copy_source()
         obsolete_source = source / "scripts/obsolete-helper"
