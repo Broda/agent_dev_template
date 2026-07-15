@@ -30,7 +30,7 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
         "CHANGELOG.md": "6b0e43176413e4e809d46f89b5da23c3976050f6c2dc22a774852399963f09a3",
         ".gitignore": "8ed32c34caaa326b71d25ce9835819a720ec3c2a91585b53bf22c75d0bbea2fe",
         ".github/workflows/ci.yml": "906f2350397192fad881369ec876626aa8c76f3bf0343d8c0094dfe3545c2287",
-        "docs/PROJECT_CONTEXT.md": "63488ebff522099afa5a364194ad2ca0d60b24df782053c48a034abfac43b62f",
+        "docs/PROJECT_CONTEXT.md": "fc665dff7f34eba9e726c47fdf615299572b5f5dc6130c88142a1f5e0c1eb897",
         "docs/ROADMAP.md": "33718c326a7c6f8081848d280f7c1dd37e03199d34b7948e628cbbf9e2a45f21",
         "docs/ARCHITECTURE.md": "bc07491dedab929850fefd658afa49ca8a63f5d027b80565e30353873bfd70c9",
         "docs/FILE_MAP.md": "7098cf4ce0d6ec3387972ad897e8462f0dd50357253222611e85a6ef7d6ea4bc",

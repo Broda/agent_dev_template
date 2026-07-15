@@ -191,6 +191,7 @@ Lean file registry for the Project Harness Template.
 | `.harness/runtime/python/template_cli/validator_semantics.py` | Semantic validation for finalized development docs and structured contract fidelity |
 | `.harness/runtime/python/template_cli/validator_skills.py` | Repo-scoped skill and skill metadata validation helpers |
 | `.harness/runtime/python/template_cli/plugin_sync.py` | Plugin skill mirror sync command implementation |
+| `.harness/runtime/python/template_cli/development_doc_migration.py` | Transactional legacy generated-development-doc semantic migration used during harness updates |
 | `.harness/runtime/python/template_cli/posix_modes.py` | Canonical POSIX launcher mode inventory plus generation, Git-index, and validation helpers |
 | `.harness/runtime/python/template_cli/intent_registry.py` | Intent registry loading, schema validation, and command lookup helpers |
 | `.harness/runtime/python/template_cli/intents.py` | Intent registry rendering and compatibility exports for generated intent-doc sync helpers |
@@ -200,6 +201,7 @@ Lean file registry for the Project Harness Template.
 | `.harness/runtime/python/template_cli/notes.py` | Durable research note capture command implementation |
 | `.harness/runtime/python/template_cli/render.py` | Development document render orchestration |
 | `.harness/runtime/python/template_cli/render_capabilities.py` | Capability and structured finalized-contract helpers for development doc rendering |
+| `.harness/runtime/python/template_cli/render_markers.py` | Version marker shared by current development renderers and update migration detection |
 | `.harness/runtime/python/template_cli/render_ci.py` | Pure renderer for generated development CI workflow |
 | `.harness/runtime/python/template_cli/render_contract.py` | Implementation contract extraction and formatting for finalized development docs |
 | `.harness/runtime/python/template_cli/render_helpers.py` | State-extraction, file-manipulation, and hydration helpers for development doc rendering |

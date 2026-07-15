@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from template_cli.render_helpers import MILESTONE_NAME
+from template_cli.render_markers import DEVELOPMENT_DOC_CONTRACT_MARKER
 
 
 def _render_project_context(
@@ -37,7 +38,9 @@ def _render_project_context(
     invariant_lines = _render_lines(invariants or [], "- None captured.")
     milestone_lines = _render_lines(milestone_summaries or [], "- Use ROADMAP.md for milestone details.")
     deferred_lines = _render_lines(deferred_scope or [], "- None recorded.")
-    return f"""# PROJECT_CONTEXT.md — Structured Mode v2
+    return f"""{DEVELOPMENT_DOC_CONTRACT_MARKER}
+
+# PROJECT_CONTEXT.md — Structured Mode v2
 
 This document defines how this project evolves.
 

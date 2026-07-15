@@ -374,6 +374,14 @@ new schema file, update `.harness/commands/harness_manifest.json` compatibility
 metadata, keep fixture coverage for old and new valid states, and include an
 explicit migration path before finalization or rendering writes the new version.
 
+For finalized projects created before the current development-doc contract
+marker, the first applicable update also performs a transactional compatibility
+migration. It preserves `state/project-init.json` byte for byte, backs up every
+changed generated doc under `.harness-update-backups/`, corrects exact stale
+deferred-scope fallbacks, and appends the authoritative finalized contract to
+`docs/PROJECT_CONTEXT.md` without replacing project-authored content. Strict
+development validation accepts the migration or restores the original docs.
+
 ## Development Phase
 
 Repo-scoped skill: `.agents/skills/development-governance/SKILL.md`

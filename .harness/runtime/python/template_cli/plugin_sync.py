@@ -3,6 +3,7 @@ from __future__ import annotations
 import shutil
 from pathlib import Path
 
+from template_cli.development_doc_migration import apply_pending_development_doc_migration
 from template_cli.validator_plugins import PLUGIN_SKILL_METADATA, PLUGIN_SKILLS
 from template_cli.validator_skills import REPO_SKILL_METADATA, REPO_SKILLS
 from template_cli.validators import run_validate_governance
@@ -24,7 +25,17 @@ def run_sync_plugin_skills(root: Path) -> int:
     for relative_path in copied:
         print(f"- {relative_path}")
     print()
-    return run_validate_governance(root)
+    try:
+        migration = apply_pending_development_doc_migration(root)
+    except Exception as exc:
+        print(f"FAIL: unable to migrate legacy generated development docs: {exc}")
+        return 1
+
+    result = run_validate_governance(root)
+    if result != 0 and migration is not None:
+        migration.rollback()
+        print("Rolled back generated development-doc migration after validation failure.")
+    return result
 
 
 def _copy_file(source: Path, destination: Path) -> None:

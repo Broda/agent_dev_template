@@ -13,6 +13,103 @@ LEGACY_SCHEMA_PATH = "state/project-init.schema.v2.json"
 
 
 class ProjectHarnessUpdateSourceOnlyTests(ProjectHarnessUpdateTestCase):
+    def test_old_development_updater_migrates_stale_generated_contract_atomically(self) -> None:
+        old_source = self._git_checkout_source(PROJECT_OWNED_SCHEMA_COMMIT, "old-development-source")
+        current_source = self._current_worktree_source()
+        project = self.tmpdir / "old-development-project"
+        run_cmd(["./scripts/project-harness", "new", str(project), "--no-git"], cwd=old_source)
+        self.install_finalized_cli_project(project)
+        self._make_legacy_stale_deferred_docs(project)
+        state_path = project / "state/project-init.json"
+        state_before = state_path.read_bytes()
+        authored_markers = {
+            "README.md": "Project-authored README migration marker.",
+            "docs/ARCHITECTURE.md": "Project-authored architecture migration marker.",
+            "docs/ROADMAP.md": "Project-authored roadmap migration marker.",
+            "docs/SECURITY_POLICY.md": "Project-authored security migration marker.",
+        }
+        for relative_path, marker in authored_markers.items():
+            path = project / relative_path
+            path.write_text(path.read_text(encoding="utf-8") + f"\n{marker}\n", encoding="utf-8")
+        self._align_target_generated_docs(current_source, project)
+        docs_before = self._migration_doc_bytes(project)
+        combined_before = "\n".join(value.decode() for value in docs_before.values())
+        self.assertRegex(combined_before, r"(?im)Deferred scope:\s*\n\s*- None recorded\.")
+
+        result = run_cmd(
+            [
+                "./scripts/project-harness",
+                "update",
+                "--apply",
+                "--source-path",
+                str(current_source),
+                "--yes",
+                "--include-mixed",
+            ],
+            cwd=project,
+        )
+
+        self.assertIn("Migrated legacy generated development contract sections:", result.stdout)
+        self.assertIn("Applied harness update.", result.stdout)
+        self.assertIn("validate-development: 0", result.stdout)
+        self.assertEqual(state_before, state_path.read_bytes())
+        combined_after = "\n".join(
+            (project / relative_path).read_text(encoding="utf-8") for relative_path in docs_before
+        )
+        self.assertNotRegex(combined_after, r"(?im)Deferred scope:\s*\n\s*- None recorded\.")
+        self.assertIn("[harness-development-doc-contract]: # (version-2)", combined_after)
+        self.assertIn("Harness-Managed Semantic Contract", combined_after)
+        self.assertIn("Collectors", combined_after)
+        self.assertIn("Report runs are append-only.", combined_after)
+        for marker in authored_markers.values():
+            self.assertIn(marker, combined_after)
+        migration_backups = list(
+            (project / ".harness-update-backups").glob("*-development-docs/docs/PROJECT_CONTEXT.md")
+        )
+        self.assertTrue(migration_backups)
+        validation = run_cmd(["./scripts/validate-development"], cwd=project)
+        self.assertIn("PASS: development integrity checks completed with no blocking failures.", validation.stdout)
+
+    def test_old_development_updater_restores_migrated_docs_when_new_validation_fails(self) -> None:
+        old_source = self._git_checkout_source(PROJECT_OWNED_SCHEMA_COMMIT, "rollback-development-source")
+        current_source = self._current_worktree_source()
+        project = self.tmpdir / "rollback-development-project"
+        run_cmd(["./scripts/project-harness", "new", str(project), "--no-git"], cwd=old_source)
+        self.install_finalized_cli_project(project)
+        self._make_legacy_stale_deferred_docs(project)
+        roadmap_path = project / "docs/ROADMAP.md"
+        roadmap_path.write_text(
+            roadmap_path.read_text(encoding="utf-8") + "\n- [ ] Build web ui (forced validation failure).\n",
+            encoding="utf-8",
+        )
+        self._align_target_generated_docs(current_source, project)
+        state_path = project / "state/project-init.json"
+        state_before = state_path.read_bytes()
+        docs_before = self._migration_doc_bytes(project)
+        runtime_path = project / ".harness/runtime/python/template_cli/plugin_sync.py"
+        runtime_before = runtime_path.read_bytes()
+
+        result = run_cmd(
+            [
+                "./scripts/project-harness",
+                "update",
+                "--apply",
+                "--source-path",
+                str(current_source),
+                "--yes",
+                "--include-mixed",
+            ],
+            cwd=project,
+            check=False,
+        )
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("Rolled back generated development-doc migration after validation failure.", result.stdout)
+        self.assertIn("Post-update hook failed. Rolled back copied files from backup:", result.stdout)
+        self.assertEqual(state_before, state_path.read_bytes())
+        self.assertEqual(docs_before, self._migration_doc_bytes(project))
+        self.assertEqual(runtime_before, runtime_path.read_bytes())
+
     def test_old_downstream_updater_installs_new_schema_path_in_one_pass(self) -> None:
         old_source = self._git_checkout_source(PROJECT_OWNED_SCHEMA_COMMIT, "project-owned-schema-source")
         current_source = self._current_worktree_source()
@@ -111,3 +208,41 @@ class ProjectHarnessUpdateSourceOnlyTests(ProjectHarnessUpdateTestCase):
             ignore=shutil.ignore_patterns(".git", "__pycache__", ".pytest_cache"),
         )
         return source
+
+    @staticmethod
+    def _migration_doc_bytes(project):
+        paths = [
+            "README.md",
+            "docs/PROJECT_CONTEXT.md",
+            "docs/ARCHITECTURE.md",
+            "docs/ROADMAP.md",
+            "docs/adr/ADR-0001-record-architecture-decisions.md",
+            "docs/SECURITY_POLICY.md",
+        ]
+        return {relative_path: (project / relative_path).read_bytes() for relative_path in paths}
+
+    @staticmethod
+    def _make_legacy_stale_deferred_docs(project):
+        replacements = {
+            "docs/PROJECT_CONTEXT.md": (
+                "Deferred scope:\n\n- Collectors\n- Remote APIs\n- Browser UI\n- Authentication",
+                "Deferred scope:\n\n- None recorded.",
+            ),
+            "docs/ARCHITECTURE.md": (
+                "Deferred scope:\n\n- Collectors\n- Remote APIs\n- Browser UI\n- Authentication",
+                "Deferred scope: None recorded.",
+            ),
+        }
+        for relative_path, (populated, stale) in replacements.items():
+            path = project / relative_path
+            content = path.read_text(encoding="utf-8")
+            if populated not in content:
+                raise AssertionError(f"fixture cannot create legacy stale deferred block in {relative_path}")
+            path.write_text(content.replace(populated, stale, 1), encoding="utf-8")
+
+    @staticmethod
+    def _align_target_generated_docs(current_source, project):
+        for relative_path in ProjectHarnessUpdateSourceOnlyTests._migration_doc_bytes(project):
+            target = current_source / relative_path
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(project / relative_path, target)

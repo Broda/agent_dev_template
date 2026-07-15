@@ -156,6 +156,9 @@ Goal: apply low-risk harness-owned changes while protecting project history.
 - [x] In development mode, also run `./scripts/validate-development`.
 - [x] Update recorded harness provenance only after validation passes.
 - [x] Print a rollback/review summary with changed paths and validation output.
+- [x] Migrate legacy generated development-contract omissions transactionally
+      during an old updater's first apply, with doc backups, authored-content
+      preservation, strict validation, and rollback on failure.
 
 Exit criteria:
 

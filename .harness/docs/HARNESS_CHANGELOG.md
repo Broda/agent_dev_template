@@ -37,6 +37,11 @@ projects receive their own `CHANGELOG.md` during finalization.
   `state/project-init.json` and legacy project-owned schema byte for byte.
 - Ignored marker-only CommonMark bullets when compiling note and session
   sections so empty template placeholders cannot become bogus contract items.
+- Added an atomic development-doc compatibility migration to the skill-sync
+  update hook. Existing finalized projects with legacy generated contract
+  omissions now receive a versioned authoritative contract section and
+  corrected deferred-scope fallbacks without changing project state or
+  replacing authored docs; validation failure restores the original docs.
 - Unified effective deferred scope across state normalization, rendering, and
   validation so populated out-of-scope or non-goal fields cannot render as
   `None recorded`; structured Finalized Contract JSON and legacy headings

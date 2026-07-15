@@ -124,6 +124,14 @@ before provenance stamping, then validates the stamped manifest. Review changed
 paths with `git diff`. Mode-only launcher drift is a harness-owned update and is
 repaired from the target manifest even when file bytes are unchanged.
 
+When a development project predates the current generated semantic-contract
+marker, the incoming skill-sync hook performs a narrow compatibility migration
+before strict development validation. It backs up only changed generated docs,
+replaces exact stale deferred-scope fallback blocks, and appends a versioned
+authoritative contract section to `docs/PROJECT_CONTEXT.md`; it does not rewrite
+the full document set or modify `state/project-init.json`. A failed validation
+restores those docs before the updater rolls back its harness-owned changes.
+
 Expected behavior:
 
 1. Show a dry-run summary before changing files.
@@ -131,7 +139,8 @@ Expected behavior:
 3. Deliver the harness-owned `.harness/schemas/project-init.schema.v2.json` with compatible runtime evolution while preserving the project-owned state instance and legacy schema.
 4. Update reusable harness runtime files only after confirmation.
 5. Run `./scripts/sync-plugin-skills` when repo-scoped skills change.
-6. Run `./scripts/validate-governance`.
+6. Transactionally migrate legacy generated development-contract omissions when required.
+7. Run `./scripts/validate-governance` and, in development mode, `./scripts/validate-development`.
 
 ## `validate`
 
