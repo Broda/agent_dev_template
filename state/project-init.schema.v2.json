@@ -137,6 +137,63 @@
     },
     "implementation": { "type": "object" },
     "mvpContract": { "type": "object" },
+    "brainstormingContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schemaVersion", "decisions", "risks", "relatedNotes"],
+      "properties": {
+        "schemaVersion": { "type": "integer", "const": 1 },
+        "decisions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "level", "situation", "constraints", "chosenOption", "rationale", "source"],
+            "properties": {
+              "id": { "type": "string" },
+              "level": { "type": "string" },
+              "situation": { "type": "string" },
+              "constraints": { "type": "string" },
+              "chosenOption": { "type": "string" },
+              "rationale": { "type": "string" },
+              "source": { "type": "string" }
+            }
+          }
+        },
+        "risks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "statement", "probability", "impact", "mitigation", "contingency", "source"],
+            "properties": {
+              "id": { "type": "string" },
+              "statement": { "type": "string" },
+              "probability": { "type": "string" },
+              "impact": { "type": "string" },
+              "mitigation": { "type": "string" },
+              "contingency": { "type": "string" },
+              "source": { "type": "string" }
+            }
+          }
+        },
+        "relatedNotes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "title", "path", "sourceContext", "tags"],
+            "properties": {
+              "id": { "type": "string" },
+              "title": { "type": "string" },
+              "path": { "type": "string" },
+              "sourceContext": { "type": "string" },
+              "tags": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
     "finalizedContract": {
       "type": "object",
       "additionalProperties": false,

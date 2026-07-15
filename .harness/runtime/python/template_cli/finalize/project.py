@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import date
 from pathlib import Path
 
+from template_cli.brainstorming_contract import compile_brainstorming_contract
 from template_cli.finalize.artifacts import (
     _ensure_finalization_dirs,
     _load_existing_state,
@@ -65,6 +66,11 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
 
     _ensure_finalization_dirs(root, write_export=write_export)
     existing_state = _load_existing_state(root)
+    brainstorming_contract = compile_brainstorming_contract(
+        root,
+        context.session_paths,
+        context.related_note_paths,
+    )
 
     _write_and_validate_finalized_project(
         root,
@@ -78,6 +84,7 @@ def run_finalize_project(root: Path, idea_id: str, *, write_export: bool = False
         session_path=session_path,
         export_path=export_path,
         write_export=write_export,
+        brainstorming_contract=brainstorming_contract,
     )
 
     _print_finalization_result(session_path, export_path, write_export=write_export)

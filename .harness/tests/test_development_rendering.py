@@ -26,13 +26,13 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
         "docs/adr/ADR-TEMPLATE.md",
     ]
     RENDERED_ARTIFACT_HASHES_WITH_PERSISTENCE = {
-        "README.md": "93faa4d2153984f0a5d6a8d4bcbf08661527549077892b9bc4fb93efeb4ba154",
+        "README.md": "26e3d0be4e5d732b64b8e5d75fd60d4d56d23804cad19483da99c3c19d781ab7",
         "CHANGELOG.md": "6b0e43176413e4e809d46f89b5da23c3976050f6c2dc22a774852399963f09a3",
         ".gitignore": "8ed32c34caaa326b71d25ce9835819a720ec3c2a91585b53bf22c75d0bbea2fe",
         ".github/workflows/ci.yml": "906f2350397192fad881369ec876626aa8c76f3bf0343d8c0094dfe3545c2287",
-        "docs/PROJECT_CONTEXT.md": "7aaadcd72ee884a0f28a6c842844052d6fc1798b72ebb5315b8b529ad7b6f572",
+        "docs/PROJECT_CONTEXT.md": "63488ebff522099afa5a364194ad2ca0d60b24df782053c48a034abfac43b62f",
         "docs/ROADMAP.md": "33718c326a7c6f8081848d280f7c1dd37e03199d34b7948e628cbbf9e2a45f21",
-        "docs/ARCHITECTURE.md": "60763209a2e1b329bbaba7ab534935249ae1e9c3202de7d43a54f20ac9f4f050",
+        "docs/ARCHITECTURE.md": "bc07491dedab929850fefd658afa49ca8a63f5d027b80565e30353873bfd70c9",
         "docs/FILE_MAP.md": "7098cf4ce0d6ec3387972ad897e8462f0dd50357253222611e85a6ef7d6ea4bc",
         "docs/GOVERNANCE_INDEX.md": "497048e642436fcce5bf2a274f1c7baff743f0c7ee9b39459cc3fc4afd43cf65",
         "docs/VERSIONING_AND_RELEASE_POLICY.md": "51505e9f8bc81eeecc0faf15379d30f1eb5b675bf144f8c2b33de82620e45966",

@@ -72,6 +72,18 @@ def _rewrite_state_history_paths(state: dict[str, Any]) -> None:
     governance = state.get("governance")
     if isinstance(governance, dict) and isinstance(governance.get("latestReviewSession"), str):
         governance["latestReviewSession"] = _history_text(str(governance["latestReviewSession"]))
+    brainstorming_contract = state.get("brainstormingContract")
+    if isinstance(brainstorming_contract, dict):
+        for key in ["decisions", "risks", "relatedNotes"]:
+            records = brainstorming_contract.get(key, [])
+            if not isinstance(records, list):
+                continue
+            for record in records:
+                if not isinstance(record, dict):
+                    continue
+                for path_key in ["source", "path"]:
+                    if isinstance(record.get(path_key), str):
+                        record[path_key] = _history_text(record[path_key])
 
 
 def _rewrite_archived_catalogs(root: Path) -> None:

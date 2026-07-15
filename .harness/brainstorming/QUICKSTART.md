@@ -37,8 +37,16 @@ Core flow:
 ./scripts/lab status
 ./scripts/lab doctor
 ./scripts/lab review --idea-id idea-template-hardening --result conditional-pass --summary "Ready after parity checks"
+./scripts/lab handoff --idea-id idea-template-hardening --check
+./scripts/lab handoff --idea-id idea-template-hardening
 ./scripts/finalize-project --idea-id idea-template-hardening
 ```
+
+Handoff compiles all native decision and risk records plus notes whose
+`Related Idea ID` matches the target. Complete each decision's chosen option
+and rationale and each risk's statement, mitigation, and contingency; handoff
+check and finalization stop with record-specific guidance when those semantics
+are incomplete.
 
 Optional summary snapshot:
 

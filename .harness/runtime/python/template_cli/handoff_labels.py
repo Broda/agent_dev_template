@@ -18,6 +18,9 @@ def handoff_source_files(root: Path, context: Any) -> list[Path]:
     for rel_path in context.idea_files:
         if rel_path not in ordered:
             ordered.append(rel_path)
+    for rel_path in context.related_note_paths:
+        if rel_path not in ordered:
+            ordered.append(rel_path)
     return [root / rel_path for rel_path in ordered]
 
 

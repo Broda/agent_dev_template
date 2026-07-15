@@ -276,8 +276,8 @@ This will:
 2. Append a finalization session entry under `sessions/`.
 3. Optionally generate a summary snapshot under `exports/`.
 4. Move brainstorming history into `.harness/history/` before development validation.
-4. Render the development governance docs into `docs/`, `README.md`, `CHANGELOG.md`, and `.gitignore`.
-5. Switch `MODE.md` to `development`.
+5. Render the development governance docs into `docs/`, `README.md`, `CHANGELOG.md`, and `.gitignore`.
+6. Switch `MODE.md` to `development`.
 
 `state/project-init.json` uses schemaVersion 2, with the checked-in contract at
 `state/project-init.schema.v2.json`. Draft state keeps the full canonical shape
@@ -292,6 +292,23 @@ finalizer preserves an existing `state/project-init.json.finalizedContract`;
 otherwise it hydrates the object from a `## Finalized Contract` fenced JSON
 block in the active idea or session history and normalizes capability values to
 canonical tokens.
+
+Native `lab decide`, `lab risk`, and related `lab note` records do not require
+special headings or hand-authored JSON. `lab handoff` and finalization compile
+every repeated native record into the optional `brainstormingContract` state
+object in deterministic source order. Development architecture, roadmap, and
+the initial ADR render the chosen options, rationales, decision constraints,
+risk controls, contingencies, and related-note paths. Notes are discovered from
+`NOTES_CATALOG.md` and note metadata by `Related Idea ID`, even when the idea
+catalog Notes cell is empty.
+
+`./scripts/lab handoff --check` fails with the record ID and missing semantic
+fields when a native decision lacks a chosen option or rationale, or a native
+risk lacks its statement, mitigation, or contingency. Finalization performs
+the same check even when handoff was skipped. Populate out-of-scope and
+non-goal fields normally; the finalizer carries them into effective deferred
+scope so generated docs cannot report `Deferred scope: None recorded` while
+canonical state contains exclusions.
 
 ````md
 ## Finalized Contract
@@ -332,8 +349,10 @@ Render coverage is intentionally scoped: `README.md` renders public contracts
 and deferred scope, `docs/PROJECT_CONTEXT.md` renders invariants, ordered
 milestones, and deferred scope, and `docs/ARCHITECTURE.md`, `docs/ROADMAP.md`,
 and the initial ADR render the detailed implementation contract sections.
-`CHANGELOG.md` keeps the initialization entry only. Older states without
-`finalizedContract` still validate and render through legacy prose fallback.
+`CHANGELOG.md` keeps the initialization entry only. Existing structured
+`Finalized Contract` JSON and recognized legacy headings remain supported;
+older states without either structured contract still validate and render
+through legacy prose fallback.
 
 Generated development docs include a GitHub Actions baseline by default. Set
 `documentation.ciPolicy` in `state/project-init.json` before rendering when a

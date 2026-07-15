@@ -572,6 +572,20 @@ Ruff CI and runtime-discovery preparation landed.
 
 ### Rendering And Finalization Hardening
 
+- [x] Compile native brainstorming semantics into finalization state instead of
+      relying on first-label scalar extraction or special contract headings.
+  - Aggregate repeated `lab decide` and `lab risk` records deterministically,
+    discover notes through `Related Idea ID`, and retain source paths through
+    history archival.
+  - Fail handoff and finalization with record-specific remediation when native
+    choices, rationales, risk statements, mitigations, or contingencies are
+    materially incomplete.
+  - Render native semantics into development governance and reconcile product
+    out-of-scope/non-goal text with structured deferred scope.
+  - Acceptance: real CLI-path regressions cover multiple decisions, risks,
+    notes with an empty idea-catalog Notes cell, blocking behavior, structured
+    JSON compatibility, legacy headings, archive rewrites, and contradiction-free docs.
+
 - [x] Add an end-to-end golden fixture for `lab handoff` followed by noninteractive
       finalization and development validation.
   - Build a temp-repo fixture that starts in brainstorming mode with one active

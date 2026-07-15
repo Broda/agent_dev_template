@@ -8,6 +8,7 @@ from template_cli.render_capabilities import (
     active_milestone_name,
     contract_list,
     contract_milestones,
+    effective_deferred_scope,
     milestone_summary_lines,
     project_profile,
     structured_domain_concepts,
@@ -27,7 +28,6 @@ from template_cli.render_helpers import (
     _related_hydration_files_from_state,
     _render_artifact_source_table,
     _replace_file_literals,
-    _state_list,
     _state_value,
     _write_rendered_text,
 )
@@ -99,7 +99,7 @@ def run_render_development_docs(root: Path) -> int:
     domain_concepts = structured_domain_concepts(state) or inferred_concepts
     implementation_contract = collect_implementation_contract(state, hydration_files)
     milestones = contract_milestones(state)
-    deferred_scope = contract_list(state, "deferredScope") or _state_list(state, "implementation.mvpExclusions")
+    deferred_scope = effective_deferred_scope(state)
     public_contracts = contract_list(state, "publicContracts")
     invariants = contract_list(state, "invariants")
     active_milestone = active_milestone_name(state)

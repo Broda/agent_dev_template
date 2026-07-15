@@ -214,7 +214,56 @@ def collect_implementation_contract(state: dict, hydration_files: list[Path]) ->
     milestone_details = _milestone_details(state)
     if milestone_details:
         sections.append(("Ordered Milestones", milestone_details))
+    sections.extend(_native_brainstorming_sections(state))
     return sections
+
+
+def _native_brainstorming_sections(state: dict) -> list[tuple[str, list[str]]]:
+    contract = state.get("brainstormingContract", {})
+    if not isinstance(contract, dict):
+        return []
+    sections: list[tuple[str, list[str]]] = []
+    decisions = [_format_decision(item) for item in contract.get("decisions", []) if isinstance(item, dict)]
+    if decisions:
+        sections.append(("Native Brainstorming Decisions", decisions))
+    risks = [_format_risk(item) for item in contract.get("risks", []) if isinstance(item, dict)]
+    if risks:
+        sections.append(("Native Brainstorming Risks", risks))
+    notes = [_format_note(item) for item in contract.get("relatedNotes", []) if isinstance(item, dict)]
+    if notes:
+        sections.append(("Related Brainstorming Notes", notes))
+    return sections
+
+
+def _format_decision(record: dict) -> str:
+    parts = [
+        f"Decision {record.get('id', '')}",
+        f"Chosen option: {record.get('chosenOption', '')}",
+        f"Rationale: {record.get('rationale', '')}",
+    ]
+    if str(record.get("constraints", "") or "").strip():
+        parts.append(f"Constraints: {record['constraints']}")
+    if str(record.get("situation", "") or "").strip():
+        parts.append(f"Situation: {record['situation']}")
+    parts.append(f"Source: {record.get('source', '')}")
+    return " — ".join(parts)
+
+
+def _format_risk(record: dict) -> str:
+    return " — ".join(
+        [
+            f"Risk {record.get('id', '')}: {record.get('statement', '')}",
+            f"Probability: {record.get('probability', '')}",
+            f"Impact: {record.get('impact', '')}",
+            f"Mitigation: {record.get('mitigation', '')}",
+            f"Contingency: {record.get('contingency', '')}",
+            f"Source: {record.get('source', '')}",
+        ]
+    )
+
+
+def _format_note(record: dict) -> str:
+    return f"{record.get('id', '')}: {record.get('title', '')} — Source: {record.get('path', '')}"
 
 
 def _milestone_details(state: dict) -> list[str]:

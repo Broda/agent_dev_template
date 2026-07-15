@@ -3,8 +3,15 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from template_cli.brainstorming_contract import semantic_contract_issues
 from template_cli.io_helpers import ValidationResult, read_text
-from template_cli.render_capabilities import contract_list, contract_milestones, finalized_contract, project_profile
+from template_cli.render_capabilities import (
+    contract_list,
+    contract_milestones,
+    effective_deferred_scope,
+    finalized_contract,
+    project_profile,
+)
 
 GENERATED_DOCS = [
     "README.md",
@@ -37,10 +44,12 @@ def validate_semantic_finalization(root: Path, result: ValidationResult, state: 
     if re.search(r"\bCom,\s", combined):
         result.add_failure("Generated docs contain malformed dotted-name concept fragment: Com,")
 
-    deferred = contract_list(state, "deferredScope")
+    deferred = effective_deferred_scope(state)
     _validate_unique_deferred_scope(result, deferred)
     _validate_deferred_scope_not_active(result, documents.get("docs/ROADMAP.md", ""), deferred)
     _validate_structured_contract_rendered(result, combined, state)
+    _validate_brainstorming_contract(result, combined, state)
+    _validate_deferred_scope_rendering(result, combined, deferred)
 
 
 def _read_documents(root: Path) -> dict[str, str]:
@@ -124,3 +133,39 @@ def _validate_structured_contract_rendered(result: ValidationResult, combined: s
             result.add_failure(
                 f"Generated development docs are missing captured milestone: {milestone['id']} {milestone['name']}"
             )
+
+
+def _validate_brainstorming_contract(result: ValidationResult, combined: str, state: dict) -> None:
+    for issue in semantic_contract_issues(state):
+        result.add_failure(f"Native brainstorming contract is incomplete: {issue}")
+    contract = state.get("brainstormingContract", {})
+    if not isinstance(contract, dict):
+        return
+    for record in contract.get("decisions", []):
+        if not isinstance(record, dict):
+            continue
+        for key in ["chosenOption", "rationale", "constraints"]:
+            value = str(record.get(key, "") or "").strip()
+            if value and value not in combined:
+                result.add_failure(f"Generated development docs are missing native decision detail: {value}")
+    for record in contract.get("risks", []):
+        if not isinstance(record, dict):
+            continue
+        for key in ["statement", "mitigation", "contingency"]:
+            value = str(record.get(key, "") or "").strip()
+            if value and value not in combined:
+                result.add_failure(f"Generated development docs are missing native risk detail: {value}")
+    for record in contract.get("relatedNotes", []):
+        if not isinstance(record, dict):
+            continue
+        value = str(record.get("path", "") or "").strip()
+        if value and value not in combined:
+            result.add_failure(f"Generated development docs are missing related note reference: {value}")
+
+
+def _validate_deferred_scope_rendering(result: ValidationResult, combined: str, deferred: list[str]) -> None:
+    if deferred and re.search(r"Deferred scope:\s*\n\s*- None recorded\.", combined, re.IGNORECASE):
+        result.add_failure("Generated development docs contradict populated deferred scope with 'None recorded'.")
+    for value in deferred:
+        if value not in combined:
+            result.add_failure(f"Generated development docs are missing effective deferred scope: {value}")

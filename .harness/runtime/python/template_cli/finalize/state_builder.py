@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from template_cli.brainstorming_contract import has_substantive_brainstorming_contract
 from template_cli.finalize.helpers import STATE_SCHEMA_VERSION, is_placeholder_value, summarize_decisions, unique_values
 from template_cli.finalized_contract import build_finalized_contract
 from template_cli.wiki import default_wiki_config
@@ -50,8 +51,10 @@ def _build_finalized_state(
     hydration_files: list[Path],
     session_path: str,
     notes_col: str,
+    related_note_paths: list[str],
     export_path: str,
     write_export: bool,
+    brainstorming_contract: dict,
 ) -> dict:
     existing_artifacts = existing_state.get("artifacts", {}) if isinstance(existing_state, dict) else {}
     preserved_note_references = str(existing_artifacts.get("noteReferences", "") or "").strip()
@@ -78,7 +81,8 @@ def _build_finalized_state(
         list(preserved_adr_references) + ["docs/adr/ADR-0001-record-architecture-decisions.md"]
     )
 
-    effective_note_references = notes_col
+    discovered_note_references = ", ".join(f"`{path}`" for path in related_note_paths)
+    effective_note_references = discovered_note_references or notes_col
     if is_placeholder_value(effective_note_references) or effective_note_references.lower() in {
         "none recorded",
         "_none_",
@@ -148,5 +152,12 @@ def _build_finalized_state(
         existing_detail = existing_state.get(detail_key) if isinstance(existing_state, dict) else None
         if isinstance(existing_detail, dict) and existing_detail:
             state[detail_key] = existing_detail
+    existing_brainstorming_contract = (
+        existing_state.get("brainstormingContract") if isinstance(existing_state, dict) else None
+    )
+    if has_substantive_brainstorming_contract(brainstorming_contract):
+        state["brainstormingContract"] = brainstorming_contract
+    elif has_substantive_brainstorming_contract(existing_brainstorming_contract):
+        state["brainstormingContract"] = existing_brainstorming_contract
     state["finalizedContract"] = build_finalized_contract(existing_state, state, hydration_files)
     return state

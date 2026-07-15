@@ -121,6 +121,7 @@ BRAINSTORMING_CORE_ARTIFACTS = [
     ".github/workflows/release-readiness.yml",
     ".github/PULL_REQUEST_TEMPLATE.md",
     ".harness/runtime/python/template_cli/render_governance_templates.py",
+    ".harness/runtime/python/template_cli/brainstorming_contract.py",
     ".harness/runtime/python/template_cli/render_adr.py",
     ".harness/runtime/python/template_cli/render_architecture.py",
     ".harness/runtime/python/template_cli/render_ci.py",

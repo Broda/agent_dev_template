@@ -22,3 +22,12 @@ projects receive their own `CHANGELOG.md` during finalization.
   validation so CLI/data-pipeline finalization preserves reviewed milestones,
   invariants, deferred scope, and capability boundaries without web/API/auth
   template residue.
+- Fixed brainstorming-to-development semantic fidelity by compiling repeated
+  native decision and risk records plus `Related Idea ID` notes into canonical
+  structured state, rendering their full choices/rationales/constraints and
+  risk controls into development governance, and blocking handoff/finalization
+  with actionable record-level guidance when native semantics are incomplete.
+- Unified effective deferred scope across state normalization, rendering, and
+  validation so populated out-of-scope or non-goal fields cannot render as
+  `None recorded`; structured Finalized Contract JSON and legacy headings
+  remain compatible.

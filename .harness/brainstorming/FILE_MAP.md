@@ -71,6 +71,7 @@ Lean file registry for the Project Harness Template.
 | `.harness/tests/test_finalization_regression.py` | End-to-end finalization regression tests for multi-session detail carryover |
 | `.harness/tests/test_harness_manifest.py` | Harness manifest validation and provenance stamping regression tests |
 | `.harness/tests/test_lab_handoff.py` | Lab handoff compiler regression tests for lossless brainstorming-to-finalization state |
+| `.harness/tests/test_native_semantic_handoff.py` | End-to-end native decision, risk, related-note, semantic-blocking, and finalization fidelity regressions |
 | `.harness/tests/test_lab_finalization.py` | Lab finalization command regression tests |
 | `.harness/tests/test_intent_registry_contract.py` | Intent-registry render, parity, and CI-contract regression suite |
 | `.harness/tests/test_intent_registry_parser_parity.py` | Registry-versus-CLI-parser argument parity regression tests |
@@ -154,6 +155,7 @@ Lean file registry for the Project Harness Template.
 | `.harness/runtime/python/template_cli/bootstrap/update_output.py` | Project harness update dry-run output rendering helpers |
 | `.harness/runtime/python/template_cli/bootstrap/update_plan.py` | Project harness update plan classification and baseline comparison helpers |
 | `.harness/runtime/python/template_cli/bootstrap/update_source.py` | Project harness update source resolution helpers |
+| `.harness/runtime/python/template_cli/brainstorming_contract.py` | Deterministic native decision, risk, and related-note contract compilation and completeness validation |
 | `.harness/runtime/python/template_cli/external_idea.py` | External idea payload validation and JSON result contracts |
 | `.harness/runtime/python/template_cli/finalized_contract.py` | Finalized structured-contract hydration, preservation, and capability normalization helpers |
 | `.harness/runtime/python/template_cli/finalized_contract_tokens.py` | Canonical finalized-contract capability tokens, aliases, and fallback inference helpers |

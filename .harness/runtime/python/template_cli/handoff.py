@@ -3,6 +3,12 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from template_cli.brainstorming_contract import (
+    compile_brainstorming_contract,
+    has_substantive_brainstorming_contract,
+    semantic_contract_failure,
+    semantic_contract_issues,
+)
 from template_cli.finalize.context import load_finalize_context
 from template_cli.finalize.helpers import (
     STATE_FILE,
@@ -15,7 +21,7 @@ from template_cli.finalize.helpers import (
 from template_cli.handoff_contract import REQUIRED_PATHS, SCALAR_LABELS
 from template_cli.handoff_implementation import fill_implementation_contract
 from template_cli.handoff_labels import first_label_value, handoff_source_files
-from template_cli.handoff_state import fill, fill_list, load_state, value_at, with_defaults
+from template_cli.handoff_state import fill, fill_list, load_state, set_value, value_at, with_defaults
 from template_cli.handoff_summary import print_summary, write_handoff_session
 from template_cli.io_helpers import IDEA_ROW_RE, ValidationResult, parse_markdown_table_rows, write_text
 from template_cli.state_schema import validate_project_state_data
@@ -63,14 +69,30 @@ def run_lab_handoff(root: Path, *, idea_id: str = "", check: bool = False, no_sy
     fill_list(state, "artifacts.sessionFiles", context.session_paths, filled)
     fill_list(state, "artifacts.adrReferences", _existing_adr_references(root), filled)
 
+    native_contract = compile_brainstorming_contract(root, context.session_paths, context.related_note_paths)
+    if has_substantive_brainstorming_contract(native_contract):
+        set_value(state, "brainstormingContract", native_contract)
+        filled.append("brainstormingContract")
+    if context.related_note_paths:
+        set_value(state, "artifacts.noteReferences", _note_references(context.related_note_paths))
+        if "artifacts.noteReferences" not in filled:
+            filled.append("artifacts.noteReferences")
+
     contract_sections = fill_implementation_contract(state, source_files, filled)
     missing = [path for path in REQUIRED_PATHS if not value_at(state, path)]
+    contract_issues = semantic_contract_issues(state)
 
     print_summary(
         context.idea_id, context.idea_files, context.session_paths, filled, missing, contract_sections, check=check
     )
     if check:
+        if contract_issues:
+            print(semantic_contract_failure(context.idea_id, contract_issues))
+            return 1
         return 0
+
+    if contract_issues:
+        raise SystemExit(semantic_contract_failure(context.idea_id, contract_issues))
 
     session_path = write_handoff_session(
         root, context.idea_id, context.idea_files, context.session_paths, filled, missing, contract_sections
@@ -119,3 +141,7 @@ def _existing_adr_references(root: Path) -> list[str]:
         ".harness/brainstorming/docs/adr/ADR-0001-adopt-governance-structure-for-idea-lab.md",
     ]
     return [candidate for candidate in candidates if (root / candidate).exists()]
+
+
+def _note_references(paths: list[str]) -> str:
+    return ", ".join(f"`{path}`" for path in paths)

@@ -28,7 +28,10 @@ class ProjectHarnessUpdateSourceOnlyTests(ProjectHarnessUpdateTestCase):
                 self.assertFalse((project / relative_path).exists())
 
         backend = ["python3", str(REPO_ROOT / ".harness/runtime/python/cli.py"), "project-harness-update"]
-        result = run_cmd([*backend, "--apply", "--source-path", str(current_source), "--yes"], cwd=project)
+        result = run_cmd(
+            [*backend, "--apply", "--source-path", str(current_source), "--yes", "--include-mixed"],
+            cwd=project,
+        )
 
         self.assertIn("Applied harness update.", result.stdout)
         self.assertIn("validate-governance: 0", result.stdout)

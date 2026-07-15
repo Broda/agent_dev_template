@@ -23,7 +23,7 @@ Use `./scripts/lab <command>` for durable brainstorming lifecycle writes:
 - Import external idea package: `./scripts/lab import-idea --payload-file /tmp/example-idea.json --activate --create-session --json --no-sync`
 - Activate: `./scripts/lab activate --idea-id <id>`
 - Decision: `./scripts/lab decide --idea-id <id> --chosen-option "<choice>" --rationale "<why>"`
-- Risk: `./scripts/lab risk --idea-id <id> --statement "<risk>"`
+- Risk: `./scripts/lab risk --idea-id <id> --statement "<risk>" --mitigation "<prevention>" --contingency "<recovery>"`
 - Review: `./scripts/lab review --idea-id <id> --result <pass|conditional-pass|revise|fail>`
 - Export: `./scripts/lab export --idea-id <id>`
 - Handoff: `./scripts/lab handoff [--idea-id <id>] [--check]`
@@ -51,4 +51,4 @@ Offer quick actions: `capture idea`, `record decision`, `log risk`, `save path n
 ## Finalization
 
 When the user wants to switch to development mode, use `$project-finalizer`.
-When the user is worried about losing detail, or the idea has rich implementation/session context, run `./scripts/lab handoff --check` first and then `./scripts/lab handoff` to distill source material into `state/project-init.json` before finalizing.
+When the user is worried about losing detail, or the idea has rich implementation/session context, run `./scripts/lab handoff --check` first and then `./scripts/lab handoff` to distill source material into `state/project-init.json` before finalizing. Native `lab decide`, `lab risk`, and related `lab note` records are compiled as a structured brainstorming contract; incomplete choices, rationales, mitigations, or contingencies block handoff with source-record guidance.

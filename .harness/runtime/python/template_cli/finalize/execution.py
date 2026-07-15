@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from template_cli.brainstorming_contract import semantic_contract_failure, semantic_contract_issues
 from template_cli.finalize.artifacts import (
     _backup_finalization_outputs,
     _write_finalization_session_log,
@@ -38,6 +39,7 @@ def _write_and_validate_finalized_project(
     session_path: str,
     export_path: str,
     write_export: bool,
+    brainstorming_contract: dict,
 ) -> None:
     with BackupManager(root) as backups:
         _backup_finalization_outputs(
@@ -89,9 +91,14 @@ def _write_and_validate_finalized_project(
             hydration_files=context.hydrate_files,
             session_path=session_path,
             notes_col=context.notes_col,
+            related_note_paths=context.related_note_paths,
             export_path=export_path,
             write_export=write_export,
+            brainstorming_contract=brainstorming_contract,
         )
+        contract_issues = semantic_contract_issues(state)
+        if contract_issues:
+            raise SystemExit(semantic_contract_failure(context.idea_id, contract_issues))
         schema_result = ValidationResult()
         validate_project_state_data(root, schema_result, state, variant="finalized")
         if schema_result.failures:

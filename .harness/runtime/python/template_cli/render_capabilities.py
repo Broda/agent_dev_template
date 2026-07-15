@@ -79,6 +79,28 @@ def contract_list(state: dict, key: str) -> list[str]:
     return _string_list(contract.get(key))
 
 
+def effective_deferred_scope(state: dict) -> list[str]:
+    structured = contract_list(state, "deferredScope")
+    if structured:
+        return structured
+    legacy = _state_list(state, "implementation.mvpExclusions")
+    if legacy:
+        return legacy
+    values: list[str] = []
+    for path in ["product.outOfScope", "product.nonGoals"]:
+        value = _state_value(state, path).strip()
+        if value.lower() in {
+            "",
+            "none",
+            "none recorded",
+            "see roadmap and follow-up sessions.",
+            "track non-goals explicitly.",
+        }:
+            continue
+        values.extend(line.strip(" -\t") for line in value.splitlines() if line.strip(" -\t"))
+    return list(dict.fromkeys(values))
+
+
 def contract_milestones(state: dict) -> list[dict[str, Any]]:
     raw = finalized_contract(state).get("milestones", [])
     if not isinstance(raw, list):

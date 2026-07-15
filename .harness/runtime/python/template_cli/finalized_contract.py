@@ -40,7 +40,7 @@ def normalize_finalized_contract(raw_contract: dict[str, Any], state: dict | Non
         "publicContracts": _object_list(contract.get("publicContracts"), ["name", "contract", "surface", "version"]),
         "versionDomains": _object_list(contract.get("versionDomains"), ["domain", "version", "compatibility"]),
         "milestones": _normalize_milestones(contract.get("milestones")),
-        "deferredScope": _string_list(contract.get("deferredScope")),
+        "deferredScope": _string_list(contract.get("deferredScope")) or _state_deferred_scope(state),
     }
     return normalized
 
@@ -55,7 +55,8 @@ def _legacy_contract(state: dict, hydration_files: list[Path]) -> dict[str, Any]
         "dataModel": _heading_values(hydration_files, ["Data Model"]),
         "publicContracts": _heading_values(hydration_files, ["Public Contracts"]),
         "versionDomains": _heading_values(hydration_files, ["Version Domains", "Versioning Domains"]),
-        "deferredScope": _heading_values(hydration_files, ["Deferred Scope", "MVP Exclusions", "Out of Scope"]),
+        "deferredScope": _heading_values(hydration_files, ["Deferred Scope", "MVP Exclusions", "Out of Scope"])
+        or _state_deferred_scope(state),
         "milestones": [],
     }
 
@@ -213,6 +214,25 @@ def _string_list(value: Any) -> list[str]:
     if not isinstance(value, list):
         return []
     return _unique([str(item).strip() for item in value if str(item).strip()])
+
+
+def _state_deferred_scope(state: dict[str, Any]) -> list[str]:
+    product = state.get("product", {})
+    if not isinstance(product, dict):
+        return []
+    values: list[str] = []
+    for key in ["outOfScope", "nonGoals"]:
+        value = str(product.get(key, "") or "").strip()
+        if value.lower() in {
+            "",
+            "none",
+            "none recorded",
+            "see roadmap and follow-up sessions.",
+            "track non-goals explicitly.",
+        }:
+            continue
+        values.extend(line.strip(" -\t") for line in value.splitlines() if line.strip(" -\t"))
+    return _unique(values)
 
 
 def _unique(values: list[str]) -> list[str]:

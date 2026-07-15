@@ -15,6 +15,7 @@ class FinalizeContext:
     owner: str
     existing_export_path: str
     notes_col: str
+    related_note_paths: list[str]
     idea_files: list[str]
     session_paths: list[str]
     hydrate_files: list[Path]
@@ -45,7 +46,8 @@ def load_finalize_context(root: Path, idea_id: str) -> FinalizeContext:
             "Create at least one session before finalizing."
         )
 
-    hydrate_files = [root / rel for rel in idea_files + session_paths]
+    related_note_paths = _note_paths_for_idea(root, idea_id)
+    hydrate_files = [root / rel for rel in idea_files + session_paths + related_note_paths]
     if existing_export_path and path_exists(root, existing_export_path):
         hydrate_files.append(root / existing_export_path)
 
@@ -55,6 +57,7 @@ def load_finalize_context(root: Path, idea_id: str) -> FinalizeContext:
         owner=owner,
         existing_export_path=existing_export_path,
         notes_col=notes_col,
+        related_note_paths=related_note_paths,
         idea_files=idea_files,
         session_paths=session_paths,
         hydrate_files=hydrate_files,
@@ -90,3 +93,22 @@ def _session_paths_for_idea(root: Path, idea_id: str, sessions_col: str) -> list
         if match not in session_paths:
             session_paths.append(match)
     return session_paths
+
+
+def _note_paths_for_idea(root: Path, idea_id: str) -> list[str]:
+    note_paths: list[str] = []
+    catalog_path = root / "NOTES_CATALOG.md"
+    if catalog_path.exists():
+        for line in catalog_path.read_text(encoding="utf-8").splitlines():
+            if not line.strip().startswith("|"):
+                continue
+            cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+            if len(cells) < 6 or cells[3] != idea_id:
+                continue
+            candidate = clean_backticks(cells[5])
+            if candidate and path_exists(root, candidate) and candidate not in note_paths:
+                note_paths.append(candidate)
+    for candidate in files_containing(root, "notes", f"- Related Idea ID: {idea_id}"):
+        if candidate not in note_paths:
+            note_paths.append(candidate)
+    return sorted(note_paths)
