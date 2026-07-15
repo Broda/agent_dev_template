@@ -74,7 +74,7 @@ def _rewrite_state_history_paths(state: dict[str, Any]) -> None:
         governance["latestReviewSession"] = _history_text(str(governance["latestReviewSession"]))
     brainstorming_contract = state.get("brainstormingContract")
     if isinstance(brainstorming_contract, dict):
-        for key in ["decisions", "risks", "relatedNotes"]:
+        for key in ["decisions", "risks", "relatedNotes", "sessionSections"]:
             records = brainstorming_contract.get(key, [])
             if not isinstance(records, list):
                 continue

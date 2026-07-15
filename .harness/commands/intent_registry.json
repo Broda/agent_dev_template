@@ -393,7 +393,7 @@
         "make sure nothing gets lost",
         "distill this idea for finalization"
       ],
-      "description": "compile idea, native decisions and risks, related notes, sessions, and structured contract details into canonical draft state; fail with guidance when native semantic records are incomplete",
+      "description": "compile idea, native decisions and risks, complete related-note bodies, substantive session context, and structured contract details into canonical draft state; fail with guidance when native semantic records are incomplete",
       "filesTouched": "`state/project-init.json`, `sessions/*`",
       "writeBehavior": "write",
       "requiredArgs": [],

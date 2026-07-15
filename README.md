@@ -300,7 +300,13 @@ object in deterministic source order. Development architecture, roadmap, and
 the initial ADR render the chosen options, rationales, decision constraints,
 risk controls, contingencies, and related-note paths. Notes are discovered from
 `NOTES_CATALOG.md` and note metadata by `Related Idea ID`, even when the idea
-catalog Notes cell is empty.
+catalog Notes cell is empty. The canonical contract also retains each related
+note's ordered Captured Information, Key Facts / Constraints, Open Questions /
+Follow-ups, and Links, plus substantive Current Focus and Exploration Path
+Notes from native sessions. Those values and their archived source paths render
+into the detailed architecture, roadmap, and initial ADR contract sections.
+Development validation fails if any compiled value is absent from the generated
+authoritative documentation.
 
 `./scripts/lab handoff --check` fails with the record ID and missing semantic
 fields when a native decision lacks a chosen option or rationale, or a native
@@ -358,10 +364,13 @@ Generated development docs include a GitHub Actions baseline by default. Set
 `documentation.ciPolicy` in `state/project-init.json` before rendering when a
 project needs different CI versus local verification wording.
 
-Future state schema changes should add a new schema file, update
-`.harness/commands/harness_manifest.json` compatibility metadata, keep fixture
-coverage for old and new valid states, and include an explicit migration path
-before changing finalization or rendering behavior.
+`state/project-init.json` is project-owned and update/apply never overwrites it.
+Its compatible `state/project-init.schema.v2.json` contract is harness-owned so
+runtime and additive schema evolution arrive together without requiring
+`--include-mixed`. Incompatible state changes should add a new schema file,
+update `.harness/commands/harness_manifest.json` compatibility metadata, keep
+fixture coverage for old and new valid states, and include an explicit migration
+path before finalization or rendering writes the new version.
 
 ## Development Phase
 

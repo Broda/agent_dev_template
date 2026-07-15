@@ -22,6 +22,7 @@ class NativeSemanticHandoffTests(LabWorkflowTestCase):
             "Native Brainstorming Decisions",
             "Native Brainstorming Risks",
             "Related Brainstorming Notes",
+            "Native Brainstorming Session Context",
         ]:
             self.assertIn(section, check.stdout)
 
@@ -35,12 +36,34 @@ class NativeSemanticHandoffTests(LabWorkflowTestCase):
         )
         self.assertEqual("risk-0017", contract["risks"][0]["id"])
         self.assertEqual("note-0001", contract["relatedNotes"][0]["id"])
+        self.assertEqual(
+            ["The workflow enforces a five-hour exam clock.", "Citations use Chicago Author-Date."],
+            contract["relatedNotes"][0]["capturedInformation"],
+        )
+        self.assertEqual(
+            ["The first SMARTCASE score is retained.", "Records use stable UUIDs."],
+            contract["relatedNotes"][0]["keyFacts"],
+        )
+        self.assertEqual(
+            ["Should updated_at change during replay?"],
+            contract["relatedNotes"][0]["openQuestions"],
+        )
+        self.assertEqual(["https://example.test/semantic-contract"], contract["relatedNotes"][0]["links"])
+        session_items = [item for section_record in contract["sessionSections"] for item in section_record["items"]]
+        self.assertIn("Preserve continuity through finalize.", session_items)
+        self.assertIn("Keep the share-target route explicit.", session_items)
         self.assertIn("notes/", draft["artifacts"]["noteReferences"])
 
         run_cmd(["./scripts/finalize-project", "--idea-id", idea_id], cwd=self.repo)
         state = json.loads((self.repo / "state/project-init.json").read_text(encoding="utf-8"))
         self.assertEqual(2, len(state["brainstormingContract"]["decisions"]))
         self.assertTrue(state["brainstormingContract"]["relatedNotes"][0]["path"].startswith(".harness/history/notes/"))
+        self.assertTrue(
+            all(
+                record["source"].startswith(".harness/history/sessions/")
+                for record in state["brainstormingContract"]["sessionSections"]
+            )
+        )
         self.assertIn("Cross-template handoff.", state["finalizedContract"]["deferredScope"])
 
         docs = "\n".join(
@@ -59,11 +82,45 @@ class NativeSemanticHandoffTests(LabWorkflowTestCase):
             "A partial write could leave replay state inconsistent.",
             "Commit each event and sequence update atomically.",
             "Rebuild projections from the last verified sequence.",
+            "five-hour exam clock",
+            "Chicago Author-Date",
+            "first SMARTCASE score",
+            "stable UUIDs",
+            "updated_at",
+            "https://example.test/semantic-contract",
+            "Preserve continuity through finalize.",
+            "share-target route",
             ".harness/history/notes/",
+            ".harness/history/sessions/",
             "Cross-template handoff.",
         ]:
             self.assertIn(expected, docs)
         self.assertNotRegex(docs, r"Deferred scope:\s*\n\s*- None recorded\.")
+
+    def test_validation_detects_omitted_compiled_note_semantics(self) -> None:
+        idea_id = "idea-native-contract-omission"
+        self.write_finalize_fixture(idea_id)
+        session = f"sessions/2026-04-03_{idea_id}.md"
+        for command in self._native_record_commands(idea_id, session):
+            run_cmd(command, cwd=self.repo)
+        run_cmd(["./scripts/finalize-project", "--idea-id", idea_id], cwd=self.repo)
+
+        omitted = "Records use stable UUIDs."
+        for relative_path in [
+            "docs/ARCHITECTURE.md",
+            "docs/ROADMAP.md",
+            "docs/adr/ADR-0001-record-architecture-decisions.md",
+        ]:
+            path = self.repo / relative_path
+            path.write_text(path.read_text(encoding="utf-8").replace(omitted, "[omitted]"), encoding="utf-8")
+
+        result = run_cmd(["./scripts/validate-development"], cwd=self.repo, check=False)
+
+        self.assertNotEqual(0, result.returncode)
+        self.assertIn(
+            f"Generated development docs are missing compiled related note key fact / constraint: {omitted}",
+            result.stdout,
+        )
 
     def test_handoff_blocks_incomplete_native_decision_with_guidance(self) -> None:
         idea_id = "idea-incomplete-native-contract"
@@ -191,6 +248,19 @@ class NativeSemanticHandoffTests(LabWorkflowTestCase):
             ],
             [
                 "./scripts/lab",
+                "path-note",
+                "--idea-id",
+                idea_id,
+                "--title",
+                "Route boundary exploration",
+                "--summary",
+                "Keep the share-target route explicit.",
+                "--session",
+                session,
+                "--no-sync",
+            ],
+            [
+                "./scripts/lab",
                 "note",
                 "--idea-id",
                 idea_id,
@@ -198,8 +268,18 @@ class NativeSemanticHandoffTests(LabWorkflowTestCase):
                 "Replay ordering evidence",
                 "--source",
                 "architecture review",
+                "--summary",
+                "The workflow enforces a five-hour exam clock.",
+                "--detail",
+                "Citations use Chicago Author-Date.",
                 "--fact",
-                "Sequence ordering is independent of wall-clock precision.",
+                "The first SMARTCASE score is retained.",
+                "--fact",
+                "Records use stable UUIDs.",
+                "--question",
+                "Should updated_at change during replay?",
+                "--link",
+                "https://example.test/semantic-contract",
                 "--tags",
                 "replay,ordering",
                 "--no-sync",

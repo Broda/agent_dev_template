@@ -16,6 +16,7 @@ def compile_brainstorming_contract(
 ) -> dict[str, Any]:
     decisions: list[dict[str, str]] = []
     risks: list[dict[str, str]] = []
+    session_sections: list[dict[str, Any]] = []
     for relative_path in sorted(set(session_paths)):
         path = root / relative_path
         if not path.exists():
@@ -23,8 +24,10 @@ def compile_brainstorming_contract(
         content = read_text(path)
         decisions.extend(_records(content, "Decision", relative_path, _decision_record))
         risks.extend(_records(content, "Risk", relative_path, _risk_record))
+        for section in ["Current Focus", "Exploration Path Notes"]:
+            session_sections.extend(_session_section_records(content, section, relative_path))
 
-    related_notes: list[dict[str, str]] = []
+    related_notes: list[dict[str, Any]] = []
     for relative_path in sorted(set(note_paths)):
         path = root / relative_path
         if not path.exists():
@@ -37,6 +40,10 @@ def compile_brainstorming_contract(
                 "path": relative_path,
                 "sourceContext": _label_value(content, "Source Context"),
                 "tags": _label_value(content, "Tags"),
+                "capturedInformation": _section_items(content, "Captured Information"),
+                "keyFacts": _section_items(content, "Key Facts / Constraints"),
+                "openQuestions": _section_items(content, "Open Questions / Follow-ups"),
+                "links": _section_items(content, "Links"),
             }
         )
 
@@ -45,13 +52,17 @@ def compile_brainstorming_contract(
         "decisions": decisions,
         "risks": risks,
         "relatedNotes": related_notes,
+        "sessionSections": session_sections,
     }
 
 
 def has_substantive_brainstorming_contract(contract: object) -> bool:
     if not isinstance(contract, dict):
         return False
-    return any(isinstance(contract.get(key), list) and contract[key] for key in ["decisions", "risks", "relatedNotes"])
+    return any(
+        isinstance(contract.get(key), list) and contract[key]
+        for key in ["decisions", "risks", "relatedNotes", "sessionSections"]
+    )
 
 
 def semantic_contract_issues(state: dict[str, Any]) -> list[str]:
@@ -91,6 +102,9 @@ def semantic_contract_issues(state: dict[str, Any]) -> list[str]:
     for index, note in enumerate(contract.get("relatedNotes", []), start=1):
         if not isinstance(note, dict) or not str(note.get("path", "") or "").strip():
             issues.append(f"Related note record {index} is missing its source path.")
+    for index, section in enumerate(contract.get("sessionSections", []), start=1):
+        if not isinstance(section, dict) or not str(section.get("source", "") or "").strip():
+            issues.append(f"Session section record {index} is missing its source path.")
     return issues
 
 
@@ -148,6 +162,70 @@ def _risk_record(block: str, heading_id: str, source: str) -> dict[str, str]:
         "contingency": _label_value(block, "Contingency plan"),
         "source": source,
     }
+
+
+def _session_section_records(content: str, section: str, source: str) -> list[dict[str, Any]]:
+    groups = _section_groups(content, section)
+    return [
+        {"section": section, "heading": heading, "items": items, "source": source} for heading, items in groups if items
+    ]
+
+
+def _section_items(content: str, section: str) -> list[str]:
+    return [item for _, items in _section_groups(content, section) for item in items]
+
+
+def _section_groups(content: str, section: str) -> list[tuple[str, list[str]]]:
+    lines = content.splitlines()
+    section_re = re.compile(rf"^##\s+{re.escape(section)}\s*$", re.IGNORECASE)
+    index = next((idx for idx, line in enumerate(lines) if section_re.match(line.strip())), -1)
+    if index < 0:
+        return []
+    groups: list[tuple[str, list[str]]] = []
+    heading = ""
+    body: list[str] = []
+    index += 1
+    while index < len(lines):
+        stripped = lines[index].strip()
+        if re.match(r"^#{1,2}\s+", stripped):
+            break
+        subheading = re.match(r"^###\s+(.+?)\s*$", stripped)
+        if subheading:
+            _append_group(groups, heading, body)
+            heading = subheading.group(1).strip()
+            body = []
+        else:
+            body.append(lines[index])
+        index += 1
+    _append_group(groups, heading, body)
+    return groups
+
+
+def _append_group(groups: list[tuple[str, list[str]]], heading: str, lines: list[str]) -> None:
+    items = _content_items(lines)
+    if items:
+        groups.append((heading, items))
+
+
+def _content_items(lines: list[str]) -> list[str]:
+    items: list[str] = []
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            continue
+        bullet = re.match(r"^[-*+]\s+(.+?)\s*$", stripped)
+        if bullet:
+            items.append(bullet.group(1).strip())
+        elif items:
+            items[-1] = f"{items[-1]} {stripped}"
+        else:
+            items.append(stripped)
+    placeholders = {
+        "none recorded.",
+        "none recorded",
+        "summary pending: fill in captured research details.",
+    }
+    return [item for item in items if item.casefold() not in placeholders]
 
 
 def _label_value(content: str, label: str) -> str:

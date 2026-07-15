@@ -85,6 +85,7 @@
       ".harness/docs/",
       ".harness/runtime/python/template_cli/",
       ".harness/tests/",
+      "state/project-init.schema.v2.json",
       "scripts/",
       ".agents/skills/",
       ".harness/plugins/project-lifecycle-lab/"
@@ -95,7 +96,6 @@
       "notes/",
       "exports/",
       "state/project-init.json",
-      "state/project-init.schema.v2.json",
       "docs/",
       "src/",
       "tests/"

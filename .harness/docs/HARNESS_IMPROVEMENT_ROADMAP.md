@@ -577,6 +577,10 @@ Ruff CI and runtime-discovery preparation landed.
   - Aggregate repeated `lab decide` and `lab risk` records deterministically,
     discover notes through `Related Idea ID`, and retain source paths through
     history archival.
+  - Compile ordered note-body sections and substantive Current Focus /
+    Exploration Path Notes into source-traceable canonical state, render every
+    item into authoritative development contract sections, and validate against
+    omissions.
   - Fail handoff and finalization with record-specific remediation when native
     choices, rationales, risk statements, mitigations, or contingencies are
     materially incomplete.
@@ -585,6 +589,9 @@ Ruff CI and runtime-discovery preparation landed.
   - Acceptance: real CLI-path regressions cover multiple decisions, risks,
     notes with an empty idea-catalog Notes cell, blocking behavior, structured
     JSON compatibility, legacy headings, archive rewrites, and contradiction-free docs.
+  - Treat the compatible state schema as harness-owned during update/apply so
+    downstream runtime evolution cannot strand a project on an incompatible old
+    schema; preserve `state/project-init.json` byte for byte.
 
 - [x] Add an end-to-end golden fixture for `lab handoff` followed by noninteractive
       finalization and development validation.

@@ -27,6 +27,13 @@ projects receive their own `CHANGELOG.md` during finalization.
   structured state, rendering their full choices/rationales/constraints and
   risk controls into development governance, and blocking handoff/finalization
   with actionable record-level guidance when native semantics are incomplete.
+- Extended that canonical contract to retain complete ordered related-note
+  bodies and substantive Current Focus / Exploration Path Notes with source
+  traceability, render them into authoritative development contract sections,
+  and detect generated-document omissions during semantic validation.
+- Reclassified the compatible state schema as harness-owned so update/apply
+  delivers runtime schema evolution automatically while preserving the
+  downstream project's `state/project-init.json` byte for byte.
 - Unified effective deferred scope across state normalization, rendering, and
   validation so populated out-of-scope or non-goal fields cannot render as
   `None recorded`; structured Finalized Contract JSON and legacy headings

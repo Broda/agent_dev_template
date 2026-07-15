@@ -158,9 +158,33 @@ def _validate_brainstorming_contract(result: ValidationResult, combined: str, st
     for record in contract.get("relatedNotes", []):
         if not isinstance(record, dict):
             continue
-        value = str(record.get("path", "") or "").strip()
+        for key, label in [
+            ("title", "title"),
+            ("path", "reference"),
+            ("capturedInformation", "captured information"),
+            ("keyFacts", "key fact / constraint"),
+            ("openQuestions", "open question / follow-up"),
+            ("links", "link"),
+        ]:
+            _validate_compiled_values(result, combined, record.get(key), f"related note {label}")
+    for record in contract.get("sessionSections", []):
+        if not isinstance(record, dict):
+            continue
+        for key, label in [
+            ("section", "section name"),
+            ("heading", "subheading"),
+            ("items", "item"),
+            ("source", "source"),
+        ]:
+            _validate_compiled_values(result, combined, record.get(key), f"native session {label}")
+
+
+def _validate_compiled_values(result: ValidationResult, combined: str, raw: object, label: str) -> None:
+    values = raw if isinstance(raw, list) else [raw]
+    for raw_value in values:
+        value = str(raw_value or "").strip()
         if value and value not in combined:
-            result.add_failure(f"Generated development docs are missing related note reference: {value}")
+            result.add_failure(f"Generated development docs are missing compiled {label}: {value}")
 
 
 def _validate_deferred_scope_rendering(result: ValidationResult, combined: str, deferred: list[str]) -> None:

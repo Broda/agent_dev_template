@@ -15,7 +15,7 @@ Use this skill when finalizing an idea into development mode or diagnosing why f
 4. Run `./scripts/lab doctor [--idea-id <id>]` when fields, sessions, or source artifacts are unclear.
 5. Run `./scripts/lab handoff [--idea-id <id>] --check` when rich brainstormed details should be carried forward or finalization fields are incomplete.
 6. Run `./scripts/lab handoff [--idea-id <id>]` before finalizing when the check shows useful fields can be distilled into `state/project-init.json`.
-7. Treat native decision/risk completeness failures as blockers: complete the cited source records, then rerun handoff check. Related notes are discovered by `Related Idea ID` even when the idea catalog Notes cell is empty.
+7. Treat native decision/risk completeness failures as blockers: complete the cited source records, then rerun handoff check. Related notes are discovered by `Related Idea ID` even when the idea catalog Notes cell is empty; their ordered body sections and substantive Current Focus / Exploration Path Notes become source-traceable canonical contract data.
 8. If multiple ideas are active, require an explicit `--idea-id`.
 9. Treat non-interactive finalization as the default; use `--interactive` only when the user explicitly wants prompt-fill mode.
 
@@ -38,7 +38,7 @@ Run one of:
 
 Use `--write-export` only when the user wants an archival summary under `exports/`; finalization then moves root brainstorming history into `.harness/history/`.
 Use `--interactive` to opt into prompts for missing or editable finalization fields. Without `--interactive`, missing required fields should fail with guidance instead of prompting.
-Use `./scripts/lab handoff` before these commands when the source sessions contain detailed implementation requirements that should become canonical state. Finalization also compiles native records directly and fails closed if their semantic contract is materially incomplete.
+Use `./scripts/lab handoff` before these commands when the source sessions contain detailed implementation requirements that should become canonical state. Finalization also compiles native records, complete related-note semantics, and substantive session context directly, then fails closed if the semantic contract is materially incomplete or generated authoritative docs omit a compiled value.
 
 ## After Finalization
 

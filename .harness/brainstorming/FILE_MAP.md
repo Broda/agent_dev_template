@@ -71,7 +71,7 @@ Lean file registry for the Project Harness Template.
 | `.harness/tests/test_finalization_regression.py` | End-to-end finalization regression tests for multi-session detail carryover |
 | `.harness/tests/test_harness_manifest.py` | Harness manifest validation and provenance stamping regression tests |
 | `.harness/tests/test_lab_handoff.py` | Lab handoff compiler regression tests for lossless brainstorming-to-finalization state |
-| `.harness/tests/test_native_semantic_handoff.py` | End-to-end native decision, risk, related-note, semantic-blocking, and finalization fidelity regressions |
+| `.harness/tests/test_native_semantic_handoff.py` | End-to-end native decision, risk, full related-note body, session-context, semantic-blocking, and finalization fidelity regressions |
 | `.harness/tests/test_lab_finalization.py` | Lab finalization command regression tests |
 | `.harness/tests/test_intent_registry_contract.py` | Intent-registry render, parity, and CI-contract regression suite |
 | `.harness/tests/test_intent_registry_parser_parity.py` | Registry-versus-CLI-parser argument parity regression tests |
@@ -140,7 +140,7 @@ Lean file registry for the Project Harness Template.
 | `scripts/lab-note.sh` | POSIX launcher for Python research note capture helper |
 | `scripts/project-harness.sh` | POSIX launcher for harness bootstrap helpers |
 | `state/project-init.json` | Canonical structured handoff state |
-| `state/project-init.schema.v2.json` | JSON Schema and variant contract for canonical state schemaVersion 2 |
+| `state/project-init.schema.v2.json` | Harness-owned JSON Schema and variant contract delivered with compatible runtime evolution for project-owned canonical state |
 | `.github/workflows/ci.yml` | Blocking CI for tests and governance validation |
 | `.github/workflows/governance-audit.yml` | Warn-only CI audit |
 | `.github/workflows/release-readiness.yml` | Manual public-template release readiness smoke workflow |

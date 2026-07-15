@@ -188,7 +188,25 @@
               "title": { "type": "string" },
               "path": { "type": "string" },
               "sourceContext": { "type": "string" },
-              "tags": { "type": "string" }
+              "tags": { "type": "string" },
+              "capturedInformation": { "type": "array", "items": { "type": "string" } },
+              "keyFacts": { "type": "array", "items": { "type": "string" } },
+              "openQuestions": { "type": "array", "items": { "type": "string" } },
+              "links": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "sessionSections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["section", "heading", "items", "source"],
+            "properties": {
+              "section": { "type": "string" },
+              "heading": { "type": "string" },
+              "items": { "type": "array", "items": { "type": "string" } },
+              "source": { "type": "string" }
             }
           }
         }

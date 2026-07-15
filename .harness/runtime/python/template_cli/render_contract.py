@@ -229,9 +229,14 @@ def _native_brainstorming_sections(state: dict) -> list[tuple[str, list[str]]]:
     risks = [_format_risk(item) for item in contract.get("risks", []) if isinstance(item, dict)]
     if risks:
         sections.append(("Native Brainstorming Risks", risks))
-    notes = [_format_note(item) for item in contract.get("relatedNotes", []) if isinstance(item, dict)]
+    notes = _format_notes([item for item in contract.get("relatedNotes", []) if isinstance(item, dict)])
     if notes:
         sections.append(("Related Brainstorming Notes", notes))
+    session_context = _format_session_sections(
+        [item for item in contract.get("sessionSections", []) if isinstance(item, dict)]
+    )
+    if session_context:
+        sections.append(("Native Brainstorming Session Context", session_context))
     return sections
 
 
@@ -262,8 +267,37 @@ def _format_risk(record: dict) -> str:
     )
 
 
-def _format_note(record: dict) -> str:
-    return f"{record.get('id', '')}: {record.get('title', '')} — Source: {record.get('path', '')}"
+def _format_notes(records: list[dict]) -> list[str]:
+    details: list[str] = []
+    fields = [
+        ("capturedInformation", "Captured information"),
+        ("keyFacts", "Key fact / constraint"),
+        ("openQuestions", "Open question / follow-up"),
+        ("links", "Link"),
+    ]
+    for record in records:
+        note_id = record.get("id", "")
+        source = record.get("path", "")
+        details.append(f"Note {note_id}: {record.get('title', '')} — Source: {source}")
+        for key, label in fields:
+            values = record.get(key, [])
+            if not isinstance(values, list):
+                continue
+            details.extend(f"Note {note_id} — {label}: {value} — Source: {source}" for value in values)
+    return details
+
+
+def _format_session_sections(records: list[dict]) -> list[str]:
+    details: list[str] = []
+    for record in records:
+        section = str(record.get("section", "") or "")
+        heading = str(record.get("heading", "") or "")
+        label = f"{section} / {heading}" if heading else section
+        source = record.get("source", "")
+        items = record.get("items", [])
+        if isinstance(items, list):
+            details.extend(f"{label}: {item} — Source: {source}" for item in items)
+    return details
 
 
 def _milestone_details(state: dict) -> list[str]:

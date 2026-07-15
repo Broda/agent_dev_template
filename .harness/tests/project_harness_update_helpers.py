@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import shutil
 from pathlib import Path
 
@@ -23,3 +24,10 @@ class ProjectHarnessUpdateTestCase(LabWorkflowTestCase):
         run_cmd(["git", "add", "-A"], cwd=source)
         run_cmd(["git", "commit", "-m", "baseline"], cwd=source)
         return run_cmd(["git", "rev-parse", "HEAD"], cwd=source).stdout.strip()
+
+    def mark_state_schema_project_owned(self, project: Path) -> None:
+        manifest_path = project / ".harness/commands/harness_manifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["artifactInventory"]["harnessOwned"].remove("state/project-init.schema.v2.json")
+        manifest["artifactInventory"]["projectOwned"].append("state/project-init.schema.v2.json")
+        manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
