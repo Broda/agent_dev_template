@@ -4,9 +4,14 @@ on:
   workflow_dispatch:
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   test-and-validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
     steps:
@@ -73,6 +78,7 @@ jobs:
           name: generated-artifact-drift
           path: .ci/generated-drift
           if-no-files-found: ignore
+          retention-days: 3
 
       - name: Run regression suite
         shell: bash

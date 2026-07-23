@@ -220,6 +220,8 @@ Date:
 
 # Guiding Rule
 
-Manual verification complements generated CI in Structured Mode.
+Generated GitHub CI is feedback and compatibility evidence by default. When
+project policy requires independent release qualification, record authoritative
+exact-SHA evidence from the separately controlled verifier here.
 
 Do not mark milestones complete without this report.

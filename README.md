@@ -101,7 +101,10 @@ brainstorming mode so milestone auto-commits do not spawn CI runs. The Ubuntu
 job runs Ruff, mypy, generated-artifact drift checks, the full regression
 suite, and governance plus brainstorming validation. The Windows job runs the
 same regression suite through the PowerShell launchers plus launcher-specific
-update and rendering smoke checks.
+update and rendering smoke checks. Superseded pull-request runs are cancelled;
+manual audit and release-readiness runs remain independent. Failure-only drift
+artifacts expire after three days, and measured Ubuntu jobs use conservative
+timeouts without imposing an unmeasured bound on Windows.
 
 Runtime extraction is planned but not active. ADR-0002 records the boundary:
 the first extracted runtime should remain Python, wrappers must verify manifest
@@ -360,9 +363,14 @@ and the initial ADR render the detailed implementation contract sections.
 older states without either structured contract still validate and render
 through legacy prose fallback.
 
-Generated development docs include a GitHub Actions baseline by default. Set
-`documentation.ciPolicy` in `state/project-init.json` before rendering when a
-project needs different CI versus local verification wording.
+Generated development docs include a GitHub Actions feedback and compatibility
+baseline by default. Pull-request runs cancel older runs for the same pull
+request, while push and manual runs remain independent; failure-only generated
+document diagnostics expire after three days. GitHub CI is not assumed to be an
+independently trusted release authority. A project can accept authoritative
+exact-SHA release evidence from a separately controlled verifier. Set
+`documentation.ciPolicy` in `state/project-init.json` before rendering to
+replace that default policy wording without changing workflow behavior.
 
 `state/project-init.json` is project-owned and update/apply never overwrites it.
 Its compatible `.harness/schemas/project-init.schema.v2.json` contract is

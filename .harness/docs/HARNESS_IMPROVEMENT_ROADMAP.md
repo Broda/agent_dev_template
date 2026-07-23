@@ -808,3 +808,41 @@ Exit criteria:
 - `./scripts/harness-release-check` passes.
 - Invalid payloads with `--json` return `{"ok": false, "code": ..., "error": ...}` and no traceback.
 - Public docs avoid private hostnames, private paths, and container-specific workspace-root assumptions.
+
+## HM10 - Cross-Project CI Efficiency Baseline
+
+Goal: reduce avoidable hosted CI usage across template and generated-project
+workflows without weakening validation or treating GitHub as an independently
+trusted release authority.
+
+Scope:
+
+- [x] Cancel superseded pull-request runs by workflow and pull-request number
+      while keeping push, manual audit, and manual release-readiness runs
+      independent.
+- [x] Measure the complete local governance and regression suites before
+      selecting conservative Ubuntu job timeouts.
+  - Baseline on 2026-07-22: governance validation completed in 1.23 seconds;
+    251 unit tests completed in 367.58 seconds with three expected platform
+    skips.
+  - Applied bounds: 10 minutes for the warn-only governance audit, 30 minutes
+    for Ubuntu CI, and 45 minutes for the broader release-readiness smoke.
+  - The Windows job remains unbounded until Windows runner timing evidence is
+    available; generated project jobs retain project-owned timeout policy.
+- [x] Retain failure-only generated-drift diagnostic artifacts for three days.
+- [x] Emit equivalent pull-request concurrency and diagnostic retention from
+      the development CI renderer without changing `documentation.ciPolicy`
+      override semantics.
+- [x] Document GitHub CI as feedback and compatibility evidence by default and
+      allow project policy to name a separately controlled exact-SHA verifier
+      as the authoritative release-evidence producer.
+- [x] Add contract coverage for template workflows, rendered workflow output,
+      renderer idempotence, and the non-cancellation of manual qualification.
+
+Exit criteria:
+
+- Template validation rejects lost PR cancellation, timeout, or three-day
+  diagnostic-retention contracts.
+- Generated CI retains pull-request cancellation and failure-diagnostic
+  behavior across repeated rendering.
+- `./scripts/validate-governance` and the full harness unit suite pass.

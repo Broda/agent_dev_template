@@ -242,7 +242,11 @@ class ProjectHarnessUpdateSourceOnlyTests(ProjectHarnessUpdateTestCase):
 
     @staticmethod
     def _align_target_generated_docs(current_source, project):
-        for relative_path in ProjectHarnessUpdateSourceOnlyTests._migration_doc_bytes(project):
+        generated_paths = [
+            *ProjectHarnessUpdateSourceOnlyTests._migration_doc_bytes(project),
+            ".github/workflows/ci.yml",
+        ]
+        for relative_path in generated_paths:
             target = current_source / relative_path
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(project / relative_path, target)

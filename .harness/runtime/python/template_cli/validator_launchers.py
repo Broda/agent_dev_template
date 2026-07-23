@@ -33,6 +33,7 @@ def validate_python_launchers(root: Path, result: ValidationResult) -> None:
     _validate_project_harness_update_launcher(root, result)
     _validate_shell_launchers_are_portable(root, result)
     _validate_windows_ci_launcher_job(root, result)
+    _validate_ci_efficiency_contract(root, result)
     _validate_brainstorming_workflows_manual_only(root, result)
     _validate_release_readiness_workflow(root, result)
 
@@ -246,6 +247,40 @@ def _validate_windows_ci_launcher_job(root: Path, result: ValidationResult) -> N
     for label, snippet in required_snippets.items():
         if snippet not in ci_text:
             result.add_failure(f"CI workflow is missing Windows PowerShell launcher coverage: {label}")
+
+
+def _validate_ci_efficiency_contract(root: Path, result: ValidationResult) -> None:
+    if read_mode(root) != "brainstorming":
+        return
+    shared_concurrency = {
+        "PR-scoped concurrency group": (
+            "group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}"
+        ),
+        "PR-only cancellation": "cancel-in-progress: ${{ github.event_name == 'pull_request' }}",
+    }
+    workflow_contracts = {
+        ".github/workflows/ci.yml": {
+            **shared_concurrency,
+            "measured Ubuntu timeout": "timeout-minutes: 30",
+            "three-day diagnostic retention": "          retention-days: 3\n",
+        },
+        ".github/workflows/governance-audit.yml": {
+            **shared_concurrency,
+            "measured governance timeout": "timeout-minutes: 10",
+        },
+        ".github/workflows/release-readiness.yml": {
+            **shared_concurrency,
+            "measured release-readiness timeout": "timeout-minutes: 45",
+        },
+    }
+    for relative_path, required_snippets in workflow_contracts.items():
+        path = root / relative_path
+        if not path.exists():
+            continue
+        workflow_text = read_text(path)
+        for label, snippet in required_snippets.items():
+            if snippet not in workflow_text:
+                result.add_failure(f"Workflow {relative_path} is missing CI-efficiency contract: {label}")
 
 
 def _validate_brainstorming_workflows_manual_only(root: Path, result: ValidationResult) -> None:

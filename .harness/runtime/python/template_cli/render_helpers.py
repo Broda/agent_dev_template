@@ -10,8 +10,9 @@ from template_cli.state_schema import validate_project_state_data
 
 MILESTONE_NAME = "Milestone 0 — Foundation"
 DEFAULT_CI_POLICY = (
-    "Generated GitHub Actions CI is included as a baseline guardrail; local build, "
-    "test, and manual verification remain authoritative."
+    "Generated GitHub Actions CI provides feedback and compatibility checks by default; "
+    "release authority remains defined by project policy, and authoritative exact-SHA "
+    "evidence may come from a separately controlled verifier."
 )
 RENDERED_ARTIFACTS = [
     ("README.md", "Python renderer", "Regenerate from state"),

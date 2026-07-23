@@ -6,6 +6,16 @@ projects receive their own `CHANGELOG.md` during finalization.
 ## [Unreleased]
 
 - Current planned harness version: `0.1.1`.
+- Added the HM10 CI-efficiency baseline: superseded pull-request runs now
+  cancel by pull request while manual and release-readiness runs remain
+  independent, measured Ubuntu jobs have conservative timeouts, and
+  failure-only drift artifacts expire after three days.
+- Generated development CI now applies the same pull-request cancellation and
+  three-day diagnostic retention behavior, while leaving project-specific
+  build and test timeout policy to the generated project.
+- Clarified that generated GitHub CI is feedback and compatibility evidence by
+  default and that authoritative exact-SHA release evidence may come from a
+  separately controlled verifier defined by project policy.
 - Fixed Bash 3.2 `set -u` failures in `lab.sh` and `project-harness.sh` by
   replacing empty-array argument forwarding with scalar-plus-positional
   argument construction.

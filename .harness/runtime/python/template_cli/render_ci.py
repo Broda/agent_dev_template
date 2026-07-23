@@ -22,13 +22,23 @@ def render_development_ci(
         shell: bash
         run: |
           if [ -x ./scripts/render-intent-docs ] && [ -d .harness/commands ]; then
+            mkdir -p .ci/generated-drift
             ./scripts/render-intent-docs
-            git diff --stat --exit-code || {
+            if ! git diff --quiet -- .harness/commands/CONVERSATIONAL_MODE.md .harness/commands/COMMANDS.md; then
               echo "Generated intent docs are out of sync. Run ./scripts/render-intent-docs and commit the result."
-              git diff -- .harness/commands/CONVERSATIONAL_MODE.md .harness/commands/COMMANDS.md
+              git diff --stat -- .harness/commands/CONVERSATIONAL_MODE.md .harness/commands/COMMANDS.md | tee .ci/generated-drift/summary.txt
+              git diff --binary -- .harness/commands/CONVERSATIONAL_MODE.md .harness/commands/COMMANDS.md > .ci/generated-drift/generated-intent-docs.patch
               exit 1
-            }
+            fi
           fi""",
+        """      - name: Upload generated intent-doc drift
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-intent-doc-drift
+          path: .ci/generated-drift
+          if-no-files-found: ignore
+          retention-days: 3""",
     ]
 
     if uses_rust:
@@ -66,6 +76,10 @@ on:
     branches:
       - main
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   test-and-validate:

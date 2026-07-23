@@ -29,15 +29,15 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
         "README.md": "26e3d0be4e5d732b64b8e5d75fd60d4d56d23804cad19483da99c3c19d781ab7",
         "CHANGELOG.md": "6b0e43176413e4e809d46f89b5da23c3976050f6c2dc22a774852399963f09a3",
         ".gitignore": "8ed32c34caaa326b71d25ce9835819a720ec3c2a91585b53bf22c75d0bbea2fe",
-        ".github/workflows/ci.yml": "906f2350397192fad881369ec876626aa8c76f3bf0343d8c0094dfe3545c2287",
-        "docs/PROJECT_CONTEXT.md": "fc665dff7f34eba9e726c47fdf615299572b5f5dc6130c88142a1f5e0c1eb897",
+        ".github/workflows/ci.yml": "4ce8449dcf87cc98c6afc87f4b53b6cd7a4b606d5a40efc1c932a6807e6a7954",
+        "docs/PROJECT_CONTEXT.md": "0efa304a40522671fe43ef2b2a570277961ee038e0a81f61b50af6e3020e1e41",
         "docs/ROADMAP.md": "33718c326a7c6f8081848d280f7c1dd37e03199d34b7948e628cbbf9e2a45f21",
         "docs/ARCHITECTURE.md": "bc07491dedab929850fefd658afa49ca8a63f5d027b80565e30353873bfd70c9",
         "docs/FILE_MAP.md": "7098cf4ce0d6ec3387972ad897e8462f0dd50357253222611e85a6ef7d6ea4bc",
         "docs/GOVERNANCE_INDEX.md": "497048e642436fcce5bf2a274f1c7baff743f0c7ee9b39459cc3fc4afd43cf65",
-        "docs/VERSIONING_AND_RELEASE_POLICY.md": "51505e9f8bc81eeecc0faf15379d30f1eb5b675bf144f8c2b33de82620e45966",
+        "docs/VERSIONING_AND_RELEASE_POLICY.md": "16528e82ceb43a10b577e702467aaeb18825db332d1530b4d35c775a6f9c15e3",
         "docs/SECURITY_POLICY.md": "7ef2bbb4b88b9b6f5dd7bf76f7a68458e1299e6c2bbdf1dc4aa5245a816a13fb",
-        "docs/RUNTIME_VERIFICATION_REPORT.md": "5943eace8b0e7ff81272ff52cd96743d9c8c346b89c034f122f55ed42e0d83ff",
+        "docs/RUNTIME_VERIFICATION_REPORT.md": "4b4f8add7a7bfb4d536dc2e08d42948981d6969db017182d46a07719f19fa75f",
         "docs/MIGRATION_POLICY.md": "814a50f3e97822b55759d7ae31d9635b1f0a3d055c9e5ea1b09833fba9abcd87",
         "docs/adr/ADR-0001-record-architecture-decisions.md": "8b9915a8255208b7013a601a8041c165d0a1348c61b75eadc036325a6aaea88d",
         "docs/adr/ADR-TEMPLATE.md": "774f25a2fe377a86b588870ee31e54322568c90707242164ec9075da92472d52",
@@ -69,7 +69,15 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
         self.assertIn("uses: actions/setup-python@v6", ci)
         self.assertNotIn("uses: actions/checkout@v4", ci)
         self.assertNotIn("uses: actions/setup-python@v5", ci)
-        self.assertIn("Generated GitHub Actions CI is included as a baseline guardrail", project_context)
+        self.assertIn("Generated GitHub Actions CI provides feedback and compatibility checks", project_context)
+        self.assertIn(
+            "group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}",
+            ci,
+        )
+        self.assertIn("cancel-in-progress: ${{ github.event_name == 'pull_request' }}", ci)
+        self.assertIn("if: failure()\n        uses: actions/upload-artifact@v4", ci)
+        self.assertIn("retention-days: 3", ci)
+        self.assertNotIn("timeout-minutes:", ci)
         self.assertNotIn("No CI/CD required at this stage.", project_context)
 
         file_map = (self.repo / "docs/FILE_MAP.md").read_text(encoding="utf-8")
@@ -81,8 +89,8 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
 
         version_policy = (self.repo / "docs/VERSIONING_AND_RELEASE_POLICY.md").read_text(encoding="utf-8")
         runtime_report = (self.repo / "docs/RUNTIME_VERIFICATION_REPORT.md").read_text(encoding="utf-8")
-        self.assertIn("does not rely on CI/CD alone", version_policy)
-        self.assertIn("Manual verification complements generated CI", runtime_report)
+        self.assertIn("separately controlled verifier", version_policy)
+        self.assertIn("exact-SHA evidence", runtime_report)
         self.assertNotIn("This project does not require CI/CD", version_policy)
         self.assertNotIn("Manual verification replaces CI", runtime_report)
 
@@ -229,7 +237,10 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
         run_cmd(["./scripts/validate-development"], cwd=self.repo)
 
         project_context = (self.repo / "docs/PROJECT_CONTEXT.md").read_text(encoding="utf-8")
+        ci = (self.repo / ".github/workflows/ci.yml").read_text(encoding="utf-8")
         self.assertIn("Generated CI is advisory; release decisions require local smoke evidence.", project_context)
+        self.assertIn("cancel-in-progress: ${{ github.event_name == 'pull_request' }}", ci)
+        self.assertIn("retention-days: 3", ci)
 
     def test_command_metavariables_and_tbd_text_do_not_trip_placeholder_validation(self) -> None:
         self.write_render_fixture()

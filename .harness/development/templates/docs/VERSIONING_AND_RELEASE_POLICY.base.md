@@ -3,8 +3,9 @@
 This document defines how versions are incremented, how releases are cut,
 and how public contract stability is preserved.
 
-This project does not rely on CI/CD alone,
-but it does require disciplined versioning and local verification.
+GitHub CI provides feedback and compatibility checks by default; it is not
+assumed to be an independently trusted release authority. Release policy may
+accept authoritative exact-SHA evidence from a separately controlled verifier.
 
 ---
 
