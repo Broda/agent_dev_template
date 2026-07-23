@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+DEVELOPMENT_CI_TIMEOUT_MINUTES = 60
+
 
 def render_development_ci(
     language: str,
@@ -84,6 +86,9 @@ concurrency:
 jobs:
   test-and-validate:
     runs-on: ubuntu-latest
+    timeout-minutes: """
+        + str(DEVELOPMENT_CI_TIMEOUT_MINUTES)
+        + """
     permissions:
       contents: read
     steps:

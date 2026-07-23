@@ -181,6 +181,7 @@ Lean file registry for the Project Harness Template.
 | `.harness/runtime/python/template_cli/handoff_summary.py` | Handoff summary output and session-log rendering helpers |
 | `.harness/runtime/python/template_cli/validator_artifacts.py` | Retained artifact lists for brainstorming and development validation |
 | `.harness/runtime/python/template_cli/validator_code_size.py` | Python file-size validation for template tooling and tests |
+| `.harness/runtime/python/template_cli/validator_ci.py` | Mode-aware, placement-sensitive CI efficiency contract validation |
 | `.harness/runtime/python/template_cli/validator_intents.py` | Intent registry, generated command docs, and CI sync validation helpers |
 | `.harness/runtime/python/template_cli/validator_launchers.py` | Launcher consistency checks for shell and PowerShell entrypoints |
 | `.harness/runtime/python/template_cli/validator_manifest.py` | Harness manifest validation and provenance stamping helpers |

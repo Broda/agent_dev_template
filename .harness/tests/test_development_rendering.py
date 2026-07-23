@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import textwrap
+import unittest
 
 from workflow_test_helpers import LabWorkflowTestCase, run_cmd
 
@@ -29,7 +30,7 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
         "README.md": "26e3d0be4e5d732b64b8e5d75fd60d4d56d23804cad19483da99c3c19d781ab7",
         "CHANGELOG.md": "6b0e43176413e4e809d46f89b5da23c3976050f6c2dc22a774852399963f09a3",
         ".gitignore": "8ed32c34caaa326b71d25ce9835819a720ec3c2a91585b53bf22c75d0bbea2fe",
-        ".github/workflows/ci.yml": "4ce8449dcf87cc98c6afc87f4b53b6cd7a4b606d5a40efc1c932a6807e6a7954",
+        ".github/workflows/ci.yml": "0a6be48e90f27517adb3eb5fce60b5018f81cb2887db3a8570a300ee91447a23",
         "docs/PROJECT_CONTEXT.md": "0efa304a40522671fe43ef2b2a570277961ee038e0a81f61b50af6e3020e1e41",
         "docs/ROADMAP.md": "33718c326a7c6f8081848d280f7c1dd37e03199d34b7948e628cbbf9e2a45f21",
         "docs/ARCHITECTURE.md": "bc07491dedab929850fefd658afa49ca8a63f5d027b80565e30353873bfd70c9",
@@ -77,7 +78,7 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
         self.assertIn("cancel-in-progress: ${{ github.event_name == 'pull_request' }}", ci)
         self.assertIn("if: failure()\n        uses: actions/upload-artifact@v4", ci)
         self.assertIn("retention-days: 3", ci)
-        self.assertNotIn("timeout-minutes:", ci)
+        self.assertIn("    timeout-minutes: 60", ci)
         self.assertNotIn("No CI/CD required at this stage.", project_context)
 
         file_map = (self.repo / "docs/FILE_MAP.md").read_text(encoding="utf-8")
@@ -241,6 +242,7 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
         self.assertIn("Generated CI is advisory; release decisions require local smoke evidence.", project_context)
         self.assertIn("cancel-in-progress: ${{ github.event_name == 'pull_request' }}", ci)
         self.assertIn("retention-days: 3", ci)
+        self.assertIn("    timeout-minutes: 60", ci)
 
     def test_command_metavariables_and_tbd_text_do_not_trip_placeholder_validation(self) -> None:
         self.write_render_fixture()
@@ -345,6 +347,4 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
 
 
 if __name__ == "__main__":
-    import unittest
-
     unittest.main()

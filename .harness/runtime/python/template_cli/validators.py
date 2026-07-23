@@ -23,6 +23,7 @@ from template_cli.io_helpers import (
 )
 from template_cli.state_schema import validate_project_state_file
 from template_cli.validator_artifacts import BRAINSTORMING_CORE_ARTIFACTS, DEVELOPMENT_REQUIRED_ARTIFACTS
+from template_cli.validator_ci import validate_ci_efficiency_contract
 from template_cli.validator_code_size import validate_python_file_sizes
 from template_cli.validator_intents import (
     validate_intent_registry,
@@ -187,6 +188,7 @@ def run_validate_brainstorming(
     validate_python_tool_config(root, result)
     validate_python_file_sizes(root, result)
     validate_python_launchers(root, result)
+    validate_ci_efficiency_contract(root, result)
     validate_harness_manifest(root, result)
     validate_finalization_overwrite_policy(root, result)
     validate_repo_plugins(root, result)
@@ -249,6 +251,7 @@ def run_validate_development(
     validate_python_tool_config(root, result)
     validate_python_file_sizes(root, result)
     validate_python_launchers(root, result)
+    validate_ci_efficiency_contract(root, result)
     validate_harness_manifest(root, result)
     validate_finalization_overwrite_policy(root, result)
     validate_repo_plugins(root, result)

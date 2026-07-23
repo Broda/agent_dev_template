@@ -2,9 +2,16 @@ from __future__ import annotations
 
 import json
 import shutil
+import sys
 
 from project_harness_update_helpers import ProjectHarnessUpdateTestCase
 from workflow_test_helpers import REPO_ROOT, run_cmd
+
+RUNTIME_PYTHON = REPO_ROOT / ".harness/runtime/python"
+if str(RUNTIME_PYTHON) not in sys.path:
+    sys.path.insert(0, str(RUNTIME_PYTHON))
+
+from template_cli.render_ci import render_development_ci  # noqa: E402
 
 OLD_SOURCE_COMMIT = "6afc76667393d73531d52651f1916436e0cf564e"
 PROJECT_OWNED_SCHEMA_COMMIT = "125c8ed84f5249c2fc1e8a22256716d8f8bdb041"
@@ -242,6 +249,19 @@ class ProjectHarnessUpdateSourceOnlyTests(ProjectHarnessUpdateTestCase):
 
     @staticmethod
     def _align_target_generated_docs(current_source, project):
+        state = json.loads((project / "state/project-init.json").read_text(encoding="utf-8"))
+        tech_stack = state["techStack"]
+        commands = state["commands"]
+        (project / ".github/workflows/ci.yml").write_text(
+            render_development_ci(
+                tech_stack["language"],
+                tech_stack["runtime"],
+                tech_stack["packageTool"],
+                commands["build"],
+                commands["test"],
+            ),
+            encoding="utf-8",
+        )
         generated_paths = [
             *ProjectHarnessUpdateSourceOnlyTests._migration_doc_bytes(project),
             ".github/workflows/ci.yml",

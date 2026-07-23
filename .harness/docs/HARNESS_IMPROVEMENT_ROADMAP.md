@@ -821,14 +821,26 @@ Scope:
       while keeping push, manual audit, and manual release-readiness runs
       independent.
 - [x] Measure the complete local governance and regression suites before
-      selecting conservative Ubuntu job timeouts.
+      selecting conservative job timeouts.
   - Baseline on 2026-07-22: governance validation completed in 1.23 seconds;
     251 unit tests completed in 367.58 seconds with three expected platform
     skips.
+  - Remediation verification on 2026-07-22: governance validation completed
+    with zero failures and zero warnings in 1.67 seconds; 265 unit tests
+    completed in 415.241 seconds with three expected PowerShell skips.
   - Applied bounds: 10 minutes for the warn-only governance audit, 30 minutes
-    for Ubuntu CI, and 45 minutes for the broader release-readiness smoke.
-  - The Windows job remains unbounded until Windows runner timing evidence is
-    available; generated project jobs retain project-owned timeout policy.
+    for Ubuntu CI, 45 minutes for the broader release-readiness smoke, and 60
+    minutes for both Windows launcher coverage and each generated development
+    job.
+  - The 60-minute Windows ceiling is intentionally provisional: the current
+    415.241-second full-suite observation is from Linux, so the bound preserves
+    more than eight times that duration for Windows variance and the additional
+    launcher smoke steps. Hosted Windows timing should be recorded and the
+    bound tightened only after representative evidence exists.
+  - Every emitted generated job uses the same conservative 60-minute ceiling
+    because project-owned build and test commands vary; consumers that need a
+    different bound must change the renderer contract and its validation
+    together.
 - [x] Retain failure-only generated-drift diagnostic artifacts for three days.
 - [x] Emit equivalent pull-request concurrency and diagnostic retention from
       the development CI renderer without changing `documentation.ciPolicy`
@@ -836,13 +848,18 @@ Scope:
 - [x] Document GitHub CI as feedback and compatibility evidence by default and
       allow project policy to name a separately controlled exact-SHA verifier
       as the authoritative release-evidence producer.
-- [x] Add contract coverage for template workflows, rendered workflow output,
-      renderer idempotence, and the non-cancellation of manual qualification.
+- [x] Add mode-aware, placement-sensitive contract coverage for template
+      workflows, rendered workflow output, renderer idempotence, finite Linux
+      and Windows job bounds, failure-only retention, and the non-cancellation
+      of push or manual qualification.
 
 Exit criteria:
 
-- Template validation rejects lost PR cancellation, timeout, or three-day
-  diagnostic-retention contracts.
-- Generated CI retains pull-request cancellation and failure-diagnostic
-  behavior across repeated rendering.
+- Template validation rejects lost or rebound PR cancellation, per-job timeout,
+  failure-only upload, or three-day diagnostic-retention contracts.
+- Development validation enforces the generated CI contract without requiring
+  brainstorming-only governance-audit or release-readiness workflows.
+- Generated CI retains pull-request cancellation, independent push/manual run
+  identity, finite per-job timeouts, and failure-diagnostic behavior across
+  repeated rendering.
 - `./scripts/validate-governance` and the full harness unit suite pass.
