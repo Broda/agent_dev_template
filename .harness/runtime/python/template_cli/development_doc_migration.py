@@ -15,11 +15,11 @@ from template_cli.render_helpers import _related_hydration_files_from_state
 from template_cli.render_markers import DEVELOPMENT_DOC_CONTRACT_MARKER
 
 MIGRATION_DOCS = (
-    "README.md",
-    "docs/PROJECT_CONTEXT.md",
-    "docs/ARCHITECTURE.md",
-    "docs/ROADMAP.md",
-    "docs/adr/ADR-0001-record-architecture-decisions.md",
+    Path("README.md"),
+    Path("docs/PROJECT_CONTEXT.md"),
+    Path("docs/ARCHITECTURE.md"),
+    Path("docs/ROADMAP.md"),
+    Path("docs/adr/ADR-0001-record-architecture-decisions.md"),
 )
 DEFERRED_NONE_PATTERN = re.compile(
     r"(?im)(^(?:Deferred scope:|#{1,6}[ \t]+Deferred Scope)[ \t]*\n(?:[ \t]*\n)?)[ \t]*-[ \t]*None recorded\.[ \t]*$"
@@ -70,7 +70,7 @@ def apply_pending_development_doc_migration(root: Path) -> DevelopmentDocMigrati
         if deferred_lines:
             migrated = DEFERRED_NONE_PATTERN.sub(lambda match: match.group(1) + deferred_lines, migrated)
             migrated = DEFERRED_INLINE_NONE_PATTERN.sub(f"Deferred scope:\n\n{deferred_lines}", migrated)
-        if relative_path == "docs/PROJECT_CONTEXT.md":
+        if relative_path == Path("docs/PROJECT_CONTEXT.md"):
             migrated = _append_authoritative_contract(migrated, contract)
         if migrated != content:
             updates[relative_path] = migrated
