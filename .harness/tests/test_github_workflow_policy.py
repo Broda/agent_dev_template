@@ -4,68 +4,6 @@ from workflow_test_helpers import LabWorkflowTestCase, run_cmd
 
 
 class GithubWorkflowPolicyTests(LabWorkflowTestCase):
-    def test_validate_brainstorming_checks_pr_only_ci_cancellation(self) -> None:
-        ci_path = self.repo / ".github/workflows/ci.yml"
-        ci_path.write_text(
-            ci_path.read_text(encoding="utf-8").replace(
-                "cancel-in-progress: ${{ github.event_name == 'pull_request' }}",
-                "cancel-in-progress: true",
-                1,
-            ),
-            encoding="utf-8",
-        )
-
-        result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
-
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn(
-            "Workflow .github/workflows/ci.yml is missing CI-efficiency contract: PR-only cancellation",
-            result.stdout,
-        )
-
-    def test_validate_brainstorming_checks_ci_timeout_and_retention(self) -> None:
-        ci_path = self.repo / ".github/workflows/ci.yml"
-        ci_path.write_text(
-            ci_path.read_text(encoding="utf-8")
-            .replace("timeout-minutes: 30", "timeout-minutes: 3", 1)
-            .replace("retention-days: 3", "retention-days: 4", 1),
-            encoding="utf-8",
-        )
-
-        result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
-
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("missing CI-efficiency contract: measured Ubuntu timeout", result.stdout)
-        self.assertIn("missing CI-efficiency contract: three-day diagnostic retention", result.stdout)
-
-    def test_validate_brainstorming_rejects_windows_timeout_rebound_under_permissions(self) -> None:
-        ci_path = self.repo / ".github/workflows/ci.yml"
-        ci_path.write_text(
-            ci_path.read_text(encoding="utf-8").replace(
-                "    timeout-minutes: 60\n    permissions:\n      contents: read",
-                "    permissions:\n      timeout-minutes: 60\n      contents: read",
-                1,
-            ),
-            encoding="utf-8",
-        )
-
-        result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
-
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("missing CI-efficiency contract: conservative Windows timeout", result.stdout)
-
-    def test_validate_brainstorming_rejects_missing_windows_timeout(self) -> None:
-        ci_path = self.repo / ".github/workflows/ci.yml"
-        ci_path.write_text(
-            ci_path.read_text(encoding="utf-8").replace("    timeout-minutes: 60\n", "", 1),
-            encoding="utf-8",
-        )
-
-        result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
-
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("missing CI-efficiency contract: conservative Windows timeout", result.stdout)
-
     def test_validate_brainstorming_keeps_manual_release_runs_independent(self) -> None:
         workflow_path = self.repo / ".github/workflows/release-readiness.yml"
         workflow_path.write_text(

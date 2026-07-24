@@ -10,6 +10,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from template_cli.render_capabilities import effective_deferred_scope
+from template_cli.render_ci import render_development_ci
 from template_cli.render_contract import collect_implementation_contract, format_contract_sections
 from template_cli.render_helpers import _related_hydration_files_from_state
 from template_cli.render_markers import DEVELOPMENT_DOC_CONTRACT_MARKER
@@ -43,43 +44,51 @@ class DevelopmentDocMigration:
 
 
 def apply_pending_development_doc_migration(root: Path) -> DevelopmentDocMigration | None:
-    """Upgrade legacy generated development semantics without rerendering authored docs."""
+    """Upgrade recognized legacy generated surfaces without overwriting custom content."""
     context_path = root / "docs/PROJECT_CONTEXT.md"
-    if _mode(root) != "development" or not context_path.is_file():
-        return None
-    context = context_path.read_text(encoding="utf-8")
-    if DEVELOPMENT_DOC_CONTRACT_MARKER in context:
+    if _mode(root) != "development":
         return None
 
     state = _load_finalized_state(root)
     if state is None:
         return None
-    idea_id = str(state.get("ideaId", "") or "").strip()
-    hydration_files = _related_hydration_files_from_state(root, state, idea_id)
-    contract = collect_implementation_contract(state, hydration_files)
-    deferred_scope = effective_deferred_scope(state)
 
     updates: dict[Path, str] = {}
-    deferred_lines = "\n".join(f"- {item}" for item in deferred_scope)
-    for relative_path in MIGRATION_DOCS:
-        path = root / relative_path
-        if not path.is_file():
-            continue
-        content = path.read_text(encoding="utf-8")
-        migrated = content
-        if deferred_lines:
-            migrated = DEFERRED_NONE_PATTERN.sub(lambda match: match.group(1) + deferred_lines, migrated)
-            migrated = DEFERRED_INLINE_NONE_PATTERN.sub(f"Deferred scope:\n\n{deferred_lines}", migrated)
-        if relative_path == Path("docs/PROJECT_CONTEXT.md"):
-            migrated = _append_authoritative_contract(migrated, contract)
-        if migrated != content:
-            updates[relative_path] = migrated
+    if context_path.is_file() and DEVELOPMENT_DOC_CONTRACT_MARKER not in context_path.read_text(encoding="utf-8"):
+        idea_id = str(state.get("ideaId", "") or "").strip()
+        hydration_files = _related_hydration_files_from_state(root, state, idea_id)
+        contract = collect_implementation_contract(state, hydration_files)
+        deferred_scope = effective_deferred_scope(state)
+        deferred_lines = "\n".join(f"- {item}" for item in deferred_scope)
+        for relative_path in MIGRATION_DOCS:
+            path = root / relative_path
+            if not path.is_file():
+                continue
+            content = path.read_text(encoding="utf-8")
+            migrated = content
+            if deferred_lines:
+                migrated = DEFERRED_NONE_PATTERN.sub(lambda match: match.group(1) + deferred_lines, migrated)
+                migrated = DEFERRED_INLINE_NONE_PATTERN.sub(f"Deferred scope:\n\n{deferred_lines}", migrated)
+            if relative_path == Path("docs/PROJECT_CONTEXT.md"):
+                migrated = _append_authoritative_contract(migrated, contract)
+            if migrated != content:
+                updates[relative_path] = migrated
+
+    ci_path = Path(".github/workflows/ci.yml")
+    current_ci_path = root / ci_path
+    if current_ci_path.is_file():
+        current_ci = current_ci_path.read_text(encoding="utf-8")
+        ci_inputs = _development_ci_inputs(state)
+        if ci_inputs is not None:
+            legacy_ci = render_development_ci(*ci_inputs, efficiency_contract=False)
+            if current_ci == legacy_ci:
+                updates[ci_path] = render_development_ci(*ci_inputs)
 
     if not updates:
         return None
 
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S%fZ")
-    backup_dir = root / ".harness-update-backups" / f"{stamp}-development-docs"
+    backup_dir = root / ".harness-update-backups" / f"{stamp}-development-contract"
     transaction = DevelopmentDocMigration(root, backup_dir, tuple(updates))
     try:
         for relative_path in updates:
@@ -93,12 +102,32 @@ def apply_pending_development_doc_migration(root: Path) -> DevelopmentDocMigrati
         transaction.rollback()
         raise
 
-    print("Migrated legacy generated development contract sections:")
+    print("Migrated recognized legacy generated development surfaces:")
     for relative_path in updates:
         print(f"- {relative_path}")
     print(f"Backup: {backup_dir.relative_to(root)}")
     print()
     return transaction
+
+
+def _development_ci_inputs(state: dict) -> tuple[str, str, str, str, str] | None:
+    tech_stack = state.get("techStack")
+    commands = state.get("commands")
+    if not isinstance(tech_stack, dict) or not isinstance(commands, dict):
+        return None
+    values = (
+        tech_stack.get("language"),
+        tech_stack.get("runtime"),
+        tech_stack.get("packageTool"),
+        commands.get("build"),
+        commands.get("test"),
+    )
+    normalized: list[str] = []
+    for value in values:
+        if not isinstance(value, str) or not value.strip():
+            return None
+        normalized.append(value)
+    return normalized[0], normalized[1], normalized[2], normalized[3], normalized[4]
 
 
 def _append_authoritative_contract(content: str, contract: list[tuple[str, list[str]]]) -> str:

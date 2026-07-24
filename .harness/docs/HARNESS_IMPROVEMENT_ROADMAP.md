@@ -811,15 +811,15 @@ Exit criteria:
 
 ## HM10 - Cross-Project CI Efficiency Baseline
 
-Goal: reduce avoidable hosted CI usage across template and generated-project
-workflows without weakening validation or treating GitHub as an independently
-trusted release authority.
+Goal: reduce avoidable hosted CI usage in generated projects and template-only
+manual workflows without weakening validation, breaking direct updates, or
+treating GitHub as an independently trusted release authority.
 
 Scope:
 
-- [x] Cancel superseded pull-request runs by workflow and pull-request number
-      while keeping push, manual audit, and manual release-readiness runs
-      independent.
+- [x] Cancel superseded generated-project pull-request runs by workflow and
+      pull-request number while keeping push, manual audit, and manual
+      release-readiness runs independent.
 - [x] Measure the complete local governance and regression suites before
       selecting conservative job timeouts.
   - Baseline on 2026-07-22: governance validation completed in 1.23 seconds;
@@ -828,15 +828,9 @@ Scope:
   - Remediation verification on 2026-07-22: governance validation completed
     with zero failures and zero warnings in 1.67 seconds; 265 unit tests
     completed in 415.241 seconds with three expected PowerShell skips.
-  - Applied bounds: 10 minutes for the warn-only governance audit, 30 minutes
-    for Ubuntu CI, 45 minutes for the broader release-readiness smoke, and 60
-    minutes for both Windows launcher coverage and each generated development
-    job.
-  - The 60-minute Windows ceiling is intentionally provisional: the current
-    415.241-second full-suite observation is from Linux, so the bound preserves
-    more than eight times that duration for Windows variance and the additional
-    launcher smoke steps. Hosted Windows timing should be recorded and the
-    bound tightened only after representative evidence exists.
+  - Applied bounds: 10 minutes for the warn-only governance audit, 45 minutes
+    for the broader release-readiness smoke, and 60 minutes for each generated
+    development job.
   - Every emitted generated job uses the same conservative 60-minute ceiling
     because project-owned build and test commands vary; consumers that need a
     different bound must change the renderer contract and its validation
@@ -849,14 +843,21 @@ Scope:
       allow project policy to name a separately controlled exact-SHA verifier
       as the authoritative release-evidence producer.
 - [x] Add mode-aware, placement-sensitive contract coverage for template
-      workflows, rendered workflow output, renderer idempotence, finite Linux
-      and Windows job bounds, failure-only retention, and the non-cancellation
-      of push or manual qualification.
+      manual workflows, rendered workflow output, renderer idempotence, finite
+      generated-job bounds, failure-only retention, and the non-cancellation of
+      push or manual qualification.
+- [x] Preserve direct upgrades from older finalized consumers by keeping the
+      template root CI byte-compatible and transactionally migrating only exact
+      legacy generated outputs. Customized workflows are preserved and fail
+      closed rather than being overwritten.
+- [ ] Apply equivalent cancellation and finite bounds to the template root CI
+      after the updater can distinguish its brainstorming source workflow from
+      project-specific finalized output without a mixed-generated conflict.
 
 Exit criteria:
 
-- Template validation rejects lost or rebound PR cancellation, per-job timeout,
-  failure-only upload, or three-day diagnostic-retention contracts.
+- Template validation rejects lost or rebound finite bounds and independent-run
+  identity for the manual governance and release-readiness workflows.
 - Development validation enforces the generated CI contract without requiring
   brainstorming-only governance-audit or release-readiness workflows.
 - Generated CI retains pull-request cancellation, independent push/manual run

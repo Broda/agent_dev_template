@@ -6,16 +6,23 @@ projects receive their own `CHANGELOG.md` during finalization.
 ## [Unreleased]
 
 - Current planned harness version: `0.1.1`.
-- Added the HM10 CI-efficiency baseline: superseded pull-request runs now
-  cancel by pull request while manual and release-readiness runs remain
-  independent, all template CI jobs have conservative finite timeouts, and
+- Added the HM10 generated-project CI-efficiency baseline: superseded
+  pull-request runs cancel by pull request, push and manual runs remain
+  independent, generated jobs have a conservative finite timeout, and
   failure-only drift artifacts expire after three days.
+- Added finite 10- and 45-minute ceilings to the template-only manual governance
+  and release-readiness workflows. The template root CI remains byte-compatible
+  for direct finalized-consumer updates; its own cancellation and timeout
+  optimization is deferred until the updater boundary can migrate it safely.
 - Generated development CI now applies the same pull-request cancellation and
   three-day diagnostic retention behavior plus a conservative 60-minute
   timeout to every emitted job.
 - Development validation now contract-checks generated CI by workflow, job, and
   upload-step placement without requiring brainstorming-only workflows in
   finalized consumers.
+- Old finalized consumers with an exact legacy generated CI workflow migrate
+  transactionally to the new project-specific output during update. Customized
+  CI is never overwritten and instead fails closed with validation guidance.
 - Clarified that generated GitHub CI is feedback and compatibility evidence by
   default and that authoritative exact-SHA release evidence may come from a
   separately controlled verifier defined by project policy.

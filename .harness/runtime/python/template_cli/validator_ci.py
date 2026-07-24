@@ -19,8 +19,6 @@ def validate_ci_efficiency_contract(root: Path, result: ValidationResult) -> Non
 
 def _validate_brainstorming_workflows(root: Path, result: ValidationResult) -> None:
     contracts = [
-        (".github/workflows/ci.yml", "test-and-validate", 30, "measured Ubuntu timeout"),
-        (".github/workflows/ci.yml", "windows-powershell-launchers", 60, "conservative Windows timeout"),
         (".github/workflows/governance-audit.yml", "audit", 10, "measured governance timeout"),
         (
             ".github/workflows/release-readiness.yml",
@@ -46,8 +44,6 @@ def _validate_brainstorming_workflows(root: Path, result: ValidationResult) -> N
             timeout_minutes,
             timeout_label,
         )
-        if relative_path == ".github/workflows/ci.yml" and job_name == "test-and-validate":
-            _validate_drift_upload(result, relative_path, workflow_text, job_name, "generated artifact")
 
 
 def _validate_development_workflow(root: Path, result: ValidationResult) -> None:

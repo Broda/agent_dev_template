@@ -21,7 +21,7 @@ Use this skill when maintaining the harness template rather than brainstorming a
 - Review `.harness/docs/HARNESS_IMPROVEMENT_ROADMAP.md` for public-template behavior, inventory, workflow, or packaging changes; update or check off the relevant roadmap/backlog item in the same slice.
 - Update tests or fixtures when behavior changes.
 - Keep every path in the manifest's `posixExecutablePaths` at mode `100755`; generation, update/apply, and release checks must preserve that contract.
-- Keep development-doc compatibility migrations transactional and additive: preserve project state and authored content, back up every changed doc, validate before accepting the migration, and restore the docs if validation fails.
+- Keep finalized-project compatibility migrations transactional and conservative: preserve project state and authored content, back up every changed surface, validate before accepting the migration, and restore changes if validation fails. Auto-migrate a generated workflow only when it exactly matches a known legacy renderer output; never overwrite customized CI.
 - Do not hand-edit generated intent tables in `.harness/commands/CONVERSATIONAL_MODE.md` or `.harness/commands/COMMANDS.md`.
 - To change natural-language mappings, edit `.harness/commands/intent_registry.json`, run `./scripts/render-intent-docs`, then validate.
 - For external idea ingestion, keep `docs/EXTERNAL_INTEGRATION.md`, `lab import-idea`, and `project-harness new-from-idea` public-safe: examples must use generic placeholders and callers must not edit catalog, bucket, or session internals directly.

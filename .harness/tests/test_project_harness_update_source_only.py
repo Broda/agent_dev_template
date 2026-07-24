@@ -2,16 +2,9 @@ from __future__ import annotations
 
 import json
 import shutil
-import sys
 
 from project_harness_update_helpers import ProjectHarnessUpdateTestCase
 from workflow_test_helpers import REPO_ROOT, run_cmd
-
-RUNTIME_PYTHON = REPO_ROOT / ".harness/runtime/python"
-if str(RUNTIME_PYTHON) not in sys.path:
-    sys.path.insert(0, str(RUNTIME_PYTHON))
-
-from template_cli.render_ci import render_development_ci  # noqa: E402
 
 OLD_SOURCE_COMMIT = "6afc76667393d73531d52651f1916436e0cf564e"
 PROJECT_OWNED_SCHEMA_COMMIT = "125c8ed84f5249c2fc1e8a22256716d8f8bdb041"
@@ -40,6 +33,7 @@ class ProjectHarnessUpdateSourceOnlyTests(ProjectHarnessUpdateTestCase):
             path.write_text(path.read_text(encoding="utf-8") + f"\n{marker}\n", encoding="utf-8")
         self._align_target_generated_docs(current_source, project)
         docs_before = self._migration_doc_bytes(project)
+        ci_before = (project / ".github/workflows/ci.yml").read_bytes()
         combined_before = "\n".join(value.decode() for value in docs_before.values())
         self.assertRegex(combined_before, r"(?im)Deferred scope:\s*\n\s*- None recorded\.")
 
@@ -56,7 +50,8 @@ class ProjectHarnessUpdateSourceOnlyTests(ProjectHarnessUpdateTestCase):
             cwd=project,
         )
 
-        self.assertIn("Migrated legacy generated development contract sections:", result.stdout)
+        self.assertIn("Migrated recognized legacy generated development surfaces:", result.stdout)
+        self.assertIn("- .github/workflows/ci.yml", result.stdout)
         self.assertIn("Applied harness update.", result.stdout)
         self.assertIn("validate-development: 0", result.stdout)
         self.assertEqual(state_before, state_path.read_bytes())
@@ -71,9 +66,14 @@ class ProjectHarnessUpdateSourceOnlyTests(ProjectHarnessUpdateTestCase):
         for marker in authored_markers.values():
             self.assertIn(marker, combined_after)
         migration_backups = list(
-            (project / ".harness-update-backups").glob("*-development-docs/docs/PROJECT_CONTEXT.md")
+            (project / ".harness-update-backups").glob("*-development-contract/docs/PROJECT_CONTEXT.md")
         )
         self.assertTrue(migration_backups)
+        migrated_ci = (project / ".github/workflows/ci.yml").read_bytes()
+        self.assertNotEqual(ci_before, migrated_ci)
+        self.assertIn(b"cancel-in-progress: ${{ github.event_name == 'pull_request' }}", migrated_ci)
+        self.assertIn(b"timeout-minutes: 60", migrated_ci)
+        self.assertIn(b"retention-days: 3", migrated_ci)
         validation = run_cmd(["./scripts/validate-development"], cwd=project)
         self.assertIn("PASS: development integrity checks completed with no blocking failures.", validation.stdout)
 
@@ -93,6 +93,7 @@ class ProjectHarnessUpdateSourceOnlyTests(ProjectHarnessUpdateTestCase):
         state_path = project / "state/project-init.json"
         state_before = state_path.read_bytes()
         docs_before = self._migration_doc_bytes(project)
+        ci_before = (project / ".github/workflows/ci.yml").read_bytes()
         runtime_path = project / ".harness/runtime/python/template_cli/plugin_sync.py"
         runtime_before = runtime_path.read_bytes()
 
@@ -111,10 +112,46 @@ class ProjectHarnessUpdateSourceOnlyTests(ProjectHarnessUpdateTestCase):
         )
 
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("Rolled back generated development-doc migration after validation failure.", result.stdout)
+        self.assertIn("Rolled back generated development-surface migration after validation failure.", result.stdout)
         self.assertIn("Post-update hook failed. Rolled back copied files from backup:", result.stdout)
         self.assertEqual(state_before, state_path.read_bytes())
         self.assertEqual(docs_before, self._migration_doc_bytes(project))
+        self.assertEqual(ci_before, (project / ".github/workflows/ci.yml").read_bytes())
+        self.assertEqual(runtime_before, runtime_path.read_bytes())
+
+    def test_old_development_updater_preserves_customized_ci_and_fails_closed(self) -> None:
+        old_source = self._git_checkout_source(PROJECT_OWNED_SCHEMA_COMMIT, "custom-ci-source")
+        current_source = self._current_worktree_source()
+        project = self.tmpdir / "custom-ci-project"
+        run_cmd(["./scripts/project-harness", "new", str(project), "--no-git"], cwd=old_source)
+        self.install_finalized_cli_project(project)
+        self._align_target_generated_docs(current_source, project)
+        ci_path = project / ".github/workflows/ci.yml"
+        ci_path.write_text(
+            ci_path.read_text(encoding="utf-8") + "\n# Project-owned CI customization.\n", encoding="utf-8"
+        )
+        ci_before = ci_path.read_bytes()
+        runtime_path = project / ".harness/runtime/python/template_cli/plugin_sync.py"
+        runtime_before = runtime_path.read_bytes()
+
+        result = run_cmd(
+            [
+                "./scripts/project-harness",
+                "update",
+                "--apply",
+                "--source-path",
+                str(current_source),
+                "--yes",
+                "--include-mixed",
+            ],
+            cwd=project,
+            check=False,
+        )
+
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("missing CI-efficiency contract", result.stdout)
+        self.assertIn("Post-update hook failed. Rolled back copied files from backup:", result.stdout)
+        self.assertEqual(ci_before, ci_path.read_bytes())
         self.assertEqual(runtime_before, runtime_path.read_bytes())
 
     def test_old_downstream_updater_installs_new_schema_path_in_one_pass(self) -> None:
@@ -249,24 +286,7 @@ class ProjectHarnessUpdateSourceOnlyTests(ProjectHarnessUpdateTestCase):
 
     @staticmethod
     def _align_target_generated_docs(current_source, project):
-        state = json.loads((project / "state/project-init.json").read_text(encoding="utf-8"))
-        tech_stack = state["techStack"]
-        commands = state["commands"]
-        (project / ".github/workflows/ci.yml").write_text(
-            render_development_ci(
-                tech_stack["language"],
-                tech_stack["runtime"],
-                tech_stack["packageTool"],
-                commands["build"],
-                commands["test"],
-            ),
-            encoding="utf-8",
-        )
-        generated_paths = [
-            *ProjectHarnessUpdateSourceOnlyTests._migration_doc_bytes(project),
-            ".github/workflows/ci.yml",
-        ]
-        for relative_path in generated_paths:
+        for relative_path in ProjectHarnessUpdateSourceOnlyTests._migration_doc_bytes(project):
             target = current_source / relative_path
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(project / relative_path, target)

@@ -101,12 +101,12 @@ brainstorming mode so milestone auto-commits do not spawn CI runs. The Ubuntu
 job runs Ruff, mypy, generated-artifact drift checks, the full regression
 suite, and governance plus brainstorming validation. The Windows job runs the
 same regression suite through the PowerShell launchers plus launcher-specific
-update and rendering smoke checks. Superseded pull-request runs are cancelled;
-manual audit and release-readiness runs remain independent. Failure-only drift
-artifacts expire after three days. The measured Ubuntu job has a 30-minute
-timeout; the Windows job has a conservative 60-minute ceiling based on the same
-full-suite baseline plus additional launcher smoke coverage and platform
-variance.
+update and rendering smoke checks. Manual audit and release-readiness runs stay
+independent and have finite 10- and 45-minute ceilings. The template's root CI
+workflow remains byte-compatible in this release so finalized consumers can
+update directly without colliding with their project-specific generated CI;
+root-workflow cancellation and timeout changes are deferred until that updater
+boundary can migrate safely.
 
 Runtime extraction is planned but not active. ADR-0002 records the boundary:
 the first extracted runtime should remain Python, wrappers must verify manifest

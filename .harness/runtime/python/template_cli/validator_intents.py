@@ -229,14 +229,6 @@ def validate_intent_sync_ci(root: Path, result: ValidationResult) -> None:
             "drift artifact upload",
             "uses: actions/upload-artifact@v4",
         ),
-        (
-            "failure-only artifact upload",
-            "if: failure()",
-        ),
-        (
-            "three-day artifact retention",
-            "          retention-days: 3\n",
-        ),
     ]
     for label, snippet in required_checks:
         if snippet not in ci_text:

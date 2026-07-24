@@ -28,13 +28,13 @@ def run_sync_plugin_skills(root: Path) -> int:
     try:
         migration = apply_pending_development_doc_migration(root)
     except Exception as exc:
-        print(f"FAIL: unable to migrate legacy generated development docs: {exc}")
+        print(f"FAIL: unable to migrate recognized legacy generated development surfaces: {exc}")
         return 1
 
     result = run_validate_governance(root)
     if result != 0 and migration is not None:
         migration.rollback()
-        print("Rolled back generated development-doc migration after validation failure.")
+        print("Rolled back generated development-surface migration after validation failure.")
     return result
 
 
