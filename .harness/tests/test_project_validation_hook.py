@@ -184,7 +184,7 @@ print(json.dumps({{"failures": failures, "warnings": ["hook warning"]}}))
             "print(json.dumps({'failures': failures, 'warnings': []}))\n"
         )
 
-        result = self._run_hook()
+        result = self._run_hook(timeout_seconds=10)
 
         self.assertEqual(["nested validation recursion was rejected"], result.failures)
 
