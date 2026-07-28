@@ -17,6 +17,7 @@ from template_cli.posix_modes import (
     stage_posix_executable_modes,
 )
 from template_cli.validator_manifest import MANIFEST_PATH, stamp_harness_manifest
+from template_cli.validation_hook import hook_suppressed_environment
 
 
 @dataclass(frozen=True)
@@ -89,9 +90,27 @@ def _apply_update_source(root: Path, source: UpdateSource, *, yes: bool, include
 
     hook_results: list[tuple[str, int]] = []
     if any(path.startswith(".agents/skills/") for path in update_paths):
-        hook_results.append(("sync-plugin-skills", _run(_template_cli_command("sync-plugin-skills"), root)))
+        hook_results.append(
+            (
+                "sync-plugin-skills",
+                _run(
+                    _template_cli_command("sync-plugin-skills"),
+                    root,
+                    env=hook_suppressed_environment(),
+                ),
+            )
+        )
     if ".harness/commands/intent_registry.json" in update_paths:
-        hook_results.append(("render-intent-docs", _run(_template_cli_command("render-intent-docs"), root)))
+        hook_results.append(
+            (
+                "render-intent-docs",
+                _run(
+                    _template_cli_command("render-intent-docs"),
+                    root,
+                    env=hook_suppressed_environment(),
+                ),
+            )
+        )
     failed_hooks = [(label, result) for label, result in hook_results if result != 0]
     if failed_hooks:
         _rollback_update(root, backup_dir, update_paths, manifest_backup)
@@ -103,8 +122,9 @@ def _apply_update_source(root: Path, source: UpdateSource, *, yes: bool, include
     if read_mode(root) == "development":
         validation_commands.append(("validate-development", "validate-development"))
     validation_results: list[tuple[str, int]] = []
-    for cli_command, label in validation_commands:
-        result = _run(_template_cli_command(cli_command), root)
+    for index, (cli_command, label) in enumerate(validation_commands):
+        environment = hook_suppressed_environment() if index else None
+        result = _run(_template_cli_command(cli_command), root, env=environment)
         validation_results.append((label, result))
         if result != 0:
             _rollback_update(root, backup_dir, update_paths, manifest_backup)
@@ -180,16 +200,17 @@ def _rollback_update(
             shutil.copy2(manifest_backup.backup_path, manifest_path)
         elif not manifest_backup.existed and manifest_path.exists():
             manifest_path.unlink()
-    _run(_template_cli_command("sync-plugin-skills"), root)
-    _run(_template_cli_command("render-intent-docs"), root)
+    environment = hook_suppressed_environment()
+    _run(_template_cli_command("sync-plugin-skills"), root, env=environment)
+    _run(_template_cli_command("render-intent-docs"), root, env=environment)
 
 
 def _timestamp_label() -> str:
     return datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
 
 
-def _run(command: list[str], cwd: Path) -> int:
-    result = subprocess.run(command, cwd=cwd, text=True, capture_output=True, check=False)
+def _run(command: list[str], cwd: Path, *, env: dict[str, str] | None = None) -> int:
+    result = subprocess.run(command, cwd=cwd, env=env, text=True, capture_output=True, check=False)
     if result.stdout:
         print(result.stdout, end="")
     if result.stderr:

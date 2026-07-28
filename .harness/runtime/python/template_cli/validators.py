@@ -39,6 +39,7 @@ from template_cli.validator_plugins import validate_repo_plugins
 from template_cli.validator_python_config import validate_python_tool_config
 from template_cli.validator_semantics import validate_semantic_finalization
 from template_cli.validator_skills import validate_repo_skills
+from template_cli.validation_hook import add_project_validation_hook_result
 
 
 def validate_notes_catalog(root: Path, result: ValidationResult, *, base: str = "") -> None:
@@ -204,6 +205,12 @@ def run_validate_brainstorming(
             if f"`{artifact}`" not in file_map_contents:
                 result.add_warning(f"FILE_MAP.md missing registry row for: {artifact}")
 
+    add_project_validation_hook_result(
+        root,
+        result,
+        mode="brainstorming",
+        command=json_command,
+    )
     return print_brainstorming_summary_result(result, json_output=json_output, json_command=json_command)
 
 
@@ -256,6 +263,12 @@ def run_validate_development(
     validate_finalization_overwrite_policy(root, result)
     validate_repo_plugins(root, result)
     validate_repo_skills(root, result)
+    add_project_validation_hook_result(
+        root,
+        result,
+        mode="development",
+        command=json_command,
+    )
     return print_development_summary_result(result, json_output=json_output, json_command=json_command)
 
 

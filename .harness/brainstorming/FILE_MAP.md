@@ -69,6 +69,8 @@ Lean file registry for the Project Harness Template.
 | `.harness/tests/test_semantic_deferred_headings.py` | Semantic validator regressions for nested deferred roadmap headings |
 | `.harness/tests/test_semantic_finalization_fidelity.py` | Semantic finalization fidelity regression tests for structured contracts and unsupported generated surfaces |
 | `.harness/tests/test_semantic_hybrid_projects.py` | Hybrid CLI, web, admin, and editor capability regression tests |
+| `.harness/tests/test_project_validation_hook.py` | Optional project validation hook contract and adversarial process tests |
+| `.harness/tests/test_project_validation_hook_integration.py` | Optional hook warning, exact-once orchestration, and rollback integration tests |
 | `.harness/tests/test_finalization_regression.py` | End-to-end finalization regression tests for multi-session detail carryover |
 | `.harness/tests/test_harness_manifest.py` | Harness manifest validation and provenance stamping regression tests |
 | `.harness/tests/test_lab_handoff.py` | Lab handoff compiler regression tests for lossless brainstorming-to-finalization state |
@@ -191,6 +193,8 @@ Lean file registry for the Project Harness Template.
 | `.harness/runtime/python/template_cli/validator_plugins.py` | Local plugin manifest and marketplace validation helpers |
 | `.harness/runtime/python/template_cli/validator_python_config.py` | Python tool configuration validation helpers |
 | `.harness/runtime/python/template_cli/validator_semantics.py` | Semantic validation for finalized development docs and structured contract fidelity |
+| `.harness/runtime/python/template_cli/validation_hook.py` | Bounded optional project validation hook execution and closed JSON contract |
+| `.harness/runtime/python/template_cli/validation_hook_state.py` | Protected worktree ledger and mutation restoration for project validation hooks |
 | `.harness/runtime/python/template_cli/validator_skills.py` | Repo-scoped skill and skill metadata validation helpers |
 | `.harness/runtime/python/template_cli/plugin_sync.py` | Plugin skill mirror sync command implementation |
 | `.harness/runtime/python/template_cli/development_doc_migration.py` | Transactional legacy generated-development-doc semantic migration used during harness updates |

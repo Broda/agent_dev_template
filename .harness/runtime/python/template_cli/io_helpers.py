@@ -162,6 +162,13 @@ def print_development_summary_result(
 
     print("Development validation summary")
     print(f"- Failures: {len(result.failures)}")
+    print(f"- Warnings: {len(result.warnings)}")
+
+    if result.warnings:
+        print()
+        print("Warnings:")
+        for warning in result.warnings:
+            print(f"- {warning}")
 
     if result.failures:
         print()

@@ -157,6 +157,40 @@ Expected behavior:
 1. Run `./scripts/validate-governance`.
 2. If `MODE.md` is `development`, also run `./scripts/validate-development`.
 3. Report commands and exit codes without hiding local validation output.
+4. Invoke an optional project validation hook exactly once for the top-level
+   operation, even though development mode runs nested validators.
+
+## Project Validation Extension Point
+
+The only public project-owned validation extension is
+`scripts/project_harness_validation.py`. Validators launch it with
+`sys.executable`, the explicit project-root working directory, and strict
+`--mode`, `--command`, and `--json` arguments:
+
+```sh
+python scripts/project_harness_validation.py \
+  --mode <brainstorming|development> \
+  --command <validate-brainstorming|validate-development|validate-governance> \
+  --json
+```
+
+An absent hook succeeds silently. A present hook must exit zero and emit one
+UTF-8 JSON object containing exactly `failures` and `warnings`; both fields are
+required arrays of strings. No schema/version field or other extension key is
+accepted in this v1 contract.
+
+Hook execution is read-only and bounded: 60-second absolute timeout, 64 KiB
+each for stdout and stderr, no stdin, a sanitized allowlist of environment
+fields, recursion rejection, and process-group/descendant termination.
+Before/after protected-state checks detect and restore project worktree
+mutation. Any launch, process, encoding, size, JSON-shape, recursion, timeout,
+or mutation problem becomes a normal validation failure. Reported warnings are
+visible in both text summaries and parent validator JSON.
+
+`project-harness update --apply` runs generated-artifact maintenance with the
+project hook suppressed, then invokes the hook once through its top-level
+post-update governance validation. A mutating or failing hook rejects the
+update and the updater restores its transactional harness changes.
 
 ## Boundary
 

@@ -84,6 +84,42 @@ context, write behavior, counts, failures, warnings, and next-command hints.
 Adapters should treat unknown additional keys as forward-compatible metadata and
 must not infer write behavior from human-readable text.
 
+## Optional Project Validation Hook
+
+Projects may add a project-owned validator at
+`scripts/project_harness_validation.py`. The harness invokes it with the same
+Python interpreter, the project root as the working directory, and this exact
+shape:
+
+```sh
+python scripts/project_harness_validation.py \
+  --mode <brainstorming|development> \
+  --command <validate-brainstorming|validate-development|validate-governance> \
+  --json
+```
+
+The hook must exit zero and write exactly one UTF-8 JSON object to stdout with
+only two required keys:
+
+```json
+{"failures": [], "warnings": []}
+```
+
+Both values must be arrays of strings. Missing hooks are silent successes.
+Malformed, missing, extra, multiple, trailing, oversized, or invalidly encoded
+output; nonzero exit; spawn failure; recursion; timeout; and protected
+worktree mutation all become validation failures. Hook warnings appear in
+normal validation summaries and parent JSON output.
+
+The hook is read-only and runs once per intentional top-level validation,
+including `project-harness validate` and updater apply. It receives only a
+bounded allowlist of process environment fields (`PATH`, home/user, temporary
+directory, locale, virtual-environment, platform, and `CI` fields), plus
+internal encoding and recursion guards. It has a 60-second absolute timeout,
+64 KiB stdout and stderr limits, and process-tree termination. Validation
+records protected worktree state before invocation, restores detected hook
+mutations, and fails closed.
+
 ## Tooling Runtime
 
 - Python 3 is required for the repository automation scripts under `scripts/`.

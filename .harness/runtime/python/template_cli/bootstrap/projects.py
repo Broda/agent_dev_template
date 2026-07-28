@@ -24,6 +24,7 @@ from template_cli.posix_modes import (
     stage_posix_executable_modes,
 )
 from template_cli.validator_manifest import load_harness_manifest, stamp_harness_manifest
+from template_cli.validation_hook import hook_suppressed_environment
 from template_cli.workflow_idea_commands import import_external_idea
 
 COPY_IGNORE = shutil.ignore_patterns(
@@ -234,9 +235,10 @@ def run_project_harness_validate(root: Path) -> int:
     if read_mode(root) == "development":
         commands.append(("validate-development", "./scripts/validate-development"))
 
-    for cli_command, display_command in commands:
+    for index, (cli_command, display_command) in enumerate(commands):
         print(f"Running: {display_command}")
-        result = _run(_template_cli_command(cli_command), root)
+        environment = hook_suppressed_environment() if index else None
+        result = _run(_template_cli_command(cli_command), root, env=environment)
         print(f"Exit code: {result}")
         if result != 0:
             return result
@@ -264,8 +266,8 @@ def _write_brainstorming_mode(root: Path) -> None:
     )
 
 
-def _run(command: list[str], cwd: Path) -> int:
-    result = subprocess.run(command, cwd=cwd, text=True, capture_output=True, check=False)
+def _run(command: list[str], cwd: Path, *, env: dict[str, str] | None = None) -> int:
+    result = subprocess.run(command, cwd=cwd, env=env, text=True, capture_output=True, check=False)
     if result.stdout:
         print(result.stdout, end="")
     if result.stderr:
