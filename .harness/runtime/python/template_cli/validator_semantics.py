@@ -33,7 +33,12 @@ def validate_semantic_finalization(root: Path, result: ValidationResult, state: 
     active_content = "\n".join(_active_task_lines(documents.get("docs/ROADMAP.md", ""))).lower()
 
     if profile.is_cli:
-        _reject_terms(result, active_content, ["web ui", "admin ui", "editor-facing"], "CLI project")
+        if not profile.allows_web_ui_claim:
+            _reject_terms(result, active_content, ["web ui"], "CLI project")
+        if not profile.allows_admin_ui_claim:
+            _reject_terms(result, active_content, ["admin ui"], "CLI project")
+        if not profile.allows_editor_facing_claim:
+            _reject_terms(result, active_content, ["editor-facing"], "CLI project")
     if not profile.has_api:
         _reject_terms(result, active_content, ["api endpoints", "dto structures", "api handlers"], "non-API project")
     if not profile.has_authentication:

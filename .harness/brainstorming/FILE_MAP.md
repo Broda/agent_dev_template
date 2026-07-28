@@ -68,6 +68,7 @@ Lean file registry for the Project Harness Template.
 | `.harness/tests/test_development_wiki.py` | Development wiki render and sync-check regression tests |
 | `.harness/tests/test_semantic_deferred_headings.py` | Semantic validator regressions for nested deferred roadmap headings |
 | `.harness/tests/test_semantic_finalization_fidelity.py` | Semantic finalization fidelity regression tests for structured contracts and unsupported generated surfaces |
+| `.harness/tests/test_semantic_hybrid_projects.py` | Hybrid CLI, web, admin, and editor capability regression tests |
 | `.harness/tests/test_finalization_regression.py` | End-to-end finalization regression tests for multi-session detail carryover |
 | `.harness/tests/test_harness_manifest.py` | Harness manifest validation and provenance stamping regression tests |
 | `.harness/tests/test_lab_handoff.py` | Lab handoff compiler regression tests for lossless brainstorming-to-finalization state |

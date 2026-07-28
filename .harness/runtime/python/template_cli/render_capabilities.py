@@ -19,6 +19,18 @@ class ProjectProfile:
     is_data_pipeline: bool
 
     @property
+    def allows_web_ui_claim(self) -> bool:
+        return self.has_web_ui or self.has_admin
+
+    @property
+    def allows_admin_ui_claim(self) -> bool:
+        return self.has_admin
+
+    @property
+    def allows_editor_facing_claim(self) -> bool:
+        return self.has_admin
+
+    @property
     def interface_label(self) -> str:
         if self.is_cli and self.is_data_pipeline:
             return "CLI and data pipeline"
@@ -220,7 +232,11 @@ def project_profile(state: dict) -> ProjectProfile:
             _contains_word(" ".join([project_text, stack_text]), token)
             for token in ["api", "http", "rest", "graphql", "endpoint", "axum", "fastapi"]
         )
-        has_admin = any(_contains_word(project_text, token) for token in ["admin", "editor", "privileged"])
+        capability_text = " ".join([project_text, stack_text])
+        has_admin = any(
+            _contains_word(capability_text, token)
+            for token in ["admin", "editor", "privileged", "cms"]
+        ) or _contains_phrase(capability_text, "content management")
     uses_javascript = any(token in stack_text for token in ["javascript", "typescript", "node", "npm", "pnpm", "yarn"])
     has_authentication = auth_text not in {"", "none", "no", "n/a", "_none_", "not applicable"}
 

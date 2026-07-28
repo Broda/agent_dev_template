@@ -72,7 +72,8 @@ class SemanticFinalizationFidelityTests(LabWorkflowTestCase):
         roadmap.write_text(
             roadmap.read_text(encoding="utf-8").replace(
                 "\n# Deferred Scope\n",
-                "\n- [ ] Build Web UI admin flow with API endpoints and DTO structures.\n\n# Deferred Scope\n",
+                "\n- [ ] Build Web UI and admin UI with an editor-facing flow, API endpoints, and DTO structures.\n"
+                "\n# Deferred Scope\n",
                 1,
             ),
             encoding="utf-8",
@@ -82,6 +83,8 @@ class SemanticFinalizationFidelityTests(LabWorkflowTestCase):
 
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("unsupported cli project surface: web ui", result.stdout.lower())
+        self.assertIn("unsupported cli project surface: admin ui", result.stdout.lower())
+        self.assertIn("unsupported cli project surface: editor-facing", result.stdout.lower())
         self.assertIn("unsupported non-API project surface: api endpoints", result.stdout)
         self.assertIn("unsupported non-API project surface: dto structures", result.stdout)
 
