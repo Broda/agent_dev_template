@@ -850,6 +850,9 @@ Scope:
       template root CI byte-compatible and transactionally migrating only exact
       legacy generated outputs. Customized workflows are preserved and fail
       closed rather than being overwritten.
+- [x] Fetch complete Git history in every template-root job that runs the exact
+      prior-consumer transition regression, with local workflow-policy coverage
+      preventing shallow checkout from returning.
 - [ ] Apply equivalent cancellation and finite bounds to the template root CI
       after the updater can distinguish its brainstorming source workflow from
       project-specific finalized output without a mixed-generated conflict.

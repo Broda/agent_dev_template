@@ -3,7 +3,53 @@ from __future__ import annotations
 from workflow_test_helpers import LabWorkflowTestCase, run_cmd
 
 
+def _mapping_block(text: str, key: str, indent: int) -> str:
+    lines = text.splitlines()
+    target = f"{' ' * indent}{key}:"
+    for index, line in enumerate(lines):
+        if line != target:
+            continue
+        for end in range(index + 1, len(lines)):
+            candidate = lines[end]
+            if candidate.strip() and len(candidate) - len(candidate.lstrip()) <= indent:
+                return "\n".join(lines[index:end])
+        return "\n".join(lines[index:])
+    return ""
+
+
+def _checkout_step(job_block: str) -> str:
+    lines = job_block.splitlines()
+    target = "      - name: Checkout"
+    for index, line in enumerate(lines):
+        if line != target:
+            continue
+        for end in range(index + 1, len(lines)):
+            candidate = lines[end]
+            if candidate.strip() and len(candidate) - len(candidate.lstrip()) <= 6:
+                return "\n".join(lines[index:end])
+        return "\n".join(lines[index:])
+    return ""
+
+
 class GithubWorkflowPolicyTests(LabWorkflowTestCase):
+    def test_historical_suite_jobs_fetch_full_prior_consumer_history(self) -> None:
+        required_jobs = {
+            ".github/workflows/ci.yml": (
+                "test-and-validate",
+                "windows-powershell-launchers",
+            ),
+            ".github/workflows/release-readiness.yml": ("public-template-smoke",),
+        }
+
+        for relative_path, job_names in required_jobs.items():
+            workflow_text = (self.repo / relative_path).read_text(encoding="utf-8")
+            for job_name in job_names:
+                with self.subTest(workflow=relative_path, job=job_name):
+                    job_block = _mapping_block(workflow_text, job_name, 2)
+                    checkout_step = _checkout_step(job_block)
+                    self.assertIn("        uses: actions/checkout@v6", checkout_step)
+                    self.assertIn("          fetch-depth: 0", checkout_step)
+
     def test_validate_brainstorming_keeps_manual_release_runs_independent(self) -> None:
         workflow_path = self.repo / ".github/workflows/release-readiness.yml"
         workflow_path.write_text(
