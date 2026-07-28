@@ -98,6 +98,21 @@ class ProjectHarnessUpdateTests(ProjectHarnessUpdateTestCase):
         self.assertIn("missing:", result.stdout)
         self.assertIn("scripts/lab.sh", result.stdout)
 
+    def test_update_dry_run_omits_absent_excluded_source_files(self) -> None:
+        source = self.copy_source()
+        excluded_paths = ["pyproject.toml", "requirements-dev.txt", ".agents/plugins/marketplace.json"]
+        for relative_path in excluded_paths:
+            (self.repo / relative_path).unlink()
+
+        result = run_cmd(
+            ["./scripts/project-harness", "update", "--dry-run", "--source-path", str(source), "--json"],
+            cwd=self.repo,
+        )
+        payload = json.loads(result.stdout)
+        planned_paths = {path for paths in payload["plan"].values() for path in paths}
+
+        self.assertTrue(set(excluded_paths).isdisjoint(planned_paths))
+
     def test_update_dry_run_reports_conflicted_mixed_generated_file(self) -> None:
         self.init_git_repo()
         source = self.copy_source()
@@ -159,7 +174,7 @@ class ProjectHarnessUpdateTests(ProjectHarnessUpdateTestCase):
         )
 
         self.assertIn("Project harness update dry run", result.stdout)
-        self.assertIn(f"Target harness: 0.1.1 ({target_commit})", result.stdout)
+        self.assertIn(f"Target harness: 0.2.0 ({target_commit})", result.stdout)
         self.assertIn("Target source worktree: clean", result.stdout)
         self.assertIn("Recorded source baseline: resolved", result.stdout)
         self.assertIn("scripts/lab.sh", result.stdout)

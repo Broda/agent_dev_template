@@ -29,7 +29,7 @@ class DevelopmentRenderingTests(LabWorkflowTestCase):
     RENDERED_ARTIFACT_HASHES_WITH_PERSISTENCE = {
         "README.md": "26e3d0be4e5d732b64b8e5d75fd60d4d56d23804cad19483da99c3c19d781ab7",
         "CHANGELOG.md": "6b0e43176413e4e809d46f89b5da23c3976050f6c2dc22a774852399963f09a3",
-        ".gitignore": "8ed32c34caaa326b71d25ce9835819a720ec3c2a91585b53bf22c75d0bbea2fe",
+        ".gitignore": "e714182388d453c9486c28ab7ea92b5488960fb815d3997ad8c0d80b760261d0",
         ".github/workflows/ci.yml": "0a6be48e90f27517adb3eb5fce60b5018f81cb2887db3a8570a300ee91447a23",
         "docs/PROJECT_CONTEXT.md": "0efa304a40522671fe43ef2b2a570277961ee038e0a81f61b50af6e3020e1e41",
         "docs/ROADMAP.md": "33718c326a7c6f8081848d280f7c1dd37e03199d34b7948e628cbbf9e2a45f21",

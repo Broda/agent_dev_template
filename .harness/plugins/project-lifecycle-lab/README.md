@@ -3,7 +3,7 @@
 This plugin packages reusable Codex operating knowledge for project harness templates.
 
 The plugin is intentionally not the project runtime. Canonical project state, deterministic scripts, validators, generated development docs, and local workflow history stay in the harness repository.
-Current plugin version: `0.1.1`.
+Current plugin version: `0.2.0`.
 
 ## Packaging Decision
 
@@ -13,6 +13,12 @@ Current plugin version: `0.1.1`.
 - The local plugin marketplace points at `./.harness/plugins/project-lifecycle-lab`.
 - Copied mirrors remain checked in until plugin packaging needs release-time generation.
 - `./scripts/sync-plugin-skills` is the maintenance path for refreshing plugin mirrors.
+- Marketplace metadata is maintained deliberately in
+  `.agents/plugins/marketplace.json`; `sync-plugin-skills` does not generate or
+  rewrite it.
+- The public template's marketplace version is release-aligned deliberately.
+  In a generated consumer it remains an excluded project-local surface, so an
+  updater preserves the consumer's recorded marketplace version.
 - `./scripts/validate-governance` validates manifest shape, marketplace registration, mirror drift, and the harness/plugin boundary wording.
 - The plugin `version` stays aligned with `.harness/commands/harness_manifest.json` `harnessVersion`.
 - Cached or reinstalled plugin copies contain skill mirrors only. Repo launcher

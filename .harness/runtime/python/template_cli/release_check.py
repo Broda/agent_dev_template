@@ -9,11 +9,10 @@ import tempfile
 from collections.abc import Sequence
 from pathlib import Path
 
-GENERATED_ARTIFACT_PATHS = [
+GENERATED_AND_MIRRORED_ARTIFACT_PATHS = [
     ".harness/commands/CONVERSATIONAL_MODE.md",
     ".harness/commands/COMMANDS.md",
     ".harness/commands/harness_manifest.json",
-    ".agents/plugins/marketplace.json",
     ".agents/skills/",
     ".harness/plugins/project-lifecycle-lab/skills/",
     ".harness/development/templates/docs/",
@@ -52,16 +51,16 @@ def run_harness_release_check(root: Path) -> int:
 
 
 def _check_generated_artifacts(root: Path) -> int:
-    before = _git_diff(root, GENERATED_ARTIFACT_PATHS)
+    before = _git_diff(root, GENERATED_AND_MIRRORED_ARTIFACT_PATHS)
     for command in [["./scripts/render-intent-docs"], ["./scripts/sync-plugin-skills"]]:
         result = _run(command, root)
         if result != 0:
             return result
-    after = _git_diff(root, GENERATED_ARTIFACT_PATHS)
+    after = _git_diff(root, GENERATED_AND_MIRRORED_ARTIFACT_PATHS)
     if before != after:
         print("Generated artifacts changed after maintenance commands.")
         print("Review the diff, then rerun ./scripts/harness-release-check.")
-        _run(["git", "diff", "--", *GENERATED_ARTIFACT_PATHS], root)
+        _run(["git", "diff", "--", *GENERATED_AND_MIRRORED_ARTIFACT_PATHS], root)
         return 1
     print("Generated artifacts are in sync.")
     return 0

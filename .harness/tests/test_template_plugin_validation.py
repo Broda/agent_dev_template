@@ -63,26 +63,26 @@ class TemplatePluginValidationTests(LabWorkflowTestCase):
     def test_validate_brainstorming_checks_plugin_version_matches_harness(self) -> None:
         manifest_path = self.repo / ".harness/plugins/project-lifecycle-lab/.codex-plugin/plugin.json"
         manifest_path.write_text(
-            manifest_path.read_text(encoding="utf-8").replace('"version": "0.1.1"', '"version": "9.9.9"', 1),
+            manifest_path.read_text(encoding="utf-8").replace('"version": "0.2.0"', '"version": "9.9.9"', 1),
             encoding="utf-8",
         )
 
         result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
 
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("Plugin manifest version must match harnessVersion 0.1.1", result.stdout)
+        self.assertIn("Plugin manifest version must match harnessVersion 0.2.0", result.stdout)
 
     def test_validate_brainstorming_checks_plugin_marketplace_version(self) -> None:
         marketplace_path = self.repo / ".agents/plugins/marketplace.json"
         marketplace_path.write_text(
-            marketplace_path.read_text(encoding="utf-8").replace('"version": "0.1.1"', '"version": "9.9.9"', 1),
+            marketplace_path.read_text(encoding="utf-8").replace('"version": "0.2.0"', '"version": "9.9.9"', 1),
             encoding="utf-8",
         )
 
         result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
 
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("Plugin marketplace version must match harnessVersion 0.1.1", result.stdout)
+        self.assertIn("Plugin marketplace version must match harnessVersion 0.2.0", result.stdout)
 
     def test_validate_brainstorming_checks_plugin_public_author_metadata(self) -> None:
         manifest_path = self.repo / ".harness/plugins/project-lifecycle-lab/.codex-plugin/plugin.json"

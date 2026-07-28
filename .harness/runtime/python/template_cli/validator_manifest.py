@@ -14,15 +14,19 @@ from template_cli.posix_modes import POSIX_EXECUTABLE_PATHS, git_index_mode, has
 MANIFEST_PATH = ".harness/commands/harness_manifest.json"
 MANIFEST_SCHEMA_PATH = ".harness/commands/harness_manifest.schema.json"
 EXPECTED_SCHEMA_VERSION = 2
-EXPECTED_HARNESS_VERSION = "0.1.1"
+EXPECTED_HARNESS_VERSION = "0.2.0"
 EXPECTED_TEMPLATE_REPOSITORY = "https://github.com/Broda/agent_dev_template"
 EXPECTED_COMPATIBILITY = {
     "wrapperRuntimeVersion": 1,
-    "capabilityVersion": 1,
+    "capabilityVersion": 2,
     "stateSchemaVersion": 2,
     "stateSchemaPath": ".harness/schemas/project-init.schema.v2.json",
 }
 EXPECTED_MODES = ["brainstorming", "development"]
+EXPECTED_WRAPPER_FAMILIES = sorted(Path(path).name for path in POSIX_EXECUTABLE_PATHS if not Path(path).suffix)
+EXPECTED_WRAPPER_PATHS = [
+    f"scripts/{family}{suffix}" for family in EXPECTED_WRAPPER_FAMILIES for suffix in ("", ".ps1", ".sh")
+]
 EXPECTED_STABLE_WRAPPER_BACKENDS = {
     "scripts/lab": "lab-<command>",
     "scripts/finalize-project": "finalize-project",
@@ -111,7 +115,7 @@ def _validate_top_level(manifest: dict[str, Any], result: ValidationResult) -> N
     if manifest.get("schemaVersion") != EXPECTED_SCHEMA_VERSION:
         result.add_failure("Harness manifest schemaVersion must be 2.")
     if manifest.get("harnessVersion") != EXPECTED_HARNESS_VERSION:
-        result.add_failure("Harness manifest harnessVersion must be 0.1.1.")
+        result.add_failure(f"Harness manifest harnessVersion must be {EXPECTED_HARNESS_VERSION}.")
     if manifest.get("templateRepository") != EXPECTED_TEMPLATE_REPOSITORY:
         result.add_failure(f"Harness manifest templateRepository must be {EXPECTED_TEMPLATE_REPOSITORY}.")
     if manifest.get("supportedModes") != EXPECTED_MODES:
@@ -214,6 +218,28 @@ def _validate_inventory(manifest: dict[str, Any], result: ValidationResult) -> N
         if not isinstance(entry, str) or not entry.strip():
             result.add_failure("Harness manifest artifactInventoryExclusions contains an empty path.")
     _validate_retained_artifact_coverage(inventory, exclusions, result)
+    _validate_exact_ownership_boundaries(inventory, result)
+
+
+def _validate_exact_ownership_boundaries(inventory: dict[str, Any], result: ValidationResult) -> None:
+    harness_owned = inventory.get("harnessOwned", [])
+    project_owned = inventory.get("projectOwned", [])
+    archival = inventory.get("archival", [])
+    if not all(isinstance(entries, list) for entries in [harness_owned, project_owned, archival]):
+        return
+    wrapper_paths = sorted(entry for entry in harness_owned if isinstance(entry, str) and entry.startswith("scripts/"))
+    if wrapper_paths != sorted(EXPECTED_WRAPPER_PATHS):
+        result.add_failure("Harness manifest must own exactly 12 command families / 36 wrapper files under scripts/.")
+    if "scripts/" in harness_owned:
+        result.add_failure("Harness manifest must not broadly own scripts/.")
+    if "scripts/project_harness_validation.py" not in project_owned:
+        result.add_failure("Harness manifest must mark scripts/project_harness_validation.py project-owned.")
+    if ".harness/history/" not in archival:
+        result.add_failure("Harness manifest must mark .harness/history/ as archival.")
+    if ".harness/history/exports/.gitkeep" not in harness_owned:
+        result.add_failure("Harness manifest must own .harness/history/exports/.gitkeep exactly.")
+    if "state/project-init.schema.v2.json" in project_owned:
+        result.add_failure("Harness manifest must use only the canonical .harness project-init schema path.")
 
 
 def _validate_retained_artifact_coverage(
@@ -268,6 +294,8 @@ def _validate_snapshot_policy(manifest: dict[str, Any], result: ValidationResult
         return
 
     documented = {entry for entry in broad_entries if isinstance(entry, str)}
+    if "scripts/" in documented:
+        result.add_failure("Harness manifest snapshot policy must not retain stale scripts/ broad entries.")
     inventory = manifest.get("artifactInventory", {})
     if not isinstance(inventory, dict):
         return

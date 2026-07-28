@@ -35,3 +35,4 @@ Thumbs.db
 external/
 tasklist.md
 .hermes/
+.harness-update-backups/

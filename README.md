@@ -176,6 +176,18 @@ ownership classes for conservative update dry-run and apply tooling. The
 `posixExecutablePaths` inventory is the distribution contract for launchers that
 must remain mode `100755` in generated repositories and source archives.
 
+Harness `0.2.0` owns exactly 36 wrapper files across 12 command families under
+`scripts/`; unmatched scripts remain project content and
+`scripts/project_harness_validation.py` is exactly project-owned.
+`.harness/history/` is archival except for the exact harness-owned
+`exports/.gitkeep` sentinel. `artifactInventoryExclusions` are omitted from
+update enumeration, so an excluded target file is neither copied nor reported
+missing. Consumers upgrading from a `0.1.x` manifest that broadly owns
+`scripts/` must use the target-planner transition documented in
+`.harness/docs/BOOTSTRAP_TOOL.md` for the first apply. That transition preserves
+mixed/generated project surfaces; later updates use the normal reviewed mixed
+flow after the exact target manifest has been installed.
+
 In the template repository, `sourceCommitType` is `template`. When
 `./scripts/project-harness new` creates a project from a Git checkout, it stamps
 the generated copy with the source checkout's exact 40-character commit SHA and
@@ -414,12 +426,14 @@ wording without changing workflow behavior.
 `state/project-init.json` is project-owned and update/apply never overwrites it.
 Its compatible `.harness/schemas/project-init.schema.v2.json` contract is
 harness-owned so runtime and additive schema evolution arrive together on the
-first update pass without requiring `--include-mixed`. The legacy
-`state/project-init.schema.v2.json` remains project-owned for older runtime
-compatibility and is not overwritten. Incompatible state changes should add a
-new schema file, update `.harness/commands/harness_manifest.json` compatibility
-metadata, keep fixture coverage for old and new valid states, and include an
-explicit migration path before finalization or rendering writes the new version.
+first update pass without requiring `--include-mixed`. It is the only required
+schema location. Upgrades preserve a pre-existing project-owned
+`state/project-init.schema.v2.json` compatibility copy, but fresh projects do
+not create or validate that legacy path. Incompatible state changes should add
+a new canonical schema file, update
+`.harness/commands/harness_manifest.json` compatibility metadata, keep fixture
+coverage for old and new valid states, and include an explicit migration path
+before finalization or rendering writes the new version.
 
 For finalized projects created before the current development-doc contract
 marker, the first applicable update also performs a transactional compatibility
@@ -447,11 +461,16 @@ When repo-scoped skills change, sync their plugin mirrors before validating:
 ./scripts/sync-plugin-skills
 ```
 
+This command copies repo-scoped skill and UI-metadata mirrors only. It does not
+generate `.agents/plugins/marketplace.json`; maintainers update marketplace
+version and availability metadata deliberately and validate it with the rest of
+the package surfaces.
+
 Repo-scoped skills are canonical for this template because they can reference
 local state, scripts, validators, and governance docs directly. The
 `.harness/plugins/project-lifecycle-lab/` package is an optional distribution mirror for
 portable agent behavior; it must not replace repo-local runtime state or
-validation. The current harness and plugin version is `0.1.1`; keep the plugin
+validation. The current harness and plugin version is `0.2.0`; keep the plugin
 version aligned with the harness version and use
 `.harness/plugins/project-lifecycle-lab/README.md` for the external smoke-check steps.
 

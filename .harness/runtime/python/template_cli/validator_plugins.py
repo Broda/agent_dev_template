@@ -56,7 +56,7 @@ def validate_repo_plugins(root: Path, result: ValidationResult) -> None:
         return
 
     entry = matching_entries[0]
-    if entry.get("version") != EXPECTED_HARNESS_VERSION:
+    if _is_template_source(root) and entry.get("version") != EXPECTED_HARNESS_VERSION:
         result.add_failure(
             f"Plugin marketplace version must match harnessVersion {EXPECTED_HARNESS_VERSION}: {PLUGIN_MARKETPLACE}"
         )
@@ -177,3 +177,12 @@ def _read_json(path: Path, result: ValidationResult, label: str) -> dict:
     except json.JSONDecodeError as exc:
         result.add_failure(f"Invalid JSON in repo {label}: {path.as_posix()} ({exc})")
         return {}
+
+
+def _is_template_source(root: Path) -> bool:
+    manifest_path = root / ".harness/commands/harness_manifest.json"
+    try:
+        manifest = json.loads(read_text(manifest_path))
+    except (FileNotFoundError, json.JSONDecodeError):
+        return False
+    return manifest.get("sourceCommitType") == "template"

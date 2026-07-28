@@ -864,3 +864,47 @@ Exit criteria:
   identity, finite per-job timeouts, and failure-diagnostic behavior across
   repeated rendering.
 - `./scripts/validate-governance` and the full harness unit suite pass.
+
+## HM11 - Consumer Update And Validation Extension Contract
+
+Goal: make hybrid validation, project-specific checks, and the first consumer
+upgrade to harness `0.2.0` safe, bounded, and independently reviewable.
+
+Scope:
+
+- [x] Split CLI-only UI claims into explicit web, admin, and editor-facing
+      predicates across structured capabilities and legacy project/stack
+      inference.
+- [x] Add the optional project-owned validation hook with a closed JSON
+      contract, exact-once orchestration, bounded process execution,
+      process-tree timeout termination, recursion rejection, warning
+      propagation, and protected-state mutation restoration.
+- [x] Apply manifest exclusions during update enumeration so excluded target
+      files are neither copied nor reported missing.
+- [x] Replace broad harness ownership of `scripts/` with 12 command families /
+      36 exact wrapper paths, preserve unmatched scripts as project content,
+      and mark the project hook exactly project-owned.
+- [x] Establish `.harness/history/` as archival, retain
+      `.harness/history/exports/.gitkeep`, and preserve history across consumer
+      updates.
+- [x] Add the target-planner transition required when a `0.1.x` consumer's
+      installed planner still broadly owns `scripts/`.
+- [x] Use only `.harness/schemas/project-init.schema.v2.json` as the required
+      schema location while preserving pre-existing legacy copies during
+      upgrades.
+- [x] Align FILE_MAP wrapper coverage, POSIX executable-mode contracts,
+      updater-order guidance, harness/plugin/marketplace version `0.2.0`, and
+      capability version 2.
+- [x] Document that `sync-plugin-skills` refreshes skill mirrors only;
+      marketplace metadata is updated deliberately.
+
+Exit criteria:
+
+- Exact prior-consumer dry-run and apply regressions preserve custom scripts,
+  the project hook, history, ignored/local mixed content, plugin/skill
+  surfaces, and executable modes with no unexplained plan categories.
+- Injected validator and mutating-hook failures restore harness and project
+  content transactionally.
+- Governance, the complete unit suite, release check, fresh generation,
+  packaging/version consistency, FILE_MAP coverage, executable modes, and
+  public-safety checks pass.

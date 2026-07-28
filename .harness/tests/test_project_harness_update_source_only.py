@@ -13,7 +13,7 @@ LEGACY_SCHEMA_PATH = "state/project-init.schema.v2.json"
 
 
 class ProjectHarnessUpdateSourceOnlyTests(ProjectHarnessUpdateTestCase):
-    def test_old_development_updater_migrates_stale_generated_contract_atomically(self) -> None:
+    def test_target_planner_migrates_old_development_contract_atomically(self) -> None:
         old_source = self._git_checkout_source(PROJECT_OWNED_SCHEMA_COMMIT, "old-development-source")
         current_source = self._current_worktree_source()
         project = self.tmpdir / "old-development-project"
@@ -39,8 +39,7 @@ class ProjectHarnessUpdateSourceOnlyTests(ProjectHarnessUpdateTestCase):
 
         result = run_cmd(
             [
-                "./scripts/project-harness",
-                "update",
+                *self._target_backend(current_source),
                 "--apply",
                 "--source-path",
                 str(current_source),
@@ -77,7 +76,7 @@ class ProjectHarnessUpdateSourceOnlyTests(ProjectHarnessUpdateTestCase):
         validation = run_cmd(["./scripts/validate-development"], cwd=project)
         self.assertIn("PASS: development integrity checks completed with no blocking failures.", validation.stdout)
 
-    def test_old_development_updater_restores_migrated_docs_when_new_validation_fails(self) -> None:
+    def test_target_planner_restores_old_migrated_docs_when_validation_fails(self) -> None:
         old_source = self._git_checkout_source(PROJECT_OWNED_SCHEMA_COMMIT, "rollback-development-source")
         current_source = self._current_worktree_source()
         project = self.tmpdir / "rollback-development-project"
@@ -99,8 +98,7 @@ class ProjectHarnessUpdateSourceOnlyTests(ProjectHarnessUpdateTestCase):
 
         result = run_cmd(
             [
-                "./scripts/project-harness",
-                "update",
+                *self._target_backend(current_source),
                 "--apply",
                 "--source-path",
                 str(current_source),
@@ -119,7 +117,7 @@ class ProjectHarnessUpdateSourceOnlyTests(ProjectHarnessUpdateTestCase):
         self.assertEqual(ci_before, (project / ".github/workflows/ci.yml").read_bytes())
         self.assertEqual(runtime_before, runtime_path.read_bytes())
 
-    def test_old_development_updater_preserves_customized_ci_and_fails_closed(self) -> None:
+    def test_target_planner_preserves_old_customized_ci_and_fails_closed(self) -> None:
         old_source = self._git_checkout_source(PROJECT_OWNED_SCHEMA_COMMIT, "custom-ci-source")
         current_source = self._current_worktree_source()
         project = self.tmpdir / "custom-ci-project"
@@ -136,8 +134,7 @@ class ProjectHarnessUpdateSourceOnlyTests(ProjectHarnessUpdateTestCase):
 
         result = run_cmd(
             [
-                "./scripts/project-harness",
-                "update",
+                *self._target_backend(current_source),
                 "--apply",
                 "--source-path",
                 str(current_source),
@@ -217,6 +214,11 @@ class ProjectHarnessUpdateSourceOnlyTests(ProjectHarnessUpdateTestCase):
         for relative_path in missing_modules:
             with self.subTest(before=relative_path):
                 self.assertFalse((project / relative_path).exists())
+        for relative_path in [
+            ".github/workflows/governance-audit.yml",
+            ".github/workflows/release-readiness.yml",
+        ]:
+            shutil.copy2(current_source / relative_path, project / relative_path)
 
         backend = ["python3", str(REPO_ROOT / ".harness/runtime/python/cli.py"), "project-harness-update"]
         result = run_cmd(
@@ -252,6 +254,14 @@ class ProjectHarnessUpdateSourceOnlyTests(ProjectHarnessUpdateTestCase):
             ignore=shutil.ignore_patterns(".git", "__pycache__", ".pytest_cache"),
         )
         return source
+
+    @staticmethod
+    def _target_backend(current_source):
+        return [
+            "python3",
+            str(current_source / ".harness/runtime/python/cli.py"),
+            "project-harness-update",
+        ]
 
     @staticmethod
     def _migration_doc_bytes(project):

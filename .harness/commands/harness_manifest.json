@@ -1,13 +1,13 @@
 {
   "schemaVersion": 2,
-  "harnessVersion": "0.1.1",
+  "harnessVersion": "0.2.0",
   "templateRepository": "https://github.com/Broda/agent_dev_template",
   "sourceCommit": "template-source",
   "sourceCommitType": "template",
   "sourceWorktreeDirty": false,
   "compatibility": {
     "wrapperRuntimeVersion": 1,
-    "capabilityVersion": 1,
+    "capabilityVersion": 2,
     "stateSchemaVersion": 2,
     "stateSchemaPath": ".harness/schemas/project-init.schema.v2.json"
   },
@@ -86,7 +86,43 @@
       ".harness/runtime/python/template_cli/",
       ".harness/schemas/",
       ".harness/tests/",
-      "scripts/",
+      ".harness/history/exports/.gitkeep",
+      "scripts/finalize-project",
+      "scripts/finalize-project.ps1",
+      "scripts/finalize-project.sh",
+      "scripts/harness-release-check",
+      "scripts/harness-release-check.ps1",
+      "scripts/harness-release-check.sh",
+      "scripts/lab",
+      "scripts/lab.ps1",
+      "scripts/lab.sh",
+      "scripts/lab-note",
+      "scripts/lab-note.ps1",
+      "scripts/lab-note.sh",
+      "scripts/lab-sync",
+      "scripts/lab-sync.ps1",
+      "scripts/lab-sync.sh",
+      "scripts/project-harness",
+      "scripts/project-harness.ps1",
+      "scripts/project-harness.sh",
+      "scripts/render-development-docs",
+      "scripts/render-development-docs.ps1",
+      "scripts/render-development-docs.sh",
+      "scripts/render-intent-docs",
+      "scripts/render-intent-docs.ps1",
+      "scripts/render-intent-docs.sh",
+      "scripts/sync-plugin-skills",
+      "scripts/sync-plugin-skills.ps1",
+      "scripts/sync-plugin-skills.sh",
+      "scripts/validate-brainstorming",
+      "scripts/validate-brainstorming.ps1",
+      "scripts/validate-brainstorming.sh",
+      "scripts/validate-development",
+      "scripts/validate-development.ps1",
+      "scripts/validate-development.sh",
+      "scripts/validate-governance",
+      "scripts/validate-governance.ps1",
+      "scripts/validate-governance.sh",
       ".agents/skills/",
       ".harness/plugins/project-lifecycle-lab/"
     ],
@@ -96,7 +132,7 @@
       "notes/",
       "exports/",
       "state/project-init.json",
-      "state/project-init.schema.v2.json",
+      "scripts/project_harness_validation.py",
       "docs/",
       "src/",
       "tests/"
@@ -112,7 +148,8 @@
     ],
     "archival": [
       "NOTES_CATALOG.md",
-      "IDEA_CATALOG.md"
+      "IDEA_CATALOG.md",
+      ".harness/history/"
     ]
   },
   "artifactInventoryExclusions": [
@@ -130,7 +167,7 @@
   "artifactInventorySnapshotPolicy": {
     "decision": "keep-broad-directory-entries",
     "snapshotGeneration": "deferred",
-    "rationale": "Broad directory entries keep the update manifest readable while the harness-owned/project-owned boundary is still evolving. Generated snapshots can be introduced later when update planning needs file-level release manifests.",
+    "rationale": "Broad entries remain only where the whole directory has one ownership class. Command wrappers use exact harness-owned paths over the project-owned scripts boundary, and history uses an archival boundary with one exact harness-owned sentinel.",
     "broadEntries": [
       ".agents/skills/",
       ".harness/brainstorming/",
@@ -145,7 +182,7 @@
       ".harness/schemas/",
       ".harness/plugins/project-lifecycle-lab/",
       ".harness/tests/",
-      "scripts/",
+      ".harness/history/",
       "sessions/",
       "src/",
       "tests/"

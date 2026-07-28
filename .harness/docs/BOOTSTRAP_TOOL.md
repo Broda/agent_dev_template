@@ -70,10 +70,12 @@ Future `update` work should load this manifest rather than scraping Markdown
 docs. Update tooling must preserve project-owned and archival paths by default
 and classify mixed/generated paths conservatively.
 
-Compatible state schema evolution ships through the harness-owned
-`.harness/schemas/` artifact while `state/project-init.json` and the legacy
-`state/project-init.schema.v2.json` remain project-owned. A missing target path
-lets even an older downstream updater install the incoming schema in one pass.
+Compatible state schema evolution ships through the single canonical
+harness-owned `.harness/schemas/project-init.schema.v2.json` artifact while
+`state/project-init.json` remains project-owned. A pre-existing legacy
+`state/project-init.schema.v2.json` remains preserved as project content during
+an upgrade, but it is not generated or required. A missing canonical target
+path lets even an older downstream updater install the incoming schema in one pass.
 Incompatible changes must ship as a new schema artifact, update the manifest
 compatibility entry, and include migration tests before finalization or
 rendering starts writing the new version.
@@ -116,13 +118,50 @@ checkouts. The helper loads the current project's recorded harness manifest,
 loads the source manifest, classifies candidate files by manifest ownership
 class, and prints a deterministic no-write plan.
 
+Paths in the target manifest's `artifactInventoryExclusions` do not participate
+in enumeration at all: they are neither copied nor reported missing. This
+includes project-local root tooling and consumer marketplace metadata, which
+must be maintained deliberately outside a harness update.
+
+### First upgrade from broad `scripts/` ownership
+
+Harness `0.1.x` consumers record `scripts/` as broadly harness-owned. Their
+installed planner therefore cannot safely distinguish canonical wrappers from
+project/application scripts before the `0.2.0` updater is installed. For this
+one transition, run the target checkout's planner directly while the consumer
+project remains the working directory:
+
+```sh
+cd <consumer-project>
+python3 <template-checkout>/.harness/runtime/python/cli.py \
+  project-harness-update --dry-run --source-path <template-checkout>
+python3 <template-checkout>/.harness/runtime/python/cli.py \
+  project-harness-update --apply --source-path <template-checkout> --yes
+```
+
+The target planner recognizes the old broad manifest, treats only the target's
+36 exact wrapper paths as harness-owned, preserves every other script plus the
+exact project hook, and leaves mixed/generated project surfaces unchanged
+during this one transition. Harness-generated command reference sections remain
+eligible for their normal reviewed render maintenance. Its dry run prints the
+target-planner apply command. After a successful apply stamps the `0.2.0`
+manifest, normal
+`./scripts/project-harness update ...` commands use the installed planner
+again. Do not attempt the first apply through the old wrapper merely to install
+the new planner; the old planner must fail closed on custom scripts.
+
 Apply mode is conservative. It applies only clean `harnessOwned` additions,
 changes, and removals by default, refuses conflicts, refuses mixed/generated
 paths unless `--include-mixed` is supplied, writes backups under
-`.harness-update-backups/`, runs generated-file hooks when relevant, validates
-before provenance stamping, then validates the stamped manifest. Review changed
-paths with `git diff`. Mode-only launcher drift is a harness-owned update and is
-repaired from the target manifest even when file bytes are unchanged.
+`.harness-update-backups/`, copies the reviewed paths, repairs executable modes,
+and stamps the target manifest so target hooks and validators see the incoming
+contract. It then runs required generated-artifact maintenance, validates
+governance (plus development mode when applicable), and invokes the project
+validation extension exactly once through the top-level governance pass. Any
+hook, stamp, or validation failure restores copied paths and the prior manifest.
+Review successful changes with `git diff`. Mode-only launcher drift is a
+harness-owned update and is repaired from the target manifest even when file
+bytes are unchanged.
 
 When a development project predates the current generated semantic-contract
 marker, the incoming skill-sync hook performs a narrow compatibility migration
@@ -136,7 +175,7 @@ Expected behavior:
 
 1. Show a dry-run summary before changing files.
 2. Preserve project-local state: `ideas/`, `sessions/`, `notes/`, `exports/`, `state/project-init.json`, and finalized `docs/`.
-3. Deliver the harness-owned `.harness/schemas/project-init.schema.v2.json` with compatible runtime evolution while preserving the project-owned state instance and legacy schema.
+3. Deliver the harness-owned `.harness/schemas/project-init.schema.v2.json` with compatible runtime evolution while preserving the project-owned state instance and any pre-existing legacy schema copy.
 4. Update reusable harness runtime files only after confirmation.
 5. Run `./scripts/sync-plugin-skills` when repo-scoped skills change.
 6. Transactionally migrate legacy generated development-contract omissions when required.

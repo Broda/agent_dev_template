@@ -33,6 +33,7 @@ Thumbs.db
 # Temporary
 tmp/
 temp/
+.harness-update-backups/
 
 # Packaged artifacts
 release/

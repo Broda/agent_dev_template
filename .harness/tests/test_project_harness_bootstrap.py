@@ -25,6 +25,8 @@ class ProjectHarnessBootstrapTests(LabWorkflowTestCase):
         log = run_cmd(["git", "log", "--oneline", "-1"], cwd=target)
         self.assertIn("Initialize project harness", log.stdout)
         self.assertIn("Current mode: brainstorming", (target / "MODE.md").read_text(encoding="utf-8"))
+        self.assertTrue((target / ".harness/schemas/project-init.schema.v2.json").exists())
+        self.assertFalse((target / "state/project-init.schema.v2.json").exists())
         run_cmd(["./scripts/validate-governance"], cwd=target)
 
     def test_project_harness_new_commits_without_global_git_identity(self) -> None:

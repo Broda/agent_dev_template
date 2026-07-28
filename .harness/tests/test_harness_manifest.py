@@ -65,7 +65,7 @@ class HarnessManifestTests(LabWorkflowTestCase):
     def test_validate_governance_checks_broad_inventory_policy_coverage(self) -> None:
         manifest_path = self.repo / ".harness/commands/harness_manifest.json"
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        manifest["artifactInventorySnapshotPolicy"]["broadEntries"].remove("scripts/")
+        manifest["artifactInventorySnapshotPolicy"]["broadEntries"].remove(".harness/tests/")
         manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
         result = run_cmd(["./scripts/validate-governance"], cwd=self.repo, check=False)
@@ -73,7 +73,7 @@ class HarnessManifestTests(LabWorkflowTestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn(
             "Harness manifest broad artifactInventory entry must be documented in "
-            "artifactInventorySnapshotPolicy.broadEntries: harnessOwned.scripts/",
+            "artifactInventorySnapshotPolicy.broadEntries: harnessOwned..harness/tests/",
             result.stdout,
         )
 
@@ -95,22 +95,48 @@ class HarnessManifestTests(LabWorkflowTestCase):
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         inventory = manifest["artifactInventory"]
 
-        self.assertIn("scripts/", inventory["harnessOwned"])
+        wrapper_paths = sorted(path for path in inventory["harnessOwned"] if path.startswith("scripts/"))
+        self.assertEqual(36, len(wrapper_paths))
+        self.assertNotIn("scripts/", inventory["harnessOwned"])
+        self.assertIn("scripts/finalize-project.ps1", wrapper_paths)
+        self.assertIn("scripts/render-development-docs.ps1", wrapper_paths)
+        self.assertIn("scripts/validate-development.ps1", wrapper_paths)
         self.assertIn(".harness/commands/harness_manifest.schema.json", inventory["harnessOwned"])
         self.assertIn(".harness/commands/intent_registry.json", inventory["harnessOwned"])
         self.assertIn(".harness/commands/intent_registry.schema.json", inventory["harnessOwned"])
         self.assertIn(".harness/schemas/", inventory["harnessOwned"])
+        self.assertIn(".harness/history/exports/.gitkeep", inventory["harnessOwned"])
         self.assertIn("state/project-init.json", inventory["projectOwned"])
-        self.assertIn("state/project-init.schema.v2.json", inventory["projectOwned"])
+        self.assertIn("scripts/project_harness_validation.py", inventory["projectOwned"])
+        self.assertNotIn("state/project-init.schema.v2.json", inventory["projectOwned"])
         self.assertIn("README.md", inventory["mixedGenerated"])
         self.assertIn(".harness/commands/harness_manifest.json", inventory["mixedGenerated"])
         self.assertIn("IDEA_CATALOG.md", inventory["archival"])
+        self.assertIn(".harness/history/", inventory["archival"])
         self.assertIn("pyproject.toml", manifest["artifactInventoryExclusions"])
         self.assertEqual(
             manifest["artifactInventorySnapshotPolicy"]["decision"],
             "keep-broad-directory-entries",
         )
-        self.assertIn("scripts/", manifest["artifactInventorySnapshotPolicy"]["broadEntries"])
+        self.assertNotIn("scripts/", manifest["artifactInventorySnapshotPolicy"]["broadEntries"])
+
+    def test_manifest_and_file_map_cover_all_wrapper_files(self) -> None:
+        manifest = json.loads((self.repo / ".harness/commands/harness_manifest.json").read_text(encoding="utf-8"))
+        file_map = (self.repo / ".harness/brainstorming/FILE_MAP.md").read_text(encoding="utf-8")
+        wrapper_files = sorted(
+            path.relative_to(self.repo).as_posix()
+            for path in (self.repo / "scripts").iterdir()
+            if path.is_file() and path.name != "project_harness_validation.py"
+        )
+        manifest_wrappers = sorted(
+            path for path in manifest["artifactInventory"]["harnessOwned"] if path.startswith("scripts/")
+        )
+
+        self.assertEqual(36, len(wrapper_files))
+        self.assertEqual(wrapper_files, manifest_wrappers)
+        for relative_path in wrapper_files:
+            with self.subTest(relative_path=relative_path):
+                self.assertIn(f"`{relative_path}`", file_map)
 
     def test_harness_command_schema_files_are_valid_json_contracts(self) -> None:
         manifest_schema = json.loads(
@@ -167,5 +193,6 @@ class HarnessManifestTests(LabWorkflowTestCase):
         self.assertEqual(manifest["sourceCommit"], source_commit)
         self.assertEqual(manifest["sourceCommitType"], "git")
         self.assertFalse(manifest["sourceWorktreeDirty"])
-        self.assertEqual(manifest["harnessVersion"], "0.1.1")
+        self.assertEqual(manifest["harnessVersion"], "0.2.0")
+        self.assertEqual(manifest["compatibility"]["capabilityVersion"], 2)
         run_cmd(["./scripts/validate-governance"], cwd=target)

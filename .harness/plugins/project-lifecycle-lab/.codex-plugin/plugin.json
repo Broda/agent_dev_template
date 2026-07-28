@@ -1,6 +1,6 @@
 {
   "name": "project-lifecycle-lab",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Reusable agent workflows for operating project harness templates.",
   "author": {
     "name": "Project Harness Template Maintainers",

@@ -71,6 +71,7 @@ Lean file registry for the Project Harness Template.
 | `.harness/tests/test_semantic_hybrid_projects.py` | Hybrid CLI, web, admin, and editor capability regression tests |
 | `.harness/tests/test_project_validation_hook.py` | Optional project validation hook contract and adversarial process tests |
 | `.harness/tests/test_project_validation_hook_integration.py` | Optional hook warning, exact-once orchestration, and rollback integration tests |
+| `.harness/tests/test_project_harness_prior_consumer_transition.py` | Exact 0.1.x consumer ownership-transition, preservation, executable-mode, and rollback regression |
 | `.harness/tests/test_finalization_regression.py` | End-to-end finalization regression tests for multi-session detail carryover |
 | `.harness/tests/test_harness_manifest.py` | Harness manifest validation and provenance stamping regression tests |
 | `.harness/tests/test_lab_handoff.py` | Lab handoff compiler regression tests for lossless brainstorming-to-finalization state |
@@ -130,6 +131,9 @@ Lean file registry for the Project Harness Template.
 | `scripts/render-intent-docs.ps1` | PowerShell launcher for generated intent table rendering |
 | `scripts/sync-plugin-skills.ps1` | PowerShell launcher for plugin skill mirror syncing |
 | `scripts/validate-brainstorming.ps1` | Windows brainstorming validator |
+| `scripts/finalize-project.ps1` | PowerShell launcher for Python in-place finalization |
+| `scripts/render-development-docs.ps1` | PowerShell launcher for development doc rendering |
+| `scripts/validate-development.ps1` | PowerShell launcher for development validation |
 | `scripts/finalize-project.sh` | POSIX launcher for Python in-place finalization |
 | `scripts/harness-release-check.sh` | POSIX launcher for local public-template release checks |
 | `scripts/render-intent-docs.sh` | POSIX launcher for generated intent table rendering |
@@ -144,7 +148,7 @@ Lean file registry for the Project Harness Template.
 | `scripts/project-harness.sh` | POSIX launcher for harness bootstrap helpers |
 | `state/project-init.json` | Canonical structured handoff state |
 | `.harness/schemas/project-init.schema.v2.json` | Harness-owned canonical JSON Schema and variant contract delivered with compatible runtime evolution |
-| `state/project-init.schema.v2.json` | Legacy project-owned schema location preserved for older downstream runtimes |
+| `.harness/history/exports/.gitkeep` | Durable sentinel for the project-owned archived export directory |
 | `.github/workflows/ci.yml` | Blocking CI for tests and governance validation |
 | `.github/workflows/governance-audit.yml` | Warn-only CI audit |
 | `.github/workflows/release-readiness.yml` | Manual public-template release readiness smoke workflow |

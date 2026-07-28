@@ -75,10 +75,38 @@ class ProjectHarnessUpdateApplyTests(ProjectHarnessUpdateTestCase):
         self.assertIn("# target wrapper update", (project / "scripts/lab.sh").read_text(encoding="utf-8"))
         self.assertTrue((project / ".harness-update-backups").exists())
 
+    def test_update_apply_does_not_copy_absent_excluded_source_files(self) -> None:
+        source = self.copy_source()
+        self.init_git_source(source)
+        project = self.tmpdir / "generated-project"
+        run_cmd(["./scripts/project-harness", "new", str(project), "--no-git"], cwd=source)
+        self.install_finalized_cli_project(project)
+        (source / "README.md").write_bytes((project / "README.md").read_bytes())
+        excluded_paths = [".github/PULL_REQUEST_TEMPLATE.md"]
+        for relative_path in excluded_paths:
+            (project / relative_path).unlink()
+        wrapper = source / "scripts/lab.sh"
+        wrapper.write_text(
+            wrapper.read_text(encoding="utf-8") + "\n# exclusion update\n",
+            encoding="utf-8",
+        )
+
+        result = run_cmd(
+            ["./scripts/project-harness", "update", "--apply", "--source-path", str(source), "--yes"],
+            cwd=project,
+        )
+
+        self.assertIn("Applied harness update.", result.stdout)
+        for relative_path in excluded_paths:
+            with self.subTest(relative_path=relative_path):
+                self.assertFalse((project / relative_path).exists())
+                self.assertNotIn(f"  - {relative_path}", result.stdout)
+
     def test_update_apply_removes_clean_harness_owned_deleted_source_file(self) -> None:
         source = self.copy_source()
-        obsolete_source = source / "scripts/obsolete-helper"
-        obsolete_source.write_text("#!/usr/bin/env sh\n", encoding="utf-8")
+        obsolete_path = ".harness/docs/obsolete-helper.md"
+        obsolete_source = source / obsolete_path
+        obsolete_source.write_text("# Obsolete helper\n", encoding="utf-8")
         self.init_git_source(source)
         project = self.tmpdir / "generated-project"
         run_cmd(["./scripts/project-harness", "new", str(project), "--no-git"], cwd=source)
@@ -90,7 +118,7 @@ class ProjectHarnessUpdateApplyTests(ProjectHarnessUpdateTestCase):
         )
 
         self.assertIn("removed: 1", dry_run.stdout)
-        self.assertIn("scripts/obsolete-helper", dry_run.stdout)
+        self.assertIn(obsolete_path, dry_run.stdout)
 
         result = run_cmd(
             ["./scripts/project-harness", "update", "--apply", "--source-path", str(source), "--yes"],
@@ -98,9 +126,9 @@ class ProjectHarnessUpdateApplyTests(ProjectHarnessUpdateTestCase):
         )
 
         self.assertIn("Applied harness update.", result.stdout)
-        self.assertIn("scripts/obsolete-helper", result.stdout)
-        self.assertFalse((project / "scripts/obsolete-helper").exists())
-        backup_files = list((project / ".harness-update-backups").glob("*/scripts/obsolete-helper"))
+        self.assertIn(obsolete_path, result.stdout)
+        self.assertFalse((project / obsolete_path).exists())
+        backup_files = list((project / ".harness-update-backups").glob(f"*/{obsolete_path}"))
         self.assertTrue(backup_files)
 
     def test_update_apply_syncs_plugin_skills_when_repo_skill_changes(self) -> None:

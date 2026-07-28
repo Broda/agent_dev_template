@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import json
+import shlex
+import sys
 from pathlib import Path
 
+from template_cli.bootstrap.update_plan import requires_target_planner_transition
 from template_cli.bootstrap.update_source import source_worktree_state
 
 
@@ -16,6 +19,18 @@ def _print_update_plan(
     json_output: bool = False,
 ) -> None:
     plan, baseline_available = plan_with_baseline
+    transition_required = requires_target_planner_transition(current_manifest, target_manifest)
+    transition_apply = shlex.join(
+        [
+            sys.executable,
+            str(source_root / ".harness/runtime/python/cli.py"),
+            "project-harness-update",
+            "--apply",
+            "--source-path",
+            str(source_root),
+            "--yes",
+        ]
+    )
     if json_output:
         print(
             json.dumps(
@@ -34,6 +49,15 @@ def _print_update_plan(
                     "targetSourceWorktree": source_worktree_state(source_root),
                     "recordedSourceBaseline": "resolved" if baseline_available else "unavailable",
                     "writes": "none",
+                    "plannerTransition": {
+                        "required": transition_required,
+                        "reason": (
+                            "current manifest broadly owns scripts/; continue with the target planner"
+                            if transition_required
+                            else ""
+                        ),
+                        "applyCommand": transition_apply if transition_required else "",
+                    },
                     "plan": plan,
                     "nextCommands": {
                         "applyCleanHarnessOwned": (
@@ -63,6 +87,9 @@ def _print_update_plan(
         f"({target_manifest.get('sourceCommit', 'unknown')})"
     )
     print(f"Target source worktree: {source_worktree_state(source_root)}")
+    if transition_required:
+        print("Planner transition: required (current manifest broadly owns scripts/)")
+        print(f"Continue with target planner: {transition_apply}")
     if baseline_available:
         print("Recorded source baseline: resolved")
     else:
@@ -83,8 +110,11 @@ def _print_update_plan(
         for path in paths:
             print(f"  - {path}")
     print("Next commands:")
-    print(
-        "  apply clean harness-owned updates: ./scripts/project-harness update --apply --source-path <template-checkout> --yes"
+    apply_command = (
+        transition_apply
+        if transition_required
+        else ("./scripts/project-harness update --apply --source-path <template-checkout> --yes")
     )
+    print(f"  apply clean harness-owned updates: {apply_command}")
     print("  include mixed/generated updates after review: add --include-mixed")
     print("  skip groups: rerun dry-run after adjusting the source or local files")

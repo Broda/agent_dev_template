@@ -47,23 +47,25 @@ python3 -m unittest discover -s .harness/tests -p "test_development_rendering.py
    `.harness/commands/harness_manifest.json`.
 2. Update `.harness/plugins/project-lifecycle-lab/.codex-plugin/plugin.json` to the same
    version.
-3. Bump `compatibility.wrapperRuntimeVersion` when stable wrapper behavior,
+3. Update `.agents/plugins/marketplace.json` deliberately to the same version;
+   `sync-plugin-skills` does not generate marketplace metadata.
+4. Bump `compatibility.wrapperRuntimeVersion` when stable wrapper behavior,
    launcher dispatch, or runtime discovery changes.
-4. Bump `compatibility.capabilityVersion` when command/capability semantics,
+5. Bump `compatibility.capabilityVersion` when command/capability semantics,
    registry fields, or automation expectations change.
-5. Bump `compatibility.stateSchemaVersion` only with a new schema file,
+6. Bump `compatibility.stateSchemaVersion` only with a new schema file,
    migration tests, and documentation.
-6. Run generated-file maintenance:
+7. Run generated-file maintenance:
 
 ```sh
 ./scripts/render-intent-docs
 ./scripts/sync-plugin-skills
 ```
 
-7. Run the required checks above.
-8. Update `.harness/docs/HARNESS_CHANGELOG.md` with the release date and summary.
-9. Commit the release changes in one reviewable commit.
-10. Tag the commit after CI passes.
+8. Run the required checks above.
+9. Update `.harness/docs/HARNESS_CHANGELOG.md` with the release date and summary.
+10. Commit the release changes in one reviewable commit.
+11. Tag the commit after CI passes.
 
 ## Generated And Mirrored Files
 

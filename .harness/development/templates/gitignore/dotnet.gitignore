@@ -37,6 +37,7 @@ Thumbs.db
 # Environment files
 .env
 .env.*
+.harness-update-backups/
 
 # Packaged artifacts
 release/
