@@ -23,8 +23,8 @@ from template_cli.posix_modes import (
     manifest_posix_executable_paths,
     stage_posix_executable_modes,
 )
-from template_cli.validator_manifest import load_harness_manifest, stamp_harness_manifest
 from template_cli.validation_hook import hook_suppressed_environment
+from template_cli.validator_manifest import load_harness_manifest, stamp_harness_manifest
 from template_cli.workflow_idea_commands import import_external_idea
 
 COPY_IGNORE = shutil.ignore_patterns(

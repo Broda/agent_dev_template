@@ -234,8 +234,7 @@ def project_profile(state: dict) -> ProjectProfile:
         )
         capability_text = " ".join([project_text, stack_text])
         has_admin = any(
-            _contains_word(capability_text, token)
-            for token in ["admin", "editor", "privileged", "cms"]
+            _contains_word(capability_text, token) for token in ["admin", "editor", "privileged", "cms"]
         ) or _contains_phrase(capability_text, "content management")
     uses_javascript = any(token in stack_text for token in ["javascript", "typescript", "node", "npm", "pnpm", "yarn"])
     has_authentication = auth_text not in {"", "none", "no", "n/a", "_none_", "not applicable"}

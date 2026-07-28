@@ -22,6 +22,7 @@ from template_cli.io_helpers import (
     read_text,
 )
 from template_cli.state_schema import validate_project_state_file
+from template_cli.validation_hook import add_project_validation_hook_result
 from template_cli.validator_artifacts import BRAINSTORMING_CORE_ARTIFACTS, DEVELOPMENT_REQUIRED_ARTIFACTS
 from template_cli.validator_ci import validate_ci_efficiency_contract
 from template_cli.validator_code_size import validate_python_file_sizes
@@ -39,7 +40,6 @@ from template_cli.validator_plugins import validate_repo_plugins
 from template_cli.validator_python_config import validate_python_tool_config
 from template_cli.validator_semantics import validate_semantic_finalization
 from template_cli.validator_skills import validate_repo_skills
-from template_cli.validation_hook import add_project_validation_hook_result
 
 
 def validate_notes_catalog(root: Path, result: ValidationResult, *, base: str = "") -> None:

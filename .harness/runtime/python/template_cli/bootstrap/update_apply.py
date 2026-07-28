@@ -16,8 +16,8 @@ from template_cli.posix_modes import (
     manifest_posix_executable_paths,
     stage_posix_executable_modes,
 )
-from template_cli.validator_manifest import MANIFEST_PATH, stamp_harness_manifest
 from template_cli.validation_hook import hook_suppressed_environment
+from template_cli.validator_manifest import MANIFEST_PATH, stamp_harness_manifest
 
 
 @dataclass(frozen=True)
