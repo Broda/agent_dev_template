@@ -877,8 +877,10 @@ Scope:
       inference.
 - [x] Add the optional project-owned validation hook with a closed JSON
       contract, exact-once orchestration, bounded process execution,
-      process-tree timeout termination, recursion rejection, warning
-      propagation, and protected-state mutation restoration.
+      prompt recursion rejection, warning propagation, and protected-state
+      mutation restoration. Linux `/proc` plus child-subreaper supervision
+      drains detached descendants by PID/start-time identity before success;
+      other platforms fail closed when a hook is present.
 - [x] Apply manifest exclusions during update enumeration so excluded target
       files are neither copied nor reported missing.
 - [x] Replace broad harness ownership of `scripts/` with 12 command families /

@@ -198,6 +198,7 @@ Lean file registry for the Project Harness Template.
 | `.harness/runtime/python/template_cli/validator_python_config.py` | Python tool configuration validation helpers |
 | `.harness/runtime/python/template_cli/validator_semantics.py` | Semantic validation for finalized development docs and structured contract fidelity |
 | `.harness/runtime/python/template_cli/validation_hook.py` | Bounded optional project validation hook execution and closed JSON contract |
+| `.harness/runtime/python/template_cli/validation_hook_process.py` | Linux subreaper and PID-identity containment for project validation hook descendants |
 | `.harness/runtime/python/template_cli/validation_hook_state.py` | Protected worktree ledger and mutation restoration for project validation hooks |
 | `.harness/runtime/python/template_cli/validator_skills.py` | Repo-scoped skill and skill metadata validation helpers |
 | `.harness/runtime/python/template_cli/plugin_sync.py` | Plugin skill mirror sync command implementation |

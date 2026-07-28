@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import os
 import shutil
 import subprocess
 from dataclasses import dataclass
@@ -12,11 +13,14 @@ _LEDGER_EXCLUDED_PARTS = {
     ".git",
     ".harness-update-backups",
     ".mypy_cache",
+    ".nox",
     ".pytest_cache",
     ".ruff_cache",
+    ".tox",
     ".venv",
     "__pycache__",
     "node_modules",
+    "venv",
 }
 
 
@@ -42,7 +46,8 @@ class ProtectedStateLedger:
             paths = _filesystem_paths(root)
             return cls(root, _capture_states(root, paths, snapshot_all=True), False)
 
-        untracked = _git_paths(root, ["ls-files", "-z", "--others", "--exclude-standard"]) or set()
+        filesystem_paths = _filesystem_paths(root)
+        untracked = filesystem_paths - tracked
         dirty = _git_dirty_paths(root)
         paths = {path for path in tracked | untracked if _is_protected_path(path)}
         states = _capture_states(root, paths, snapshot_paths=(dirty | untracked))
@@ -87,14 +92,7 @@ class ProtectedStateLedger:
     def _current_paths(self) -> set[str]:
         if self.git_backed:
             tracked = _git_paths(self.root, ["ls-files", "-z"]) or set()
-            untracked = (
-                _git_paths(
-                    self.root,
-                    ["ls-files", "-z", "--others", "--exclude-standard"],
-                )
-                or set()
-            )
-            return {path for path in tracked | untracked if _is_protected_path(path)}
+            return {path for path in tracked | _filesystem_paths(self.root) if _is_protected_path(path)}
         return _filesystem_paths(self.root)
 
 
@@ -141,13 +139,20 @@ def _path_fingerprint(path: Path) -> tuple[str, int] | None:
 
 def _filesystem_paths(root: Path) -> set[str]:
     paths: set[str] = set()
-    for path in root.rglob("*"):
-        if not path.is_file():
-            continue
-        relative = path.relative_to(root)
-        if _is_protected_path(relative.as_posix()):
-            paths.add(relative.as_posix())
+    for current_root, directory_names, file_names in os.walk(root, followlinks=False, onerror=_raise_walk_error):
+        directory_names[:] = sorted(name for name in directory_names if name not in _LEDGER_EXCLUDED_PARTS)
+        current_path = Path(current_root)
+        for file_name in sorted(file_names):
+            relative_path = (current_path / file_name).relative_to(root).as_posix()
+            if _is_protected_path(relative_path):
+                paths.add(relative_path)
+                if len(paths) > LEDGER_FILE_LIMIT:
+                    raise RuntimeError(f"protected worktree exceeds {LEDGER_FILE_LIMIT} files")
     return paths
+
+
+def _raise_walk_error(error: OSError) -> None:
+    raise error
 
 
 def _is_protected_path(relative_path: str) -> bool:

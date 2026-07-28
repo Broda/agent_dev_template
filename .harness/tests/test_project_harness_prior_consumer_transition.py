@@ -4,6 +4,8 @@ import json
 import os
 import shutil
 import stat
+import sys
+import unittest
 
 from project_harness_update_helpers import ProjectHarnessUpdateTestCase
 from workflow_test_helpers import REPO_ROOT, run_cmd
@@ -20,6 +22,7 @@ CUSTOM_SCRIPT_PATHS = [
 ]
 
 
+@unittest.skipUnless(sys.platform == "linux", "project validation hooks require Linux /proc containment")
 class ProjectHarnessPriorConsumerTransitionTests(ProjectHarnessUpdateTestCase):
     def test_exact_prior_consumer_transitions_safely_and_rolls_back_hook_failure(self) -> None:
         old_source = self._checkout(PRIOR_CONSUMER_COMMIT, "prior-template")
@@ -234,6 +237,4 @@ class ProjectHarnessPriorConsumerTransitionTests(ProjectHarnessUpdateTestCase):
 
 
 if __name__ == "__main__":
-    import unittest
-
     unittest.main()

@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import json
+import sys
+import unittest
 from pathlib import Path
 
 from project_harness_update_helpers import ProjectHarnessUpdateTestCase
 from workflow_test_helpers import run_cmd
 
 
+@unittest.skipUnless(sys.platform == "linux", "project validation hooks require Linux /proc containment")
 class ProjectValidationHookIntegrationTests(ProjectHarnessUpdateTestCase):
     def test_development_warning_is_visible_in_text_and_json(self) -> None:
         self._prepare_development(self.repo)
@@ -156,6 +159,4 @@ class ProjectValidationHookIntegrationTests(ProjectHarnessUpdateTestCase):
 
 
 if __name__ == "__main__":
-    import unittest
-
     unittest.main()

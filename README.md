@@ -111,14 +111,34 @@ output; nonzero exit; spawn failure; recursion; timeout; and protected
 worktree mutation all become validation failures. Hook warnings appear in
 normal validation summaries and parent JSON output.
 
-The hook is read-only and runs once per intentional top-level validation,
-including `project-harness validate` and updater apply. It receives only a
-bounded allowlist of process environment fields (`PATH`, home/user, temporary
-directory, locale, virtual-environment, platform, and `CI` fields), plus
-internal encoding and recursion guards. It has a 60-second absolute timeout,
-64 KiB stdout and stderr limits, and process-tree termination. Validation
-records protected worktree state before invocation, restores detected hook
-mutations, and fails closed.
+The hook contract is read-only and runs once per intentional top-level
+validation, including `project-harness validate` and updater apply. Nested
+validation is rejected at validator entry, before generic checks. The hook
+receives only a bounded allowlist of process environment fields (`PATH`,
+home/user, temporary directory, locale, virtual-environment, platform, and
+`CI` fields), plus internal encoding and recursion guards.
+
+Hook execution requires Linux with readable `/proc`. The validator temporarily
+acts as a child subreaper, tracks descendants by PID plus kernel start time,
+terminates the original process group and escaped/reparented descendants, and
+does not accept successful output until no live descendant remains. A present
+hook fails validation without running on other platforms or when this
+containment cannot be established. The bounds are a 60-second absolute
+runtime, 64 KiB each for stdout and stderr, 256 observed descendants, and a
+2-second cleanup drain.
+
+Protected state covers up to 20,000 tracked, untracked, and ignored project
+files with up to 32 MiB of retained backup bytes. Directory components named
+`.git`, `.harness-update-backups`, `.mypy_cache`, `.nox`, `.pytest_cache`,
+`.ruff_cache`, `.tox`, `.venv`, `venv`, `__pycache__`, or `node_modules` are
+excluded from traversal and protection. Detected byte or mode mutations are
+restored before validation returns.
+
+This is process supervision and project-worktree restoration, not a portable
+sandbox. It cannot prevent a hook from making immediate external filesystem,
+network, or other operating-system side effects. Projects must keep the hook
+cooperative, local, and read-only; background children are a contract
+violation.
 
 ## Tooling Runtime
 

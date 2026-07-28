@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import os
-import signal
 import subprocess
 import sys
 import threading
@@ -10,6 +9,7 @@ import time
 from pathlib import Path
 
 from template_cli.io_helpers import ValidationResult
+from template_cli.validation_hook_process import LinuxProcessContainment
 from template_cli.validation_hook_state import ProtectedStateLedger
 
 HOOK_PATH = Path("scripts/project_harness_validation.py")
@@ -17,6 +17,7 @@ HOOK_TIMEOUT_SECONDS = 60.0
 HOOK_STDOUT_LIMIT = 64 * 1024
 HOOK_STDERR_LIMIT = 64 * 1024
 HOOK_ACTIVE_ENV = "PROJECT_HARNESS_VALIDATION_HOOK_ACTIVE"
+HOOK_MODE_ENV = "PROJECT_HARNESS_VALIDATION_HOOK_MODE"
 HOOK_SKIP_ENV = "PROJECT_HARNESS_VALIDATION_HOOK_SKIP"
 HOOK_COMMANDS = {
     "validate-brainstorming",
@@ -121,9 +122,14 @@ def _run_bounded_process(
     *,
     timeout_seconds: float,
 ) -> tuple[int, bytes, bytes] | str:
+    try:
+        containment = LinuxProcessContainment.establish()
+    except OSError as exc:
+        return f"Project validation hook containment unavailable: {exc}"
     environment = {key: value[:8192] for key, value in os.environ.items() if key in _ENV_ALLOWLIST and value}
     environment["PYTHONIOENCODING"] = "utf-8"
     environment[HOOK_ACTIVE_ENV] = "1"
+    environment[HOOK_MODE_ENV] = _hook_mode_from_command(command)
     creation_flags = getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0) if os.name == "nt" else 0
     try:
         process = subprocess.Popen(
@@ -137,7 +143,15 @@ def _run_bounded_process(
             creationflags=creation_flags,
         )
     except OSError as exc:
+        containment.close()
         return f"Project validation hook could not start: {exc}"
+    try:
+        containment.attach(process.pid)
+    except OSError as exc:
+        cleanup_failure = containment.terminate(process, kill_process_group=True)
+        containment.close()
+        suffix = f"; {cleanup_failure}" if cleanup_failure else ""
+        return f"Project validation hook containment failed: {exc}{suffix}"
 
     stdout = bytearray()
     stderr = bytearray()
@@ -160,6 +174,14 @@ def _run_bounded_process(
     deadline = time.monotonic() + max(0.01, min(timeout_seconds, HOOK_TIMEOUT_SECONDS))
     failure = ""
     while process.poll() is None or any(reader.is_alive() for reader in readers):
+        try:
+            survivors = containment.observe()
+        except (OSError, RuntimeError) as exc:
+            failure = f"Project validation hook containment failed: {exc}"
+            break
+        if process.poll() is not None and survivors:
+            failure = "Project validation hook left descendant processes running."
+            break
         if overflow.is_set():
             failure = "Project validation hook exceeded the stdout/stderr size limit."
             break
@@ -167,19 +189,32 @@ def _run_bounded_process(
             failure = f"Project validation hook timed out after {timeout_seconds:g} seconds."
             break
         time.sleep(0.01)
+    if not failure:
+        try:
+            survivors = containment.observe()
+        except (OSError, RuntimeError) as exc:
+            failure = f"Project validation hook containment failed: {exc}"
+        else:
+            if survivors:
+                failure = "Project validation hook left descendant processes running."
     if overflow.is_set() and not failure:
         failure = "Project validation hook exceeded the stdout/stderr size limit."
     if failure:
-        _terminate_process_tree(process)
+        cleanup_failure = containment.terminate(process, kill_process_group=True)
+        if cleanup_failure:
+            failure = f"{failure} Containment cleanup failed: {cleanup_failure}"
     try:
         process.wait(timeout=1)
     except subprocess.TimeoutExpired:
-        _terminate_process_tree(process)
+        cleanup_failure = containment.terminate(process, kill_process_group=True)
+        if cleanup_failure and not failure:
+            failure = f"Project validation hook containment cleanup failed: {cleanup_failure}"
     for reader in readers:
         reader.join(timeout=1)
     for stream in [process.stdout, process.stderr]:
         if stream is not None:
             stream.close()
+    containment.close()
     if any(reader.is_alive() for reader in readers):
         return failure or "Project validation hook output streams did not close."
     if failure:
@@ -200,24 +235,6 @@ def _read_limited(stream, target: bytearray, limit: int, overflow: threading.Eve
         if len(target) > limit:
             overflow.set()
             return
-
-
-def _terminate_process_tree(process: subprocess.Popen[bytes]) -> None:
-    try:
-        if os.name == "nt":
-            subprocess.run(
-                ["taskkill", "/PID", str(process.pid), "/T", "/F"],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                check=False,
-            )
-        else:
-            os.killpg(process.pid, signal.SIGKILL)
-    except (OSError, ProcessLookupError):
-        try:
-            process.kill()
-        except OSError:
-            pass
 
 
 def _parse_hook_payload(process_result: tuple[int, bytes, bytes], result: ValidationResult) -> ValidationResult:
@@ -262,3 +279,10 @@ def _parse_hook_payload(process_result: tuple[int, bytes, bytes], result: Valida
 
 def _decode_detail(value: bytes) -> str:
     return value.decode("utf-8", errors="replace").strip()[:500]
+
+
+def _hook_mode_from_command(command: list[str]) -> str:
+    try:
+        return command[command.index("--mode") + 1]
+    except (ValueError, IndexError):
+        return "unknown"

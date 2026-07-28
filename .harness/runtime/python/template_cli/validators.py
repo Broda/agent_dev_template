@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import re
 import sys
 from pathlib import Path
@@ -22,7 +23,7 @@ from template_cli.io_helpers import (
     read_text,
 )
 from template_cli.state_schema import validate_project_state_file
-from template_cli.validation_hook import add_project_validation_hook_result
+from template_cli.validation_hook import HOOK_ACTIVE_ENV, HOOK_MODE_ENV, add_project_validation_hook_result
 from template_cli.validator_artifacts import BRAINSTORMING_CORE_ARTIFACTS, DEVELOPMENT_REQUIRED_ARTIFACTS
 from template_cli.validator_ci import validate_ci_efficiency_contract
 from template_cli.validator_code_size import validate_python_file_sizes
@@ -129,6 +130,13 @@ def run_validate_brainstorming(
     json_output: bool = False,
     json_command: str = "validate-brainstorming",
 ) -> int:
+    recursion_result = _reject_hook_recursion(
+        json_output=json_output,
+        json_command=json_command,
+        mode="brainstorming",
+    )
+    if recursion_result is not None:
+        return recursion_result
     result = ValidationResult()
 
     for artifact in BRAINSTORMING_CORE_ARTIFACTS:
@@ -220,6 +228,13 @@ def run_validate_development(
     json_output: bool = False,
     json_command: str = "validate-development",
 ) -> int:
+    recursion_result = _reject_hook_recursion(
+        json_output=json_output,
+        json_command=json_command,
+        mode="development",
+    )
+    if recursion_result is not None:
+        return recursion_result
     result = ValidationResult()
 
     for artifact in DEVELOPMENT_REQUIRED_ARTIFACTS:
@@ -273,6 +288,14 @@ def run_validate_development(
 
 
 def run_validate_governance(root: Path, *, json_output: bool = False) -> int:
+    mode = os.environ.get(HOOK_MODE_ENV, "unknown")
+    recursion_result = _reject_hook_recursion(
+        json_output=json_output,
+        json_command="validate-governance",
+        mode=mode,
+    )
+    if recursion_result is not None:
+        return recursion_result
     mode = read_mode(root)
     if mode == "brainstorming":
         return run_validate_brainstorming(root, json_output=json_output, json_command="validate-governance")
@@ -284,4 +307,20 @@ def run_validate_governance(root: Path, *, json_output: bool = False) -> int:
         print_validation_json("validate-governance", mode or "unknown", result)
         return 1
     print(f"Unknown mode in MODE.md: {mode}", file=sys.stderr)
+    return 1
+
+
+def _reject_hook_recursion(*, json_output: bool, json_command: str, mode: str) -> int | None:
+    if os.environ.get(HOOK_ACTIVE_ENV) != "1":
+        return None
+    result = ValidationResult(failures=["Project validation hook recursion is not allowed."])
+    if mode == "development":
+        return print_development_summary_result(result, json_output=json_output, json_command=json_command)
+    if mode == "brainstorming":
+        return print_brainstorming_summary_result(result, json_output=json_output, json_command=json_command)
+    if json_output:
+        print_validation_json(json_command, mode, result)
+    else:
+        print("Validation failed before generic checks:")
+        print("- Project validation hook recursion is not allowed.")
     return 1

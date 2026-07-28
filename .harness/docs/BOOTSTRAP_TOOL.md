@@ -218,18 +218,38 @@ UTF-8 JSON object containing exactly `failures` and `warnings`; both fields are
 required arrays of strings. No schema/version field or other extension key is
 accepted in this v1 contract.
 
-Hook execution is read-only and bounded: 60-second absolute timeout, 64 KiB
-each for stdout and stderr, no stdin, a sanitized allowlist of environment
-fields, recursion rejection, and process-group/descendant termination.
-Before/after protected-state checks detect and restore project worktree
-mutation. Any launch, process, encoding, size, JSON-shape, recursion, timeout,
-or mutation problem becomes a normal validation failure. Reported warnings are
-visible in both text summaries and parent validator JSON.
+The hook contract is read-only and bounded: 60-second absolute runtime, 64 KiB
+each for stdout and stderr, 256 observed descendants, a 2-second cleanup
+drain, no stdin, and a sanitized allowlist of environment fields. Nested
+validation is rejected at validator entry before generic checks.
+
+Execution requires Linux with readable `/proc`. The validator temporarily acts
+as a child subreaper, records descendants by PID plus kernel start time, and
+terminates both the original process group and escaped or reparented
+descendants. Successful hook output is not accepted until no live descendant
+remains; background children violate the contract. A present hook fails closed
+without running on other platforms or when containment cannot be established.
+
+Protected-state checks cover at most 20,000 tracked, untracked, and
+Git-ignored project files, retaining at most 32 MiB of backup bytes. Traversal
+excludes any directory component named `.git`, `.harness-update-backups`,
+`.mypy_cache`, `.nox`, `.pytest_cache`, `.ruff_cache`, `.tox`, `.venv`, `venv`,
+`__pycache__`, or `node_modules`. Byte and mode mutations are restored before
+validation returns. Any launch, containment, process, encoding, size,
+JSON-shape, recursion, timeout, or protected-state problem becomes a normal
+validation failure. Reported warnings remain visible in text summaries and
+parent validator JSON.
+
+These controls supervise hook processes and restore the bounded project
+worktree; they are not a portable security sandbox and cannot prevent
+immediate side effects outside that worktree or through the network. Hook
+authors must keep the extension cooperative, local, and read-only.
 
 `project-harness update --apply` runs generated-artifact maintenance with the
 project hook suppressed, then invokes the hook once through its top-level
 post-update governance validation. A mutating or failing hook rejects the
-update and the updater restores its transactional harness changes.
+update; protected-state restoration repairs project-owned mutation first, and
+the updater then restores its transactional harness changes.
 
 ## Boundary
 

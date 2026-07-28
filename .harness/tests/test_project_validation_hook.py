@@ -1,8 +1,12 @@
 from __future__ import annotations
 
 import os
+import stat
 import sys
 import time
+import unittest
+from contextlib import redirect_stdout
+from io import StringIO
 from pathlib import Path
 from unittest import mock
 
@@ -18,12 +22,13 @@ from template_cli.validation_hook import (  # noqa: E402
     HOOK_STDOUT_LIMIT,
     run_project_validation_hook,
 )
+from template_cli.validators import run_validate_governance  # noqa: E402
 
 
+@unittest.skipUnless(sys.platform == "linux", "project validation hooks require Linux /proc containment")
 class ProjectValidationHookContractTests(LabWorkflowTestCase):
     def test_absent_hook_succeeds_without_warning(self) -> None:
         result = self._run_hook()
-
         self.assertEqual([], result.failures)
         self.assertEqual([], result.warnings)
 
@@ -64,9 +69,7 @@ print(json.dumps({{"failures": failures, "warnings": ["hook warning"]}}))
 
     def test_hook_reported_failures_and_warnings_are_preserved(self) -> None:
         self._write_payload({"failures": ["project failure"], "warnings": ["project warning"]})
-
         result = self._run_hook()
-
         self.assertEqual(["project failure"], result.failures)
         self.assertEqual(["project warning"], result.warnings)
 
@@ -93,9 +96,7 @@ print(json.dumps({{"failures": failures, "warnings": ["hook warning"]}}))
 
     def test_invalid_utf8_is_rejected(self) -> None:
         self._write_hook("import sys\nsys.stdout.buffer.write(b'\\xff')\n")
-
         result = self._run_hook()
-
         self.assertIn("not valid UTF-8", result.failures[0])
 
     def test_nonzero_exit_is_rejected(self) -> None:
@@ -160,6 +161,57 @@ print(json.dumps({{"failures": failures, "warnings": ["hook warning"]}}))
         self.assertIn("timed out", result.failures[0])
         self.assertFalse(marker.exists())
 
+    def test_detached_descendant_is_terminated_on_timeout_before_delayed_writes(self) -> None:
+        marker = self.tmpdir / "detached-timeout-survived"
+        readme = self.repo / "README.md"
+        before = readme.read_bytes()
+        child = self._delayed_mutating_child(marker)
+        self._write_hook(
+            "import subprocess, sys, time\n"
+            f"subprocess.Popen([sys.executable, '-c', {child!r}], "
+            "start_new_session=True, stdin=subprocess.DEVNULL, "
+            "stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)\n"
+            "time.sleep(30)\n"
+        )
+
+        result = self._run_hook(timeout_seconds=0.15)
+        time.sleep(1)
+
+        self.assertTrue(any("timed out after 0.15 seconds" in value for value in result.failures))
+        self.assertFalse(marker.exists())
+        self.assertEqual(before, readme.read_bytes())
+
+    def test_success_return_with_detached_descendant_fails_and_prevents_delayed_writes(self) -> None:
+        marker = self.tmpdir / "detached-success-survived"
+        readme = self.repo / "README.md"
+        before = readme.read_bytes()
+        child = self._delayed_mutating_child(marker)
+        self._write_hook(
+            "import json, subprocess, sys\n"
+            f"subprocess.Popen([sys.executable, '-c', {child!r}], "
+            "start_new_session=True, stdin=subprocess.DEVNULL, "
+            "stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)\n"
+            "print(json.dumps({'failures': [], 'warnings': []}))\n"
+        )
+
+        result = self._run_hook()
+        time.sleep(1)
+
+        self.assertIn("Project validation hook left descendant processes running.", result.failures)
+        self.assertFalse(marker.exists())
+        self.assertEqual(before, readme.read_bytes())
+
+    def test_short_lived_child_that_exits_before_hook_is_allowed(self) -> None:
+        self._write_hook(
+            "import json, subprocess, sys\n"
+            "subprocess.run([sys.executable, '-c', 'import time; time.sleep(0.05)'], check=True)\n"
+            "print(json.dumps({'failures': [], 'warnings': []}))\n"
+        )
+
+        result = self._run_hook()
+
+        self.assertEqual([], result.failures)
+
     def test_recursive_invocation_is_rejected(self) -> None:
         self._write_payload({"failures": [], "warnings": []})
 
@@ -167,6 +219,21 @@ print(json.dumps({{"failures": failures, "warnings": ["hook warning"]}}))
             result = self._run_hook()
 
         self.assertEqual(["Project validation hook recursion is not allowed."], result.failures)
+
+    def test_recursive_governance_rejection_precedes_generic_validator_body(self) -> None:
+        output = StringIO()
+        with (
+            mock.patch.dict(os.environ, {HOOK_ACTIVE_ENV: "1"}),
+            mock.patch(
+                "template_cli.validators.read_mode",
+                side_effect=AssertionError("generic validator body was reached"),
+            ),
+            redirect_stdout(output),
+        ):
+            returncode = run_validate_governance(self.repo)
+
+        self.assertEqual(1, returncode)
+        self.assertIn("Project validation hook recursion is not allowed.", output.getvalue())
 
     def test_hook_cannot_recursively_invoke_governance_validation(self) -> None:
         self._write_hook(
@@ -184,8 +251,10 @@ print(json.dumps({{"failures": failures, "warnings": ["hook warning"]}}))
             "print(json.dumps({'failures': failures, 'warnings': []}))\n"
         )
 
-        result = self._run_hook(timeout_seconds=10)
+        started = time.monotonic()
+        result = self._run_hook(timeout_seconds=1)
 
+        self.assertLess(time.monotonic() - started, 0.75)
         self.assertEqual(["nested validation recursion was rejected"], result.failures)
 
     def test_hook_mutation_is_detected_restored_and_reported(self) -> None:
@@ -204,6 +273,34 @@ print(json.dumps({{"failures": failures, "warnings": ["hook warning"]}}))
         self.assertIn("hook failed", result.failures)
         self.assertEqual(before, readme.read_bytes())
 
+    def test_ignored_project_file_mutation_is_detected_and_restores_bytes_and_mode(self) -> None:
+        ignored = self.repo / ".project-local/ignored.txt"
+        ignored.parent.mkdir()
+        ignored.write_text("preserve ignored bytes\n", encoding="utf-8")
+        ignored.chmod(0o640)
+        exclude = self.repo / ".git/info/exclude"
+        exclude.parent.mkdir(parents=True, exist_ok=True)
+        with exclude.open("a", encoding="utf-8") as handle:
+            handle.write("\n.project-local/\n")
+        before = ignored.read_bytes()
+        before_mode = stat.S_IMODE(ignored.stat().st_mode)
+        self._write_hook(
+            "import json\n"
+            "from pathlib import Path\n"
+            "path = Path('.project-local/ignored.txt')\n"
+            "path.write_text('mutated ignored bytes\\n', encoding='utf-8')\n"
+            "path.chmod(0o777)\n"
+            "print(json.dumps({'failures': [], 'warnings': []}))\n"
+        )
+
+        result = self._run_hook()
+
+        self.assertTrue(
+            any("mutated protected worktree paths: .project-local/ignored.txt" in value for value in result.failures)
+        )
+        self.assertEqual(before, ignored.read_bytes())
+        self.assertEqual(before_mode, stat.S_IMODE(ignored.stat().st_mode))
+
     def _run_hook(self, *, timeout_seconds: float = 2):
         return run_project_validation_hook(
             self.repo,
@@ -215,13 +312,38 @@ print(json.dumps({{"failures": failures, "warnings": ["hook warning"]}}))
     def _write_payload(self, payload: object) -> None:
         self._write_hook(f"import json\nprint(json.dumps({payload!r}))\n")
 
+    @staticmethod
+    def _delayed_mutating_child(marker: Path) -> str:
+        return (
+            "from pathlib import Path;import time;time.sleep(0.8);"
+            f"Path({str(marker)!r}).write_text('bad', encoding='utf-8');"
+            "Path('README.md').write_text('mutated', encoding='utf-8')"
+        )
+
     def _write_hook(self, source: str) -> Path:
         path = self.repo / "scripts/project_harness_validation.py"
         path.write_text(source.lstrip(), encoding="utf-8")
         return path
 
 
-if __name__ == "__main__":
-    import unittest
+class ProjectValidationHookPlatformTests(LabWorkflowTestCase):
+    def test_present_hook_fails_closed_without_linux_proc_containment(self) -> None:
+        hook = self.repo / "scripts/project_harness_validation.py"
+        hook.write_text(
+            "import json\nprint(json.dumps({'failures': [], 'warnings': []}))\n",
+            encoding="utf-8",
+        )
 
+        with mock.patch("template_cli.validation_hook_process.sys.platform", "darwin"):
+            result = run_project_validation_hook(
+                self.repo,
+                mode="brainstorming",
+                command="validate-governance",
+            )
+
+        self.assertEqual(1, len(result.failures))
+        self.assertIn("strong descendant containment is supported only on Linux with /proc", result.failures[0])
+
+
+if __name__ == "__main__":
     unittest.main()

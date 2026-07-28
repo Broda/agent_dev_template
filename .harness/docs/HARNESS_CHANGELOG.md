@@ -12,8 +12,13 @@ projects receive their own `CHANGELOG.md` during finalization.
 - Added the bounded project-owned
   `scripts/project_harness_validation.py` extension with a closed JSON
   failures/warnings contract, exact-once orchestration, visible warnings,
-  sanitized environment, output limits, absolute timeout, descendant
-  termination, recursion rejection, and protected-state mutation restoration.
+  sanitized environment, output limits, absolute timeout, prompt recursion
+  rejection, and protected-state mutation restoration. Linux execution now
+  uses `/proc`, a child subreaper, and PID/start-time identity tracking to
+  terminate detached descendants before accepting success; present hooks fail
+  closed on other platforms. Protected capture includes ignored project files
+  while precisely excluding documented cache, virtualenv, dependency, Git,
+  and updater-backup directories.
 - Made update planning honor `artifactInventoryExclusions`, replaced broad
   harness ownership of `scripts/` with 36 exact wrapper paths, established the
   project hook and history boundaries, and retained a durable archived-export
