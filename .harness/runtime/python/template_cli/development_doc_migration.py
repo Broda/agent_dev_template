@@ -7,7 +7,7 @@ import shutil
 import tempfile
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from pathlib import Path
+from pathlib import Path, PurePath
 
 from template_cli.render_capabilities import effective_deferred_scope
 from template_cli.render_ci import render_development_ci
@@ -104,10 +104,14 @@ def apply_pending_development_doc_migration(root: Path) -> DevelopmentDocMigrati
 
     print("Migrated recognized legacy generated development surfaces:")
     for relative_path in updates:
-        print(f"- {relative_path}")
-    print(f"Backup: {backup_dir.relative_to(root)}")
+        print(f"- {_format_repository_path(relative_path)}")
+    print(f"Backup: {_format_repository_path(backup_dir.relative_to(root))}")
     print()
     return transaction
+
+
+def _format_repository_path(path: PurePath) -> str:
+    return path.as_posix()
 
 
 def _development_ci_inputs(state: dict) -> tuple[str, str, str, str, str] | None:

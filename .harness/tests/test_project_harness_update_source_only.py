@@ -2,14 +2,37 @@ from __future__ import annotations
 
 import json
 import shutil
+import sys
+import unittest
+from pathlib import PureWindowsPath
 
 from project_harness_update_helpers import ProjectHarnessUpdateTestCase
 from workflow_test_helpers import REPO_ROOT, run_cmd
+
+SCRIPT_ROOT = REPO_ROOT / ".harness/runtime/python"
+if str(SCRIPT_ROOT) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_ROOT))
+
+from template_cli.development_doc_migration import _format_repository_path  # noqa: E402
 
 OLD_SOURCE_COMMIT = "6afc76667393d73531d52651f1916436e0cf564e"
 PROJECT_OWNED_SCHEMA_COMMIT = "125c8ed84f5249c2fc1e8a22256716d8f8bdb041"
 CANONICAL_SCHEMA_PATH = ".harness/schemas/project-init.schema.v2.json"
 LEGACY_SCHEMA_PATH = "state/project-init.schema.v2.json"
+
+
+class DevelopmentDocMigrationFormattingTests(unittest.TestCase):
+    def test_repository_path_normalizes_windows_separators(self) -> None:
+        self.assertEqual(
+            ".github/workflows/ci.yml",
+            _format_repository_path(PureWindowsPath(r".github\workflows\ci.yml")),
+        )
+        self.assertEqual(
+            ".harness-update-backups/20260728T120000000000Z-development-contract",
+            _format_repository_path(
+                PureWindowsPath(r".harness-update-backups\20260728T120000000000Z-development-contract")
+            ),
+        )
 
 
 class ProjectHarnessUpdateSourceOnlyTests(ProjectHarnessUpdateTestCase):
