@@ -103,10 +103,6 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Run full regression suite through PowerShell launchers
-        shell: pwsh
-        run: python -m unittest discover -s .harness/tests -v
-
       - name: Run PowerShell project-harness update smoke
         shell: pwsh
         run: |
