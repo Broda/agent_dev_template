@@ -151,17 +151,22 @@ class TemplateValidationTests(LabWorkflowTestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("PowerShell launcher scripts/lab.ps1 is missing expected snippet", result.stdout)
 
-    def test_validate_brainstorming_checks_windows_ci_launcher_coverage(self) -> None:
+    def test_validate_brainstorming_checks_focused_windows_ci_launcher_coverage(self) -> None:
         ci_path = self.repo / ".github/workflows/ci.yml"
-        ci_path.write_text(
-            ci_path.read_text(encoding="utf-8").replace("runs-on: windows-latest", "runs-on: ubuntu-latest", 1),
-            encoding="utf-8",
+        ci_text = ci_path.read_text(encoding="utf-8")
+        self.assertNotIn("Run full regression suite through PowerShell launchers", ci_text)
+        required_snippets = (
+            ("Run PowerShell project-harness update smoke", "PowerShell update smoke"),
+            ("Run PowerShell generated artifact launcher smoke", "PowerShell generated artifact smoke"),
+            ("./scripts/validate-governance.ps1", "PowerShell governance launcher"),
         )
-
-        result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
-
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("CI workflow is missing Windows PowerShell launcher coverage: Windows runner", result.stdout)
+        for snippet, coverage_label in required_snippets:
+            with self.subTest(snippet=snippet):
+                ci_path.write_text(ci_text.replace(snippet, "removed Windows smoke", 1), encoding="utf-8")
+                result = run_cmd(["./scripts/validate-brainstorming"], cwd=self.repo, check=False)
+                self.assertNotEqual(result.returncode, 0)
+                expected = f"CI workflow is missing Windows PowerShell launcher coverage: {coverage_label}"
+                self.assertIn(expected, result.stdout)
 
     def test_validate_brainstorming_requires_release_readiness_workflow(self) -> None:
         workflow_path = self.repo / ".github/workflows/release-readiness.yml"

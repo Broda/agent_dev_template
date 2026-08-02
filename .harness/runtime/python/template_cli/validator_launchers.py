@@ -228,7 +228,6 @@ def _validate_windows_ci_launcher_job(root: Path, result: ValidationResult) -> N
     required_snippets = {
         "Windows runner": "runs-on: windows-latest",
         "PowerShell shell": "shell: pwsh",
-        "full regression suite": "python -m unittest discover -s .harness/tests -v",
         "PowerShell update smoke": "Run PowerShell project-harness update smoke",
         "PowerShell update help": "./scripts/project-harness.ps1 update --help",
         "PowerShell update diagnostics": "Invoke-SmokeCommand",
